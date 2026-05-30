@@ -7,7 +7,7 @@ export interface GameStats {
   longestStreak: number
 }
 
-const LEVELS = [
+export const LEVELS = [
   { level: 1, label: 'Nybörjare', xp: 0 },
   { level: 2, label: 'Grundnivå', xp: 100 },
   { level: 3, label: 'Mellanstadium', xp: 300 },
