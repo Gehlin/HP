@@ -1,5 +1,7 @@
 import type { ExamSession, AnswerKey } from '../types'
 import { updateStreak, loadStats } from './gamification'
+import { recordAnswer } from './srs'
+import { questions } from '../data/questions'
 
 const CURRENT_KEY = 'hp_current_session'
 const HISTORY_KEY = 'hp_session_history'
@@ -48,6 +50,10 @@ export function finishSession() {
   history.unshift(session)
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50)))
   updateStreak()
+  const qMap = Object.fromEntries(questions.map(q => [q.id, q.answer]))
+  for (const [qid, userAnswer] of Object.entries(session.answers)) {
+    if (qMap[qid]) recordAnswer(qid, userAnswer === qMap[qid])
+  }
 }
 
 export function skipQuestion(questionId: string) {

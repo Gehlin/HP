@@ -5,6 +5,7 @@ import type { QuestionType, AnswerKey } from '../types'
 import MathText from '../components/MathText'
 import { useState, useEffect } from 'react'
 import { loadStats, saveStats, getLevel } from '../utils/gamification'
+import { getStats as getSrsStats } from '../utils/srs'
 
 interface XpInfo {
   earned: number
@@ -226,6 +227,16 @@ export default function Results() {
             const bgCls = ok ? 'bg-emerald-900/20' : isSkipped ? 'bg-slate-800/40' : 'bg-red-900/20'
             const indicator = ok ? '✓' : isSkipped ? '→' : '✗'
 
+            const srs = getSrsStats(q.id)
+            const srsPill = (() => {
+              if (!srs) return null
+              if (srs.timesWrong > srs.timesCorrect)
+                return { label: 'Repeteras', cls: 'bg-red-900/40 text-red-400 border-red-700' }
+              if (srs.timesCorrect >= 3 && ok)
+                return { label: 'Kan detta', cls: 'bg-emerald-900/40 text-emerald-400 border-emerald-700' }
+              return { label: 'Övar', cls: 'bg-amber-900/40 text-amber-400 border-amber-700' }
+            })()
+
             return (
               <div
                 key={q.id}
@@ -240,6 +251,11 @@ export default function Results() {
                     <div className="text-xs text-slate-400 mb-1 flex items-center gap-2">
                       {q.type} · {q.source}
                       {isFlagged && <span className="text-amber-400">★</span>}
+                      {srsPill && (
+                        <span className={`border rounded px-1.5 py-0.5 text-xs font-medium ${srsPill.cls}`}>
+                          {srsPill.label}
+                        </span>
+                      )}
                     </div>
                     <div className="text-sm line-clamp-2">
                       <MathText text={q.text} />

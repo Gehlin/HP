@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import type { QuestionType } from '../types'
 import { questions } from '../data/questions'
 import { buildSession, saveSession, loadHistory } from '../utils/session'
+import { getDueQuestions } from '../utils/srs'
 
-type Mode = 'drill' | 'exam'
+type Mode = 'drill' | 'exam' | 'repetition'
 type Difficulty = 'easy' | 'medium' | 'hard'
 
 const TYPE_INFO: Record<QuestionType, { label: string; desc: string; time: string }> = {
@@ -63,6 +64,8 @@ export default function Practice() {
 
   const available = filteredPool.length
 
+  const dueIds = useMemo(() => getDueQuestions(questions.map(q => q.id)), [])
+
   const wrongQuestionIds = useMemo(() => {
     const history = loadHistory()
     const wrongSet = new Set<string>()
@@ -84,6 +87,14 @@ export default function Practice() {
   }
 
   const start = () => {
+    if (mode === 'repetition') {
+      const pool = questions.filter(q => dueIds.includes(q.id))
+      if (pool.length === 0) return
+      const session = buildSession(pool.map(q => q.id), null, true, 'drill')
+      saveSession(session)
+      navigate('/session')
+      return
+    }
     const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
     const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
     const session = buildSession(chosen.map(q => q.id), timed ? 55 * 60 : null, instantFeedback, 'drill')
@@ -118,167 +129,188 @@ export default function Practice() {
         {/* Mode */}
         <section className="mb-8">
           <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Läge</label>
-          <div className="grid grid-cols-2 gap-3">
-            {(['drill', 'exam'] as Mode[]).map(m => (
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              onClick={() => setMode('drill')}
+              className={`rounded-xl p-4 border text-left transition-colors ${mode === 'drill' ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+            >
+              <div className="font-bold">Övning</div>
+              <div className="text-xs text-slate-400 mt-1">Välj delprov och antal frågor</div>
+            </button>
+            <button
+              onClick={() => setMode('exam')}
+              className={`rounded-xl p-4 border text-left transition-colors ${mode === 'exam' ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+            >
+              <div className="font-bold">Provläge</div>
+              <div className="text-xs text-slate-400 mt-1">Fullständigt prov, 40 frågor</div>
+            </button>
+            <button
+              onClick={() => setMode('repetition')}
+              className={`rounded-xl p-4 border text-left transition-colors ${mode === 'repetition' ? 'border-purple-500 bg-purple-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+            >
+              <div className="font-bold">Repetition</div>
+              <div className="text-xs text-slate-400 mt-1">
+                {dueIds.length > 0 ? `${dueIds.length} frågor att repetera` : 'Inga frågor idag'}
+              </div>
+            </button>
+          </div>
+        </section>
+
+        {mode === 'repetition' && dueIds.length === 0 && (
+          <div className="mb-8 rounded-xl border border-slate-700 bg-slate-800 p-5 text-center text-slate-400">
+            Inga frågor att repetera idag — kom tillbaka imorgon!
+          </div>
+        )}
+
+        {mode !== 'repetition' && (
+          <>
+            {/* Question types */}
+            <section className="mb-8">
+              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Delprov</label>
+              <div className="grid grid-cols-2 gap-3">
+                {(Object.keys(TYPE_INFO) as QuestionType[]).map(t => {
+                  const cnt = questions.filter(q => q.type === t).length
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => toggleType(t)}
+                      className={`rounded-xl p-4 border text-left transition-colors ${selectedTypes.includes(t) ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                    >
+                      <div className="font-black text-lg">{t}</div>
+                      <div className="text-xs text-slate-400">{TYPE_INFO[t].desc}</div>
+                      <div className="text-xs text-slate-500 mt-1">{cnt} frågor</div>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+
+            {/* Difficulty filter */}
+            <section className="mb-8">
+              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Svårighetsgrad</label>
+              <div className="flex gap-3">
+                {ALL_DIFFICULTIES.map(d => (
+                  <button
+                    key={d}
+                    onClick={() => toggleDifficulty(d)}
+                    className={`flex-1 rounded-xl py-3 px-4 border font-bold transition-colors ${
+                      selectedDifficulties.includes(d)
+                        ? 'border-blue-500 bg-blue-600/20 text-white'
+                        : 'border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
+                    }`}
+                  >
+                    {DIFFICULTY_LABELS[d]}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* Topic/tag filter */}
+            <section className="mb-8">
               <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={`rounded-xl p-4 border text-left transition-colors ${mode === m ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                onClick={() => setTagsOpen(prev => !prev)}
+                className="w-full flex items-center justify-between text-xs font-bold tracking-widest text-slate-400 uppercase mb-3"
               >
-                <div className="font-bold">{m === 'drill' ? 'Övning' : 'Provläge'}</div>
-                <div className="text-xs text-slate-400 mt-1">
-                  {m === 'drill' ? 'Välj delprov och antal frågor' : 'Fullständigt prov, 40 frågor'}
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Question types */}
-        <section className="mb-8">
-          <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Delprov</label>
-          <div className="grid grid-cols-2 gap-3">
-            {(Object.keys(TYPE_INFO) as QuestionType[]).map(t => {
-              const cnt = questions.filter(q => q.type === t).length
-              return (
-                <button
-                  key={t}
-                  onClick={() => toggleType(t)}
-                  className={`rounded-xl p-4 border text-left transition-colors ${selectedTypes.includes(t) ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-                >
-                  <div className="font-black text-lg">{t}</div>
-                  <div className="text-xs text-slate-400">{TYPE_INFO[t].desc}</div>
-                  <div className="text-xs text-slate-500 mt-1">{cnt} frågor</div>
-                </button>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* Difficulty filter */}
-        <section className="mb-8">
-          <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Svårighetsgrad</label>
-          <div className="flex gap-3">
-            {ALL_DIFFICULTIES.map(d => (
-              <button
-                key={d}
-                onClick={() => toggleDifficulty(d)}
-                className={`flex-1 rounded-xl py-3 px-4 border font-bold transition-colors ${
-                  selectedDifficulties.includes(d)
-                    ? 'border-blue-500 bg-blue-600/20 text-white'
-                    : 'border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
-                }`}
-              >
-                {DIFFICULTY_LABELS[d]}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Topic/tag filter */}
-        <section className="mb-8">
-          <button
-            onClick={() => setTagsOpen(prev => !prev)}
-            className="w-full flex items-center justify-between text-xs font-bold tracking-widest text-slate-400 uppercase mb-3"
-          >
-            <span>
-              Ämnesfilter
-              {!allTagsSelected && (
-                <span className="ml-2 text-blue-400 normal-case font-normal tracking-normal">
-                  ({selectedTags.length} av {ALL_TAGS.length})
+                <span>
+                  Ämnesfilter
+                  {!allTagsSelected && (
+                    <span className="ml-2 text-blue-400 normal-case font-normal tracking-normal">
+                      ({selectedTags.length} av {ALL_TAGS.length})
+                    </span>
+                  )}
                 </span>
+                <span className="text-slate-500">{tagsOpen ? '▲' : '▼'}</span>
+              </button>
+              {tagsOpen && (
+                <div className="flex flex-wrap gap-2">
+                  {ALL_TAGS.map(tag => (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                        selectedTags.includes(tag)
+                          ? 'border-blue-500 bg-blue-600/20 text-white'
+                          : 'border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
               )}
-            </span>
-            <span className="text-slate-500">{tagsOpen ? '▲' : '▼'}</span>
-          </button>
-          {tagsOpen && (
-            <div className="flex flex-wrap gap-2">
-              {ALL_TAGS.map(tag => (
+            </section>
+
+            {/* Count */}
+            <section className="mb-8">
+              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">
+                Antal frågor — {Math.min(count, available)} (av {available} tillgängliga)
+              </label>
+              <input
+                type="range"
+                min={5}
+                max={Math.max(available, 5)}
+                value={count}
+                onChange={e => setCount(Number(e.target.value))}
+                className="w-full accent-blue-500"
+              />
+              <div className="flex justify-between text-xs text-slate-500 mt-1">
+                <span>5</span><span>{available}</span>
+              </div>
+            </section>
+
+            {/* Timer */}
+            <section className="mb-8">
+              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Tidsgräns</label>
+              <div className="grid grid-cols-2 gap-3">
                 <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    selectedTags.includes(tag)
-                      ? 'border-blue-500 bg-blue-600/20 text-white'
-                      : 'border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
-                  }`}
+                  onClick={() => setTimed(false)}
+                  className={`rounded-xl p-4 border text-left transition-colors ${!timed ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
                 >
-                  {tag}
+                  <div className="font-bold">Utan tid</div>
+                  <div className="text-xs text-slate-400 mt-1">Ta den tid du behöver</div>
                 </button>
-              ))}
-            </div>
-          )}
-        </section>
+                <button
+                  onClick={() => setTimed(true)}
+                  className={`rounded-xl p-4 border text-left transition-colors ${timed ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                >
+                  <div className="font-bold">Med tid</div>
+                  <div className="text-xs text-slate-400 mt-1">55 min (som riktigt HP)</div>
+                </button>
+              </div>
+            </section>
 
-        {/* Count */}
-        <section className="mb-8">
-          <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">
-            Antal frågor — {Math.min(count, available)} (av {available} tillgängliga)
-          </label>
-          <input
-            type="range"
-            min={5}
-            max={Math.max(available, 5)}
-            value={count}
-            onChange={e => setCount(Number(e.target.value))}
-            className="w-full accent-blue-500"
-          />
-          <div className="flex justify-between text-xs text-slate-500 mt-1">
-            <span>5</span><span>{available}</span>
-          </div>
-        </section>
+            {/* Feedback */}
+            <section className="mb-10">
+              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Återkoppling</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setInstantFeedback(true)}
+                  className={`rounded-xl p-4 border text-left transition-colors ${instantFeedback ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                >
+                  <div className="font-bold">Direkt</div>
+                  <div className="text-xs text-slate-400 mt-1">Se rätt/fel direkt efter varje svar</div>
+                </button>
+                <button
+                  onClick={() => setInstantFeedback(false)}
+                  className={`rounded-xl p-4 border text-left transition-colors ${!instantFeedback ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                >
+                  <div className="font-bold">I efterhand</div>
+                  <div className="text-xs text-slate-400 mt-1">Genomgång efter avslutat pass</div>
+                </button>
+              </div>
+            </section>
 
-        {/* Timer */}
-        <section className="mb-8">
-          <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Tidsgräns</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setTimed(false)}
-              className={`rounded-xl p-4 border text-left transition-colors ${!timed ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-            >
-              <div className="font-bold">Utan tid</div>
-              <div className="text-xs text-slate-400 mt-1">Ta den tid du behöver</div>
-            </button>
-            <button
-              onClick={() => setTimed(true)}
-              className={`rounded-xl p-4 border text-left transition-colors ${timed ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-            >
-              <div className="font-bold">Med tid</div>
-              <div className="text-xs text-slate-400 mt-1">55 min (som riktigt HP)</div>
-            </button>
-          </div>
-        </section>
-
-        {/* Feedback */}
-        <section className="mb-10">
-          <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Återkoppling</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setInstantFeedback(true)}
-              className={`rounded-xl p-4 border text-left transition-colors ${instantFeedback ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-            >
-              <div className="font-bold">Direkt</div>
-              <div className="text-xs text-slate-400 mt-1">Se rätt/fel direkt efter varje svar</div>
-            </button>
-            <button
-              onClick={() => setInstantFeedback(false)}
-              className={`rounded-xl p-4 border text-left transition-colors ${!instantFeedback ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-            >
-              <div className="font-bold">I efterhand</div>
-              <div className="text-xs text-slate-400 mt-1">Genomgång efter avslutat pass</div>
-            </button>
-          </div>
-        </section>
-
-        {available === 0 && (
-          <p className="text-amber-400 text-sm mb-4">
-            Inga frågor matchar dina filter. Justera svårighetsgrad, ämnen eller delprov.
-          </p>
+            {available === 0 && (
+              <p className="text-amber-400 text-sm mb-4">
+                Inga frågor matchar dina filter. Justera svårighetsgrad, ämnen eller delprov.
+              </p>
+            )}
+          </>
         )}
 
         <button
           onClick={start}
-          disabled={selectedTypes.length === 0 || available === 0}
+          disabled={mode === 'repetition' ? dueIds.length === 0 : (selectedTypes.length === 0 || available === 0)}
           className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 transition-colors rounded-2xl py-4 font-bold text-lg"
         >
           Starta träning →
