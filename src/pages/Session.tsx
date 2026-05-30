@@ -22,6 +22,42 @@ export default function Session() {
   const [answers, setAnswers] = useState<Record<string, AnswerKey>>(session?.answers ?? {})
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
+  const [keyboardUsed, setKeyboardUsed] = useState(false)
+
+  // Derived values computed before effects to satisfy Rules of Hooks
+  const sessionQuestions = (session?.questionIds ?? [])
+    .map(id => questions.find(q => q.id === id))
+    .filter(Boolean) as typeof questions
+
+  const q = sessionQuestions[current] ?? null
+  const chosen = q ? answers[q.id] : undefined
+  const isRevealed = q ? !!revealed[q.id] : false
+  const isCorrect = chosen === q?.answer
+
+  const answerOptions = q
+    ? (Object.entries(q.options).filter(([k]) => ANSWER_KEYS.includes(k as AnswerKey)) as [AnswerKey, string][])
+    : []
+
+  const pick = (key: AnswerKey) => {
+    if (!q || isRevealed) return
+    const updated = { ...answers, [q.id]: key }
+    setAnswers(updated)
+    updateAnswer(q.id, key)
+    if (session?.instantFeedback) {
+      setRevealed(r => ({ ...r, [q.id]: true }))
+    }
+  }
+
+  const handleFinish = () => {
+    finishSession()
+    navigate('/results')
+  }
+
+  const fmtTime = (s: number) => {
+    const m = Math.floor(s / 60)
+    const sec = s % 60
+    return `${m}:${sec.toString().padStart(2, '0')}`
+  }
 
   useEffect(() => {
     if (!session) { navigate('/'); return }
@@ -38,45 +74,47 @@ export default function Session() {
     return () => clearInterval(t)
   }, [timeLeft])
 
+  // Keyboard shortcuts: A–E selects answer, Enter/Space reveals or advances
+  useEffect(() => {
+    if (!session || !q) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+
+      const key = e.key.toUpperCase()
+
+      if (ANSWER_KEYS.includes(key as AnswerKey)) {
+        if (!isRevealed && key in q.options) {
+          e.preventDefault()
+          setKeyboardUsed(true)
+          pick(key as AnswerKey)
+        }
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        setKeyboardUsed(true)
+        if (!session.instantFeedback && chosen && !isRevealed) {
+          setRevealed(r => ({ ...r, [q.id]: true }))
+        } else if (chosen || isRevealed) {
+          if (current < sessionQuestions.length - 1) {
+            setCurrent(c => c + 1)
+          } else {
+            handleFinish()
+          }
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isRevealed, chosen, current, session?.instantFeedback, q?.id, sessionQuestions.length])
+
+  // Early returns after all hooks
   if (!session) return null
-
-  const sessionQuestions = session.questionIds
-    .map(id => questions.find(q => q.id === id))
-    .filter(Boolean) as typeof questions
-
-  const q = sessionQuestions[current]
   if (!q) return null
 
-  const chosen = answers[q.id]
-  const isRevealed = revealed[q.id]
-  const isCorrect = chosen === q.answer
-
-  const answerOptions = Object.entries(q.options).filter(([k]) =>
-    ANSWER_KEYS.includes(k as AnswerKey)
-  ) as [AnswerKey, string][]
-
-  const pick = (key: AnswerKey) => {
-    if (isRevealed) return
-    const updated = { ...answers, [q.id]: key }
-    setAnswers(updated)
-    updateAnswer(q.id, key)
-    if (session.instantFeedback) {
-      setRevealed(r => ({ ...r, [q.id]: true }))
-    }
-  }
-
-  const handleFinish = () => {
-    finishSession()
-    navigate('/results')
-  }
-
-  const fmtTime = (s: number) => {
-    const m = Math.floor(s / 60)
-    const sec = s % 60
-    return `${m}:${sec.toString().padStart(2, '0')}`
-  }
-
   const progress = ((current + 1) / sessionQuestions.length) * 100
+  const lastOptionKey = answerOptions[answerOptions.length - 1]?.[0] ?? 'D'
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col">
@@ -149,7 +187,7 @@ export default function Session() {
         )}
 
         {/* Answers */}
-        <div className="grid gap-3 mb-6">
+        <div className="grid gap-3 mb-2">
           {answerOptions.map(([key, text]) => {
             let cls = 'border-slate-700 bg-slate-800 hover:bg-slate-700 hover:border-slate-500'
             if (chosen === key && !isRevealed) cls = 'border-blue-500 bg-blue-600/20'
@@ -168,6 +206,13 @@ export default function Session() {
             )
           })}
         </div>
+
+        {/* Keyboard hint — hidden after first keyboard interaction */}
+        {!keyboardUsed && (
+          <p className="text-center text-xs text-slate-600 mt-2 mb-2">
+            Tryck A–{lastOptionKey} för att svara · Enter för att gå vidare
+          </p>
+        )}
 
         {/* Feedback */}
         {isRevealed && (
