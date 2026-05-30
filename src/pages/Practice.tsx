@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { QuestionType } from '../types'
 import { questions } from '../data/questions'
-import { buildSession, saveSession } from '../utils/session'
+import { buildSession, saveSession, loadHistory } from '../utils/session'
 
 type Mode = 'drill' | 'exam'
+type Difficulty = 'easy' | 'medium' | 'hard'
 
 const TYPE_INFO: Record<QuestionType, { label: string; desc: string; time: string }> = {
   XYZ: { label: 'XYZ', desc: 'Matematisk problemlösning', time: '12 min / 12 frågor' },
@@ -13,6 +14,15 @@ const TYPE_INFO: Record<QuestionType, { label: string; desc: string; time: strin
   DTK: { label: 'DTK', desc: 'Diagram, tabeller och kartor', time: '23 min / 12 frågor' },
 }
 
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: 'Lätt',
+  medium: 'Medel',
+  hard: 'Svår',
+}
+
+const ALL_DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard']
+const ALL_TAGS = Array.from(new Set(questions.flatMap(q => q.tags))).sort()
+
 export default function Practice() {
   const navigate = useNavigate()
   const [mode, setMode] = useState<Mode>('drill')
@@ -20,6 +30,9 @@ export default function Practice() {
   const [timed, setTimed] = useState(false)
   const [instantFeedback, setInstantFeedback] = useState(true)
   const [count, setCount] = useState(20)
+  const [selectedDifficulties, setSelectedDifficulties] = useState<Difficulty[]>([...ALL_DIFFICULTIES])
+  const [selectedTags, setSelectedTags] = useState<string[]>([...ALL_TAGS])
+  const [tagsOpen, setTagsOpen] = useState(false)
 
   const toggleType = (t: QuestionType) => {
     setSelectedTypes(prev =>
@@ -27,16 +40,58 @@ export default function Practice() {
     )
   }
 
-  const available = questions.filter(q => selectedTypes.includes(q.type)).length
+  const toggleDifficulty = (d: Difficulty) => {
+    setSelectedDifficulties(prev =>
+      prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]
+    )
+  }
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(x => x !== tag) : [...prev, tag]
+    )
+  }
+
+  const filteredPool = useMemo(() =>
+    questions.filter(q =>
+      selectedTypes.includes(q.type) &&
+      selectedDifficulties.includes(q.difficulty) &&
+      q.tags.some(t => selectedTags.includes(t))
+    ),
+    [selectedTypes, selectedDifficulties, selectedTags]
+  )
+
+  const available = filteredPool.length
+
+  const wrongQuestionIds = useMemo(() => {
+    const history = loadHistory()
+    const wrongSet = new Set<string>()
+    for (const session of history) {
+      for (const [qid, answer] of Object.entries(session.answers)) {
+        const q = questions.find(x => x.id === qid)
+        if (q && q.answer !== answer) wrongSet.add(qid)
+      }
+    }
+    return Array.from(wrongSet)
+  }, [])
+
+  const startWrongDrill = () => {
+    const pool = questions.filter(q => wrongQuestionIds.includes(q.id))
+    const shuffled = [...pool].sort(() => Math.random() - 0.5)
+    const session = buildSession(shuffled.map(q => q.id), null, true, 'drill')
+    saveSession(session)
+    navigate('/session')
+  }
 
   const start = () => {
-    const pool = questions.filter(q => selectedTypes.includes(q.type))
-    const shuffled = [...pool].sort(() => Math.random() - 0.5)
-    const chosen = shuffled.slice(0, Math.min(count, pool.length))
+    const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
+    const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
     const session = buildSession(chosen.map(q => q.id), timed ? 55 * 60 : null, instantFeedback, 'drill')
     saveSession(session)
     navigate('/session')
   }
+
+  const allTagsSelected = selectedTags.length === ALL_TAGS.length
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
@@ -46,6 +101,19 @@ export default function Practice() {
         </button>
 
         <h1 className="text-3xl font-black mb-8">Konfigurera träning</h1>
+
+        {/* Wrong answers quick-drill */}
+        {wrongQuestionIds.length > 0 && (
+          <section className="mb-8">
+            <button
+              onClick={startWrongDrill}
+              className="w-full rounded-xl p-4 border border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-left transition-colors"
+            >
+              <div className="font-bold text-amber-400">Öva på dina fel — {wrongQuestionIds.length} frågor du svarat fel på</div>
+              <div className="text-xs text-amber-300/70 mt-1">Starta direkt med omedelbar återkoppling</div>
+            </button>
+          </section>
+        )}
 
         {/* Mode */}
         <section className="mb-8">
@@ -85,6 +153,61 @@ export default function Practice() {
               )
             })}
           </div>
+        </section>
+
+        {/* Difficulty filter */}
+        <section className="mb-8">
+          <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Svårighetsgrad</label>
+          <div className="flex gap-3">
+            {ALL_DIFFICULTIES.map(d => (
+              <button
+                key={d}
+                onClick={() => toggleDifficulty(d)}
+                className={`flex-1 rounded-xl py-3 px-4 border font-bold transition-colors ${
+                  selectedDifficulties.includes(d)
+                    ? 'border-blue-500 bg-blue-600/20 text-white'
+                    : 'border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
+                }`}
+              >
+                {DIFFICULTY_LABELS[d]}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Topic/tag filter */}
+        <section className="mb-8">
+          <button
+            onClick={() => setTagsOpen(prev => !prev)}
+            className="w-full flex items-center justify-between text-xs font-bold tracking-widest text-slate-400 uppercase mb-3"
+          >
+            <span>
+              Ämnesfilter
+              {!allTagsSelected && (
+                <span className="ml-2 text-blue-400 normal-case font-normal tracking-normal">
+                  ({selectedTags.length} av {ALL_TAGS.length})
+                </span>
+              )}
+            </span>
+            <span className="text-slate-500">{tagsOpen ? '▲' : '▼'}</span>
+          </button>
+          {tagsOpen && (
+            <div className="flex flex-wrap gap-2">
+              {ALL_TAGS.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    selectedTags.includes(tag)
+                      ? 'border-blue-500 bg-blue-600/20 text-white'
+                      : 'border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Count */}
@@ -146,6 +269,12 @@ export default function Practice() {
             </button>
           </div>
         </section>
+
+        {available === 0 && (
+          <p className="text-amber-400 text-sm mb-4">
+            Inga frågor matchar dina filter. Justera svårighetsgrad, ämnen eller delprov.
+          </p>
+        )}
 
         <button
           onClick={start}
