@@ -9,6 +9,7 @@ export default function Results() {
   const navigate = useNavigate()
   const session = loadSession()
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'flagged'>('all')
 
   if (!session) return <div className="p-8 text-white">Ingen session hittades.</div>
 
@@ -77,10 +78,25 @@ export default function Results() {
 
         {/* Review */}
         <h2 className="text-xl font-black mb-4">Genomgång</h2>
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setReviewFilter('all')}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
+          >
+            Alla ({sessionQuestions.length})
+          </button>
+          <button
+            onClick={() => setReviewFilter('flagged')}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'flagged' ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
+          >
+            ★ Markerade ({(session.flagged ?? []).length})
+          </button>
+        </div>
         <div className="space-y-3 mb-8">
-          {sessionQuestions.map(q => {
+          {sessionQuestions.filter(q => reviewFilter === 'all' || (session.flagged ?? []).includes(q.id)).map(q => {
             const userAnswer = session.answers[q.id]
             const ok = userAnswer === q.answer
+            const isFlagged = (session.flagged ?? []).includes(q.id)
             const expanded = expandedId === q.id
             const answerOptions = Object.entries(q.options).filter(([k]) =>
               ANSWER_KEYS.includes(k as AnswerKey)
@@ -97,7 +113,10 @@ export default function Results() {
                 >
                   <span className="text-lg">{ok ? '✓' : '✗'}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs text-slate-400 mb-1">{q.type} · {q.source}</div>
+                    <div className="text-xs text-slate-400 mb-1 flex items-center gap-2">
+                      {q.type} · {q.source}
+                      {isFlagged && <span className="text-amber-400">★</span>}
+                    </div>
                     <div className="text-sm line-clamp-2">
                       <MathText text={q.text} />
                     </div>

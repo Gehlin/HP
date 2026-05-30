@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { AnswerKey } from '../types'
 import { questions } from '../data/questions'
-import { loadSession, updateAnswer, finishSession } from '../utils/session'
+import { loadSession, updateAnswer, finishSession, toggleFlag } from '../utils/session'
 import MathText from '../components/MathText'
 
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
@@ -23,6 +23,7 @@ export default function Session() {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [keyboardUsed, setKeyboardUsed] = useState(false)
+  const [flagged, setFlagged] = useState<string[]>(session?.flagged ?? [])
 
   // Derived values computed before effects to satisfy Rules of Hooks
   const sessionQuestions = (session?.questionIds ?? [])
@@ -51,6 +52,12 @@ export default function Session() {
   const handleFinish = () => {
     finishSession()
     navigate('/results')
+  }
+
+  const handleFlag = () => {
+    if (!q) return
+    toggleFlag(q.id)
+    setFlagged(f => f.includes(q.id) ? f.filter(id => id !== q.id) : [...f, q.id])
   }
 
   const fmtTime = (s: number) => {
@@ -127,6 +134,13 @@ export default function Session() {
           <span className="text-slate-400 text-sm">
             Fråga {current + 1} / {sessionQuestions.length}
           </span>
+          <button
+            onClick={handleFlag}
+            title={flagged.includes(q.id) ? 'Ta bort markering' : 'Markera fråga'}
+            className={`text-sm px-2 py-1 rounded-lg border transition-colors ${flagged.includes(q.id) ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300'}`}
+          >
+            {flagged.includes(q.id) ? '★' : '☆'} Markera
+          </button>
         </div>
         <div className="flex items-center gap-4">
           {timeLeft !== null && (

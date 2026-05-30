@@ -33,6 +33,7 @@ export interface ExamSession {
   id: string
   questionIds: string[]
   answers: Record<string, AnswerKey>
+  flagged?: string[]
   startTime: number
   endTime?: number
   mode: 'timed' | 'untimed'

@@ -47,6 +47,15 @@ export function finishSession() {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50)))
 }
 
+export function toggleFlag(questionId: string) {
+  const session = loadSession()
+  if (!session) return
+  const flagged = session.flagged ?? []
+  const idx = flagged.indexOf(questionId)
+  session.flagged = idx >= 0 ? flagged.filter(id => id !== questionId) : [...flagged, questionId]
+  saveSession(session)
+}
+
 export function loadHistory(): ExamSession[] {
   return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')
 }
