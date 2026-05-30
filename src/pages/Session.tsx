@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { AnswerKey } from '../types'
 import { questions } from '../data/questions'
-import { loadSession, updateAnswer, finishSession, toggleFlag } from '../utils/session'
+import { loadSession, updateAnswer, finishSession, toggleFlag, skipQuestion } from '../utils/session'
 import MathText from '../components/MathText'
 
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
@@ -24,6 +24,7 @@ export default function Session() {
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [keyboardUsed, setKeyboardUsed] = useState(false)
   const [flagged, setFlagged] = useState<string[]>(session?.flagged ?? [])
+  const [skipped, setSkipped] = useState<string[]>(session?.skipped ?? [])
 
   // Derived values computed before effects to satisfy Rules of Hooks
   const sessionQuestions = (session?.questionIds ?? [])
@@ -52,6 +53,17 @@ export default function Session() {
   const handleFinish = () => {
     finishSession()
     navigate('/results')
+  }
+
+  const handleSkip = () => {
+    if (!q) return
+    skipQuestion(q.id)
+    setSkipped(s => [...s, q.id])
+    if (current < sessionQuestions.length - 1) {
+      setCurrent(c => c + 1)
+    } else {
+      handleFinish()
+    }
   }
 
   const handleFlag = () => {
@@ -220,6 +232,18 @@ export default function Session() {
             )
           })}
         </div>
+
+        {/* Skip button — only when no answer chosen yet */}
+        {!chosen && !isRevealed && (
+          <div className="flex justify-center mt-1">
+            <button
+              onClick={handleSkip}
+              className="text-xs text-slate-500 hover:text-slate-300 transition-colors py-1"
+            >
+              Hoppa över →
+            </button>
+          </div>
+        )}
 
         {/* Keyboard hint — hidden after first keyboard interaction */}
         {!keyboardUsed && (

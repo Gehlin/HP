@@ -47,6 +47,16 @@ export function finishSession() {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50)))
 }
 
+export function skipQuestion(questionId: string) {
+  const session = loadSession()
+  if (!session) return
+  const skipped = session.skipped ?? []
+  if (!skipped.includes(questionId)) {
+    session.skipped = [...skipped, questionId]
+    saveSession(session)
+  }
+}
+
 export function toggleFlag(questionId: string) {
   const session = loadSession()
   if (!session) return

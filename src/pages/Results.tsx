@@ -17,8 +17,10 @@ export default function Results() {
     .map(id => questions.find(q => q.id === id))
     .filter(Boolean) as typeof questions
 
+  const skipped = session.skipped ?? []
   const correct = sessionQuestions.filter(q => session.answers[q.id] === q.answer).length
   const total = sessionQuestions.length
+  const skippedCount = sessionQuestions.filter(q => skipped.includes(q.id)).length
   const pct = Math.round((correct / total) * 100)
 
   const byType: Record<QuestionType, { correct: number; total: number }> = {
@@ -48,7 +50,9 @@ export default function Results() {
         {/* Score card */}
         <div className="bg-slate-800 rounded-2xl p-6 mb-6 text-center">
           <div className="text-7xl font-black text-blue-400">{pct}%</div>
-          <div className="text-slate-400 mt-1">{correct} av {total} rätt · {fmtDuration}</div>
+          <div className="text-slate-400 mt-1">
+            {correct} av {total} rätt{skippedCount > 0 && ` · ${skippedCount} hoppade`} · {fmtDuration}
+          </div>
           <div className="mt-4 h-3 bg-slate-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-blue-500 rounded-full transition-all"
@@ -94,24 +98,29 @@ export default function Results() {
         </div>
         <div className="space-y-3 mb-8">
           {sessionQuestions.filter(q => reviewFilter === 'all' || (session.flagged ?? []).includes(q.id)).map(q => {
+            const isSkipped = skipped.includes(q.id)
             const userAnswer = session.answers[q.id]
-            const ok = userAnswer === q.answer
+            const ok = !isSkipped && userAnswer === q.answer
             const isFlagged = (session.flagged ?? []).includes(q.id)
             const expanded = expandedId === q.id
             const answerOptions = Object.entries(q.options).filter(([k]) =>
               ANSWER_KEYS.includes(k as AnswerKey)
             ) as [AnswerKey, string][]
 
+            const borderCls = ok ? 'border-emerald-700' : isSkipped ? 'border-slate-600' : 'border-red-700'
+            const bgCls = ok ? 'bg-emerald-900/20' : isSkipped ? 'bg-slate-800/40' : 'bg-red-900/20'
+            const indicator = ok ? '✓' : isSkipped ? '→' : '✗'
+
             return (
               <div
                 key={q.id}
-                className={`rounded-xl border overflow-hidden ${ok ? 'border-emerald-700' : 'border-red-700'}`}
+                className={`rounded-xl border overflow-hidden ${borderCls}`}
               >
                 <button
                   onClick={() => setExpandedId(expanded ? null : q.id)}
-                  className={`w-full flex items-start gap-3 p-4 text-left ${ok ? 'bg-emerald-900/20' : 'bg-red-900/20'}`}
+                  className={`w-full flex items-start gap-3 p-4 text-left ${bgCls}`}
                 >
-                  <span className="text-lg">{ok ? '✓' : '✗'}</span>
+                  <span className={`text-lg ${isSkipped ? 'text-slate-400' : ''}`}>{indicator}</span>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs text-slate-400 mb-1 flex items-center gap-2">
                       {q.type} · {q.source}

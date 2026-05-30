@@ -34,6 +34,7 @@ export interface ExamSession {
   questionIds: string[]
   answers: Record<string, AnswerKey>
   flagged?: string[]
+  skipped?: string[]
   startTime: number
   endTime?: number
   mode: 'timed' | 'untimed'
