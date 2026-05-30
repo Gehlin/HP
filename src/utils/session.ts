@@ -1,4 +1,5 @@
 import type { ExamSession, AnswerKey } from '../types'
+import { updateStreak, loadStats } from './gamification'
 
 const CURRENT_KEY = 'hp_current_session'
 const HISTORY_KEY = 'hp_session_history'
@@ -41,10 +42,12 @@ export function finishSession() {
   const session = loadSession()
   if (!session) return
   session.endTime = Date.now()
+  session.streakBefore = loadStats().streak
   saveSession(session)
   const history: ExamSession[] = JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')
   history.unshift(session)
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50)))
+  updateStreak()
 }
 
 export function skipQuestion(questionId: string) {

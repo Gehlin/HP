@@ -42,6 +42,8 @@ export interface ExamSession {
   instantFeedback: boolean
   type: 'exam' | 'drill'
   drillType?: QuestionType
+  xpEarned?: number
+  streakBefore?: number
 }
 
 export interface SessionResult {

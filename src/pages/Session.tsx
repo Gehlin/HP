@@ -24,7 +24,7 @@ export default function Session() {
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [keyboardUsed, setKeyboardUsed] = useState(false)
   const [flagged, setFlagged] = useState<string[]>(session?.flagged ?? [])
-  const [skipped, setSkipped] = useState<string[]>(session?.skipped ?? [])
+  const [, setSkipped] = useState<string[]>(session?.skipped ?? [])
 
   // Derived values computed before effects to satisfy Rules of Hooks
   const sessionQuestions = (session?.questionIds ?? [])

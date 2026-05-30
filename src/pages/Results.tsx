@@ -1,21 +1,79 @@
 import { useNavigate } from 'react-router-dom'
-import { loadSession } from '../utils/session'
+import { loadSession, saveSession } from '../utils/session'
 import { questions } from '../data/questions'
 import type { QuestionType, AnswerKey } from '../types'
 import MathText from '../components/MathText'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { loadStats, saveStats, getLevel } from '../utils/gamification'
+
+interface XpInfo {
+  earned: number
+  easy: number
+  medium: number
+  hard: number
+  stats: ReturnType<typeof loadStats>
+  level: ReturnType<typeof getLevel>
+  leveledUp: boolean
+  streakIncreased: boolean
+}
 
 export default function Results() {
   const navigate = useNavigate()
   const session = loadSession()
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [reviewFilter, setReviewFilter] = useState<'all' | 'flagged'>('all')
+  const [cardVisible, setCardVisible] = useState(false)
+  const [xpInfo, setXpInfo] = useState<XpInfo | null>(null)
+
+  const sessionQuestions = session
+    ? (session.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as typeof questions)
+    : []
+
+  useEffect(() => {
+    if (!session) return
+
+    const sq = session.questionIds
+      .map(id => questions.find(q => q.id === id))
+      .filter(Boolean) as typeof questions
+
+    const easyCorrect = sq.filter(q => q.difficulty === 'easy' && session.answers[q.id] === q.answer).length
+    const medCorrect = sq.filter(q => q.difficulty === 'medium' && session.answers[q.id] === q.answer).length
+    const hardCorrect = sq.filter(q => q.difficulty === 'hard' && session.answers[q.id] === q.answer).length
+    const earned = easyCorrect * 10 + medCorrect * 15 + hardCorrect * 25 + 20
+
+    let leveledUp = false
+    let streakIncreased = false
+
+    if (session.xpEarned === undefined) {
+      const statsBefore = loadStats()
+      const levelBefore = getLevel(statsBefore.xp)
+      const statsAfter = { ...statsBefore, xp: statsBefore.xp + earned }
+      saveStats(statsAfter)
+      const levelAfter = getLevel(statsAfter.xp)
+      leveledUp = levelAfter.level > levelBefore.level
+      if (session.streakBefore !== undefined) {
+        streakIncreased = statsAfter.streak > session.streakBefore
+      }
+      saveSession({ ...session, xpEarned: earned })
+    }
+
+    const stats = loadStats()
+    setXpInfo({
+      earned: session.xpEarned ?? earned,
+      easy: easyCorrect,
+      medium: medCorrect,
+      hard: hardCorrect,
+      stats,
+      level: getLevel(stats.xp),
+      leveledUp,
+      streakIncreased,
+    })
+
+    const t = setTimeout(() => setCardVisible(true), 150)
+    return () => clearTimeout(t)
+  }, [])
 
   if (!session) return <div className="p-8 text-white">Ingen session hittades.</div>
-
-  const sessionQuestions = session.questionIds
-    .map(id => questions.find(q => q.id === id))
-    .filter(Boolean) as typeof questions
 
   const skipped = session.skipped ?? []
   const correct = sessionQuestions.filter(q => session.answers[q.id] === q.answer).length
@@ -41,11 +99,68 @@ export default function Results() {
 
   const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
+  const xpProgress = xpInfo
+    ? xpInfo.level.level === 10
+      ? 100
+      : Math.min(100, Math.round(
+          ((xpInfo.stats.xp - xpInfo.level.currentLevelXp) /
+            (xpInfo.level.nextLevelXp - xpInfo.level.currentLevelXp)) * 100
+        ))
+    : 0
+
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       <div className="max-w-2xl mx-auto px-6 py-10">
         <h1 className="text-3xl font-black mb-2">Resultat</h1>
         <p className="text-slate-400 mb-8">{scoreLabel}</p>
+
+        {/* XP earned card */}
+        {xpInfo && (
+          <div className={`mb-6 transition-all duration-500 ${cardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+            {xpInfo.leveledUp && (
+              <div className="bg-amber-500/20 border border-amber-500 rounded-xl px-4 py-3 mb-3 text-center">
+                <span className="text-amber-400 font-bold">⭐ Ny nivå uppnådd! Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
+              </div>
+            )}
+            {xpInfo.streakIncreased && (
+              <div className="bg-orange-500/20 border border-orange-500 rounded-xl px-4 py-3 mb-3 text-center">
+                <span className="text-orange-400 font-bold">🔥 {xpInfo.stats.streak} dagars streak!</span>
+              </div>
+            )}
+            <div className="bg-slate-800 border border-blue-500/30 rounded-2xl p-5">
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-4xl font-black text-blue-400">+{xpInfo.earned} XP</span>
+                <span className="text-slate-400 text-sm">intjänat</span>
+              </div>
+              <div className="space-y-0.5 mb-4 text-sm text-slate-400">
+                {xpInfo.easy > 0 && (
+                  <div>{xpInfo.easy} lätt × 10 = <span className="text-slate-300">{xpInfo.easy * 10} XP</span></div>
+                )}
+                {xpInfo.medium > 0 && (
+                  <div>{xpInfo.medium} medel × 15 = <span className="text-slate-300">{xpInfo.medium * 15} XP</span></div>
+                )}
+                {xpInfo.hard > 0 && (
+                  <div>{xpInfo.hard} svår × 25 = <span className="text-slate-300">{xpInfo.hard * 25} XP</span></div>
+                )}
+                <div>Sessionbonus = <span className="text-slate-300">20 XP</span></div>
+              </div>
+              <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+                <span>Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
+                {xpInfo.level.level < 10 && (
+                  <span>
+                    {xpInfo.stats.xp - xpInfo.level.currentLevelXp} / {xpInfo.level.nextLevelXp - xpInfo.level.currentLevelXp} XP
+                  </span>
+                )}
+              </div>
+              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                  style={{ width: `${xpProgress}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Score card */}
         <div className="bg-slate-800 rounded-2xl p-6 mb-6 text-center">
