@@ -1,11 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import { loadHistory } from '../utils/session'
 import { questions } from '../data/questions'
+import { loadStats, getLevel, LEVELS } from '../utils/gamification'
 import type { QuestionType } from '../types'
 
 export default function Progress() {
   const navigate = useNavigate()
   const history = loadHistory()
+  const stats = loadStats()
+  const levelInfo = getLevel(stats.xp)
 
   const allAnswers: { qid: string; correct: boolean }[] = []
   history.forEach(s => {
@@ -35,23 +38,10 @@ export default function Progress() {
   const totalCorrect = allAnswers.filter(a => a.correct).length
   const totalAnswered = allAnswers.length
 
-  if (history.length === 0) {
-    return (
-      <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4">📊</div>
-          <h2 className="text-xl font-bold mb-2">Inga träningspass ännu</h2>
-          <p className="text-slate-400 mb-6">Börja öva för att se din statistik här.</p>
-          <button
-            onClick={() => navigate('/practice')}
-            className="bg-blue-600 hover:bg-blue-500 transition-colors px-6 py-3 rounded-xl font-bold"
-          >
-            Starta träning
-          </button>
-        </div>
-      </div>
-    )
-  }
+  const isMaxLevel = levelInfo.level === 10
+  const xpInCurrentLevel = stats.xp - levelInfo.currentLevelXp
+  const xpNeededForCurrentLevel = isMaxLevel ? 1 : levelInfo.nextLevelXp - levelInfo.currentLevelXp
+  const progressPercent = isMaxLevel ? 100 : Math.min(100, Math.round((xpInCurrentLevel / xpNeededForCurrentLevel) * 100))
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
@@ -62,57 +52,149 @@ export default function Progress() {
 
         <h1 className="text-3xl font-black mb-8">Min statistik</h1>
 
-        {/* Overall */}
-        <div className="bg-slate-800 rounded-2xl p-6 mb-6 text-center">
-          <div className="text-5xl font-black text-blue-400">
-            {totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0}%
+        {/* Level Card */}
+        <div className="bg-slate-800 rounded-2xl p-6 mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">Nuvarande nivå</div>
+              <div className="text-2xl font-black text-yellow-400">Nivå {levelInfo.level} — {levelInfo.label}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-slate-400 mb-1">Totalt XP</div>
+              <div className="text-2xl font-black text-blue-400">{stats.xp} XP</div>
+            </div>
           </div>
-          <div className="text-slate-400 mt-1">
-            {totalCorrect} av {totalAnswered} rätt · {history.length} pass
-          </div>
-        </div>
 
-        {/* By type */}
-        <div className="grid grid-cols-2 gap-3 mb-8">
-          {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
-            .filter(([, v]) => v.total > 0)
-            .map(([type, v]) => {
-              const p = Math.round((v.correct / v.total) * 100)
+          {isMaxLevel ? (
+            <div className="text-xs text-yellow-400 mb-2">Maxnivå uppnådd! 🏆</div>
+          ) : (
+            <div className="text-xs text-slate-400 mb-2">
+              {xpInCurrentLevel} / {xpNeededForCurrentLevel} XP till nivå {levelInfo.level + 1} ({levelInfo.nextLevelXp - stats.xp} XP kvar)
+            </div>
+          )}
+
+          {/* Segmented progress bar — one segment per level */}
+          <div className="flex gap-1 mb-1">
+            {LEVELS.map((lvl, idx) => {
+              const isCompleted = lvl.level < levelInfo.level
+              const isCurrent = lvl.level === levelInfo.level
+              let fillWidth = '0%'
+              if (isCompleted) fillWidth = '100%'
+              else if (isCurrent) fillWidth = `${progressPercent}%`
               return (
-                <div key={type} className="bg-slate-800 rounded-xl p-4">
-                  <div className="font-black text-blue-400 text-lg">{type}</div>
-                  <div className="text-2xl font-bold">{p}%</div>
-                  <div className="text-xs text-slate-400">{v.correct}/{v.total} rätt</div>
-                  <div className="mt-2 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${p}%` }} />
-                  </div>
+                <div
+                  key={lvl.level}
+                  className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden"
+                  title={`Nivå ${lvl.level}: ${lvl.label} (${LEVELS[idx].xp} XP)`}
+                >
+                  <div
+                    className={`h-full rounded-full transition-all ${isCompleted ? 'bg-yellow-400' : 'bg-blue-500'}`}
+                    style={{ width: fillWidth }}
+                  />
                 </div>
               )
             })}
+          </div>
+          <div className="flex justify-between text-xs text-slate-500">
+            <span>Nybörjare</span>
+            <span>HP-Legend</span>
+          </div>
         </div>
 
-        {/* History */}
-        <h2 className="text-xl font-black mb-4">Tidigare pass</h2>
-        <div className="space-y-3">
-          {history.slice(0, 10).map(s => {
-            const qs = s.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean)
-            const c = qs.filter(q => q && s.answers[q.id] === q.answer).length
-            const p = qs.length > 0 ? Math.round((c / qs.length) * 100) : 0
-            const date = new Date(s.startTime).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-            return (
-              <div key={s.id} className="bg-slate-800 rounded-xl p-4 flex items-center justify-between">
-                <div>
-                  <div className="text-sm text-slate-400">{date}</div>
-                  <div className="text-sm">{qs.length} frågor · {s.mode === 'timed' ? 'Med tid' : 'Utan tid'}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xl font-black">{p}%</div>
-                  <div className="text-xs text-slate-400">{c}/{qs.length}</div>
-                </div>
+        {/* Streak & General Stats */}
+        <div className="bg-slate-800 rounded-2xl p-6 mb-6">
+          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Träningsstatistik</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-2xl mb-1">🔥</div>
+              <div className="text-2xl font-black">{stats.streak}</div>
+              <div className="text-xs text-slate-400">Nuv. streak</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-1">🏆</div>
+              <div className="text-2xl font-black">{stats.longestStreak}</div>
+              <div className="text-xs text-slate-400">Längsta streak</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-1">📚</div>
+              <div className="text-2xl font-black">{history.length}</div>
+              <div className="text-xs text-slate-400">Totalt pass</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-1">❓</div>
+              <div className="text-2xl font-black">{totalAnswered}</div>
+              <div className="text-xs text-slate-400">Frågor besv.</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-1">✅</div>
+              <div className="text-2xl font-black">{totalCorrect}</div>
+              <div className="text-xs text-slate-400">Rätt svar</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-1">📊</div>
+              <div className="text-2xl font-black">
+                {totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0}%
               </div>
-            )
-          })}
+              <div className="text-xs text-slate-400">Träffsäkerhet</div>
+            </div>
+          </div>
         </div>
+
+        {history.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-slate-400 mb-6">Inga träningspass ännu. Börja öva för att se din detaljerade statistik!</p>
+            <button
+              onClick={() => navigate('/practice')}
+              className="bg-blue-600 hover:bg-blue-500 transition-colors px-6 py-3 rounded-xl font-bold"
+            >
+              Starta träning
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* By type */}
+            <div className="grid grid-cols-2 gap-3 mb-8">
+              {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
+                .filter(([, v]) => v.total > 0)
+                .map(([type, v]) => {
+                  const p = Math.round((v.correct / v.total) * 100)
+                  return (
+                    <div key={type} className="bg-slate-800 rounded-xl p-4">
+                      <div className="font-black text-blue-400 text-lg">{type}</div>
+                      <div className="text-2xl font-bold">{p}%</div>
+                      <div className="text-xs text-slate-400">{v.correct}/{v.total} rätt</div>
+                      <div className="mt-2 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${p}%` }} />
+                      </div>
+                    </div>
+                  )
+                })}
+            </div>
+
+            {/* History */}
+            <h2 className="text-xl font-black mb-4">Tidigare pass</h2>
+            <div className="space-y-3">
+              {history.slice(0, 10).map(s => {
+                const qs = s.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean)
+                const c = qs.filter(q => q && s.answers[q.id] === q.answer).length
+                const p = qs.length > 0 ? Math.round((c / qs.length) * 100) : 0
+                const date = new Date(s.startTime).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                return (
+                  <div key={s.id} className="bg-slate-800 rounded-xl p-4 flex items-center justify-between">
+                    <div>
+                      <div className="text-sm text-slate-400">{date}</div>
+                      <div className="text-sm">{qs.length} frågor · {s.mode === 'timed' ? 'Med tid' : 'Utan tid'}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-black">{p}%</div>
+                      <div className="text-xs text-slate-400">{c}/{qs.length}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
