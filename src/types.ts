@@ -44,6 +44,8 @@ export interface ExamSession {
   drillType?: QuestionType
   xpEarned?: number
   streakBefore?: number
+  examId?: string
+  sectionTimestamps?: Record<string, number>
 }
 
 export interface SessionResult {

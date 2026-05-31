@@ -172,6 +172,19 @@ export default function Home() {
             </div>
           </button>
 
+          <button
+            onClick={() => navigate('/exam-select')}
+            className="bg-slate-800/70 hover:bg-slate-700 transition-colors border border-slate-600 rounded-2xl p-6 text-left group"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-xl font-bold">Simulera HP-prov</div>
+                <div className="text-slate-400 text-sm mt-1">40 frågor · 4 avsnitt · 55 minuter</div>
+              </div>
+              <div className="text-3xl group-hover:translate-x-1 transition-transform text-slate-400">→</div>
+            </div>
+          </button>
+
           <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => navigate('/theory')}

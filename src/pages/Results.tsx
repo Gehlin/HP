@@ -6,6 +6,7 @@ import MathText from '../components/MathText'
 import { useState, useEffect } from 'react'
 import { loadStats, saveStats, getLevel } from '../utils/gamification'
 import { getStats as getSrsStats } from '../utils/srs'
+import { SECTION_META, HP_AVERAGES, SECTION_ORDER } from '../data/exams'
 
 interface XpInfo {
   earned: number
@@ -195,6 +196,146 @@ export default function Results() {
               )
             })}
         </div>
+
+        {/* Exam-specific report */}
+        {session.type === 'exam' && (() => {
+          const timestamps = session.sectionTimestamps ?? {}
+
+          // Compute actual time per section (ms)
+          const sectionStarts: Record<string, number> = {
+            XYZ: session.startTime,
+            KVA: timestamps.KVA ?? 0,
+            NOG: timestamps.NOG ?? 0,
+            DTK: timestamps.DTK ?? 0,
+          }
+          const sectionEnds: Record<string, number> = {
+            XYZ: timestamps.KVA ?? session.endTime ?? 0,
+            KVA: timestamps.NOG ?? session.endTime ?? 0,
+            NOG: timestamps.DTK ?? session.endTime ?? 0,
+            DTK: session.endTime ?? 0,
+          }
+          const fmtMin = (ms: number) => {
+            if (!ms) return '—'
+            const secs = Math.round(ms / 1000)
+            return `${Math.floor(secs / 60)}m ${secs % 60}s`
+          }
+
+          // Tag accuracy for "Vad du bör öva mer på"
+          const tagMap: Record<string, { correct: number; total: number }> = {}
+          sessionQuestions.forEach(q => {
+            const ok = session.answers[q.id] === q.answer
+            q.tags.forEach(tag => {
+              if (!tagMap[tag]) tagMap[tag] = { correct: 0, total: 0 }
+              tagMap[tag].total++
+              if (ok) tagMap[tag].correct++
+            })
+          })
+          const weakTags = Object.entries(tagMap)
+            .filter(([, v]) => v.total >= 1)
+            .sort(([, a], [, b]) => (a.correct / a.total) - (b.correct / b.total))
+            .slice(0, 3)
+
+          return (
+            <>
+              {/* Section breakdown table */}
+              <div className="mb-8">
+                <h2 className="text-xl font-black mb-4">Avsnittsresultat</h2>
+                <div className="bg-slate-800 rounded-2xl overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wide">
+                        <th className="text-left px-4 py-3">Avsnitt</th>
+                        <th className="text-right px-4 py-3">Rätt</th>
+                        <th className="text-right px-4 py-3">Resultat</th>
+                        <th className="text-right px-4 py-3 hidden sm:table-cell">Rekomm.</th>
+                        <th className="text-right px-4 py-3 hidden sm:table-cell">Din tid</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {SECTION_ORDER.filter(type => byType[type].total > 0).map(type => {
+                        const v = byType[type]
+                        const p = Math.round((v.correct / v.total) * 100)
+                        const meta = SECTION_META[type]
+                        const actualMs = sectionEnds[type] - sectionStarts[type]
+                        const hasTime = sectionStarts[type] > 0 && sectionEnds[type] > 0
+                        return (
+                          <tr key={type} className="border-b border-slate-700/50 last:border-0">
+                            <td className="px-4 py-3">
+                              <span className="font-black text-sm">{type}</span>
+                              <span className="text-slate-500 text-xs ml-2 hidden sm:inline">{meta?.description}</span>
+                            </td>
+                            <td className="px-4 py-3 text-right text-slate-300">{v.correct}/{v.total}</td>
+                            <td className="px-4 py-3 text-right">
+                              <span className={`font-bold ${p >= HP_AVERAGES[type] ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                {p}%
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-right text-slate-500 hidden sm:table-cell">
+                              ~{meta?.recommendedMin}m
+                            </td>
+                            <td className="px-4 py-3 text-right text-slate-400 hidden sm:table-cell">
+                              {hasTime ? fmtMin(actualMs) : '—'}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* HP average comparison */}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5 mb-8">
+                <h3 className="font-bold mb-3 text-sm uppercase tracking-widest text-slate-400">Jämförelse med medel</h3>
+                <div className="space-y-3">
+                  {SECTION_ORDER.filter(type => byType[type].total > 0).map(type => {
+                    const v = byType[type]
+                    const p = Math.round((v.correct / v.total) * 100)
+                    const avg = HP_AVERAGES[type]
+                    const diff = p - avg
+                    return (
+                      <div key={type} className="flex items-center gap-3">
+                        <span className="w-10 text-xs font-black text-slate-400">{type}</span>
+                        <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden relative">
+                          <div
+                            className="absolute h-full bg-slate-600 rounded-full"
+                            style={{ width: `${avg}%` }}
+                          />
+                          <div
+                            className={`absolute h-full rounded-full transition-all ${p >= avg ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                            style={{ width: `${p}%` }}
+                          />
+                        </div>
+                        <span className={`text-xs font-bold w-14 text-right ${diff >= 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                          {p}% {diff >= 0 ? `+${diff}` : diff}pp
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+                <p className="text-xs text-slate-500 mt-3">pp = procentenheter jämfört med HP-genomsnittet</p>
+              </div>
+
+              {/* Weakest topics */}
+              {weakTags.length > 0 && (
+                <div className="bg-amber-900/20 border border-amber-700/40 rounded-2xl p-5 mb-8">
+                  <h3 className="font-bold mb-3 text-amber-400">Vad du bör öva mer på</h3>
+                  <ul className="space-y-2">
+                    {weakTags.map(([tag, v]) => {
+                      const p = Math.round((v.correct / v.total) * 100)
+                      return (
+                        <li key={tag} className="flex items-center justify-between text-sm">
+                          <span className="text-slate-300 capitalize">{tag}</span>
+                          <span className="text-amber-400 font-bold">{p}% ({v.correct}/{v.total})</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+              )}
+            </>
+          )
+        })()}
 
         {/* Review */}
         <h2 className="text-xl font-black mb-4">Genomgång</h2>
