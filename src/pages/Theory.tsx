@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { InlineMath } from 'react-katex'
 
-type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas'
+type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas' | 'algebra'
 
 const SECTIONS: { id: Section; label: string }[] = [
   { id: 'overview', label: 'Översikt' },
@@ -11,6 +11,7 @@ const SECTIONS: { id: Section; label: string }[] = [
   { id: 'NOG', label: 'NOG' },
   { id: 'DTK', label: 'DTK' },
   { id: 'formulas', label: 'Formelblad' },
+  { id: 'algebra', label: 'Algebra' },
 ]
 
 function Overview() {
@@ -288,6 +289,126 @@ function Formulas() {
   )
 }
 
+function AlgebraSection() {
+  return (
+    <div className="space-y-6">
+      <p className="text-slate-300">Grundläggande algebraiska metoder — ekvationer, faktorisering och andragradsekvationer.</p>
+
+      {/* 1. Linear equations */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Linjära ekvationer — steg för steg</h3>
+        <div className="space-y-2 text-sm text-slate-300">
+          <p>Målet är att isolera variabeln på ena sidan. Utför samma operation på båda sidor.</p>
+        </div>
+        <div className="bg-slate-800 rounded-xl p-4 mt-3 text-sm space-y-2">
+          <p className="font-bold text-slate-200">Exempel: Lös <InlineMath math="3x - 5 = 2x + 7" /></p>
+          <div className="text-slate-400 space-y-1">
+            <p><InlineMath math="3x - 5 = 2x + 7" /> &nbsp;|&nbsp; Subtrahera <InlineMath math="2x" /> från båda sidor</p>
+            <p><InlineMath math="x - 5 = 7" /> &nbsp;|&nbsp; Addera 5 på båda sidor</p>
+            <p><InlineMath math="x = 12" /> &nbsp; <span className="text-emerald-400 font-bold">✓</span></p>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Expanding brackets */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Parentesmultiplikation — FOIL</h3>
+        <p className="text-sm text-slate-300 mb-3">
+          Multiplicera varje term i den första parentesen med varje term i den andra: First · Outer · Inner · Last.
+        </p>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2">
+          <p className="font-bold text-slate-200">Exempel: <InlineMath math="(a+b)(c+d)" /></p>
+          <div className="text-slate-400 space-y-1">
+            <p>F: <InlineMath math="a \cdot c = ac" /></p>
+            <p>O: <InlineMath math="a \cdot d = ad" /></p>
+            <p>I: <InlineMath math="b \cdot c = bc" /></p>
+            <p>L: <InlineMath math="b \cdot d = bd" /></p>
+            <p className="text-slate-200 pt-1">Resultat: <InlineMath math="ac + ad + bc + bd" /></p>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Factoring */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Faktorisering</h3>
+        <div className="space-y-3">
+          <div className="bg-slate-800 rounded-xl p-3 text-sm">
+            <p className="font-bold text-slate-200 mb-1">Gemensam faktor</p>
+            <p className="text-slate-400"><InlineMath math="6x^2 + 9x = 3x(2x + 3)" /></p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-3 text-sm">
+            <p className="font-bold text-slate-200 mb-1">Konjugatregel (kvadratskillnad)</p>
+            <p className="text-slate-400"><InlineMath math="x^2 - 16 = (x+4)(x-4)" /></p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-3 text-sm">
+            <p className="font-bold text-slate-200 mb-1">Trinomfaktorisering</p>
+            <p className="text-slate-400">
+              <InlineMath math="x^2 + 5x + 6" /> — hitta två tal vars produkt är 6 och summa är 5: (2, 3).
+            </p>
+            <p className="text-slate-400 mt-1"><InlineMath math="= (x+2)(x+3)" /></p>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Conjugate / square identities */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">De tre kvadratidentiteterna</h3>
+        <div className="bg-slate-800 rounded-xl divide-y divide-slate-700">
+          {([
+            ['(a+b)^2 = a^2 + 2ab + b^2', '(x+3)^2 = x^2 + 6x + 9'],
+            ['(a-b)^2 = a^2 - 2ab + b^2', '(x-5)^2 = x^2 - 10x + 25'],
+            ['(a+b)(a-b) = a^2 - b^2', '(x+4)(x-4) = x^2 - 16'],
+          ] as [string, string][]).map(([id, ex]) => (
+            <div key={id} className="p-3 text-sm">
+              <p className="text-slate-200"><InlineMath math={id} /></p>
+              <p className="text-slate-400 text-xs mt-1">Ex: <InlineMath math={ex} /></p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 5. PQ formula */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Andragradsekvationer — PQ-formeln</h3>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-3">
+          <p className="text-slate-300">
+            För <InlineMath math="x^2 + px + q = 0" />:
+          </p>
+          <p className="text-center text-slate-200 text-base">
+            <InlineMath math="x = -\frac{p}{2} \pm \sqrt{\left(\frac{p}{2}\right)^2 - q}" />
+          </p>
+          <div className="border-t border-slate-700 pt-3 space-y-1">
+            <p className="font-bold text-slate-200">Exempel: <InlineMath math="x^2 - 5x + 6 = 0" /></p>
+            <p className="text-slate-400"><InlineMath math="p = -5,\; q = 6" /></p>
+            <p className="text-slate-400">
+              <InlineMath math="x = \frac{5}{2} \pm \sqrt{\left(\frac{5}{2}\right)^2 - 6} = \frac{5}{2} \pm \sqrt{6{,}25 - 6} = \frac{5}{2} \pm 0{,}5" />
+            </p>
+            <p className="text-emerald-400 font-bold"><InlineMath math="x_1 = 3, \quad x_2 = 2" /></p>
+          </div>
+        </div>
+      </div>
+
+      {/* 6. Common mistakes */}
+      <div className="bg-amber-900/30 border border-amber-700 rounded-xl p-4">
+        <div className="font-bold mb-3 text-amber-300">⚠️ Vanliga misstag</div>
+        <ul className="text-sm text-slate-300 space-y-2 list-disc list-inside">
+          <li>
+            <strong>Glömma att vända olikhetstecknet</strong> vid division/multiplikation med negativt tal.
+            &nbsp;<InlineMath math="-2x > 4 \Rightarrow x < -2" />, inte <InlineMath math="x > -2" />.
+          </li>
+          <li>
+            <strong>Teckelmiss vid expansion av </strong><InlineMath math="-(a - b)" />:&nbsp;
+            resultatet är <InlineMath math="-a + b" />, inte <InlineMath math="-a - b" />.
+          </li>
+          <li>
+            <strong><InlineMath math="x^2 = 4" /> har två lösningar</strong>: <InlineMath math="x = 2" /> och <InlineMath math="x = -2" />. Missa inte den negativa roten.
+          </li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
 export default function Theory() {
   const navigate = useNavigate()
   const [section, setSection] = useState<Section>('overview')
@@ -299,6 +420,7 @@ export default function Theory() {
     NOG: <NOGSection />,
     DTK: <DTKSection />,
     formulas: <Formulas />,
+    algebra: <AlgebraSection />,
   }
 
   return (
