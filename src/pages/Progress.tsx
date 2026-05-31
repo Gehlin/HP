@@ -38,6 +38,39 @@ export default function Progress() {
   const totalCorrect = allAnswers.filter(a => a.correct).length
   const totalAnswered = allAnswers.length
 
+  // Build 90-day heatmap data
+  const todayMidnight = new Date()
+  todayMidnight.setHours(0, 0, 0, 0)
+
+  const questionsByDay: Record<string, number> = {}
+  history.forEach(s => {
+    const d = new Date(s.startTime)
+    d.setHours(0, 0, 0, 0)
+    const key = d.toISOString().slice(0, 10)
+    questionsByDay[key] = (questionsByDay[key] ?? 0) + Object.keys(s.answers).length
+  })
+
+  const heatDays: { date: Date; count: number }[] = []
+  for (let i = 89; i >= 0; i--) {
+    const d = new Date(todayMidnight)
+    d.setDate(d.getDate() - i)
+    heatDays.push({ date: d, count: questionsByDay[d.toISOString().slice(0, 10)] ?? 0 })
+  }
+
+  // Pad front so first column starts on Sunday
+  const startDow = heatDays[0].date.getDay()
+  const paddedHeatDays: ({ date: Date; count: number } | null)[] = [
+    ...Array(startDow).fill(null),
+    ...heatDays,
+  ]
+
+  function heatColor(count: number): string {
+    if (count === 0) return 'bg-slate-700'
+    if (count <= 10) return 'bg-blue-900'
+    if (count <= 30) return 'bg-blue-600'
+    return 'bg-blue-400'
+  }
+
   const isMaxLevel = levelInfo.level === 10
   const xpInCurrentLevel = stats.xp - levelInfo.currentLevelXp
   const xpNeededForCurrentLevel = isMaxLevel ? 1 : levelInfo.nextLevelXp - levelInfo.currentLevelXp
@@ -173,7 +206,7 @@ export default function Progress() {
 
             {/* History */}
             <h2 className="text-xl font-black mb-4">Tidigare pass</h2>
-            <div className="space-y-3">
+            <div className="space-y-3 mb-8">
               {history.slice(0, 10).map(s => {
                 const qs = s.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean)
                 const c = qs.filter(q => q && s.answers[q.id] === q.answer).length
@@ -192,6 +225,38 @@ export default function Progress() {
                   </div>
                 )
               })}
+            </div>
+
+            {/* Activity heat map — last 90 days */}
+            <div className="bg-slate-800 rounded-2xl p-6 mb-6">
+              <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Aktivitet — senaste 90 dagarna</h2>
+              <div
+                className="grid gap-1 overflow-x-auto"
+                style={{ gridTemplateRows: 'repeat(7, minmax(0,1fr))', gridAutoFlow: 'column', gridAutoColumns: '12px' }}
+              >
+                {paddedHeatDays.map((day, i) =>
+                  day ? (
+                    <div
+                      key={i}
+                      className={`w-3 h-3 rounded-sm ${heatColor(day.count)}`}
+                      title={`${day.date.toLocaleDateString('sv-SE')}: ${day.count} frågor`}
+                    />
+                  ) : (
+                    <div key={i} className="w-3 h-3" />
+                  )
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-3 text-xs text-slate-400">
+                <span>Färre</span>
+                <div className="flex gap-1 items-center">
+                  <div className="w-3 h-3 rounded-sm bg-slate-700" title="0 frågor" />
+                  <div className="w-3 h-3 rounded-sm bg-blue-900" title="1–10 frågor" />
+                  <div className="w-3 h-3 rounded-sm bg-blue-600" title="11–30 frågor" />
+                  <div className="w-3 h-3 rounded-sm bg-blue-400" title="30+ frågor" />
+                </div>
+                <span>Fler</span>
+                <span className="ml-auto text-slate-500">0 = grå · 1–10 = mörkblå · 11–30 = mellanblå · 30+ = ljusblå</span>
+              </div>
             </div>
           </>
         )}
