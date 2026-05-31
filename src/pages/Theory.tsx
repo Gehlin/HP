@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { InlineMath } from 'react-katex'
 
-type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas' | 'algebra' | 'probability' | 'geometry'
+type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas' | 'algebra' | 'probability' | 'geometry' | 'nog-strategy'
 
 const SECTIONS: { id: Section; label: string }[] = [
   { id: 'overview', label: 'Översikt' },
@@ -14,6 +14,7 @@ const SECTIONS: { id: Section; label: string }[] = [
   { id: 'algebra', label: 'Algebra' },
   { id: 'probability', label: 'Sannolikhet' },
   { id: 'geometry', label: 'Geometri' },
+  { id: 'nog-strategy', label: 'NOG Strategibok' },
 ]
 
 function Overview() {
@@ -829,6 +830,205 @@ function GeometrySection() {
   )
 }
 
+function NOGStrategySection() {
+  const examples: {
+    pattern: string
+    patternDesc: string
+    question: string
+    s1: string
+    s2: string
+    r1: string
+    r2: string
+    rBoth: string | null
+    answer: string
+    why: string
+  }[] = [
+    {
+      pattern: 'Direkt algebra',
+      patternDesc: 'Påståendet ger en ekvation med en obekant — ett entydigt värde följer direkt.',
+      question: 'Vad är värdet av x?',
+      s1: '3x + 7 = 22',
+      s2: '2x − 1 = 9',
+      r1: '3x = 15  →  x = 5. Entydigt svar. Räcker.',
+      r2: '2x = 10  →  x = 5. Entydigt svar. Räcker.',
+      rBoth: null,
+      answer: 'D',
+      why: 'Båda påståendena ger var och en ett unikt värde på x.',
+    },
+    {
+      pattern: 'Indirekt algebra',
+      patternDesc: 'Frågan gäller ett uttryck (t.ex. x + y), inte variablerna var för sig. Fråga dig: "behöver jag veta x och y enskilt, eller räcker det att veta summan?"',
+      question: 'Vad är värdet av x + y?',
+      s1: '2x + 2y = 18',
+      s2: 'x = 5 och y = 4',
+      r1: '2(x + y) = 18  →  x + y = 9. Vi vet inte x eller y separat — men frågan gäller bara x + y. Räcker!',
+      r2: 'x + y = 5 + 4 = 9. Räcker.',
+      rBoth: null,
+      answer: 'D',
+      why: 'Påstående (1) ger värdet på uttrycket x + y direkt via enkel algebra, utan att avslöja x och y separat. Klassisk fälla — välj inte "räcker inte" bara för att du inte kan lösa ut variablerna var för sig.',
+    },
+    {
+      pattern: 'Ordning med 3+ personer',
+      patternDesc: 'Bygg upp en komplett rangordning steg för steg. Ett påstående placerar ofta bara en person relativt en annan.',
+      question: 'Är Anna äldre än Bea?',
+      s1: 'Anna är äldre än Carla.',
+      s2: 'Bea är yngre än Carla.',
+      r1: 'Anna > Carla. Inget sägs om Beas ålder i förhållande till Anna. Räcker inte.',
+      r2: 'Carla > Bea. Inget sägs om Annas ålder i förhållande till Bea. Räcker inte.',
+      rBoth: 'Tillsammans: Anna > Carla > Bea  →  Anna är äldre än Bea. Entydigt "Ja". Räcker!',
+      answer: 'C',
+      why: 'Båda påståendena behövs för att bygga hela ordningskedjan Anna > Carla > Bea.',
+    },
+    {
+      pattern: 'Geometrisk tillräcklighet',
+      patternDesc: 'En figur med n dimensioner behöver n oberoende villkor. En rektangel har två mått — ett samband räcker inte.',
+      question: 'Vad är arean av rektangeln?',
+      s1: 'Rektangelns omkrets är 20 cm.',
+      s2: 'Diagonalens längd är 5√2 cm.',
+      r1: '2(l + b) = 20  →  l + b = 10. Oändligt många (l, b)-par fungerar (1×9, 2×8, 3×7 …). Räcker inte.',
+      r2: 'l² + b² = 50. Fortfarande oändligt många lösningar. Räcker inte.',
+      rBoth: '(l+b)² = 100  →  l² + 2lb + b² = 100  →  50 + 2lb = 100  →  lb = 25. Area = lb = 25 cm². Räcker!',
+      answer: 'C',
+      why: 'Varje påstående ger ett samband med två obekanta. Tillsammans ger de exakt arean utan att lösa ut l och b separat.',
+    },
+    {
+      pattern: '"Ja/Nej"-frågor',
+      patternDesc: 'Svaret behöver vara entydigt — inte nödvändigtvis "Ja". Om svaret alltid är "Nej" är det lika entydigt och räcker.',
+      question: 'Är n ett jämnt tal?',
+      s1: '3n är ett jämnt tal.',
+      s2: 'n² är ett jämnt tal.',
+      r1: '3 är udda, så 3n jämnt ⟺ n jämnt. Svaret är alltid "Ja". Räcker.',
+      r2: 'n² jämnt ⟺ n jämnt (udda × udda = udda). Svaret är alltid "Ja". Räcker.',
+      rBoth: null,
+      answer: 'D',
+      why: 'Båda påståendena ger entydigt "Ja". Kom ihåg: det spelar ingen roll vilket svar det är, bara att det alltid är detsamma.',
+    },
+    {
+      pattern: 'Mängdräkning',
+      patternDesc: 'Inklusionsexklusionsprincipen: |A ∪ B| = |A| + |B| − |A ∩ B|. Du behöver tre av de fyra storheterna för att bestämma den fjärde.',
+      question: 'Hur många elever gillar både matematik och idrott?',
+      s1: '15 elever gillar matematik, 12 gillar idrott, och klassen har 25 elever.',
+      s2: '5 elever gillar varken matematik eller idrott.',
+      r1: 'Vi vet |M| = 15, |I| = 12, totalt = 25 — men utan antalet som gillar ingen av dem kan vi inte beräkna överlappet. Räcker inte.',
+      r2: 'Bara 5 gillar varken. Utan |M| och |I| kan vi inte beräkna överlapp. Räcker inte.',
+      rBoth: '|M ∪ I| = 25 − 5 = 20. Överlapp = 15 + 12 − 20 = 7 elever. Räcker!',
+      answer: 'C',
+      why: 'De två påståendena kompletterar varandra: (1) ger delmängdsstorlekarna och totalen, (2) ger antalet utanför unionen.',
+    },
+    {
+      pattern: 'Procentuell förändring',
+      patternDesc: 'Procent kräver ursprungsvärdet. Varken nytt pris eller förändring i kronor räcker ensamt.',
+      question: 'Med hur många procent ökade priset?',
+      s1: 'Det nya priset är 650 kr.',
+      s2: 'Priset ökade med 130 kr.',
+      r1: 'Nytt pris = 650. Utan ursprungspriset kan vi inte beräkna procentökning. Räcker inte.',
+      r2: 'Ökning = 130 kr. Utan ursprungspriset kan vi inte beräkna procentökning. Räcker inte.',
+      rBoth: 'Ursprungspris = 650 − 130 = 520. Ökning (%) = 130 / 520 × 100 = 25 %. Räcker!',
+      answer: 'C',
+      why: 'Klassisk procentfälla: varje påstående verkar knappt otillräckligt, men tillsammans ger de ursprungsvärdet som saknas.',
+    },
+    {
+      pattern: 'Svaret E — bägge otillräckliga',
+      patternDesc: 'Sällsynt men förekommer. Om du efter att ha kombinerat påståendena fortfarande har flera möjliga svar är svaret E.',
+      question: 'Vad är värdet av x?',
+      s1: 'x² = y²',
+      s2: 'y = 3',
+      r1: 'x² = y²  →  x = ±y. Utan y vet vi inget om x. Räcker inte.',
+      r2: 'y = 3. Utan koppling till x vet vi inte x. Räcker inte.',
+      rBoth: 'Tillsammans: x² = 9  →  x = 3 eller x = −3. Fortfarande två möjliga värden. Räcker inte.',
+      answer: 'E',
+      why: 'Kombinationen ger x² = 9 men inte tecknet på x. Ingen ytterligare information (t.ex. x > 0) finns — svaret är E.',
+    },
+  ]
+
+  const answerColors: Record<string, string> = {
+    A: 'text-blue-400',
+    B: 'text-purple-400',
+    C: 'text-amber-400',
+    D: 'text-emerald-400',
+    E: 'text-red-400',
+  }
+
+  return (
+    <div className="space-y-6">
+      <p className="text-slate-300">
+        8 genomarbetade NOG-uppgifter — ett mönster per uppgift. Lär dig känna igen situationen och välj rätt svar snabbt.
+      </p>
+
+      <div className="bg-slate-800 rounded-xl overflow-hidden text-sm">
+        <div className="bg-slate-700 p-3 font-bold">Snabbreferens — svarsalternativ</div>
+        <div className="divide-y divide-slate-700">
+          {([
+            ['A', 'Räcker (1) ensamt, men ej (2) ensamt'],
+            ['B', 'Räcker (2) ensamt, men ej (1) ensamt'],
+            ['C', 'Räcker (1) och (2) tillsammans, men ej var för sig'],
+            ['D', 'Räcker (1) ensamt OCH (2) ensamt (var för sig)'],
+            ['E', 'Räcker ej ens med (1) och (2) tillsammans'],
+          ] as [string, string][]).map(([letter, desc]) => (
+            <div key={letter} className="p-3 flex gap-3">
+              <span className={`font-black w-5 shrink-0 ${answerColors[letter]}`}>{letter}</span>
+              <span className="text-slate-300">{desc}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {examples.map((ex, i) => (
+        <div key={i} className="bg-slate-800 rounded-xl overflow-hidden text-sm">
+          <div className="bg-slate-700/60 px-4 py-3 flex items-start gap-3">
+            <span className="text-blue-400 font-black text-base shrink-0">#{i + 1}</span>
+            <div>
+              <span className="font-bold text-slate-200">{ex.pattern}</span>
+              <p className="text-xs text-slate-400 mt-0.5">{ex.patternDesc}</p>
+            </div>
+          </div>
+
+          <div className="p-4 space-y-4">
+            <div className="bg-slate-700/40 rounded-lg p-3">
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Fråga</p>
+              <p className="text-slate-200 font-bold">{ex.question}</p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="bg-slate-700/40 rounded-lg p-3">
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Påstående (1)</p>
+                <p className="text-slate-300 italic mb-2">{ex.s1}</p>
+                <p className="text-slate-400">→ {ex.r1}</p>
+              </div>
+              <div className="bg-slate-700/40 rounded-lg p-3">
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Påstående (2)</p>
+                <p className="text-slate-300 italic mb-2">{ex.s2}</p>
+                <p className="text-slate-400">→ {ex.r2}</p>
+              </div>
+              {ex.rBoth && (
+                <div className="bg-slate-700/40 rounded-lg p-3">
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Båda tillsammans</p>
+                  <p className="text-slate-400">→ {ex.rBoth}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-start gap-3 border-t border-slate-700 pt-3">
+              <span className={`font-black text-2xl shrink-0 ${answerColors[ex.answer]}`}>{ex.answer}</span>
+              <p className="text-slate-300 pt-1">{ex.why}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <div className="bg-blue-900/30 border border-blue-700 rounded-xl p-4 text-sm">
+        <div className="font-bold mb-2 text-blue-300">Generell strategi — 4 steg</div>
+        <ol className="text-slate-300 space-y-1 list-decimal list-inside">
+          <li>Identifiera exakt vad du behöver veta för att svara på frågan.</li>
+          <li>Testa (1) ensamt — entydigt svar? Om ja: A eller D.</li>
+          <li>Testa (2) ensamt — entydigt svar? Om ja: B eller D (om (1) räckte) annars B.</li>
+          <li>Om inget räckte ensamt: testa (1) + (2) — entydigt? → C. Annars E.</li>
+        </ol>
+      </div>
+    </div>
+  )
+}
+
 export default function Theory() {
   const navigate = useNavigate()
   const [section, setSection] = useState<Section>('overview')
@@ -843,6 +1043,7 @@ export default function Theory() {
     algebra: <AlgebraSection />,
     probability: <ProbabilitySection />,
     geometry: <GeometrySection />,
+    'nog-strategy': <NOGStrategySection />,
   }
 
   return (
