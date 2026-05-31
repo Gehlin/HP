@@ -136,33 +136,33 @@ export default function Session() {
   const lastOptionKey = answerOptions[answerOptions.length - 1]?.[0] ?? 'D'
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
-      {/* Header */}
-      <header className="border-b border-slate-800 px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className={`text-xs font-black px-2 py-1 rounded ${TYPE_COLOR[q.type] ?? 'bg-slate-700'}`}>
+    <div className="h-screen sm:h-auto sm:min-h-screen bg-slate-900 text-white flex flex-col">
+      {/* Header — sticky so timer + Avsluta stay visible on mobile */}
+      <header className="sticky top-0 z-10 bg-slate-900 border-b border-slate-800 px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <span className={`text-xs font-black px-2 py-1 rounded shrink-0 ${TYPE_COLOR[q.type] ?? 'bg-slate-700'}`}>
             {q.type}
           </span>
-          <span className="text-slate-400 text-sm">
-            Fråga {current + 1} / {sessionQuestions.length}
+          <span className="text-slate-400 text-sm shrink-0">
+            {current + 1} / {sessionQuestions.length}
           </span>
           <button
             onClick={handleFlag}
             title={flagged.includes(q.id) ? 'Ta bort markering' : 'Markera fråga'}
-            className={`text-sm px-2 py-1 rounded-lg border transition-colors ${flagged.includes(q.id) ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300'}`}
+            className={`text-sm px-2 py-1 rounded-lg border transition-colors shrink-0 ${flagged.includes(q.id) ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300'}`}
           >
-            {flagged.includes(q.id) ? '★' : '☆'} Markera
+            {flagged.includes(q.id) ? '★' : '☆'}<span className="hidden sm:inline"> Markera</span>
           </button>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           {timeLeft !== null && (
-            <span className={`font-mono font-bold ${timeLeft < 120 ? 'text-red-400' : 'text-slate-300'}`}>
+            <span className={`font-mono font-bold text-sm sm:text-base ${timeLeft < 120 ? 'text-red-400' : 'text-slate-300'}`}>
               {fmtTime(timeLeft)}
             </span>
           )}
           <button
             onClick={handleFinish}
-            className="text-xs text-slate-400 hover:text-white border border-slate-700 rounded-lg px-3 py-1"
+            className="text-xs text-slate-400 hover:text-white border border-slate-700 rounded-lg px-2 sm:px-3 py-1"
           >
             Avsluta
           </button>
@@ -170,100 +170,105 @@ export default function Session() {
       </header>
 
       {/* Progress bar */}
-      <div className="h-1 bg-slate-800">
+      <div className="h-1 bg-slate-800 shrink-0">
         <div
           className="h-full bg-blue-500 transition-all duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {/* Question */}
-      <main className="flex-1 max-w-2xl mx-auto w-full px-6 py-8 flex flex-col">
-        <div className="text-xs text-slate-500 mb-4">{q.source} · #{q.number}</div>
+      {/* Scrollable question area */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
+          <div className="text-xs text-slate-500 mb-4">{q.source} · #{q.number}</div>
 
-        <div className="bg-slate-800 rounded-2xl p-6 mb-6 text-lg leading-relaxed">
-          <MathText text={q.text} />
-        </div>
+          {/* overflow-x-auto prevents wide math from breaking layout on narrow screens */}
+          <div className="bg-slate-800 rounded-2xl p-4 sm:p-6 mb-6 text-base sm:text-lg leading-relaxed overflow-x-auto">
+            <MathText text={q.text} />
+          </div>
 
-        {/* Table data if present */}
-        {q.tableData && (
-          <div className="bg-slate-800 rounded-2xl p-4 mb-6 overflow-x-auto">
-            {q.tableData.caption && (
-              <p className="text-xs text-slate-400 mb-3">{q.tableData.caption}</p>
-            )}
-            <table className="text-sm w-full">
-              <thead>
-                <tr className="border-b border-slate-600">
-                  {q.tableData.headers.map((h, i) => (
-                    <th key={i} className="text-left py-1 pr-4 text-slate-300 font-bold">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {q.tableData.rows.map((row, i) => (
-                  <tr key={i} className="border-b border-slate-700/50">
-                    {row.map((cell, j) => (
-                      <td key={j} className="py-1 pr-4 text-slate-200">{cell}</td>
+          {/* Table data if present */}
+          {q.tableData && (
+            <div className="bg-slate-800 rounded-2xl p-4 mb-6 overflow-x-auto">
+              {q.tableData.caption && (
+                <p className="text-xs text-slate-400 mb-3">{q.tableData.caption}</p>
+              )}
+              <table className="text-sm w-full">
+                <thead>
+                  <tr className="border-b border-slate-600">
+                    {q.tableData.headers.map((h, i) => (
+                      <th key={i} className="text-left py-1 pr-4 text-slate-300 font-bold">{h}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Answers */}
-        <div className="grid gap-3 mb-2">
-          {answerOptions.map(([key, text]) => {
-            let cls = 'border-slate-700 bg-slate-800 hover:bg-slate-700 hover:border-slate-500'
-            if (chosen === key && !isRevealed) cls = 'border-blue-500 bg-blue-600/20'
-            if (isRevealed && key === q.answer) cls = 'border-emerald-500 bg-emerald-600/20'
-            if (isRevealed && chosen === key && key !== q.answer) cls = 'border-red-500 bg-red-600/20'
-            return (
-              <button
-                key={key}
-                onClick={() => pick(key)}
-                disabled={isRevealed}
-                className={`border rounded-xl p-4 text-left flex items-start gap-3 transition-colors ${cls}`}
-              >
-                <span className="font-black text-slate-400 w-6 shrink-0">{key}</span>
-                <MathText text={text} />
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Skip button — only when no answer chosen yet */}
-        {!chosen && !isRevealed && (
-          <div className="flex justify-center mt-1">
-            <button
-              onClick={handleSkip}
-              className="text-xs text-slate-500 hover:text-slate-300 transition-colors py-1"
-            >
-              Hoppa över →
-            </button>
-          </div>
-        )}
-
-        {/* Keyboard hint — hidden after first keyboard interaction */}
-        {!keyboardUsed && (
-          <p className="text-center text-xs text-slate-600 mt-2 mb-2">
-            Tryck A–{lastOptionKey} för att svara · Enter för att gå vidare
-          </p>
-        )}
-
-        {/* Feedback */}
-        {isRevealed && (
-          <div className={`rounded-xl p-4 mb-6 ${isCorrect ? 'bg-emerald-900/40 border border-emerald-700' : 'bg-red-900/40 border border-red-700'}`}>
-            <div className="font-bold mb-1">{isCorrect ? '✓ Rätt!' : `✗ Fel — rätt svar: ${q.answer}`}</div>
-            <div className="text-sm text-slate-300 leading-relaxed">
-              <MathText text={q.explanation} />
+                </thead>
+                <tbody>
+                  {q.tableData.rows.map((row, i) => (
+                    <tr key={i} className="border-b border-slate-700/50">
+                      {row.map((cell, j) => (
+                        <td key={j} className="py-1 pr-4 text-slate-200">{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Reveal / Next */}
-        <div className="flex gap-3 mt-auto">
+          {/* Answers — min-h-14 (56px) ensures adequate tap targets on mobile */}
+          <div className="grid gap-3 mb-2">
+            {answerOptions.map(([key, text]) => {
+              let cls = 'border-slate-700 bg-slate-800 hover:bg-slate-700 hover:border-slate-500'
+              if (chosen === key && !isRevealed) cls = 'border-blue-500 bg-blue-600/20'
+              if (isRevealed && key === q.answer) cls = 'border-emerald-500 bg-emerald-600/20'
+              if (isRevealed && chosen === key && key !== q.answer) cls = 'border-red-500 bg-red-600/20'
+              return (
+                <button
+                  key={key}
+                  onClick={() => pick(key)}
+                  disabled={isRevealed}
+                  className={`w-full border rounded-xl p-4 text-left flex items-start gap-3 transition-colors min-h-14 ${cls}`}
+                >
+                  <span className="font-black text-slate-400 w-6 shrink-0">{key}</span>
+                  <MathText text={text} />
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Skip button — only when no answer chosen yet */}
+          {!chosen && !isRevealed && (
+            <div className="flex justify-center mt-1">
+              <button
+                onClick={handleSkip}
+                className="text-xs text-slate-500 hover:text-slate-300 transition-colors py-1"
+              >
+                Hoppa över →
+              </button>
+            </div>
+          )}
+
+          {/* Keyboard hint — hidden after first keyboard interaction */}
+          {!keyboardUsed && (
+            <p className="text-center text-xs text-slate-600 mt-2 mb-2">
+              Tryck A–{lastOptionKey} för att svara · Enter för att gå vidare
+            </p>
+          )}
+
+          {/* Feedback */}
+          {isRevealed && (
+            <div className={`rounded-xl p-4 mt-4 ${isCorrect ? 'bg-emerald-900/40 border border-emerald-700' : 'bg-red-900/40 border border-red-700'}`}>
+              <div className="font-bold mb-1">{isCorrect ? '✓ Rätt!' : `✗ Fel — rätt svar: ${q.answer}`}</div>
+              <div className="text-sm text-slate-300 leading-relaxed">
+                <MathText text={q.explanation} />
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Action buttons — outside scroll area so always visible on mobile */}
+      <div className="shrink-0 border-t border-slate-800 bg-slate-900 px-3 sm:px-6 py-3 sm:py-4">
+        <div className="max-w-2xl mx-auto flex gap-3">
           {!session.instantFeedback && chosen && !isRevealed && (
             <button
               onClick={() => setRevealed(r => ({ ...r, [q.id]: true }))}
@@ -289,7 +294,7 @@ export default function Session() {
             </button>
           )}
         </div>
-      </main>
+      </div>
     </div>
   )
 }
