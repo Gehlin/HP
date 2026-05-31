@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { InlineMath } from 'react-katex'
 
-type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas' | 'algebra'
+type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas' | 'algebra' | 'probability'
 
 const SECTIONS: { id: Section; label: string }[] = [
   { id: 'overview', label: 'Översikt' },
@@ -12,6 +12,7 @@ const SECTIONS: { id: Section; label: string }[] = [
   { id: 'DTK', label: 'DTK' },
   { id: 'formulas', label: 'Formelblad' },
   { id: 'algebra', label: 'Algebra' },
+  { id: 'probability', label: 'Sannolikhet' },
 ]
 
 function Overview() {
@@ -409,6 +410,187 @@ function AlgebraSection() {
   )
 }
 
+function ProbabilitySection() {
+  return (
+    <div className="space-y-6">
+      <p className="text-slate-300">Sannolikhet och kombinatorik — grundläggande begrepp, räkneregler och HP-strategier.</p>
+
+      {/* 1. Basic probability */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Grunddefinition</h3>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2">
+          <p className="text-slate-200">
+            <InlineMath math="P(A) = \dfrac{\text{antal gynnsamma utfall}}{\text{antal möjliga utfall}}" />
+          </p>
+          <p className="text-slate-400 pt-1">
+            <strong className="text-slate-200">Exempel — tärning:</strong> Sannolikheten att slå ett jämnt tal (2, 4 eller 6) är{' '}
+            <InlineMath math="\tfrac{3}{6} = \tfrac{1}{2}" />.
+          </p>
+          <p className="text-slate-400">Sannolikheten är alltid ett tal mellan 0 och 1 (eller 0 % och 100 %).</p>
+        </div>
+      </div>
+
+      {/* 2. Complement */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Komplementregeln</h3>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2">
+          <p className="text-slate-200 text-base">
+            <InlineMath math="P(\text{inte } A) = 1 - P(A)" />
+          </p>
+          <p className="text-slate-300 pt-1">
+            <strong>När ska du använda den?</strong> Alltid när det är lättare att räkna det <em>oönskade</em> utfallet.
+          </p>
+          <p className="text-slate-400">
+            Exempel: Sannolikheten att <em>minst en</em> av tre kast inte landar på 6 är svår att räkna direkt — men
+            komplement (att <em>alla tre</em> landar på 6) är enkelt:{' '}
+            <InlineMath math="1 - \left(\tfrac{1}{6}\right)^3 = 1 - \tfrac{1}{216}" />.
+          </p>
+        </div>
+      </div>
+
+      {/* 3. Independent events */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Oberoende händelser</h3>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2">
+          <p className="text-slate-200 text-base">
+            <InlineMath math="P(A \text{ och } B) = P(A) \times P(B)" />
+          </p>
+          <p className="text-slate-300 pt-1">
+            Gäller när utfallet av A inte påverkar utfallet av B.
+          </p>
+          <p className="text-slate-400">
+            Exempel: Sannolikheten att slå 6 på en tärning <em>och</em> krona med ett mynt:{' '}
+            <InlineMath math="\tfrac{1}{6} \times \tfrac{1}{2} = \tfrac{1}{12}" />.
+          </p>
+        </div>
+      </div>
+
+      {/* 4. Permutations vs combinations */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Permutationer vs. kombinationer</h3>
+        <div className="space-y-3">
+          <div className="bg-slate-800 rounded-xl p-3 text-sm">
+            <p className="font-bold text-slate-200 mb-1">Permutation — ordning spelar roll</p>
+            <p className="text-slate-400">
+              Hur många sätt kan 3 av 5 personer ställa sig i kö?{' '}
+              <InlineMath math="5 \times 4 \times 3 = 60" /> sätt.
+            </p>
+            <p className="text-slate-400 mt-1">
+              Allmänt: <InlineMath math="n \times (n{-}1) \times \cdots \times (n{-}k{+}1)" />
+            </p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-3 text-sm">
+            <p className="font-bold text-slate-200 mb-1">Kombination — ordning spelar ingen roll</p>
+            <p className="text-slate-400">
+              Hur många sätt kan vi välja 3 av 5 personer (utan hänsyn till ordning)?{' '}
+              <InlineMath math="\dfrac{5 \times 4 \times 3}{3 \times 2 \times 1} = 10" /> sätt.
+            </p>
+            <p className="text-slate-400 mt-1">
+              Dividera alltid med <InlineMath math="k!" /> för att ta bort dubbletter av samma urval.
+            </p>
+          </div>
+          <div className="bg-blue-900/30 border border-blue-700 rounded-xl p-3 text-sm">
+            <p className="text-blue-300 font-bold mb-1">Tumregel</p>
+            <p className="text-slate-300">
+              Nämns ett lopp, en köordning eller en kod → permutation.
+              Nämns ett lag, en kommitté eller ett urval utan ordning → kombination.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. At least one */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">"Minst en"-problem</h3>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2">
+          <p className="text-slate-300">
+            Frågor av typen <em>"sannolikheten att minst en …"</em> löses <strong>alltid</strong> med komplement:
+          </p>
+          <p className="text-slate-200">
+            <InlineMath math="P(\text{minst en}) = 1 - P(\text{ingen})" />
+          </p>
+          <p className="text-slate-400 pt-1">
+            Exempel: En låda med 10 kulor, 3 röda. Du drar 2 (med återläggning). Sannolikheten att få minst en röd:
+          </p>
+          <div className="text-slate-400 space-y-1">
+            <p><InlineMath math="P(\text{ingen röd}) = \tfrac{7}{10} \times \tfrac{7}{10} = \tfrac{49}{100}" /></p>
+            <p><InlineMath math="P(\text{minst en röd}) = 1 - \tfrac{49}{100} = \tfrac{51}{100}" /></p>
+          </div>
+        </div>
+      </div>
+
+      {/* 6. Conditional probability (intuitive) */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Betingad sannolikhet — intuitiv förståelse</h3>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-3">
+          <p className="text-slate-300">
+            Betingad sannolikhet svarar på: <em>"Vad är sannolikheten för A, givet att vi vet att B redan har hänt?"</em>
+          </p>
+          <p className="text-slate-400">
+            <strong className="text-slate-200">Exempel:</strong> En klass har 20 elever, varav 12 gillar matematik
+            och 8 gillar bägge matematik och idrott. Givet att en slumpmässigt vald elev gillar matematik — vad är
+            sannolikheten att de även gillar idrott?
+          </p>
+          <p className="text-slate-400">
+            Vi begränsar oss till de 12 matematikälskarna. Av dem gillar 8 även idrott:{' '}
+            <InlineMath math="\tfrac{8}{12} = \tfrac{2}{3}" />.
+          </p>
+          <p className="text-slate-300 font-bold">
+            Nyckel: Byt ut "hela populationen" mot "den betingade gruppen" och räkna som vanligt.
+          </p>
+        </div>
+      </div>
+
+      {/* 7. Three worked HP-style examples */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Tre HP-uppgifter med lösningar</h3>
+        <div className="space-y-4">
+
+          <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2">
+            <p className="font-bold text-slate-200">Uppgift 1</p>
+            <p className="text-slate-300">
+              En väska innehåller 4 röda och 6 blå kulor. Du drar 2 kulor utan återläggning. Vad är sannolikheten att
+              båda är röda?
+            </p>
+            <div className="border-t border-slate-700 pt-2 text-slate-400 space-y-1">
+              <p>Första draget: <InlineMath math="\tfrac{4}{10}" /></p>
+              <p>Andra draget (en röd borta): <InlineMath math="\tfrac{3}{9}" /></p>
+              <p><InlineMath math="P = \tfrac{4}{10} \times \tfrac{3}{9} = \tfrac{12}{90} = \tfrac{2}{15}" /></p>
+              <p className="text-emerald-400 font-bold">Svar: 2/15</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2">
+            <p className="font-bold text-slate-200">Uppgift 2</p>
+            <p className="text-slate-300">
+              På hur många sätt kan 5 personer sitta runt ett runt bord om det är rotationssymmetri
+              (dvs. två placeringar räknas som lika om de är varandras rotation)?
+            </p>
+            <div className="border-t border-slate-700 pt-2 text-slate-400 space-y-1">
+              <p>Håll en person fast som referens. Placera resten:</p>
+              <p><InlineMath math="(5-1)! = 4! = 24" /> sätt.</p>
+              <p className="text-emerald-400 font-bold">Svar: 24</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2">
+            <p className="font-bold text-slate-200">Uppgift 3</p>
+            <p className="text-slate-300">
+              Du kastar en tärning 3 gånger. Vad är sannolikheten att du <em>minst en gång</em> slår en 1:a?
+            </p>
+            <div className="border-t border-slate-700 pt-2 text-slate-400 space-y-1">
+              <p>Använd komplement: <InlineMath math="P(\text{ingen 1:a}) = \left(\tfrac{5}{6}\right)^3 = \tfrac{125}{216}" /></p>
+              <p><InlineMath math="P(\text{minst en 1:a}) = 1 - \tfrac{125}{216} = \tfrac{91}{216}" /></p>
+              <p className="text-emerald-400 font-bold">Svar: 91/216 ≈ 42 %</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Theory() {
   const navigate = useNavigate()
   const [section, setSection] = useState<Section>('overview')
@@ -421,6 +603,7 @@ export default function Theory() {
     DTK: <DTKSection />,
     formulas: <Formulas />,
     algebra: <AlgebraSection />,
+    probability: <ProbabilitySection />,
   }
 
   return (
