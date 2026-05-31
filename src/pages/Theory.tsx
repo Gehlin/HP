@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { InlineMath } from 'react-katex'
 
-type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas' | 'algebra' | 'probability'
+type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas' | 'algebra' | 'probability' | 'geometry'
 
 const SECTIONS: { id: Section; label: string }[] = [
   { id: 'overview', label: 'Översikt' },
@@ -13,6 +13,7 @@ const SECTIONS: { id: Section; label: string }[] = [
   { id: 'formulas', label: 'Formelblad' },
   { id: 'algebra', label: 'Algebra' },
   { id: 'probability', label: 'Sannolikhet' },
+  { id: 'geometry', label: 'Geometri' },
 ]
 
 function Overview() {
@@ -591,6 +592,243 @@ function ProbabilitySection() {
   )
 }
 
+function GeometrySection() {
+  const [revealed, setRevealed] = useState<Record<number, boolean>>({})
+  const toggle = (i: number) => setRevealed(r => ({ ...r, [i]: !r[i] }))
+
+  const snabbtest: { q: string; a: string }[] = [
+    {
+      q: 'En rektangel är 8 cm lång och 5 cm bred. Vad är diagonalens längd?',
+      a: 'Pythagoras: √(8² + 5²) = √(64 + 25) = √89 ≈ 9,4 cm',
+    },
+    {
+      q: 'Två liknande trianglar har sidorna i förhållandet 3 : 5. Vad är förhållandet mellan deras areor?',
+      a: 'Arean skalar med kvadraten på sidoförhållandet: 3² : 5² = 9 : 25',
+    },
+    {
+      q: 'En cirkel har radien 6. Vad är arean? (Svaret i termer av π)',
+      a: 'A = πr² = π · 36 = 36π',
+    },
+    {
+      q: 'Vad är mittpunkten mellan koordinaterna (2, 8) och (6, 4)?',
+      a: 'Mittpunkt = ((2+6)/2, (8+4)/2) = (4, 6)',
+    },
+    {
+      q: 'En cylinder har radien 3 och höjden 10. Vad är volymen? (Svaret i termer av π)',
+      a: 'V = πr²h = π · 9 · 10 = 90π',
+    },
+  ]
+
+  return (
+    <div className="space-y-6">
+      <p className="text-slate-300">Geometriska formler, bevis och strategier — från grundformlerna till koordinatgeometri.</p>
+
+      {/* 1. Area / perimeter / volume formulas */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Area, omkrets &amp; volym</h3>
+        <div className="bg-slate-800 rounded-xl divide-y divide-slate-700 text-sm">
+          {([
+            ['Rektangel — area', 'A = l \\cdot b', 'Längd × bredd. Diagonalen d = √(l² + b²)'],
+            ['Triangel — area', 'A = \\tfrac{1}{2} \\cdot b \\cdot h', 'b = bas, h = höjd (vinkelrätt mot basen)'],
+            ['Parallelogram — area', 'A = b \\cdot h', 'Samma formel som rektangeln men h är lodrät höjd'],
+            ['Cirkel — area', 'A = \\pi r^2', 'r = radien'],
+            ['Cirkel — omkrets', 'O = 2\\pi r', 'Diameter d = 2r, alltså O = πd'],
+            ['Cylinder — volym', 'V = \\pi r^2 h', 'Basarea × höjd'],
+            ['Rektangulär låda — volym', 'V = l \\cdot b \\cdot h', 'Längd × bredd × höjd'],
+          ] as [string, string, string][]).map(([label, formula, note]) => (
+            <div key={label} className="p-3 flex flex-col gap-1">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-slate-400 shrink-0">{label}</span>
+                <span className="text-slate-200"><InlineMath math={formula} /></span>
+              </div>
+              <span className="text-xs text-slate-500">{note}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 2. Pythagoras */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Pythagoras sats</h3>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-3">
+          <p className="text-slate-200 text-base text-center">
+            <InlineMath math="a^2 + b^2 = c^2" />
+          </p>
+          <p className="text-slate-300">
+            <strong>c</strong> är alltid hypotenusan — sidan <em>mitt emot rät vinkel</em>, den längsta sidan.
+            Kateter kallas de andra två sidorna.
+          </p>
+          <div className="border-t border-slate-700 pt-3">
+            <p className="font-bold text-slate-200 mb-2">Pytagoreiska tripplar att memorera</p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                ['3–4–5', '9 + 16 = 25 ✓'],
+                ['5–12–13', '25 + 144 = 169 ✓'],
+                ['6–8–10', 'Skalas från 3–4–5 (× 2)'],
+                ['8–15–17', '64 + 225 = 289 ✓'],
+              ].map(([triple, check]) => (
+                <div key={triple} className="bg-slate-700 rounded-lg p-2">
+                  <span className="font-bold text-emerald-400">{triple}</span>
+                  <span className="text-slate-400 text-xs block">{check}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-slate-400 text-xs mt-2">
+              Alla skalade versioner fungerar: t.ex. 9–12–15 (3×3–4–5).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Similar triangles */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Likformiga trianglar</h3>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-3">
+          <p className="text-slate-300">
+            Två trianglar är <strong>likformiga</strong> om alla vinklar är lika stora. Sidorna är då proportionella.
+          </p>
+          <p className="text-slate-300">
+            <strong>När används de?</strong> Skuggor, kartor, perspektivproblem, och uppgifter om "ett föremål inne i ett annat".
+          </p>
+          <div className="border-t border-slate-700 pt-3 space-y-2">
+            <div className="bg-slate-700 rounded-lg p-3">
+              <p className="font-bold text-slate-200 mb-1">Sidoförhållande k</p>
+              <p className="text-slate-400">
+                Om sidorna i stor triangel är <InlineMath math="k" /> gånger sidorna i liten triangel:
+              </p>
+              <ul className="text-slate-400 mt-1 space-y-1 list-disc list-inside">
+                <li>Omkrets skalar med <InlineMath math="k" /></li>
+                <li>Area skalar med <InlineMath math="k^2" /></li>
+                <li>Volym (för 3D-kroppar) skalar med <InlineMath math="k^3" /></li>
+              </ul>
+            </div>
+            <div className="bg-slate-800 rounded-lg p-3 border border-slate-600">
+              <p className="font-bold text-slate-200 mb-1">Exempel</p>
+              <p className="text-slate-400">
+                Två likformiga trianglar med sidor i förhållande 2 : 3. Lilla triangelns area är 12.
+                Stora triangelns area: <InlineMath math="12 \times \left(\tfrac{3}{2}\right)^2 = 12 \times \tfrac{9}{4} = 27" />.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Circle theorems */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Cirkelsatser</h3>
+        <div className="space-y-3 text-sm">
+          <div className="bg-slate-800 rounded-xl p-3">
+            <p className="font-bold text-slate-200 mb-1">Inskriberad vinkel</p>
+            <p className="text-slate-400">
+              En vinkel som är inskriberad i en cirkel (toppen på cirkeln, benen till en båge) är
+              <strong className="text-slate-300"> halva</strong> mittelpunktsvinkeln mot samma båge.
+            </p>
+            <p className="text-slate-400 mt-1">
+              Alla inskriberade vinklar mot <em>samma båge</em> är lika stora.
+            </p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-3">
+            <p className="font-bold text-slate-200 mb-1">Inskriberad vinkel mot diameter</p>
+            <p className="text-slate-400">
+              En vinkel inskriberad i en halvkrets (toppen på cirkeln, benen till diameterns ändpunkter) är alltid
+              <strong className="text-slate-300"> 90°</strong> — Thales sats.
+            </p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-3">
+            <p className="font-bold text-slate-200 mb-1">Tangent</p>
+            <p className="text-slate-400">
+              En tangent till en cirkel är <strong className="text-slate-300">vinkelrät mot radien</strong> i tangentpunkten.
+              Det ger en rät vinkel som ofta triggar Pythagoras.
+            </p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-3">
+            <p className="font-bold text-slate-200 mb-1">Två tangenter från en yttre punkt</p>
+            <p className="text-slate-400">
+              Två tangentsträckor dragna från samma yttre punkt till en cirkel är lika långa.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Coordinate geometry */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Koordinatgeometri</h3>
+        <div className="bg-slate-800 rounded-xl divide-y divide-slate-700 text-sm">
+          {([
+            [
+              'Lutning (slope)',
+              'k = \\dfrac{y_2 - y_1}{x_2 - x_1}',
+              'Förändring i y delat med förändring i x. Positiv = stiger åt höger.',
+            ],
+            [
+              'Linjens ekvation',
+              'y = kx + m',
+              'k = lutning, m = skärning med y-axeln.',
+            ],
+            [
+              'Avstånd mellan två punkter',
+              'd = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}',
+              'Pythagoras i koordinatform.',
+            ],
+            [
+              'Mittpunkt',
+              'M = \\left(\\dfrac{x_1+x_2}{2},\\, \\dfrac{y_1+y_2}{2}\\right)',
+              'Medelvärdet av x-koordinaterna respektive y-koordinaterna.',
+            ],
+          ] as [string, string, string][]).map(([label, formula, note]) => (
+            <div key={label} className="p-3 space-y-1">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-slate-400 shrink-0">{label}</span>
+                <span className="text-slate-200"><InlineMath math={formula} /></span>
+              </div>
+              <span className="text-xs text-slate-500">{note}</span>
+            </div>
+          ))}
+        </div>
+        <div className="bg-slate-800 rounded-xl p-4 text-sm space-y-2 mt-3">
+          <p className="font-bold text-slate-200">Exempel</p>
+          <p className="text-slate-400">
+            Punkterna <InlineMath math="A = (1, 2)" /> och <InlineMath math="B = (5, 8)" />.
+          </p>
+          <p className="text-slate-400">
+            Lutning: <InlineMath math="k = \tfrac{8-2}{5-1} = \tfrac{6}{4} = \tfrac{3}{2}" />
+          </p>
+          <p className="text-slate-400">
+            Avstånd: <InlineMath math="d = \sqrt{(5-1)^2 + (8-2)^2} = \sqrt{16+36} = \sqrt{52} \approx 7{,}2" />
+          </p>
+          <p className="text-slate-400">
+            Mittpunkt: <InlineMath math="M = \left(\tfrac{1+5}{2}, \tfrac{2+8}{2}\right) = (3, 5)" />
+          </p>
+        </div>
+      </div>
+
+      {/* 6. Snabbtest */}
+      <div>
+        <h3 className="font-black text-blue-400 text-lg mb-3">Snabbtest — 5 frågor</h3>
+        <p className="text-sm text-slate-400 mb-3">Testa dig själv. Klicka på en fråga för att visa svaret.</p>
+        <div className="space-y-3">
+          {snabbtest.map((item, i) => (
+            <div key={i} className="bg-slate-800 rounded-xl overflow-hidden">
+              <button
+                onClick={() => toggle(i)}
+                className="w-full text-left p-4 text-sm text-slate-200 flex justify-between items-start gap-3"
+              >
+                <span><span className="font-bold text-blue-400 mr-2">{i + 1}.</span>{item.q}</span>
+                <span className="text-slate-400 shrink-0">{revealed[i] ? '▲' : '▼'}</span>
+              </button>
+              {revealed[i] && (
+                <div className="px-4 pb-4 text-sm text-emerald-400 border-t border-slate-700 pt-3">
+                  {item.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Theory() {
   const navigate = useNavigate()
   const [section, setSection] = useState<Section>('overview')
@@ -604,6 +842,7 @@ export default function Theory() {
     formulas: <Formulas />,
     algebra: <AlgebraSection />,
     probability: <ProbabilitySection />,
+    geometry: <GeometrySection />,
   }
 
   return (
