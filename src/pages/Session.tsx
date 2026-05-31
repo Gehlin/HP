@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { AnswerKey } from '../types'
 import { questions } from '../data/questions'
@@ -25,6 +25,8 @@ export default function Session() {
   const [keyboardUsed, setKeyboardUsed] = useState(false)
   const [flagged, setFlagged] = useState<string[]>(session?.flagged ?? [])
   const [, setSkipped] = useState<string[]>(session?.skipped ?? [])
+  const [cardAnimClass, setCardAnimClass] = useState('')
+  const isTransitioning = cardAnimClass !== ''
 
   // Derived values computed before effects to satisfy Rules of Hooks
   const sessionQuestions = (session?.questionIds ?? [])
@@ -39,6 +41,15 @@ export default function Session() {
   const answerOptions = q
     ? (Object.entries(q.options).filter(([k]) => ANSWER_KEYS.includes(k as AnswerKey)) as [AnswerKey, string][])
     : []
+
+  const advanceQuestion = useCallback(() => {
+    setCardAnimClass('slide-out-left')
+    setTimeout(() => {
+      setCurrent(c => c + 1)
+      setCardAnimClass('slide-in-right')
+      setTimeout(() => setCardAnimClass(''), 160)
+    }, 150)
+  }, [])
 
   const pick = (key: AnswerKey) => {
     if (!q || isRevealed) return
@@ -114,9 +125,9 @@ export default function Session() {
         setKeyboardUsed(true)
         if (!session.instantFeedback && chosen && !isRevealed) {
           setRevealed(r => ({ ...r, [q.id]: true }))
-        } else if (chosen || isRevealed) {
+        } else if ((chosen || isRevealed) && !isTransitioning) {
           if (current < sessionQuestions.length - 1) {
-            setCurrent(c => c + 1)
+            advanceQuestion()
           } else {
             handleFinish()
           }
@@ -126,7 +137,7 @@ export default function Session() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isRevealed, chosen, current, session?.instantFeedback, q?.id, sessionQuestions.length])
+  }, [isRevealed, chosen, current, session?.instantFeedback, q?.id, sessionQuestions.length, advanceQuestion, isTransitioning])
 
   // Early returns after all hooks
   if (!session) return null
@@ -156,7 +167,7 @@ export default function Session() {
         </div>
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           {timeLeft !== null && (
-            <span className={`font-mono font-bold text-sm sm:text-base ${timeLeft < 120 ? 'text-red-400' : 'text-slate-300'}`}>
+            <span className={`font-mono font-bold text-sm sm:text-base ${timeLeft < 120 ? 'text-red-400 timer-warning' : 'text-slate-300'}`}>
               {fmtTime(timeLeft)}
             </span>
           )}
@@ -179,7 +190,7 @@ export default function Session() {
 
       {/* Scrollable question area */}
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
+        <div className={`max-w-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8 ${cardAnimClass}`}>
           <div className="text-xs text-slate-500 mb-4">{q.source} · #{q.number}</div>
 
           {/* overflow-x-auto prevents wide math from breaking layout on narrow screens */}
@@ -226,7 +237,7 @@ export default function Session() {
                   key={key}
                   onClick={() => pick(key)}
                   disabled={isRevealed}
-                  className={`w-full border rounded-xl p-4 text-left flex items-start gap-3 transition-colors min-h-14 ${cls}`}
+                  className={`w-full border rounded-xl p-4 text-left flex items-start gap-3 transition-colors min-h-14 ${cls}${isRevealed && key === q.answer ? ' correct-pulse' : ''}`}
                 >
                   <span className="font-black text-slate-400 w-6 shrink-0">{key}</span>
                   <MathText text={text} />
@@ -279,8 +290,8 @@ export default function Session() {
           )}
           {current < sessionQuestions.length - 1 ? (
             <button
-              onClick={() => setCurrent(c => c + 1)}
-              disabled={!chosen && !isRevealed}
+              onClick={advanceQuestion}
+              disabled={(!chosen && !isRevealed) || isTransitioning}
               className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 rounded-xl py-3 font-bold transition-colors"
             >
               Nästa →
