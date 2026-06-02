@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { QuestionType } from '../types'
+import type { QuestionType, ExamSession } from '../types'
 import { questions } from '../data/questions'
 import { buildSession, saveSession, loadHistory } from '../utils/session'
 import { getDueQuestions } from '../utils/srs'
@@ -63,6 +63,7 @@ export default function Practice() {
   const [selectedDifficulties, setSelectedDifficulties] = useState<Difficulty[]>([...ALL_DIFFICULTIES])
   const [selectedTags, setSelectedTags] = useState<string[]>([...ALL_TAGS])
   const [tagsOpen, setTagsOpen] = useState(false)
+  const [studyMode, setStudyMode] = useState(false)
 
   const toggleType = (t: QuestionType) => {
     setSelectedTypes(prev =>
@@ -95,6 +96,15 @@ export default function Practice() {
 
   const dueIds = useMemo(() => getDueQuestions(questions.map(q => q.id)), [])
 
+  const dueByType = useMemo(() => {
+    const counts: Record<QuestionType, number> = { XYZ: 0, KVA: 0, NOG: 0, DTK: 0 }
+    dueIds.forEach(id => {
+      const q = questions.find(x => x.id === id)
+      if (q) counts[q.type]++
+    })
+    return counts
+  }, [dueIds])
+
   const wrongQuestionIds = useMemo(() => {
     const history = loadHistory()
     const wrongSet = new Set<string>()
@@ -110,24 +120,23 @@ export default function Practice() {
   const startWrongDrill = () => {
     const pool = questions.filter(q => wrongQuestionIds.includes(q.id))
     const shuffled = [...pool].sort(() => Math.random() - 0.5)
-    const session = buildSession(shuffled.map(q => q.id), null, true, 'drill')
+    const session = buildSession(shuffled.map(q => q.id), null, true, 'drill', true)
     saveSession(session)
     navigate('/session')
   }
 
   const start = () => {
+    let session: ExamSession
     if (mode === 'repetition') {
       const pool = questions.filter(q => dueIds.includes(q.id))
       if (pool.length === 0) return
-      const session = buildSession(pool.map(q => q.id), null, true, 'drill')
-      saveSession(session)
-      navigate('/session')
-      return
+      session = buildSession(pool.map(q => q.id), null, true, 'drill', true)
+    } else {
+      const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
+      const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
+      const chosenIds = chosen.map(q => q.id)
+      session = buildSession(chosenIds, timed ? computeTimeLimit(chosenIds) : null, instantFeedback, 'drill', studyMode || undefined)
     }
-    const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
-    const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
-    const chosenIds = chosen.map(q => q.id)
-    const session = buildSession(chosenIds, timed ? computeTimeLimit(chosenIds) : null, instantFeedback, 'drill')
     saveSession(session)
     navigate('/session')
   }
@@ -186,9 +195,28 @@ export default function Practice() {
           </div>
         </section>
 
-        {mode === 'repetition' && dueIds.length === 0 && (
-          <div className="mb-8 rounded-xl border border-slate-700 bg-slate-800 p-5 text-center text-slate-400">
-            Inga frågor att repetera idag — kom tillbaka imorgon!
+        {mode === 'repetition' && (
+          <div className="mb-8 rounded-xl border border-slate-700 bg-slate-800 p-5">
+            {dueIds.length === 0 ? (
+              <p className="text-center text-slate-400">Inga frågor att repetera idag — kom tillbaka imorgon!</p>
+            ) : (
+              <>
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  {dueIds.length} frågor att repetera
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {(Object.entries(dueByType) as [QuestionType, number][])
+                    .filter(([, n]) => n > 0)
+                    .map(([type, n]) => (
+                      <div key={type} className={`rounded-lg p-2.5 text-center bg-slate-700/60 border border-slate-600`}>
+                        <div className={`text-xs font-black mb-1 ${TYPE_LABEL_COLOR[type]}`}>{type}</div>
+                        <div className="text-lg font-black text-white">{n}</div>
+                      </div>
+                    ))}
+                </div>
+                <p className="text-xs text-slate-500 mt-3">Studieläge aktiveras automatiskt vid repetition.</p>
+              </>
+            )}
           </div>
         )}
 
@@ -313,24 +341,44 @@ export default function Practice() {
             </section>
 
             {/* Feedback */}
-            <section className="mb-10">
+            <section className="mb-6">
               <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Återkoppling</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => setInstantFeedback(true)}
-                  className={`rounded-xl p-4 border text-left transition-colors ${instantFeedback ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                  onClick={() => { setInstantFeedback(true); setStudyMode(false) }}
+                  className={`rounded-xl p-4 border text-left transition-colors ${instantFeedback && !studyMode ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
                 >
                   <div className="font-bold">Direkt</div>
                   <div className="text-xs text-slate-400 mt-1">Se rätt/fel direkt efter varje svar</div>
                 </button>
                 <button
-                  onClick={() => setInstantFeedback(false)}
-                  className={`rounded-xl p-4 border text-left transition-colors ${!instantFeedback ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                  onClick={() => { setInstantFeedback(false); setStudyMode(false) }}
+                  className={`rounded-xl p-4 border text-left transition-colors ${!instantFeedback && !studyMode ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
                 >
                   <div className="font-bold">I efterhand</div>
                   <div className="text-xs text-slate-400 mt-1">Genomgång efter avslutat pass</div>
                 </button>
               </div>
+            </section>
+
+            {/* Study mode */}
+            <section className="mb-10">
+              <button
+                onClick={() => setStudyMode(prev => !prev)}
+                className={`w-full rounded-xl p-4 border text-left transition-colors ${studyMode ? 'border-violet-500 bg-violet-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className={`font-bold ${studyMode ? 'text-violet-300' : ''}`}>Studieläge</div>
+                    <div className="text-xs text-slate-400 mt-1">
+                      Förklaringar visas alltid — betygsätt svårighetsgraden för att träna SRS-repetition
+                    </div>
+                  </div>
+                  <div className={`ml-4 w-10 h-6 rounded-full transition-colors flex items-center shrink-0 ${studyMode ? 'bg-violet-600' : 'bg-slate-600'}`}>
+                    <div className={`w-4 h-4 rounded-full bg-white mx-1 transition-transform ${studyMode ? 'translate-x-4' : 'translate-x-0'}`} />
+                  </div>
+                </div>
+              </button>
             </section>
 
             {available === 0 && (

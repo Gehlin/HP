@@ -72,3 +72,7 @@
 .reveal-correct {
   animation: revealCorrect 500ms ease-out;
 }
+
+.pb-safe {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { AnswerKey } from '../types'
 import { questions } from '../data/questions'
 import { SECTION_META } from '../data/exams'
-import { loadSession, updateAnswer, finishSession, toggleFlag, skipQuestion, saveSession, saveQuestionTime } from '../utils/session'
+import { loadSession, updateAnswer, finishSession, toggleFlag, skipQuestion, saveSession, saveQuestionTime, saveQuestionQuality } from '../utils/session'
 import MathText from '../components/MathText'
 import ExplanationCard from '../components/ExplanationCard'
 
@@ -58,6 +58,7 @@ export default function Session() {
   )
 
   const questionStartRef = useRef<number>(Date.now())
+  const explanationRef = useRef<HTMLDivElement>(null)
 
   const isTransitioning = cardAnimClass !== ''
   const isExam = session?.type === 'exam'
@@ -151,6 +152,9 @@ export default function Session() {
     updateAnswer(q.id, key)
     if (session?.instantFeedback) {
       setRevealed(r => ({ ...r, [q.id]: true }))
+      setTimeout(() => {
+        explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 80)
     }
   }
 
@@ -464,12 +468,14 @@ export default function Session() {
           )}
 
           {isRevealed && (
-            <ExplanationCard
-              isCorrect={isCorrect}
-              correctAnswer={q.answer}
-              explanation={q.explanation}
-              explanationData={q.explanationData}
-            />
+            <div ref={explanationRef}>
+              <ExplanationCard
+                isCorrect={isCorrect}
+                correctAnswer={q.answer}
+                explanation={q.explanation}
+                explanationData={q.explanationData}
+              />
+            </div>
           )}
 
           {/* End-of-section footer in exam mode */}
@@ -482,30 +488,86 @@ export default function Session() {
       </main>
 
       {/* Action buttons */}
-      <div className="shrink-0 border-t border-slate-800 bg-slate-900 px-3 sm:px-6 py-3 sm:py-4">
+      <div className="shrink-0 border-t border-slate-800 bg-slate-900 px-3 sm:px-6 py-3 sm:py-4 pb-safe">
         <div className="max-w-2xl mx-auto flex gap-3">
           {!session.instantFeedback && chosen && !isRevealed && (
             <button
-              onClick={() => setRevealed(r => ({ ...r, [q.id]: true }))}
+              onClick={() => {
+                setRevealed(r => ({ ...r, [q.id]: true }))
+                setTimeout(() => {
+                  explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                }, 80)
+              }}
               className="flex-1 border border-slate-600 hover:bg-slate-800 rounded-xl py-3 font-bold transition-colors"
             >
               Visa svar
             </button>
           )}
-          {current < sessionQuestions.length - 1 ? (
+
+          {/* Study mode: quality rating buttons replace plain Nästa */}
+          {session.studyMode && isRevealed && (
+            <>
+              <button
+                onClick={() => {
+                  saveQuestionQuality(q.id, isCorrect ? 1 : 0)
+                  current < sessionQuestions.length - 1 ? handleNextQuestion() : handleFinish()
+                }}
+                disabled={isTransitioning}
+                className="flex-1 border border-red-700 bg-red-900/20 hover:bg-red-900/40 text-red-300 rounded-xl py-3 font-bold transition-colors disabled:opacity-40"
+              >
+                Svårt
+              </button>
+              <button
+                onClick={() => {
+                  saveQuestionQuality(q.id, isCorrect ? 2 : 0)
+                  current < sessionQuestions.length - 1 ? handleNextQuestion() : handleFinish()
+                }}
+                disabled={isTransitioning}
+                className="flex-1 border border-amber-700 bg-amber-900/20 hover:bg-amber-900/40 text-amber-300 rounded-xl py-3 font-bold transition-colors disabled:opacity-40"
+              >
+                Ok
+              </button>
+              <button
+                onClick={() => {
+                  saveQuestionQuality(q.id, isCorrect ? 3 : 0)
+                  current < sessionQuestions.length - 1 ? handleNextQuestion() : handleFinish()
+                }}
+                disabled={isTransitioning}
+                className="flex-1 border border-emerald-700 bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-300 rounded-xl py-3 font-bold transition-colors disabled:opacity-40"
+              >
+                Enkelt
+              </button>
+            </>
+          )}
+
+          {/* Normal advance button (not study mode) */}
+          {!session.studyMode && (
+            current < sessionQuestions.length - 1 ? (
+              <button
+                onClick={handleNextQuestion}
+                disabled={(!chosen && !isRevealed) || isTransitioning}
+                className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 rounded-xl py-3 font-bold transition-colors"
+              >
+                Nästa →
+              </button>
+            ) : (
+              <button
+                onClick={handleFinish}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-xl py-3 font-bold transition-colors"
+              >
+                Avsluta och visa resultat
+              </button>
+            )
+          )}
+
+          {/* Study mode: finish button on last question */}
+          {session.studyMode && !isRevealed && (
             <button
               onClick={handleNextQuestion}
-              disabled={(!chosen && !isRevealed) || isTransitioning}
-              className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 rounded-xl py-3 font-bold transition-colors"
+              disabled={!chosen || isTransitioning}
+              className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 rounded-xl py-3 font-bold transition-colors"
             >
-              Nästa →
-            </button>
-          ) : (
-            <button
-              onClick={handleFinish}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-xl py-3 font-bold transition-colors"
-            >
-              Avsluta och visa resultat
+              {current < sessionQuestions.length - 1 ? 'Nästa →' : 'Avsluta →'}
             </button>
           )}
         </div>

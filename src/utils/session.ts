@@ -11,6 +11,7 @@ export function buildSession(
   timeLimitSeconds: number | null,
   instantFeedback: boolean,
   type: 'exam' | 'drill',
+  studyMode?: boolean,
 ): ExamSession {
   return {
     id: crypto.randomUUID(),
@@ -19,8 +20,9 @@ export function buildSession(
     startTime: Date.now(),
     mode: timeLimitSeconds ? 'timed' : 'untimed',
     timeLimitSeconds: timeLimitSeconds ?? undefined,
-    instantFeedback,
+    instantFeedback: studyMode ? true : instantFeedback,
     type,
+    studyMode,
   }
 }
 
@@ -52,7 +54,11 @@ export function finishSession() {
   updateStreak()
   const qMap = Object.fromEntries(questions.map(q => [q.id, q.answer]))
   for (const [qid, userAnswer] of Object.entries(session.answers)) {
-    if (qMap[qid]) recordAnswer(qid, userAnswer === qMap[qid])
+    if (qMap[qid]) {
+      const correct = userAnswer === qMap[qid]
+      const quality = session.questionQualities?.[qid] ?? (correct ? 2 : 0)
+      recordAnswer(qid, correct, quality)
+    }
   }
 }
 
@@ -70,6 +76,13 @@ export function saveQuestionTime(questionId: string, ms: number) {
   const session = loadSession()
   if (!session) return
   session.questionTimes = { ...(session.questionTimes ?? {}), [questionId]: ms }
+  saveSession(session)
+}
+
+export function saveQuestionQuality(questionId: string, quality: number) {
+  const session = loadSession()
+  if (!session) return
+  session.questionQualities = { ...(session.questionQualities ?? {}), [questionId]: quality }
   saveSession(session)
 }
 

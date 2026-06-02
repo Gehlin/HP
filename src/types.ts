@@ -54,6 +54,8 @@ export interface ExamSession {
   examId?: string
   sectionTimestamps?: Record<string, number>
   questionTimes?: Record<string, number>
+  questionQualities?: Record<string, number>
+  studyMode?: boolean
 }
 
 export interface SessionResult {
