@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { questions } from '../data/questions'
 import { loadStats, getLevel, type GameStats } from '../utils/gamification'
-import { loadHistory } from '../utils/session'
+import { loadHistory, loadSession, saveSession } from '../utils/session'
+import type { ExamSession } from '../types'
 
 const DAILY_TARGET = 15
 
@@ -45,9 +46,12 @@ export default function Home() {
 
   const [stats, setStats] = useState<GameStats | null>(null)
   const [todayCount, setTodayCount] = useState(0)
+  const [resumeSession, setResumeSession] = useState<ExamSession | null>(null)
 
   useEffect(() => {
     setStats(loadStats())
+    const s = loadSession()
+    if (s && !s.endTime) setResumeSession(s)
     const today = new Date().toISOString().slice(0, 10)
     const count = loadHistory()
       .filter(s => new Date(s.startTime).toISOString().slice(0, 10) === today)
@@ -76,6 +80,44 @@ export default function Home() {
           <p className="text-slate-500 text-sm mt-2">{total} frågor · Verkliga HP-prov 2025–2026</p>
           <p className="text-slate-400 text-sm mt-3 italic">{tagline}</p>
         </div>
+
+        {/* Resume session banner */}
+        {resumeSession && (() => {
+          const answered = Object.keys(resumeSession.answers).length
+          const total = resumeSession.questionIds.length
+          const sessionType = resumeSession.type === 'exam' ? 'HP-prov' : resumeSession.studyMode ? 'Studieläge' : 'Övning'
+          const elapsed = Math.round((Date.now() - resumeSession.startTime) / 60000)
+          return (
+            <div className="bg-blue-900/30 border border-blue-600/50 rounded-2xl p-4 mb-6 flex items-center gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-0.5">Pågående pass</div>
+                <div className="text-sm text-white font-semibold">
+                  {sessionType} · {answered}/{total} frågor · startades för {elapsed} min sedan
+                </div>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => {
+                    saveSession({ ...resumeSession, endTime: undefined })
+                    navigate('/session')
+                  }}
+                  className="bg-blue-600 hover:bg-blue-500 transition-colors rounded-xl px-4 py-2 text-sm font-bold"
+                >
+                  Fortsätt
+                </button>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('hp_current_session')
+                    setResumeSession(null)
+                  }}
+                  className="border border-slate-600 hover:border-slate-400 rounded-xl px-3 py-2 text-sm text-slate-400 hover:text-white transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Dagens mål card */}
         <div className="bg-slate-800/70 border border-slate-700 rounded-2xl p-5 mb-6 flex items-center gap-5">

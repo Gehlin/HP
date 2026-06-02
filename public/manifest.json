@@ -1,0 +1,18 @@
+{
+  "name": "HP Träning",
+  "short_name": "HP",
+  "description": "Träna inför Högskoleprovets kvantitativa del — XYZ, KVA, NOG, DTK",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
