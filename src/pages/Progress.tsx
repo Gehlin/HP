@@ -2,7 +2,16 @@ import { useNavigate } from 'react-router-dom'
 import { loadHistory } from '../utils/session'
 import { questions } from '../data/questions'
 import { loadStats, getLevel, LEVELS } from '../utils/gamification'
+import { getStats as getSrsStats } from '../utils/srs'
+import { estimateHpScore, hpScoreColor } from '../utils/hpScore'
 import type { QuestionType } from '../types'
+
+const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
+  XYZ: { text: 'text-violet-400', bar: 'bg-violet-500' },
+  KVA: { text: 'text-blue-400',   bar: 'bg-blue-500'   },
+  NOG: { text: 'text-emerald-400', bar: 'bg-emerald-500' },
+  DTK: { text: 'text-amber-400',  bar: 'bg-amber-500'  },
+}
 
 export default function Progress() {
   const navigate = useNavigate()
@@ -37,6 +46,40 @@ export default function Progress() {
 
   const totalCorrect = allAnswers.filter(a => a.correct).length
   const totalAnswered = allAnswers.length
+
+  // Per-tag accuracy
+  const byTag: Record<string, { correct: number; total: number }> = {}
+  allAnswers.forEach(({ qid, correct }) => {
+    const q = questions.find(x => x.id === qid)
+    if (!q) return
+    for (const tag of q.tags) {
+      if (!byTag[tag]) byTag[tag] = { correct: 0, total: 0 }
+      byTag[tag].total++
+      if (correct) byTag[tag].correct++
+    }
+  })
+  const tagStats = Object.entries(byTag)
+    .filter(([, v]) => v.total >= 3)
+    .map(([tag, v]) => ({ tag, pct: Math.round((v.correct / v.total) * 100), ...v }))
+    .sort((a, b) => a.pct - b.pct)
+
+  // SRS mastery overview
+  const srsNew = questions.filter(q => getSrsStats(q.id) === null).length
+  const srsMastered = questions.filter(q => {
+    const r = getSrsStats(q.id)
+    return r !== null && r.interval >= 21
+  }).length
+  const srsLearning = questions.length - srsNew - srsMastered
+
+  // Accuracy trend — last 15 sessions (most recent last)
+  const trendSessions = history
+    .slice(0, 15)
+    .reverse()
+    .map(s => {
+      const qs = s.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean)
+      const c = qs.filter(q => q && s.answers[q!.id] === q!.answer).length
+      return qs.length > 0 ? Math.round((c / qs.length) * 100) : 0
+    })
 
   // Build 90-day heatmap data
   const todayMidnight = new Date()
@@ -186,41 +229,138 @@ export default function Progress() {
         ) : (
           <>
             {/* By type */}
-            <div className="grid grid-cols-2 gap-3 mb-8">
+            <div className="grid grid-cols-2 gap-3 mb-6">
               {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
                 .filter(([, v]) => v.total > 0)
                 .map(([type, v]) => {
                   const p = Math.round((v.correct / v.total) * 100)
+                  const tc = TYPE_COLORS[type]
                   return (
                     <div key={type} className="bg-slate-800 rounded-xl p-4">
-                      <div className="font-black text-blue-400 text-lg">{type}</div>
+                      <div className={`font-black text-lg ${tc.text}`}>{type}</div>
                       <div className="text-2xl font-bold">{p}%</div>
                       <div className="text-xs text-slate-400">{v.correct}/{v.total} rätt</div>
                       <div className="mt-2 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${p}%` }} />
+                        <div className={`h-full ${tc.bar} rounded-full`} style={{ width: `${p}%` }} />
                       </div>
                     </div>
                   )
                 })}
             </div>
 
+            {/* Accuracy trend chart */}
+            {trendSessions.length >= 2 && (
+              <div className="bg-slate-800 rounded-2xl p-6 mb-6">
+                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Träffsäkerhet — senaste {trendSessions.length} pass</h2>
+                <div className="flex items-end gap-1 h-20 mt-4">
+                  {trendSessions.map((pct, i) => {
+                    const barH = Math.max(4, Math.round((pct / 100) * 80))
+                    const barColor = pct >= 70 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1" title={`Pass ${i + 1}: ${pct}%`}>
+                        <div className={`w-full rounded-t ${barColor} transition-all`} style={{ height: `${barH}px` }} />
+                      </div>
+                    )
+                  })}
+                </div>
+                <div className="flex justify-between text-[10px] text-slate-600 mt-2">
+                  <span>Äldst</span>
+                  <span>Senast</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-500 mt-1">
+                  <span>{trendSessions[0]}%</span>
+                  <span className={trendSessions[trendSessions.length - 1] >= 70 ? 'text-emerald-400' : trendSessions[trendSessions.length - 1] >= 50 ? 'text-amber-400' : 'text-red-400'}>
+                    {trendSessions[trendSessions.length - 1]}% senast
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* SRS mastery overview */}
+            <div className="bg-slate-800 rounded-2xl p-6 mb-6">
+              <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Frågebank — masterstatus</h2>
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="text-center">
+                  <div className="text-2xl font-black text-slate-400">{srsNew}</div>
+                  <div className="text-xs text-slate-500 mt-1">Ej sedd</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-black text-amber-400">{srsLearning}</div>
+                  <div className="text-xs text-slate-500 mt-1">Inlärning</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-black text-emerald-400">{srsMastered}</div>
+                  <div className="text-xs text-slate-500 mt-1">Bemästrad</div>
+                </div>
+              </div>
+              <div className="flex h-2 rounded-full overflow-hidden">
+                <div className="bg-slate-600" style={{ width: `${(srsNew / questions.length) * 100}%` }} />
+                <div className="bg-amber-500" style={{ width: `${(srsLearning / questions.length) * 100}%` }} />
+                <div className="bg-emerald-500" style={{ width: `${(srsMastered / questions.length) * 100}%` }} />
+              </div>
+              <div className="text-xs text-slate-500 mt-2 text-right">{questions.length} frågor totalt</div>
+            </div>
+
+            {/* Topic weakness report */}
+            {tagStats.length > 0 && (
+              <div className="bg-slate-800 rounded-2xl p-6 mb-6">
+                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Svaga områden</h2>
+                <p className="text-xs text-slate-500 mb-4">Ämnen med minst 3 besvarade frågor, sorterade svagast först</p>
+                <div className="space-y-3">
+                  {tagStats.map(({ tag, pct, correct, total }) => (
+                    <div key={tag}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-slate-300 capitalize">{tag.replace(/-/g, ' ')}</span>
+                        <span className={`font-bold ${pct < 50 ? 'text-red-400' : pct < 70 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                          {pct}% <span className="text-slate-500 font-normal">({correct}/{total})</span>
+                        </span>
+                      </div>
+                      <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${pct < 50 ? 'bg-red-500' : pct < 70 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* History */}
             <h2 className="text-xl font-black mb-4">Tidigare pass</h2>
             <div className="space-y-3 mb-8">
               {history.slice(0, 10).map(s => {
                 const qs = s.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean)
-                const c = qs.filter(q => q && s.answers[q.id] === q.answer).length
+                const c = qs.filter(q => q && s.answers[q!.id] === q!.answer).length
                 const p = qs.length > 0 ? Math.round((c / qs.length) * 100) : 0
+                const hpScore = estimateHpScore(p)
+                const hpColor = hpScoreColor(hpScore)
                 const date = new Date(s.startTime).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                const dur = s.endTime ? Math.round((s.endTime - s.startTime) / 60000) : null
+                const typesInSession = [...new Set(qs.map(q => q!.type))] as QuestionType[]
+                const pColor = p >= 70 ? 'text-emerald-400' : p >= 50 ? 'text-amber-400' : 'text-red-400'
                 return (
-                  <div key={s.id} className="bg-slate-800 rounded-xl p-4 flex items-center justify-between">
-                    <div>
-                      <div className="text-sm text-slate-400">{date}</div>
-                      <div className="text-sm">{qs.length} frågor · {s.mode === 'timed' ? 'Med tid' : 'Utan tid'}</div>
+                  <div key={s.id} className="bg-slate-800 rounded-xl p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <div className="text-sm text-slate-400">{date}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">
+                          {qs.length} frågor{dur ? ` · ${dur} min` : ''} · {s.type === 'exam' ? 'HP-prov' : s.mode === 'timed' ? 'Med tid' : 'Övning'}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-xl font-black ${pColor}`}>{p}%</div>
+                        <div className={`text-xs font-bold ${hpColor}`}>{hpScore.toFixed(2)}</div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-xl font-black">{p}%</div>
-                      <div className="text-xs text-slate-400">{c}/{qs.length}</div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {typesInSession.map(t => (
+                        <span key={t} className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${TYPE_COLORS[t].text} bg-slate-700`}>{t}</span>
+                      ))}
+                      <div className="flex-1 h-1 bg-slate-700 rounded-full overflow-hidden ml-1">
+                        <div className={`h-full rounded-full ${p >= 70 ? 'bg-emerald-500' : p >= 50 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${p}%` }} />
+                      </div>
                     </div>
                   </div>
                 )

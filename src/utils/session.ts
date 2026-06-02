@@ -66,6 +66,13 @@ export function skipQuestion(questionId: string) {
   }
 }
 
+export function saveQuestionTime(questionId: string, ms: number) {
+  const session = loadSession()
+  if (!session) return
+  session.questionTimes = { ...(session.questionTimes ?? {}), [questionId]: ms }
+  saveSession(session)
+}
+
 export function toggleFlag(questionId: string) {
   const session = loadSession()
   if (!session) return

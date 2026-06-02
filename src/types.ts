@@ -7,6 +7,12 @@ export interface TableData {
   rows: string[][]
 }
 
+export interface ExplanationData {
+  approach?: string   // one-line method/strategy description
+  steps: string[]     // ordered solution steps (math-aware strings)
+  note?: string       // key insight or common mistake warning
+}
+
 export interface Question {
   id: string
   type: QuestionType
@@ -25,6 +31,7 @@ export interface Question {
   }
   answer: AnswerKey
   explanation: string
+  explanationData?: ExplanationData
   tags: string[]
   difficulty: 'easy' | 'medium' | 'hard'
 }
@@ -46,6 +53,7 @@ export interface ExamSession {
   streakBefore?: number
   examId?: string
   sectionTimestamps?: Record<string, number>
+  questionTimes?: Record<string, number>
 }
 
 export interface SessionResult {

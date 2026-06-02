@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { AnswerKey } from '../types'
 import { questions } from '../data/questions'
 import { SECTION_META } from '../data/exams'
-import { loadSession, updateAnswer, finishSession, toggleFlag, skipQuestion, saveSession } from '../utils/session'
+import { loadSession, updateAnswer, finishSession, toggleFlag, skipQuestion, saveSession, saveQuestionTime } from '../utils/session'
 import MathText from '../components/MathText'
+import ExplanationCard from '../components/ExplanationCard'
 
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
@@ -13,6 +14,19 @@ const TYPE_COLOR: Record<string, string> = {
   KVA: 'bg-blue-600',
   NOG: 'bg-emerald-600',
   DTK: 'bg-amber-600',
+}
+
+const TYPE_BORDER_L: Record<string, string> = {
+  XYZ: 'border-l-violet-500',
+  KVA: 'border-l-blue-500',
+  NOG: 'border-l-emerald-500',
+  DTK: 'border-l-amber-500',
+}
+
+const DIFFICULTY_BADGE: Record<string, string> = {
+  hard: 'text-red-400 bg-red-500/10 border-red-700/40',
+  medium: 'text-amber-400 bg-amber-500/10 border-amber-700/40',
+  easy: 'text-emerald-400 bg-emerald-500/10 border-emerald-700/40',
 }
 
 interface BreakScreenData {
@@ -43,6 +57,8 @@ export default function Session() {
     session?.sectionTimestamps ?? {}
   )
 
+  const questionStartRef = useRef<number>(Date.now())
+
   const isTransitioning = cardAnimClass !== ''
   const isExam = session?.type === 'exam'
 
@@ -66,14 +82,20 @@ export default function Session() {
 
   const questionsRemaining = sessionQuestions.length - current - 1
 
+  const recordCurrentQuestionTime = useCallback(() => {
+    if (q) saveQuestionTime(q.id, Date.now() - questionStartRef.current)
+  }, [q])
+
   const advanceQuestion = useCallback(() => {
+    recordCurrentQuestionTime()
     setCardAnimClass('slide-out-left')
     setTimeout(() => {
       setCurrent(c => c + 1)
+      questionStartRef.current = Date.now()
       setCardAnimClass('slide-in-right')
       setTimeout(() => setCardAnimClass(''), 160)
     }, 150)
-  }, [])
+  }, [recordCurrentQuestionTime])
 
   const doBreakContinue = useCallback((data: BreakScreenData, timestamps: Record<string, number>) => {
     const ts = Date.now()
@@ -88,9 +110,10 @@ export default function Session() {
   }, [])
 
   const handleFinish = useCallback(() => {
+    recordCurrentQuestionTime()
     finishSession()
     navigate('/results')
-  }, [navigate])
+  }, [navigate, recordCurrentQuestionTime])
 
   const handleNextQuestion = useCallback(() => {
     const nextIdx = current + 1
@@ -327,9 +350,25 @@ export default function Session() {
       {/* Scrollable question area */}
       <main className="flex-1 overflow-y-auto">
         <div className={`max-w-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8 ${cardAnimClass}`}>
-          <div className="text-xs text-slate-500 mb-4">{q.source} · #{q.number}</div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[10px] font-medium text-slate-500 bg-slate-800 border border-slate-700 rounded px-2 py-0.5">
+              {q.source} · #{q.number}
+            </span>
+            {q.difficulty !== 'medium' && (
+              <span className={`text-[10px] font-bold border rounded px-2 py-0.5 ${DIFFICULTY_BADGE[q.difficulty] ?? ''}`}>
+                {q.difficulty === 'hard' ? 'Svår' : 'Lätt'}
+              </span>
+            )}
+          </div>
 
-          <div className="bg-slate-800 rounded-2xl p-4 sm:p-6 mb-6 text-base sm:text-lg leading-relaxed overflow-x-auto">
+          {q.context && (
+            <div className="bg-slate-800/80 rounded-xl px-4 py-3 mb-4 text-sm text-slate-300 leading-relaxed border border-slate-700/60">
+              <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-1.5">Kontext</div>
+              <MathText text={q.context} />
+            </div>
+          )}
+
+          <div className={`bg-slate-800 rounded-2xl p-4 sm:p-6 mb-6 text-base sm:text-lg leading-relaxed overflow-x-auto border-l-4 ${TYPE_BORDER_L[q.type] ?? 'border-l-slate-600'}`}>
             <MathText text={q.text} />
           </div>
 
@@ -361,19 +400,47 @@ export default function Session() {
 
           <div className="grid gap-3 mb-2">
             {answerOptions.map(([key, text]) => {
-              let cls = 'border-slate-700 bg-slate-800 hover:bg-slate-700 hover:border-slate-500'
-              if (chosen === key && !isRevealed) cls = 'border-blue-500 bg-blue-600/20'
-              if (isRevealed && key === q.answer) cls = 'border-emerald-500 bg-emerald-600/20'
-              if (isRevealed && chosen === key && key !== q.answer) cls = 'border-red-500 bg-red-600/20'
+              const isChosen = chosen === key
+              const isAnswer = key === q.answer
+
+              let cls = 'border-slate-700 bg-slate-800/80 hover:bg-slate-700/80 hover:border-slate-500 text-slate-200 cursor-pointer'
+              let labelCls = 'bg-slate-700 text-slate-400'
+              if (isChosen && !isRevealed) {
+                cls = 'border-blue-500 bg-blue-600/20 text-white cursor-pointer'
+                labelCls = 'bg-blue-600 text-white'
+              }
+              if (isRevealed && isAnswer) {
+                cls = 'border-emerald-500 bg-emerald-600/15 text-white reveal-correct'
+                labelCls = 'bg-emerald-600 text-white'
+              }
+              if (isRevealed && isChosen && !isAnswer) {
+                cls = 'border-red-500 bg-red-600/15 text-white'
+                labelCls = 'bg-red-600 text-white'
+              }
+              if (isRevealed && !isAnswer && !isChosen) {
+                cls = 'border-slate-700/50 bg-slate-800/40 text-slate-500 cursor-default'
+                labelCls = 'bg-slate-700/60 text-slate-500'
+              }
+
+              const badgeLabel = isRevealed && isAnswer
+                ? '✓'
+                : (isRevealed && isChosen && !isAnswer)
+                  ? '✗'
+                  : key
+
               return (
                 <button
                   key={key}
                   onClick={() => pick(key)}
                   disabled={isRevealed}
-                  className={`w-full border rounded-xl p-4 text-left flex items-start gap-3 transition-colors min-h-14 ${cls}${isRevealed && key === q.answer ? ' correct-pulse' : ''}`}
+                  className={`w-full border rounded-xl p-4 text-left flex items-start gap-3 transition-all min-h-14 ${cls}`}
                 >
-                  <span className="font-black text-slate-400 w-6 shrink-0">{key}</span>
-                  <MathText text={text} />
+                  <span className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black transition-colors ${labelCls}`}>
+                    {badgeLabel}
+                  </span>
+                  <div className="mt-0.5 flex-1">
+                    <MathText text={text} />
+                  </div>
                 </button>
               )
             })}
@@ -397,12 +464,12 @@ export default function Session() {
           )}
 
           {isRevealed && (
-            <div className={`rounded-xl p-4 mt-4 ${isCorrect ? 'bg-emerald-900/40 border border-emerald-700' : 'bg-red-900/40 border border-red-700'}`}>
-              <div className="font-bold mb-1">{isCorrect ? '✓ Rätt!' : `✗ Fel — rätt svar: ${q.answer}`}</div>
-              <div className="text-sm text-slate-300 leading-relaxed">
-                <MathText text={q.explanation} />
-              </div>
-            </div>
+            <ExplanationCard
+              isCorrect={isCorrect}
+              correctAnswer={q.answer}
+              explanation={q.explanation}
+              explanationData={q.explanationData}
+            />
           )}
 
           {/* End-of-section footer in exam mode */}

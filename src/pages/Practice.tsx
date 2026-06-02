@@ -15,10 +15,39 @@ const TYPE_INFO: Record<QuestionType, { label: string; desc: string; time: strin
   DTK: { label: 'DTK', desc: 'Diagram, tabeller och kartor', time: '23 min / 12 frågor' },
 }
 
+// Seconds per question for each section type (based on HP time allocations)
+const SECONDS_PER_QUESTION: Record<QuestionType, number> = {
+  XYZ: 60,
+  KVA: 60,
+  NOG: 100,
+  DTK: 115,
+}
+
+function computeTimeLimit(ids: string[]): number {
+  return ids.reduce((acc, id) => {
+    const q = questions.find(x => x.id === id)
+    return acc + (q ? SECONDS_PER_QUESTION[q.type] : 60)
+  }, 0)
+}
+
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   easy: 'Lätt',
   medium: 'Medel',
   hard: 'Svår',
+}
+
+const TYPE_SELECTED: Record<QuestionType, string> = {
+  XYZ: 'border-violet-500 bg-violet-600/20 text-white',
+  KVA: 'border-blue-500 bg-blue-600/20 text-white',
+  NOG: 'border-emerald-500 bg-emerald-600/20 text-white',
+  DTK: 'border-amber-500 bg-amber-600/20 text-white',
+}
+
+const TYPE_LABEL_COLOR: Record<QuestionType, string> = {
+  XYZ: 'text-violet-400',
+  KVA: 'text-blue-400',
+  NOG: 'text-emerald-400',
+  DTK: 'text-amber-400',
 }
 
 const ALL_DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard']
@@ -97,7 +126,8 @@ export default function Practice() {
     }
     const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
     const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
-    const session = buildSession(chosen.map(q => q.id), timed ? 55 * 60 : null, instantFeedback, 'drill')
+    const chosenIds = chosen.map(q => q.id)
+    const session = buildSession(chosenIds, timed ? computeTimeLimit(chosenIds) : null, instantFeedback, 'drill')
     saveSession(session)
     navigate('/session')
   }
@@ -170,14 +200,15 @@ export default function Practice() {
               <div className="grid grid-cols-2 gap-3">
                 {(Object.keys(TYPE_INFO) as QuestionType[]).map(t => {
                   const cnt = questions.filter(q => q.type === t).length
+                  const isSelected = selectedTypes.includes(t)
                   return (
                     <button
                       key={t}
                       onClick={() => toggleType(t)}
-                      className={`rounded-xl p-4 border text-left transition-colors ${selectedTypes.includes(t) ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                      className={`rounded-xl p-4 border text-left transition-colors ${isSelected ? TYPE_SELECTED[t] : 'border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
                     >
-                      <div className="font-black text-lg">{t}</div>
-                      <div className="text-xs text-slate-400">{TYPE_INFO[t].desc}</div>
+                      <div className={`font-black text-lg ${isSelected ? TYPE_LABEL_COLOR[t] : 'text-white'}`}>{t}</div>
+                      <div className="text-xs text-slate-400 mt-0.5">{TYPE_INFO[t].desc}</div>
                       <div className="text-xs text-slate-500 mt-1">{cnt} frågor</div>
                     </button>
                   )
@@ -274,7 +305,9 @@ export default function Practice() {
                   className={`rounded-xl p-4 border text-left transition-colors ${timed ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
                 >
                   <div className="font-bold">Med tid</div>
-                  <div className="text-xs text-slate-400 mt-1">55 min (som riktigt HP)</div>
+                  <div className="text-xs text-slate-400 mt-1">
+                    {Math.round(computeTimeLimit(filteredPool.slice(0, Math.min(count, filteredPool.length)).map(q => q.id)) / 60)} min (baserat på HP-takt)
+                  </div>
                 </button>
               </div>
             </section>

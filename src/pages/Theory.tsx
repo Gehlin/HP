@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { InlineMath } from 'react-katex'
+import { InlineMath } from '../components/Math'
 
 type Section = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'formulas' | 'algebra' | 'probability' | 'geometry' | 'nog-strategy'
 

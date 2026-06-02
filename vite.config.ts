@@ -4,4 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    dedupe: ['katex'],
+  },
+  optimizeDeps: {
+    include: ['katex'],
+  },
 })

@@ -19,6 +19,20 @@ const DAILY_TAGLINES = [
 const RING_R = 28
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_R
 
+const TYPE_ACCENTS: Record<string, { color: string; border: string; bg: string; dot: string }> = {
+  XYZ: { color: 'text-violet-400', border: 'border-t-violet-500', bg: 'bg-violet-500/8', dot: 'bg-violet-500' },
+  KVA: { color: 'text-blue-400',   border: 'border-t-blue-500',   bg: 'bg-blue-500/8',   dot: 'bg-blue-500'   },
+  NOG: { color: 'text-emerald-400', border: 'border-t-emerald-500', bg: 'bg-emerald-500/8', dot: 'bg-emerald-500' },
+  DTK: { color: 'text-amber-400',  border: 'border-t-amber-500',  bg: 'bg-amber-500/8',  dot: 'bg-amber-500'  },
+}
+
+const TYPE_DESC: Record<string, string> = {
+  XYZ: 'Matematisk problemlösning',
+  KVA: 'Kvantitativa jämförelser',
+  NOG: 'Kvantitativa resonemang',
+  DTK: 'Diagram, tabeller & kartor',
+}
+
 export default function Home() {
   const navigate = useNavigate()
   const total = questions.length
@@ -50,11 +64,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-hero-grid text-white">
       <div className="max-w-4xl mx-auto px-6 py-16">
-        <div className="text-center mb-14">
-          <div className="inline-block bg-blue-600 text-white text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-1.5 bg-blue-600/20 border border-blue-500/40 text-blue-300 text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-full mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
             Högskoleprov
           </div>
-          <h1 className="text-5xl font-black mb-3 tracking-tight">HP Träning</h1>
+          <h1 className="text-5xl sm:text-6xl font-black mb-3 tracking-tight">
+            <span className="bg-gradient-to-r from-white via-blue-100 to-slate-300 bg-clip-text text-transparent">HP Träning</span>
+          </h1>
           <p className="text-slate-400 text-lg">Kvantitativ del — XYZ · KVA · NOG · DTK</p>
           <p className="text-slate-500 text-sm mt-2">{total} frågor · Verkliga HP-prov 2025–2026</p>
           <p className="text-slate-400 text-sm mt-3 italic">{tagline}</p>
@@ -94,18 +111,16 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-8">
-          {(Object.entries(byType) as [string, number][]).map(([type, count]) => (
-            <div key={type} className="bg-slate-800/70 rounded-2xl p-5 border border-slate-700">
-              <div className="text-2xl font-black text-blue-400">{type}</div>
-              <div className="text-slate-400 text-sm mt-1">{count} frågor</div>
-              <div className="text-xs text-slate-500 mt-1">
-                {type === 'XYZ' && 'Matematisk problemlösning'}
-                {type === 'KVA' && 'Kvantitativa jämförelser'}
-                {type === 'NOG' && 'Kvantitativa resonemang'}
-                {type === 'DTK' && 'Diagram, tabeller och kartor'}
+          {(Object.entries(byType) as [string, number][]).map(([type, count]) => {
+            const accent = TYPE_ACCENTS[type]
+            return (
+              <div key={type} className={`rounded-2xl p-5 border border-slate-700/60 border-t-2 ${accent?.border ?? ''} bg-slate-800/60`}>
+                <div className={`text-2xl font-black ${accent?.color ?? 'text-white'}`}>{type}</div>
+                <div className="text-slate-300 text-sm font-medium mt-1">{count} frågor</div>
+                <div className="text-xs text-slate-500 mt-1">{TYPE_DESC[type]}</div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Gamification stats bar */}
@@ -161,44 +176,44 @@ export default function Home() {
         <div className="grid grid-cols-1 gap-4">
           <button
             onClick={() => navigate('/practice')}
-            className="bg-blue-600 hover:bg-blue-500 transition-colors rounded-2xl p-6 text-left group"
+            className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all rounded-2xl p-6 text-left group shadow-lg shadow-blue-900/30"
           >
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xl font-bold">Börja öva</div>
-                <div className="text-blue-200 text-sm mt-1">Välj delprov, tidsgräns och svarsläge</div>
+                <div className="text-xl font-black">Börja öva</div>
+                <div className="text-blue-100 text-sm mt-1">Välj delprov, tidsgräns och svarsläge</div>
               </div>
-              <div className="text-3xl group-hover:translate-x-1 transition-transform">→</div>
+              <div className="text-3xl group-hover:translate-x-1.5 transition-transform">→</div>
             </div>
           </button>
 
           <button
             onClick={() => navigate('/exam-select')}
-            className="bg-slate-800/70 hover:bg-slate-700 transition-colors border border-slate-600 rounded-2xl p-6 text-left group"
+            className="bg-slate-800/80 hover:bg-slate-700/80 transition-colors border border-slate-600 hover:border-slate-500 rounded-2xl p-6 text-left group"
           >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-xl font-bold">Simulera HP-prov</div>
                 <div className="text-slate-400 text-sm mt-1">40 frågor · 4 avsnitt · 55 minuter</div>
               </div>
-              <div className="text-3xl group-hover:translate-x-1 transition-transform text-slate-400">→</div>
+              <div className="text-2xl group-hover:translate-x-1 transition-transform text-slate-400">→</div>
             </div>
           </button>
 
           <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => navigate('/theory')}
-              className="bg-slate-800/70 hover:bg-slate-700 transition-colors border border-slate-700 rounded-2xl p-5 text-left group"
+              className="bg-slate-800/70 hover:bg-slate-700/80 transition-colors border border-slate-700 hover:border-slate-600 rounded-2xl p-5 text-left group"
             >
-              <div className="text-lg font-bold">Teori & Tips</div>
-              <div className="text-slate-400 text-sm mt-1">Lär dig metoderna för varje delprov</div>
+              <div className="text-base font-bold">Teori & Tips</div>
+              <div className="text-slate-400 text-xs mt-1.5">Metoder för varje delprov</div>
             </button>
             <button
               onClick={() => navigate('/progress')}
-              className="bg-slate-800/70 hover:bg-slate-700 transition-colors border border-slate-700 rounded-2xl p-5 text-left group"
+              className="bg-slate-800/70 hover:bg-slate-700/80 transition-colors border border-slate-700 hover:border-slate-600 rounded-2xl p-5 text-left group"
             >
-              <div className="text-lg font-bold">Min statistik</div>
-              <div className="text-slate-400 text-sm mt-1">Resultat och framsteg</div>
+              <div className="text-base font-bold">Min statistik</div>
+              <div className="text-slate-400 text-xs mt-1.5">Resultat och framsteg</div>
             </button>
           </div>
         </div>

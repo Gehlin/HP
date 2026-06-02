@@ -3,10 +3,12 @@ import { loadSession, saveSession } from '../utils/session'
 import { questions } from '../data/questions'
 import type { QuestionType, AnswerKey } from '../types'
 import MathText from '../components/MathText'
+import ExplanationCard from '../components/ExplanationCard'
 import { useState, useEffect } from 'react'
 import { loadStats, saveStats, getLevel } from '../utils/gamification'
 import { getStats as getSrsStats } from '../utils/srs'
 import { SECTION_META, HP_AVERAGES, SECTION_ORDER } from '../data/exams'
+import { estimateHpScore, hpScoreColor, hpScoreLabel } from '../utils/hpScore'
 
 interface XpInfo {
   earned: number
@@ -98,6 +100,15 @@ export default function Results() {
   const fmtDuration = `${Math.floor(duration / 60)}m ${duration % 60}s`
 
   const scoreLabel = pct >= 85 ? '🏆 Utmärkt!' : pct >= 65 ? '👍 Bra jobbat' : pct >= 45 ? '📈 Fortsätt öva' : '💪 Mer träning krävs'
+  const scoreColor = pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'
+  const scoreBarColor = pct >= 70 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'
+
+  const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
+    XYZ: { text: 'text-violet-400', bar: 'bg-violet-500' },
+    KVA: { text: 'text-blue-400',   bar: 'bg-blue-500'   },
+    NOG: { text: 'text-emerald-400', bar: 'bg-emerald-500' },
+    DTK: { text: 'text-amber-400',  bar: 'bg-amber-500'  },
+  }
 
   const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
@@ -165,18 +176,45 @@ export default function Results() {
         )}
 
         {/* Score card */}
-        <div className="bg-slate-800 rounded-2xl p-6 mb-6 text-center">
-          <div className="text-7xl font-black text-blue-400">{pct}%</div>
+        <div className="bg-slate-800 rounded-2xl p-6 mb-4 text-center">
+          <div className={`text-7xl font-black ${scoreColor}`}>{pct}%</div>
           <div className="text-slate-400 mt-1">
             {correct} av {total} rätt{skippedCount > 0 && ` · ${skippedCount} hoppade`} · {fmtDuration}
           </div>
           <div className="mt-4 h-3 bg-slate-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 rounded-full transition-all"
+              className={`h-full ${scoreBarColor} rounded-full transition-all`}
               style={{ width: `${pct}%` }}
             />
           </div>
         </div>
+
+        {/* HP Score Predictor */}
+        {(() => {
+          const hpScore = estimateHpScore(pct)
+          const hpColor = hpScoreColor(hpScore)
+          const hpLabel = hpScoreLabel(hpScore)
+          const hpPct = ((hpScore - 1.00) / 1.00) * 100
+          return (
+            <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-5 mb-6">
+              <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-3">Estimerat HP-betyg</div>
+              <div className="flex items-end gap-3 mb-3">
+                <span className={`text-5xl font-black ${hpColor}`}>{hpScore.toFixed(2)}</span>
+                <span className={`text-sm font-bold mb-1 ${hpColor}`}>{hpLabel}</span>
+              </div>
+              <div className="h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${hpScore >= 1.80 ? 'bg-emerald-500' : hpScore >= 1.50 ? 'bg-blue-500' : hpScore >= 1.25 ? 'bg-amber-500' : 'bg-red-500'}`}
+                  style={{ width: `${hpPct}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[10px] text-slate-600">
+                <span>1.00</span><span>1.25</span><span>1.50</span><span>1.75</span><span>2.00</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-2">Uppskattning baserad på normdata från tidigare HP-prov.</p>
+            </div>
+          )
+        })()}
 
         {/* By type */}
         <div className="grid grid-cols-2 gap-3 mb-8">
@@ -184,13 +222,14 @@ export default function Results() {
             .filter(([, v]) => v.total > 0)
             .map(([type, v]) => {
               const p = Math.round((v.correct / v.total) * 100)
+              const tc = TYPE_COLORS[type]
               return (
                 <div key={type} className="bg-slate-800 rounded-xl p-4">
-                  <div className="font-black text-blue-400">{type}</div>
+                  <div className={`font-black ${tc.text}`}>{type}</div>
                   <div className="text-2xl font-bold mt-1">{p}%</div>
                   <div className="text-xs text-slate-400">{v.correct}/{v.total} rätt</div>
                   <div className="mt-2 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${p}%` }} />
+                    <div className={`h-full ${tc.bar} rounded-full`} style={{ width: `${p}%` }} />
                   </div>
                 </div>
               )
@@ -368,6 +407,13 @@ export default function Results() {
             const bgCls = ok ? 'bg-emerald-900/20' : isSkipped ? 'bg-slate-800/40' : 'bg-red-900/20'
             const indicator = ok ? '✓' : isSkipped ? '→' : '✗'
 
+            const questionTimeMs = session.questionTimes?.[q.id]
+            const fmtQuestionTime = questionTimeMs
+              ? questionTimeMs >= 60000
+                ? `${Math.floor(questionTimeMs / 60000)}m ${Math.round((questionTimeMs % 60000) / 1000)}s`
+                : `${Math.round(questionTimeMs / 1000)}s`
+              : null
+
             const srs = getSrsStats(q.id)
             const srsPill = (() => {
               if (!srs) return null
@@ -389,12 +435,17 @@ export default function Results() {
                 >
                   <span className={`text-lg ${isSkipped ? 'text-slate-400' : ''}`}>{indicator}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs text-slate-400 mb-1 flex items-center gap-2">
+                    <div className="text-xs text-slate-400 mb-1 flex items-center gap-2 flex-wrap">
                       {q.type} · {q.source}
                       {isFlagged && <span className="text-amber-400">★</span>}
                       {srsPill && (
                         <span className={`border rounded px-1.5 py-0.5 text-xs font-medium ${srsPill.cls}`}>
                           {srsPill.label}
+                        </span>
+                      )}
+                      {fmtQuestionTime && (
+                        <span className="border border-slate-700 rounded px-1.5 py-0.5 text-[10px] text-slate-500">
+                          ⏱ {fmtQuestionTime}
                         </span>
                       )}
                     </div>
@@ -406,23 +457,27 @@ export default function Results() {
                 </button>
 
                 {expanded && (
-                  <div className="px-4 pb-4 bg-slate-800/50">
+                  <div className="px-4 pb-4 bg-slate-800/40">
                     <div className="grid gap-2 mt-3">
                       {answerOptions.map(([key, text]) => {
                         let cls = 'border-slate-600 text-slate-400'
-                        if (key === q.answer) cls = 'border-emerald-500 text-emerald-300'
-                        if (key === userAnswer && key !== q.answer) cls = 'border-red-500 text-red-300'
+                        let labelCls = 'bg-slate-700 text-slate-400'
+                        if (key === q.answer) { cls = 'border-emerald-500/60 text-slate-200 bg-emerald-900/20'; labelCls = 'bg-emerald-600 text-white' }
+                        if (key === userAnswer && key !== q.answer) { cls = 'border-red-500/60 text-slate-200 bg-red-900/20'; labelCls = 'bg-red-600 text-white' }
                         return (
-                          <div key={key} className={`border rounded-lg px-3 py-2 text-sm flex gap-2 ${cls}`}>
-                            <span className="font-black">{key}</span>
+                          <div key={key} className={`border rounded-xl px-3 py-2.5 text-sm flex gap-3 items-start ${cls}`}>
+                            <span className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-black ${labelCls}`}>{key}</span>
                             <MathText text={text} />
                           </div>
                         )
                       })}
                     </div>
-                    <div className="mt-3 text-sm text-slate-300 bg-slate-800 rounded-lg p-3">
-                      <MathText text={q.explanation} />
-                    </div>
+                    <ExplanationCard
+                      isCorrect={!isSkipped && userAnswer === q.answer}
+                      correctAnswer={q.answer}
+                      explanation={q.explanation}
+                      explanationData={q.explanationData}
+                    />
                   </div>
                 )}
               </div>
