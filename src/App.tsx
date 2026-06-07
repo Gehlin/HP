@@ -11,6 +11,10 @@ import ExamStart from './pages/ExamStart'
 import Settings from './pages/Settings'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
 import BottomNav from './components/BottomNav'
+import { maybeShowDueNotification } from './utils/notifications'
+import { getDueQuestions } from './utils/srs'
+import { questions } from './data/questions'
+import { loadHistory } from './utils/session'
 
 const KEYBOARD_SHORTCUTS = [
   { key: 'A – E', desc: 'Välj svarsalternativ' },
@@ -33,6 +37,13 @@ function AppInner() {
       window.removeEventListener('online', online)
       window.removeEventListener('offline', offline)
     }
+  }, [])
+
+  useEffect(() => {
+    const dueCount = getDueQuestions(questions.map(q => q.id)).length
+    const history = loadHistory()
+    const lastSession = history.length > 0 ? history[0].startTime : null
+    maybeShowDueNotification(dueCount, lastSession)
   }, [])
 
   useEffect(() => {

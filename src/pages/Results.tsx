@@ -12,6 +12,7 @@ import { estimateHpScore, hpScoreColor, hpScoreLabel } from '../utils/hpScore'
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
 import { checkAchievements } from '../utils/achievements'
 import AchievementToast from '../components/AchievementToast'
+import { notificationsEnabled, notificationsSupported, requestNotificationPermission } from '../utils/notifications'
 
 interface XpInfo {
   earned: number
@@ -68,6 +69,11 @@ export default function Results() {
         streakIncreased = statsAfter.streak > session.streakBefore
       }
       saveSession({ ...session, xpEarned: earned })
+
+      // Ask for notification permission after first session, once
+      if (notificationsSupported() && !notificationsEnabled() && Notification.permission === 'default') {
+        setTimeout(() => requestNotificationPermission(), 3000)
+      }
     }
 
     const stats = loadStats()

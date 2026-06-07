@@ -1,29 +1,61 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { questions } from '../data/questions'
 import { loadStats } from '../utils/gamification'
 import { loadHistory } from '../utils/session'
 import { getBookmarks } from '../utils/bookmarks'
 import { getEarnedIds } from '../utils/achievements'
+import {
+  notificationsSupported,
+  notificationsEnabled,
+  requestNotificationPermission,
+  disableNotifications,
+} from '../utils/notifications'
 
 const KEYS = {
-  srs:         'hp_srs',
-  session:     'hp_current_session',
-  history:     'hp_session_history',
-  gamification:'hp_gamification',
-  bookmarks:   'hp_bookmarks',
-  achievements:'hp_achievements',
-  onboarding:  'hp_onboarding_done',
-  daily:       'hp_daily_done',
-  examDate:    'hp_exam_date',
+  srs:          'hp_srs',
+  session:      'hp_current_session',
+  history:      'hp_session_history',
+  gamification: 'hp_gamification',
+  bookmarks:    'hp_bookmarks',
+  achievements: 'hp_achievements',
+  onboarding:   'hp_onboarding_done',
+  daily:        'hp_daily_done',
+  examDate:     'hp_exam_date',
+  notifEnabled: 'hp_notif_enabled',
+  notifLastShown: 'hp_notif_last_shown',
 }
+
+const ALL_KEYS = Object.values(KEYS)
 
 type Confirming = 'srs' | 'history' | 'bookmarks' | 'achievements' | 'all' | null
 
+function exportData(): void {
+  const data: Record<string, unknown> = {}
+  ALL_KEYS.forEach(k => {
+    const v = localStorage.getItem(k)
+    if (v !== null) {
+      try { data[k] = JSON.parse(v) } catch { data[k] = v }
+    }
+  })
+  const payload = JSON.stringify({ version: 1, exported: new Date().toISOString(), data }, null, 2)
+  const blob = new Blob([payload], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `hp-backup-${new Date().toISOString().slice(0, 10)}.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 export default function Settings() {
   const navigate = useNavigate()
+  const fileRef = useRef<HTMLInputElement>(null)
   const [confirming, setConfirming] = useState<Confirming>(null)
   const [done, setDone] = useState<string | null>(null)
+  const [notifOn, setNotifOn] = useState(() => notificationsEnabled())
 
   const stats = loadStats()
   const history = loadHistory()
@@ -45,37 +77,46 @@ export default function Settings() {
     }
   }
 
-  const resetSrs = () => {
-    localStorage.removeItem(KEYS.srs)
-    flash('SRS-data rensad')
-  }
-
+  const resetSrs = () => { localStorage.removeItem(KEYS.srs); flash('SRS-data rensad') }
   const resetHistory = () => {
-    localStorage.removeItem(KEYS.history)
-    localStorage.removeItem(KEYS.session)
-    localStorage.removeItem(KEYS.gamification)
+    ;[KEYS.history, KEYS.session, KEYS.gamification].forEach(k => localStorage.removeItem(k))
     flash('Träningshistorik och XP nollställda')
   }
-
-  const resetBookmarks = () => {
-    localStorage.removeItem(KEYS.bookmarks)
-    flash('Bokmärken rensade')
-  }
-
-  const resetAchievements = () => {
-    localStorage.removeItem(KEYS.achievements)
-    flash('Brickor rensade')
-  }
-
+  const resetBookmarks = () => { localStorage.removeItem(KEYS.bookmarks); flash('Bokmärken rensade') }
+  const resetAchievements = () => { localStorage.removeItem(KEYS.achievements); flash('Brickor rensade') }
   const resetAll = () => {
-    Object.values(KEYS).forEach(k => localStorage.removeItem(k))
+    ALL_KEYS.forEach(k => localStorage.removeItem(k))
     flash('All data rensad — välkommen tillbaka!')
     setTimeout(() => navigate('/'), 1500)
   }
 
-  const restartOnboarding = () => {
-    localStorage.removeItem(KEYS.onboarding)
-    navigate('/')
+  const handleImport = (file: File) => {
+    const reader = new FileReader()
+    reader.onload = e => {
+      try {
+        const json = JSON.parse(e.target?.result as string)
+        if (!json.data || typeof json.data !== 'object') throw new Error()
+        Object.entries(json.data).forEach(([k, v]) => {
+          if (ALL_KEYS.includes(k)) localStorage.setItem(k, JSON.stringify(v))
+        })
+        flash('Data importerad!')
+        setTimeout(() => window.location.reload(), 1200)
+      } catch {
+        flash('Fel: ogiltig backupfil')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const toggleNotifications = async () => {
+    if (notifOn) {
+      disableNotifications()
+      setNotifOn(false)
+    } else {
+      const granted = await requestNotificationPermission()
+      setNotifOn(granted)
+      if (!granted) flash('Notiser blockerade av webbläsaren')
+    }
   }
 
   return (
@@ -112,6 +153,70 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* Backup & restore */}
+        <div className="mb-8">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Säkerhetskopiering</div>
+          <div className="space-y-3">
+            <button
+              onClick={exportData}
+              className="w-full text-left bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 rounded-xl px-5 py-4 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-slate-200">Exportera data</div>
+                  <div className="text-xs text-slate-500 mt-1">Laddar ner en JSON-fil med all din data</div>
+                </div>
+                <span className="text-slate-400 text-lg shrink-0">⬇</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="w-full text-left bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 rounded-xl px-5 py-4 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-slate-200">Importera data</div>
+                  <div className="text-xs text-slate-500 mt-1">Återställ från en tidigare exporterad fil</div>
+                </div>
+                <span className="text-slate-400 text-lg shrink-0">⬆</span>
+              </div>
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".json,application/json"
+              className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleImport(f) }}
+            />
+          </div>
+        </div>
+
+        {/* Notifications */}
+        {notificationsSupported() && (
+          <div className="mb-8">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Notiser</div>
+            <button
+              onClick={toggleNotifications}
+              className="w-full text-left bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 rounded-xl px-5 py-4 transition-colors"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="font-semibold text-slate-200">Påminnelser om repetition</div>
+                  <div className="text-xs text-slate-500 mt-1">
+                    {Notification.permission === 'denied'
+                      ? 'Blockerade av webbläsaren — ändra i webbläsarinställningarna'
+                      : 'Visa en systemnotis när du har frågor att repetera'}
+                  </div>
+                </div>
+                <div className={`w-10 h-6 rounded-full transition-colors flex items-center shrink-0 ${notifOn ? 'bg-blue-600' : 'bg-slate-600'} ${Notification.permission === 'denied' ? 'opacity-40' : ''}`}>
+                  <div className={`w-4 h-4 rounded-full bg-white mx-1 transition-transform ${notifOn ? 'translate-x-4' : 'translate-x-0'}`} />
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
+
         {/* Reset options */}
         <div className="space-y-3 mb-8">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Rensa data</div>
@@ -123,7 +228,6 @@ export default function Settings() {
             isConfirming={confirming === 'srs'}
             onPress={() => confirm('srs', resetSrs)}
           />
-
           <ResetRow
             label="Rensa träningshistorik & XP"
             description="Tar bort alla pass, XP och streak. Brickor behålls."
@@ -131,7 +235,6 @@ export default function Settings() {
             isConfirming={confirming === 'history'}
             onPress={() => confirm('history', resetHistory)}
           />
-
           <ResetRow
             label="Rensa bokmärken"
             description="Tar bort alla sparade frågor."
@@ -139,7 +242,6 @@ export default function Settings() {
             isConfirming={confirming === 'bookmarks'}
             onPress={() => confirm('bookmarks', resetBookmarks)}
           />
-
           <ResetRow
             label="Rensa brickor"
             description="Nollställer alla upplåsta achievements."
@@ -149,11 +251,11 @@ export default function Settings() {
           />
         </div>
 
-        {/* Onboarding */}
+        {/* Misc */}
         <div className="mb-8">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Övrigt</div>
           <button
-            onClick={restartOnboarding}
+            onClick={() => { localStorage.removeItem(KEYS.onboarding); navigate('/') }}
             className="w-full text-left bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 rounded-xl px-5 py-4 transition-colors"
           >
             <div className="font-semibold text-slate-200">Visa introduktion igen</div>
@@ -177,7 +279,6 @@ export default function Settings() {
           </button>
         </div>
 
-        {/* App info */}
         <div className="mt-8 text-center space-y-1">
           <p className="text-xs text-slate-600">HP Träning — Kvantitativ del</p>
           <p className="text-xs text-slate-600">{questions.length} frågor · Verkliga HP-prov 2025–2026</p>
@@ -187,14 +288,8 @@ export default function Settings() {
   )
 }
 
-function ResetRow({
-  label, description, badge, isConfirming, onPress,
-}: {
-  label: string
-  description: string
-  badge: string
-  isConfirming: boolean
-  onPress: () => void
+function ResetRow({ label, description, badge, isConfirming, onPress }: {
+  label: string; description: string; badge: string; isConfirming: boolean; onPress: () => void
 }) {
   return (
     <button
