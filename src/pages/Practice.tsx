@@ -4,6 +4,7 @@ import type { QuestionType, ExamSession } from '../types'
 import { questions } from '../data/questions'
 import { buildSession, saveSession, loadHistory } from '../utils/session'
 import { getDueQuestions } from '../utils/srs'
+import { getBookmarks } from '../utils/bookmarks'
 
 type Mode = 'drill' | 'exam' | 'repetition'
 type Difficulty = 'easy' | 'medium' | 'hard'
@@ -105,6 +106,8 @@ export default function Practice() {
     return counts
   }, [dueIds])
 
+  const bookmarkedIds = useMemo(() => getBookmarks().filter(id => questions.some(q => q.id === id)), [])
+
   const wrongQuestionIds = useMemo(() => {
     const history = loadHistory()
     const wrongSet = new Set<string>()
@@ -121,6 +124,14 @@ export default function Practice() {
     const pool = questions.filter(q => wrongQuestionIds.includes(q.id))
     const shuffled = [...pool].sort(() => Math.random() - 0.5)
     const session = buildSession(shuffled.map(q => q.id), null, true, 'drill', true)
+    saveSession(session)
+    navigate('/session')
+  }
+
+  const startBookmarkDrill = () => {
+    const pool = questions.filter(q => bookmarkedIds.includes(q.id))
+    const shuffled = [...pool].sort(() => Math.random() - 0.5)
+    const session = buildSession(shuffled.map(q => q.id), null, true, 'drill')
     saveSession(session)
     navigate('/session')
   }
@@ -152,16 +163,27 @@ export default function Practice() {
 
         <h1 className="text-3xl font-black mb-8">Konfigurera träning</h1>
 
-        {/* Wrong answers quick-drill */}
-        {wrongQuestionIds.length > 0 && (
-          <section className="mb-8">
-            <button
-              onClick={startWrongDrill}
-              className="w-full rounded-xl p-4 border border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-left transition-colors"
-            >
-              <div className="font-bold text-amber-400">Öva på dina fel — {wrongQuestionIds.length} frågor du svarat fel på</div>
-              <div className="text-xs text-amber-300/70 mt-1">Starta direkt med omedelbar återkoppling</div>
-            </button>
+        {/* Quick-drill shortcuts */}
+        {(wrongQuestionIds.length > 0 || bookmarkedIds.length > 0) && (
+          <section className="mb-8 space-y-3">
+            {wrongQuestionIds.length > 0 && (
+              <button
+                onClick={startWrongDrill}
+                className="w-full rounded-xl p-4 border border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-left transition-colors"
+              >
+                <div className="font-bold text-amber-400">Öva på dina fel — {wrongQuestionIds.length} frågor du svarat fel på</div>
+                <div className="text-xs text-amber-300/70 mt-1">Starta direkt med studieläge och omedelbar återkoppling</div>
+              </button>
+            )}
+            {bookmarkedIds.length > 0 && (
+              <button
+                onClick={startBookmarkDrill}
+                className="w-full rounded-xl p-4 border border-blue-600 bg-blue-600/10 hover:bg-blue-600/20 text-left transition-colors"
+              >
+                <div className="font-bold text-blue-400">🔖 Bokmärkta frågor — {bookmarkedIds.length} sparade</div>
+                <div className="text-xs text-blue-300/70 mt-1">Öva på frågor du valt att spara</div>
+              </button>
+            )}
           </section>
         )}
 

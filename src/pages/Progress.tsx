@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { loadHistory } from '../utils/session'
 import { questions } from '../data/questions'
 import { loadStats, getLevel, LEVELS } from '../utils/gamification'
@@ -6,6 +7,7 @@ import { getStats as getSrsStats } from '../utils/srs'
 import { estimateHpScore, hpScoreColor } from '../utils/hpScore'
 import { computeReadiness } from '../utils/readiness'
 import { getExamDate, daysUntilExam } from '../utils/examDate'
+import { getBookmarks, toggleBookmark } from '../utils/bookmarks'
 import type { QuestionType } from '../types'
 
 const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
@@ -23,6 +25,7 @@ export default function Progress() {
   const readiness = computeReadiness()
   const examDate = getExamDate()
   const daysLeft = daysUntilExam()
+  const [bookmarkIds, setBookmarkIds] = useState<string[]>(() => getBookmarks())
 
   const allAnswers: { qid: string; correct: boolean }[] = []
   history.forEach(s => {
@@ -370,6 +373,49 @@ export default function Progress() {
               </div>
               <div className="text-xs text-slate-500 mt-2 text-right">{questions.length} frågor totalt</div>
             </div>
+
+            {/* Bookmarks */}
+            {bookmarkIds.length > 0 && (() => {
+              const bookmarkedQs = bookmarkIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as typeof questions
+              return (
+                <div className="bg-slate-800 rounded-2xl p-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">🔖 Bokmärkta frågor</h2>
+                    <span className="text-xs text-slate-500">{bookmarkIds.length} sparade</span>
+                  </div>
+                  <div className="space-y-2">
+                    {bookmarkedQs.slice(0, 8).map(q => {
+                      const tc = TYPE_COLORS[q.type]
+                      return (
+                        <div key={q.id} className="flex items-center gap-3 bg-slate-700/40 rounded-xl px-3 py-2.5">
+                          <span className={`text-xs font-black shrink-0 ${tc.text}`}>{q.type}</span>
+                          <span className="text-xs text-slate-300 flex-1 line-clamp-1">{q.text.replace(/\$[^$]+\$/g, '…')}</span>
+                          <button
+                            onClick={() => {
+                              toggleBookmark(q.id)
+                              setBookmarkIds(getBookmarks())
+                            }}
+                            className="text-slate-500 hover:text-red-400 transition-colors text-xs shrink-0"
+                            title="Ta bort bokmärke"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      )
+                    })}
+                    {bookmarkedQs.length > 8 && (
+                      <p className="text-xs text-slate-500 text-center pt-1">+{bookmarkedQs.length - 8} fler</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => navigate('/practice')}
+                    className="mt-4 w-full border border-blue-700/50 text-blue-400 hover:bg-blue-900/20 rounded-xl py-2.5 text-sm font-bold transition-colors"
+                  >
+                    Öva på bokmärkta frågor →
+                  </button>
+                </div>
+              )
+            })()}
 
             {/* Topic weakness report */}
             {tagStats.length > 0 && (

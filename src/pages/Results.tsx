@@ -9,6 +9,7 @@ import { loadStats, saveStats, getLevel } from '../utils/gamification'
 import { getStats as getSrsStats } from '../utils/srs'
 import { SECTION_META, HP_AVERAGES, SECTION_ORDER } from '../data/exams'
 import { estimateHpScore, hpScoreColor, hpScoreLabel } from '../utils/hpScore'
+import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
 
 interface XpInfo {
   earned: number
@@ -26,6 +27,11 @@ export default function Results() {
   const session = loadSession()
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [reviewFilter, setReviewFilter] = useState<'all' | 'flagged'>('all')
+  const [bookmarkState, setBookmarkState] = useState<Record<string, boolean>>(() => {
+    const s = loadSession()
+    if (!s) return {}
+    return Object.fromEntries(s.questionIds.map(id => [id, isBookmarked(id)]))
+  })
   const [cardVisible, setCardVisible] = useState(false)
   const [xpInfo, setXpInfo] = useState<XpInfo | null>(null)
 
@@ -448,6 +454,16 @@ export default function Results() {
                           ⏱ {fmtQuestionTime}
                         </span>
                       )}
+                      <button
+                        onClick={e => {
+                          e.stopPropagation()
+                          const next = toggleBookmark(q.id)
+                          setBookmarkState(s => ({ ...s, [q.id]: next }))
+                        }}
+                        className={`border rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${bookmarkState[q.id] ? 'border-blue-600 text-blue-400 bg-blue-900/20' : 'border-slate-700 text-slate-500 hover:border-slate-500'}`}
+                      >
+                        🔖 {bookmarkState[q.id] ? 'Sparat' : 'Spara'}
+                      </button>
                     </div>
                     <div className="text-sm line-clamp-2">
                       <MathText text={q.text} />

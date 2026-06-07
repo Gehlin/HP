@@ -4,8 +4,10 @@ import type { AnswerKey } from '../types'
 import { questions } from '../data/questions'
 import { SECTION_META } from '../data/exams'
 import { loadSession, updateAnswer, finishSession, toggleFlag, skipQuestion, saveSession, saveQuestionTime, saveQuestionQuality } from '../utils/session'
+import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
 import MathText from '../components/MathText'
 import ExplanationCard from '../components/ExplanationCard'
+import FormulaDrawer from '../components/FormulaDrawer'
 
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
@@ -53,6 +55,12 @@ export default function Session() {
   const [cardAnimClass, setCardAnimClass] = useState('')
   const [breakScreen, setBreakScreen] = useState<BreakScreenData | null>(null)
   const [breakCountdown, setBreakCountdown] = useState(3)
+  const [showFormulas, setShowFormulas] = useState(false)
+  const [bookmarked, setBookmarked] = useState<Record<string, boolean>>(() => {
+    const session = loadSession()
+    if (!session) return {}
+    return Object.fromEntries(session.questionIds.map(id => [id, isBookmarked(id)]))
+  })
   const [sectionTimestamps, setSectionTimestamps] = useState<Record<string, number>>(
     session?.sectionTimestamps ?? {}
   )
@@ -327,6 +335,23 @@ export default function Session() {
           >
             {flagged.includes(q.id) ? '★' : '☆'}<span className="hidden sm:inline"> Markera</span>
           </button>
+          <button
+            onClick={() => {
+              const next = toggleBookmark(q.id)
+              setBookmarked(b => ({ ...b, [q.id]: next }))
+            }}
+            title={bookmarked[q.id] ? 'Ta bort bokmärke' : 'Bokmärk fråga'}
+            className={`text-sm px-2 py-1 rounded-lg border transition-colors shrink-0 ${bookmarked[q.id] ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300'}`}
+          >
+            {bookmarked[q.id] ? '🔖' : '🔖'}<span className="hidden sm:inline"> {bookmarked[q.id] ? 'Sparat' : 'Spara'}</span>
+          </button>
+          <button
+            onClick={() => setShowFormulas(true)}
+            title="Formler & strategier"
+            className="text-sm px-2 py-1 rounded-lg border border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300 transition-colors shrink-0"
+          >
+            📐<span className="hidden sm:inline"> Formler</span>
+          </button>
         </div>
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           {timeLeft !== null && (
@@ -486,6 +511,10 @@ export default function Session() {
           )}
         </div>
       </main>
+
+      {showFormulas && (
+        <FormulaDrawer questionType={q.type} onClose={() => setShowFormulas(false)} />
+      )}
 
       {/* Action buttons */}
       <div className="shrink-0 border-t border-slate-800 bg-slate-900 px-3 sm:px-6 py-3 sm:py-4 pb-safe">

@@ -76,3 +76,12 @@
 .pb-safe {
   padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 220ms cubic-bezier(0.32, 0.72, 0, 1);
+}
