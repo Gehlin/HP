@@ -9,6 +9,7 @@ import Progress from './pages/Progress'
 import ExamSelect from './pages/ExamSelect'
 import ExamStart from './pages/ExamStart'
 import Settings from './pages/Settings'
+import MathGuide from './pages/MathGuide'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
 import BottomNav from './components/BottomNav'
 import { maybeShowDueNotification } from './utils/notifications'
@@ -116,6 +117,7 @@ function AppInner() {
         <Route path="/exam-select" element={<ExamSelect />} />
         <Route path="/exam/:examId" element={<ExamStart />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/matematik" element={<MathGuide />} />
       </Routes>
 
       {!inSession && <BottomNav />}

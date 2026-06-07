@@ -1053,7 +1053,22 @@ export default function Theory() {
           ← Tillbaka
         </button>
 
-        <h1 className="text-3xl font-black mb-6">Teori & Tips</h1>
+        <h1 className="text-3xl font-black mb-4">Teori & Tips</h1>
+
+        {/* Math Guide promo */}
+        <button
+          onClick={() => navigate('/matematik')}
+          className="w-full mb-6 text-left bg-violet-900/20 border border-violet-700/50 hover:bg-violet-900/30 rounded-2xl p-4 transition-colors group"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-black text-violet-300 uppercase tracking-widest mb-0.5">Ny guide</div>
+              <div className="text-base font-bold text-white">Matematik på HP</div>
+              <div className="text-xs text-violet-400/70 mt-0.5">10 ämnen · formler · fällor · din personliga prioritering</div>
+            </div>
+            <span className="text-violet-400 text-xl group-hover:translate-x-1 transition-transform shrink-0">→</span>
+          </div>
+        </button>
 
         <div className="flex gap-2 flex-wrap mb-8">
           {SECTIONS.map(s => (

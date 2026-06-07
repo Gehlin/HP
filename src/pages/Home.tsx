@@ -379,6 +379,19 @@ export default function Home() {
           </button>
 
           <button
+            onClick={() => navigate('/matematik')}
+            className="border border-violet-700/50 bg-violet-900/10 hover:bg-violet-900/20 transition-colors rounded-2xl p-6 text-left group"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-xl font-bold text-violet-200">Matematik på HP</div>
+                <div className="text-violet-400/70 text-sm mt-1">10 ämnen · formler · din personliga prioritering</div>
+              </div>
+              <div className="text-2xl group-hover:translate-x-1 transition-transform text-violet-400">→</div>
+            </div>
+          </button>
+
+          <button
             onClick={() => navigate('/exam-select')}
             className="bg-slate-800/80 hover:bg-slate-700/80 transition-colors border border-slate-600 hover:border-slate-500 rounded-2xl p-6 text-left group"
           >
