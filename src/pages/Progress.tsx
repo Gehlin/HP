@@ -4,6 +4,8 @@ import { questions } from '../data/questions'
 import { loadStats, getLevel, LEVELS } from '../utils/gamification'
 import { getStats as getSrsStats } from '../utils/srs'
 import { estimateHpScore, hpScoreColor } from '../utils/hpScore'
+import { computeReadiness } from '../utils/readiness'
+import { getExamDate, daysUntilExam } from '../utils/examDate'
 import type { QuestionType } from '../types'
 
 const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
@@ -18,6 +20,9 @@ export default function Progress() {
   const history = loadHistory()
   const stats = loadStats()
   const levelInfo = getLevel(stats.xp)
+  const readiness = computeReadiness()
+  const examDate = getExamDate()
+  const daysLeft = daysUntilExam()
 
   const allAnswers: { qid: string; correct: boolean }[] = []
   history.forEach(s => {
@@ -127,6 +132,71 @@ export default function Progress() {
         </button>
 
         <h1 className="text-3xl font-black mb-8">Min statistik</h1>
+
+        {/* Readiness card */}
+        <div className="bg-slate-800 rounded-2xl p-6 mb-4">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">Provberedskap</div>
+              <div className="flex items-end gap-2">
+                <div className="text-4xl font-black text-white">{readiness.score}</div>
+                <div className="text-slate-500 text-sm mb-1">/100</div>
+              </div>
+              <div className={`text-sm font-bold mt-1 ${readiness.labelColor}`}>{readiness.label}</div>
+            </div>
+            <div className="text-right">
+              {examDate && daysLeft !== null ? (
+                <div>
+                  <div className="text-xs text-slate-400 mb-1">Dagar kvar</div>
+                  <div className={`text-3xl font-black ${daysLeft <= 7 ? 'text-red-400' : daysLeft <= 14 ? 'text-amber-400' : 'text-white'}`}>
+                    {daysLeft < 0 ? '—' : daysLeft}
+                  </div>
+                  <div className="text-xs text-slate-500 mt-0.5">
+                    {examDate.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' })}
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => navigate('/')}
+                  className="text-xs text-blue-400 hover:text-blue-300 border border-blue-700/50 rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  Sätt provdatum →
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="h-2 bg-slate-700 rounded-full overflow-hidden mb-4">
+            <div
+              className={`h-full rounded-full transition-all duration-700 ${readiness.score >= 80 ? 'bg-emerald-500' : readiness.score >= 65 ? 'bg-blue-500' : readiness.score >= 45 ? 'bg-amber-500' : 'bg-red-500'}`}
+              style={{ width: `${readiness.score}%` }}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className={`text-2xl font-black ${readiness.accuracy >= 70 ? 'text-emerald-400' : readiness.accuracy >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                {readiness.accuracy}%
+              </div>
+              <div className="text-xs text-slate-400 mt-1">Träffsäkerhet</div>
+              <div className="text-[10px] text-slate-600">Senaste 10 pass</div>
+            </div>
+            <div>
+              <div className={`text-2xl font-black ${readiness.mastery >= 50 ? 'text-emerald-400' : readiness.mastery >= 25 ? 'text-amber-400' : 'text-slate-400'}`}>
+                {readiness.mastery}%
+              </div>
+              <div className="text-xs text-slate-400 mt-1">Bemästrat</div>
+              <div className="text-[10px] text-slate-600">SRS-intervall ≥7 dagar</div>
+            </div>
+            <div>
+              <div className={`text-2xl font-black ${readiness.coverage >= 60 ? 'text-emerald-400' : readiness.coverage >= 30 ? 'text-amber-400' : 'text-slate-400'}`}>
+                {readiness.coverage}%
+              </div>
+              <div className="text-xs text-slate-400 mt-1">Täckning</div>
+              <div className="text-[10px] text-slate-600">Frågor sedda</div>
+            </div>
+          </div>
+        </div>
 
         {/* Level Card */}
         <div className="bg-slate-800 rounded-2xl p-6 mb-4">
