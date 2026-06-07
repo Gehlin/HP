@@ -99,7 +99,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-hero-grid text-white">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-6 py-12 pb-24">
 
         {/* Hero */}
         <div className="text-center mb-10">

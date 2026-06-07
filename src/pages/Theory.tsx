@@ -1048,7 +1048,7 @@ export default function Theory() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      <div className="max-w-2xl mx-auto px-6 py-10">
+      <div className="max-w-2xl mx-auto px-6 py-10 pb-24">
         <button onClick={() => navigate('/')} className="text-slate-400 hover:text-white mb-8 flex items-center gap-2 text-sm">
           ← Tillbaka
         </button>

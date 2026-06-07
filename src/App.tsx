@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Practice from './pages/Practice'
 import Session from './pages/Session'
@@ -8,7 +8,9 @@ import Theory from './pages/Theory'
 import Progress from './pages/Progress'
 import ExamSelect from './pages/ExamSelect'
 import ExamStart from './pages/ExamStart'
+import Settings from './pages/Settings'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
+import BottomNav from './components/BottomNav'
 
 const KEYBOARD_SHORTCUTS = [
   { key: 'A – E', desc: 'Välj svarsalternativ' },
@@ -16,7 +18,8 @@ const KEYBOARD_SHORTCUTS = [
   { key: '?', desc: 'Visa / dölj tangentbordsguide' },
 ]
 
-export default function App() {
+function AppInner() {
+  const location = useLocation()
   const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone())
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   const [showKeyGuide, setShowKeyGuide] = useState(false)
@@ -46,8 +49,10 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler)
   }, [showKeyGuide])
 
+  const inSession = location.pathname.startsWith('/session')
+
   return (
-    <BrowserRouter>
+    <>
       {!isOnline && (
         <div className="fixed top-0 inset-x-0 z-[300] bg-amber-600 text-white text-center text-xs py-1.5 font-semibold">
           Ingen internetanslutning — appen fungerar offline
@@ -99,7 +104,18 @@ export default function App() {
         <Route path="/progress" element={<Progress />} />
         <Route path="/exam-select" element={<ExamSelect />} />
         <Route path="/exam/:examId" element={<ExamStart />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
+
+      {!inSession && <BottomNav />}
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppInner />
     </BrowserRouter>
   )
 }

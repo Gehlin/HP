@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { loadSession, saveSession } from '../utils/session'
+import { loadSession, saveSession, buildSession } from '../utils/session'
 import { questions } from '../data/questions'
 import type { QuestionType, AnswerKey } from '../types'
 import MathText from '../components/MathText'
@@ -137,7 +137,7 @@ export default function Results() {
       {newAchievements.length > 0 && (
         <AchievementToast newIds={newAchievements} onDone={() => setNewAchievements([])} />
       )}
-      <div className="max-w-2xl mx-auto px-6 py-10">
+      <div className="max-w-2xl mx-auto px-6 py-10 pb-24">
         <h1 className="text-3xl font-black mb-2">Resultat</h1>
         <p className="text-slate-400 mb-8">{scoreLabel}</p>
 
@@ -548,6 +548,25 @@ export default function Results() {
             <p className="text-xs text-slate-500 text-center">Ta en skärmbild av kortet ovan för att dela ditt resultat</p>
           </div>
         </div>
+
+        {(() => {
+          const wrongIds = sessionQuestions
+            .filter(q => !skipped.includes(q.id) && session.answers[q.id] !== q.answer)
+            .map(q => q.id)
+          if (wrongIds.length === 0) return null
+          return (
+            <button
+              onClick={() => {
+                const drill = buildSession(wrongIds, null, true, 'drill', true)
+                saveSession(drill)
+                navigate('/session')
+              }}
+              className="w-full mb-3 border border-amber-600/60 bg-amber-900/15 hover:bg-amber-900/30 text-amber-300 rounded-xl py-3 font-bold transition-colors"
+            >
+              Öva på {wrongIds.length} fel från detta pass →
+            </button>
+          )
+        })()}
 
         <div className="flex gap-3">
           <button
