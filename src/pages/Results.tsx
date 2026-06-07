@@ -28,7 +28,7 @@ export default function Results() {
   const navigate = useNavigate()
   const session = loadSession()
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [reviewFilter, setReviewFilter] = useState<'all' | 'flagged'>('all')
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'wrong' | 'flagged'>('all')
   const [newAchievements, setNewAchievements] = useState<string[]>([])
   const [bookmarkState, setBookmarkState] = useState<Record<string, boolean>>(() => {
     const s = loadSession()
@@ -392,12 +392,18 @@ export default function Results() {
 
         {/* Review */}
         <h2 className="text-xl font-black mb-4">Genomgång</h2>
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-4 flex-wrap">
           <button
             onClick={() => setReviewFilter('all')}
             className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
           >
             Alla ({sessionQuestions.length})
+          </button>
+          <button
+            onClick={() => setReviewFilter('wrong')}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'wrong' ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
+          >
+            ✗ Fel ({sessionQuestions.filter(q => !skipped.includes(q.id) && session.answers[q.id] !== q.answer).length})
           </button>
           <button
             onClick={() => setReviewFilter('flagged')}
@@ -407,7 +413,11 @@ export default function Results() {
           </button>
         </div>
         <div className="space-y-3 mb-8">
-          {sessionQuestions.filter(q => reviewFilter === 'all' || (session.flagged ?? []).includes(q.id)).map(q => {
+          {sessionQuestions.filter(q => {
+            if (reviewFilter === 'wrong') return !skipped.includes(q.id) && session.answers[q.id] !== q.answer
+            if (reviewFilter === 'flagged') return (session.flagged ?? []).includes(q.id)
+            return true
+          }).map(q => {
             const isSkipped = skipped.includes(q.id)
             const userAnswer = session.answers[q.id]
             const ok = !isSkipped && userAnswer === q.answer

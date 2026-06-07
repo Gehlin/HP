@@ -377,6 +377,25 @@ export default function Session() {
         />
       </div>
 
+      {/* Per-type remaining strip — only for mixed-type non-exam sessions */}
+      {!isExam && (() => {
+        const remaining = sessionQuestions.slice(current)
+        const counts: Partial<Record<string, number>> = {}
+        remaining.forEach(qq => { counts[qq.type] = (counts[qq.type] ?? 0) + 1 })
+        const types = Object.keys(counts)
+        if (types.length <= 1) return null
+        return (
+          <div className="flex justify-center gap-3 bg-slate-900 py-1 shrink-0">
+            {types.map(t => (
+              <span key={t} className={`text-[10px] font-bold ${TYPE_COLOR[t]?.replace('bg-', 'text-').replace('-600', '-400') ?? 'text-slate-400'}`}>
+                {t} {counts[t]}
+              </span>
+            ))}
+            <span className="text-[10px] text-slate-600">kvar</span>
+          </div>
+        )
+      })()}
+
       {/* Scrollable question area */}
       <main
         className="flex-1 overflow-y-auto"
