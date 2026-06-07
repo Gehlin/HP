@@ -6,6 +6,7 @@ import { loadHistory, loadSession, saveSession } from '../utils/session'
 import { getDueQuestions } from '../utils/srs'
 import { getExamDate, setExamDate, clearExamDate, daysUntilExam, urgencyLabel, dailyTarget, KNOWN_HP_DATES } from '../utils/examDate'
 import { computeReadiness } from '../utils/readiness'
+import { isDailyChallengeCompleted, CHALLENGE_SIZE } from '../utils/dailyChallenge'
 import type { ExamSession } from '../types'
 
 const TYPE_ACCENTS: Record<string, { color: string; border: string }> = {
@@ -43,6 +44,7 @@ export default function Home() {
   const [customDate, setCustomDate] = useState('')
   const [readiness, setReadiness] = useState<ReturnType<typeof computeReadiness> | null>(null)
   const [dynamicTarget, setDynamicTarget] = useState(15)
+  const [dailyDone, setDailyDone] = useState(false)
 
   useEffect(() => {
     setStats(loadStats())
@@ -61,6 +63,7 @@ export default function Home() {
 
     const r = computeReadiness()
     setReadiness(r)
+    setDailyDone(isDailyChallengeCompleted())
 
     // Dynamic daily target
     const dueIds = getDueQuestions(questions.map(q => q.id))
@@ -352,6 +355,26 @@ export default function Home() {
                 <div className="text-blue-100 text-sm mt-1">Välj delprov, tidsgräns och svarsläge</div>
               </div>
               <div className="text-3xl group-hover:translate-x-1.5 transition-transform">→</div>
+            </div>
+          </button>
+
+          {/* Daily challenge */}
+          <button
+            onClick={() => navigate('/practice?daily=1')}
+            className={`border rounded-2xl p-6 text-left group transition-colors ${dailyDone ? 'border-emerald-700 bg-emerald-900/20' : 'border-violet-600/60 bg-violet-900/10 hover:bg-violet-900/20'}`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className={`text-xl font-black ${dailyDone ? 'text-emerald-400' : 'text-violet-300'}`}>
+                  {dailyDone ? '✓ Daglig utmaning klar' : 'Daglig utmaning'}
+                </div>
+                <div className={`text-sm mt-1 ${dailyDone ? 'text-emerald-600' : 'text-violet-400/70'}`}>
+                  {CHALLENGE_SIZE} frågor · Ny utmaning varje dag
+                </div>
+              </div>
+              <div className={`text-2xl group-hover:translate-x-1 transition-transform ${dailyDone ? 'text-emerald-400' : 'text-violet-400'}`}>
+                {dailyDone ? '✓' : '→'}
+              </div>
             </div>
           </button>
 

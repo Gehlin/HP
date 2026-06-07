@@ -1,0 +1,33 @@
+import { questions } from '../data/questions'
+
+export const CHALLENGE_SIZE = 10
+const DONE_KEY = 'hp_daily_done'
+
+function seedRng(seed: number) {
+  let s = seed
+  return () => {
+    s = (s * 1664525 + 1013904223) & 0xffffffff
+    return (s >>> 0) / 0xffffffff
+  }
+}
+
+function todaySeed(): number {
+  const d = new Date()
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()
+}
+
+export function getDailyChallengeIds(): string[] {
+  const rng = seedRng(todaySeed())
+  const shuffled = [...questions].sort(() => rng() - 0.5)
+  return shuffled.slice(0, CHALLENGE_SIZE).map(q => q.id)
+}
+
+export function isDailyChallengeCompleted(): boolean {
+  const raw = localStorage.getItem(DONE_KEY)
+  if (!raw) return false
+  return raw === new Date().toISOString().slice(0, 10)
+}
+
+export function markDailyChallengeCompleted(): void {
+  localStorage.setItem(DONE_KEY, new Date().toISOString().slice(0, 10))
+}

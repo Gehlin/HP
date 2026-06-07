@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import type { QuestionType, ExamSession } from '../types'
 import { questions } from '../data/questions'
 import { buildSession, saveSession, loadHistory } from '../utils/session'
 import { getDueQuestions } from '../utils/srs'
 import { getBookmarks } from '../utils/bookmarks'
+import { getDailyChallengeIds, markDailyChallengeCompleted } from '../utils/dailyChallenge'
 
 type Mode = 'drill' | 'exam' | 'repetition'
 type Difficulty = 'easy' | 'medium' | 'hard'
@@ -56,14 +57,19 @@ const ALL_TAGS = Array.from(new Set(questions.flatMap(q => q.tags))).sort()
 
 export default function Practice() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const tagParam = searchParams.get('tag')
+
   const [mode, setMode] = useState<Mode>('drill')
-  const [selectedTypes, setSelectedTypes] = useState<QuestionType[]>(['XYZ'])
+  const [selectedTypes, setSelectedTypes] = useState<QuestionType[]>(['XYZ', 'KVA', 'NOG', 'DTK'])
   const [timed, setTimed] = useState(false)
   const [instantFeedback, setInstantFeedback] = useState(true)
   const [count, setCount] = useState(20)
   const [selectedDifficulties, setSelectedDifficulties] = useState<Difficulty[]>([...ALL_DIFFICULTIES])
-  const [selectedTags, setSelectedTags] = useState<string[]>([...ALL_TAGS])
-  const [tagsOpen, setTagsOpen] = useState(false)
+  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
+    tagParam && ALL_TAGS.includes(tagParam) ? [tagParam] : [...ALL_TAGS]
+  )
+  const [tagsOpen, setTagsOpen] = useState(!!tagParam)
   const [studyMode, setStudyMode] = useState(false)
 
   const toggleType = (t: QuestionType) => {
@@ -107,6 +113,17 @@ export default function Practice() {
   }, [dueIds])
 
   const bookmarkedIds = useMemo(() => getBookmarks().filter(id => questions.some(q => q.id === id)), [])
+  const isDaily = searchParams.get('daily') === '1'
+
+  // Auto-start daily challenge if navigated with ?daily=1
+  useEffect(() => {
+    if (!isDaily) return
+    const ids = getDailyChallengeIds()
+    const session = buildSession(ids, null, true, 'drill')
+    saveSession(session)
+    markDailyChallengeCompleted()
+    navigate('/session', { replace: true })
+  }, [])
 
   const wrongQuestionIds = useMemo(() => {
     const history = loadHistory()

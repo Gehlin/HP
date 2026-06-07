@@ -67,6 +67,7 @@ export default function Session() {
 
   const questionStartRef = useRef<number>(Date.now())
   const explanationRef = useRef<HTMLDivElement>(null)
+  const touchStartXRef = useRef<number | null>(null)
 
   const isTransitioning = cardAnimClass !== ''
   const isExam = session?.type === 'exam'
@@ -377,7 +378,18 @@ export default function Session() {
       </div>
 
       {/* Scrollable question area */}
-      <main className="flex-1 overflow-y-auto">
+      <main
+        className="flex-1 overflow-y-auto"
+        onTouchStart={e => { touchStartXRef.current = e.touches[0].clientX }}
+        onTouchEnd={e => {
+          if (touchStartXRef.current === null) return
+          const dx = touchStartXRef.current - e.changedTouches[0].clientX
+          touchStartXRef.current = null
+          if (dx > 80 && (chosen || isRevealed) && !isTransitioning) {
+            handleNextQuestion()
+          }
+        }}
+      >
         <div className={`max-w-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8 ${cardAnimClass}`}>
           <div className="flex items-center gap-2 mb-3">
             <span className="text-[10px] font-medium text-slate-500 bg-slate-800 border border-slate-700 rounded px-2 py-0.5">

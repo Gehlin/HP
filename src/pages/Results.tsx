@@ -10,6 +10,8 @@ import { getStats as getSrsStats } from '../utils/srs'
 import { SECTION_META, HP_AVERAGES, SECTION_ORDER } from '../data/exams'
 import { estimateHpScore, hpScoreColor, hpScoreLabel } from '../utils/hpScore'
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
+import { checkAchievements } from '../utils/achievements'
+import AchievementToast from '../components/AchievementToast'
 
 interface XpInfo {
   earned: number
@@ -27,6 +29,7 @@ export default function Results() {
   const session = loadSession()
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [reviewFilter, setReviewFilter] = useState<'all' | 'flagged'>('all')
+  const [newAchievements, setNewAchievements] = useState<string[]>([])
   const [bookmarkState, setBookmarkState] = useState<Record<string, boolean>>(() => {
     const s = loadSession()
     if (!s) return {}
@@ -80,6 +83,8 @@ export default function Results() {
     })
 
     const t = setTimeout(() => setCardVisible(true), 150)
+    const newlyEarned = checkAchievements()
+    if (newlyEarned.length > 0) setTimeout(() => setNewAchievements(newlyEarned), 800)
     return () => clearTimeout(t)
   }, [])
 
@@ -129,6 +134,9 @@ export default function Results() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
+      {newAchievements.length > 0 && (
+        <AchievementToast newIds={newAchievements} onDone={() => setNewAchievements([])} />
+      )}
       <div className="max-w-2xl mx-auto px-6 py-10">
         <h1 className="text-3xl font-black mb-2">Resultat</h1>
         <p className="text-slate-400 mb-8">{scoreLabel}</p>
@@ -499,6 +507,46 @@ export default function Results() {
               </div>
             )
           })}
+        </div>
+
+        {/* Share card */}
+        <div className="mb-6">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Dela resultat</div>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-5">
+            {/* Card preview */}
+            <div id="share-card" className="bg-slate-900 rounded-xl p-5 border border-slate-700 mb-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-5 h-5 bg-violet-600 rounded-md flex items-center justify-center">
+                  <span className="text-[9px] font-black text-white">HP</span>
+                </div>
+                <span className="text-xs font-bold text-slate-400">HP Träning — Kvantitativ del</span>
+              </div>
+              <div className="flex items-end gap-4 mb-3">
+                <div className={`text-5xl font-black ${scoreColor}`}>{pct}%</div>
+                <div>
+                  <div className={`text-xl font-black ${hpScoreColor(estimateHpScore(pct))}`}>
+                    {estimateHpScore(pct).toFixed(2)}
+                  </div>
+                  <div className="text-xs text-slate-500">{hpScoreLabel(estimateHpScore(pct))}</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
+                  .filter(([, v]) => v.total > 0)
+                  .map(([type, v]) => {
+                    const p = Math.round((v.correct / v.total) * 100)
+                    return (
+                      <div key={type} className="text-center">
+                        <div className={`text-[10px] font-black ${TYPE_COLORS[type].text}`}>{type}</div>
+                        <div className="text-sm font-bold text-white">{p}%</div>
+                      </div>
+                    )
+                  })}
+              </div>
+              <div className="text-[10px] text-slate-600">{new Date().toLocaleDateString('sv-SE')}</div>
+            </div>
+            <p className="text-xs text-slate-500 text-center">Ta en skärmbild av kortet ovan för att dela ditt resultat</p>
+          </div>
         </div>
 
         <div className="flex gap-3">

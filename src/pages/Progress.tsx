@@ -8,6 +8,8 @@ import { estimateHpScore, hpScoreColor } from '../utils/hpScore'
 import { computeReadiness } from '../utils/readiness'
 import { getExamDate, daysUntilExam } from '../utils/examDate'
 import { getBookmarks, toggleBookmark } from '../utils/bookmarks'
+import { timeAnalyticsByType, accuracyByDifficulty, rollingHpScore } from '../utils/analytics'
+import { ALL_ACHIEVEMENTS, getEarnedIds, RARITY_STYLES } from '../utils/achievements'
 import type { QuestionType } from '../types'
 
 const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
@@ -26,6 +28,11 @@ export default function Progress() {
   const examDate = getExamDate()
   const daysLeft = daysUntilExam()
   const [bookmarkIds, setBookmarkIds] = useState<string[]>(() => getBookmarks())
+  const timeAnalytics = timeAnalyticsByType()
+  const difficultyAcc = accuracyByDifficulty()
+  const rollingHp = rollingHpScore()
+  const DIFFICULTY_LABELS = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' } as const
+  const earnedIds = new Set(getEarnedIds())
 
   const allAnswers: { qid: string; correct: boolean }[] = []
   history.forEach(s => {
@@ -349,6 +356,93 @@ export default function Progress() {
               </div>
             )}
 
+            {/* Rolling HP + time analytics */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {/* Rolling HP score */}
+              <div className="bg-slate-800 rounded-2xl p-5">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">HP-poäng (trend)</div>
+                {rollingHp !== null ? (
+                  <>
+                    <div className={`text-3xl font-black ${hpScoreColor(rollingHp)}`}>{rollingHp.toFixed(2)}</div>
+                    <div className="text-xs text-slate-500 mt-1">Viktat snitt senaste 10 pass</div>
+                    <div className="mt-3 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${rollingHp >= 1.80 ? 'bg-emerald-500' : rollingHp >= 1.50 ? 'bg-blue-500' : rollingHp >= 1.25 ? 'bg-amber-500' : 'bg-red-500'}`}
+                        style={{ width: `${((rollingHp - 1) / 1) * 100}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-600 mt-1"><span>1.00</span><span>2.00</span></div>
+                  </>
+                ) : (
+                  <div className="text-sm text-slate-500 mt-2">Genomför fler pass för att se trend</div>
+                )}
+              </div>
+
+              {/* Accuracy by difficulty */}
+              <div className="bg-slate-800 rounded-2xl p-5">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Träffsäkerhet per nivå</div>
+                <div className="space-y-2.5">
+                  {(['easy', 'medium', 'hard'] as const).map(d => {
+                    const { pct, total } = difficultyAcc[d]
+                    return (
+                      <div key={d}>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-slate-400">{DIFFICULTY_LABELS[d]}</span>
+                          <span className={`font-bold ${pct === null ? 'text-slate-600' : pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                            {pct !== null ? `${pct}%` : '—'}
+                            {total > 0 && <span className="text-slate-600 font-normal ml-1">({total})</span>}
+                          </span>
+                        </div>
+                        <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${pct === null ? '' : pct >= 70 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                            style={{ width: `${pct ?? 0}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Time per type vs HP standard */}
+            <div className="bg-slate-800 rounded-2xl p-6 mb-6">
+              <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Tid per fråga vs HP-standard</h2>
+              <div className="space-y-3">
+                {(Object.entries(timeAnalytics) as [QuestionType, typeof timeAnalytics[QuestionType]][])
+                  .filter(([, v]) => v.avgSeconds !== null)
+                  .map(([type, v]) => {
+                    const ratio = v.ratio!
+                    const tc = TYPE_COLORS[type]
+                    const speedLabel = ratio < 0.8 ? 'Snabb' : ratio > 1.2 ? 'Långsam' : 'I tid'
+                    const speedColor = ratio < 0.8 ? 'text-emerald-400' : ratio > 1.2 ? 'text-red-400' : 'text-slate-300'
+                    return (
+                      <div key={type} className="flex items-center gap-3">
+                        <span className={`w-10 text-xs font-black shrink-0 ${tc.text}`}>{type}</span>
+                        <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden relative">
+                          {/* HP standard marker */}
+                          <div className="absolute top-0 h-full w-0.5 bg-slate-500 z-10" style={{ left: '100%', transform: 'translateX(-1px)' }} />
+                          <div
+                            className={`h-full ${tc.bar} rounded-full`}
+                            style={{ width: `${Math.min(150, ratio * 100)}%`, opacity: ratio > 1 ? 1 : 0.7 }}
+                          />
+                        </div>
+                        <div className="text-right shrink-0 w-28">
+                          <span className="text-xs text-white font-mono">{v.avgSeconds}s</span>
+                          <span className="text-slate-600 text-xs"> / {v.hpStandard}s</span>
+                          <span className={`text-[10px] ml-1 font-bold ${speedColor}`}>{speedLabel}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                {Object.values(timeAnalytics).every(v => v.avgSeconds === null) && (
+                  <p className="text-sm text-slate-500">Inga tiddata ännu — börja ett träningspass med tidmätning.</p>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-600 mt-3">HP-standard: XYZ 60s · KVA 60s · NOG 100s · DTK 115s per fråga</p>
+            </div>
+
             {/* SRS mastery overview */}
             <div className="bg-slate-800 rounded-2xl p-6 mb-6">
               <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Frågebank — masterstatus</h2>
@@ -426,7 +520,13 @@ export default function Progress() {
                   {tagStats.map(({ tag, pct, correct, total }) => (
                     <div key={tag}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-300 capitalize">{tag.replace(/-/g, ' ')}</span>
+                        <button
+                          onClick={() => navigate(`/practice?tag=${encodeURIComponent(tag)}`)}
+                          className="text-slate-300 capitalize hover:text-white transition-colors text-left group flex items-center gap-1"
+                        >
+                          {tag.replace(/-/g, ' ')}
+                          <span className="text-[10px] text-slate-600 group-hover:text-blue-400 transition-colors">→ öva</span>
+                        </button>
                         <span className={`font-bold ${pct < 50 ? 'text-red-400' : pct < 70 ? 'text-amber-400' : 'text-emerald-400'}`}>
                           {pct}% <span className="text-slate-500 font-normal">({correct}/{total})</span>
                         </span>
@@ -481,6 +581,31 @@ export default function Progress() {
                   </div>
                 )
               })}
+            </div>
+
+            {/* Achievements */}
+            <div className="bg-slate-800 rounded-2xl p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Brickor</h2>
+                <span className="text-xs text-slate-500">{earnedIds.size}/{ALL_ACHIEVEMENTS.length} upplåsta</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {ALL_ACHIEVEMENTS.map(a => {
+                  const unlocked = earnedIds.has(a.id)
+                  const style = RARITY_STYLES[a.rarity]
+                  return (
+                    <div
+                      key={a.id}
+                      title={`${a.title}: ${a.description}`}
+                      className={`rounded-xl p-3 border text-center transition-all ${unlocked ? `${style.border} ${style.bg}` : 'border-slate-700 bg-slate-700/20 opacity-40'}`}
+                    >
+                      <div className="text-2xl mb-1">{a.icon}</div>
+                      <div className={`text-[10px] font-black leading-tight ${unlocked ? 'text-white' : 'text-slate-500'}`}>{a.title}</div>
+                      {unlocked && <div className={`text-[9px] font-bold mt-0.5 ${style.labelColor}`}>{style.label}</div>}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Activity heat map — last 90 days */}

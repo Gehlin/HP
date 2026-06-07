@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Practice from './pages/Practice'
@@ -7,10 +8,88 @@ import Theory from './pages/Theory'
 import Progress from './pages/Progress'
 import ExamSelect from './pages/ExamSelect'
 import ExamStart from './pages/ExamStart'
+import Onboarding, { isOnboardingDone } from './components/Onboarding'
+
+const KEYBOARD_SHORTCUTS = [
+  { key: 'A – E', desc: 'Välj svarsalternativ' },
+  { key: 'Enter / Space', desc: 'Visa svar / Gå till nästa fråga' },
+  { key: '?', desc: 'Visa / dölj tangentbordsguide' },
+]
 
 export default function App() {
+  const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone())
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [showKeyGuide, setShowKeyGuide] = useState(false)
+
+  useEffect(() => {
+    const online = () => setIsOnline(true)
+    const offline = () => setIsOnline(false)
+    window.addEventListener('online', online)
+    window.addEventListener('offline', offline)
+    return () => {
+      window.removeEventListener('online', online)
+      window.removeEventListener('offline', offline)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (e.key === '?') {
+        e.preventDefault()
+        setShowKeyGuide(v => !v)
+      } else if (e.key === 'Escape' && showKeyGuide) {
+        setShowKeyGuide(false)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [showKeyGuide])
+
   return (
     <BrowserRouter>
+      {!isOnline && (
+        <div className="fixed top-0 inset-x-0 z-[300] bg-amber-600 text-white text-center text-xs py-1.5 font-semibold">
+          Ingen internetanslutning — appen fungerar offline
+        </div>
+      )}
+
+      {showOnboarding && (
+        <Onboarding onClose={() => setShowOnboarding(false)} />
+      )}
+
+      {showKeyGuide && (
+        <div
+          className="fixed inset-0 bg-black/70 z-[250] flex items-center justify-center p-4"
+          onClick={() => setShowKeyGuide(false)}
+        >
+          <div
+            className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xs shadow-2xl p-6 animate-fade-in"
+            onClick={e => e.stopPropagation()}
+          >
+            <h2 className="text-sm font-black text-slate-300 uppercase tracking-widest mb-4">
+              Tangentbordsgenvägar
+            </h2>
+            <div className="flex flex-col gap-3">
+              {KEYBOARD_SHORTCUTS.map(s => (
+                <div key={s.key} className="flex items-center justify-between gap-4">
+                  <kbd className="text-xs font-mono bg-slate-800 border border-slate-600 text-slate-200 px-2.5 py-1 rounded-lg whitespace-nowrap">
+                    {s.key}
+                  </kbd>
+                  <span className="text-sm text-slate-400 text-right">{s.desc}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowKeyGuide(false)}
+              className="mt-6 w-full text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            >
+              Stäng (Esc)
+            </button>
+          </div>
+        </div>
+      )}
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/practice" element={<Practice />} />
