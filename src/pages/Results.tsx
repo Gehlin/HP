@@ -8,11 +8,12 @@ import { useState, useEffect } from 'react'
 import { loadStats, saveStats, getLevel } from '../utils/gamification'
 import { getStats as getSrsStats } from '../utils/srs'
 import { SECTION_META, HP_AVERAGES, SECTION_ORDER } from '../data/exams'
-import { estimateHpScore, hpScoreColor, hpScoreLabel } from '../utils/hpScore'
+import { hpScoreColor, hpScoreLabel, estimateSectionedScore } from '../utils/hpScore'
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
 import { checkAchievements } from '../utils/achievements'
 import AchievementToast from '../components/AchievementToast'
 import { notificationsEnabled, notificationsSupported, requestNotificationPermission } from '../utils/notifications'
+import { getTopicForQuestion } from '../utils/topicLookup'
 
 interface XpInfo {
   earned: number
@@ -38,6 +39,9 @@ export default function Results() {
   })
   const [cardVisible, setCardVisible] = useState(false)
   const [xpInfo, setXpInfo] = useState<XpInfo | null>(null)
+  const [showScale, setShowScale] = useState(false)
+  const [isNewBest, setIsNewBest] = useState(false)
+  const [shareFeedback, setShareFeedback] = useState<'idle' | 'copied'>('idle')
 
   const sessionQuestions = session
     ? (session.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as typeof questions)
@@ -74,6 +78,12 @@ export default function Results() {
       if (notificationsSupported() && !notificationsEnabled() && Notification.permission === 'default') {
         setTimeout(() => requestNotificationPermission(), 3000)
       }
+
+      const prevBest = parseInt(localStorage.getItem('hp_personal_best') ?? '0', 10)
+      if (pct > prevBest) {
+        if (prevBest > 0) setIsNewBest(true)
+        localStorage.setItem('hp_personal_best', String(pct))
+      }
     }
 
     const stats = loadStats()
@@ -94,7 +104,18 @@ export default function Results() {
     return () => clearTimeout(t)
   }, [])
 
-  if (!session) return <div className="p-8 text-white">Ingen session hittades.</div>
+  if (!session) return (
+    <div className="min-h-screen bg-app text-white flex items-center justify-center px-4">
+      <div className="text-center">
+        <div className="text-5xl font-black text-slate-700 mb-4">—</div>
+        <div className="text-slate-400 font-semibold mb-1">Ingen session hittades</div>
+        <p className="text-slate-600 text-sm mb-6">Starta ett träningspass för att se resultat.</p>
+        <button onClick={() => navigate('/practice')} className="bg-blue-600 hover:bg-blue-500 transition-colors px-6 py-3 rounded-xl font-bold text-sm">
+          Starta träning →
+        </button>
+      </div>
+    </div>
+  )
 
   const skipped = session.skipped ?? []
   const correct = sessionQuestions.filter(q => session.answers[q.id] === q.answer).length
@@ -107,27 +128,72 @@ export default function Results() {
     KVA: { correct: 0, total: 0 },
     NOG: { correct: 0, total: 0 },
     DTK: { correct: 0, total: 0 },
+    ORD: { correct: 0, total: 0 },
+    LAS: { correct: 0, total: 0 },
+    MEK: { correct: 0, total: 0 },
+    ELF: { correct: 0, total: 0 },
   }
   sessionQuestions.forEach(q => {
     byType[q.type].total++
     if (session.answers[q.id] === q.answer) byType[q.type].correct++
   })
 
+  const sectionedScore = estimateSectionedScore(byType)
+
   const duration = session.endTime ? Math.round((session.endTime - session.startTime) / 1000) : 0
   const fmtDuration = `${Math.floor(duration / 60)}m ${duration % 60}s`
 
-  const scoreLabel = pct >= 85 ? '🏆 Utmärkt!' : pct >= 65 ? '👍 Bra jobbat' : pct >= 45 ? '📈 Fortsätt öva' : '💪 Mer träning krävs'
+  const scoreLabel = pct >= 85 ? 'Utmärkt!' : pct >= 65 ? 'Bra jobbat' : pct >= 45 ? 'Fortsätt öva' : 'Mer träning krävs'
   const scoreColor = pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'
   const scoreBarColor = pct >= 70 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'
 
   const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
-    XYZ: { text: 'text-violet-400', bar: 'bg-violet-500' },
-    KVA: { text: 'text-blue-400',   bar: 'bg-blue-500'   },
+    XYZ: { text: 'text-violet-400',  bar: 'bg-violet-500'  },
+    KVA: { text: 'text-blue-400',    bar: 'bg-blue-500'    },
     NOG: { text: 'text-emerald-400', bar: 'bg-emerald-500' },
-    DTK: { text: 'text-amber-400',  bar: 'bg-amber-500'  },
+    DTK: { text: 'text-amber-400',   bar: 'bg-amber-500'   },
+    ORD: { text: 'text-rose-400',    bar: 'bg-rose-500'    },
+    LAS: { text: 'text-pink-400',    bar: 'bg-pink-500'    },
+    MEK: { text: 'text-fuchsia-400', bar: 'bg-fuchsia-500' },
+    ELF: { text: 'text-purple-400',  bar: 'bg-purple-500'  },
   }
 
   const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
+
+  const handleShare = async () => {
+    const typeLines = (Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
+      .filter(([, v]) => v.total > 0)
+      .map(([t, v]) => `${t}: ${v.correct}/${v.total}`)
+      .join(' · ')
+
+    const { quant: qScore, verbal: vScore, combined: cScore } = sectionedScore
+    const displayHpScore = cScore ?? 1.00
+    const label = hpScoreLabel(displayHpScore)
+    const sectionLine = qScore !== null && vScore !== null
+      ? `Kvantitativ: ${qScore.toFixed(2)} · Verbal: ${vScore.toFixed(2)}`
+      : null
+
+    const text = [
+      `HP Träning — ${new Date().toLocaleDateString('sv-SE')}`,
+      `${correct}/${total} rätt (${pct}%) · ${fmtDuration}`,
+      typeLines,
+      sectionLine,
+      `Estimerat betyg: ${displayHpScore.toFixed(2)} (${label})`,
+      isNewBest ? '★ Nytt personbästa!' : '',
+    ].filter(Boolean).join('\n')
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'HP Träning — resultat', text })
+        return
+      } catch {
+        // fall through to clipboard
+      }
+    }
+    await navigator.clipboard.writeText(text)
+    setShareFeedback('copied')
+    setTimeout(() => setShareFeedback('idle'), 2000)
+  }
 
   const xpProgress = xpInfo
     ? xpInfo.level.level === 10
@@ -139,12 +205,30 @@ export default function Results() {
     : 0
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen bg-app text-white">
       {newAchievements.length > 0 && (
         <AchievementToast newIds={newAchievements} onDone={() => setNewAchievements([])} />
       )}
       <div className="max-w-2xl mx-auto px-6 py-10 pb-24">
-        <h1 className="text-3xl font-black mb-2">Resultat</h1>
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <h1 className="text-3xl font-black">Resultat</h1>
+          <button
+            onClick={handleShare}
+            className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors glass border border-white/[0.08] rounded-xl px-3 py-2"
+          >
+            {shareFeedback === 'copied' ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Kopierat!
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                Dela
+              </>
+            )}
+          </button>
+        </div>
         <p className="text-slate-400 mb-8">{scoreLabel}</p>
 
         {/* XP earned card */}
@@ -160,7 +244,7 @@ export default function Results() {
                 <span className="text-orange-400 font-bold">🔥 {xpInfo.stats.streak} dagars streak!</span>
               </div>
             )}
-            <div className="bg-slate-800 border border-blue-500/30 rounded-2xl p-5">
+            <div className="glass border border-blue-500/20 rounded-2xl p-5">
               <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-4xl font-black text-blue-400">+{xpInfo.earned} XP</span>
                 <span className="text-slate-400 text-sm">intjänat</span>
@@ -185,7 +269,7 @@ export default function Results() {
                   </span>
                 )}
               </div>
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-blue-500 rounded-full transition-all duration-1000"
                   style={{ width: `${xpProgress}%` }}
@@ -196,12 +280,18 @@ export default function Results() {
         )}
 
         {/* Score card */}
-        <div className="bg-slate-800 rounded-2xl p-6 mb-4 text-center">
+        <div className="glass rounded-2xl p-6 mb-4 text-center">
+          {isNewBest && (
+            <div className="inline-flex items-center gap-1.5 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-3">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
+              Nytt personbästa!
+            </div>
+          )}
           <div className={`text-7xl font-black ${scoreColor}`}>{pct}%</div>
           <div className="text-slate-400 mt-1">
             {correct} av {total} rätt{skippedCount > 0 && ` · ${skippedCount} hoppade`} · {fmtDuration}
           </div>
-          <div className="mt-4 h-3 bg-slate-700 rounded-full overflow-hidden">
+          <div className="mt-4 h-3 bg-white/[0.05] rounded-full overflow-hidden">
             <div
               className={`h-full ${scoreBarColor} rounded-full transition-all`}
               style={{ width: `${pct}%` }}
@@ -211,20 +301,39 @@ export default function Results() {
 
         {/* HP Score Predictor */}
         {(() => {
-          const hpScore = estimateHpScore(pct)
-          const hpColor = hpScoreColor(hpScore)
-          const hpLabel = hpScoreLabel(hpScore)
-          const hpPct = ((hpScore - 1.00) / 1.00) * 100
+          const { quant, verbal, combined } = sectionedScore
+          const hasBoth = quant !== null && verbal !== null
+          const displayScore = combined ?? 1.00
+          const hpColor = hpScoreColor(displayScore)
+          const hpLabel = hpScoreLabel(displayScore)
+          const hpPct = ((displayScore - 1.00) / 1.00) * 100
           return (
-            <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-5 mb-6">
+            <div className="glass border border-white/[0.08] rounded-2xl p-5 mb-6">
               <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-3">Estimerat HP-betyg</div>
+
+              {hasBoth && (
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <div className="bg-white/[0.03] rounded-xl p-3">
+                    <div className="text-[9px] font-black tracking-widest uppercase text-slate-600 mb-1">Kvantitativ</div>
+                    <div className={`text-2xl font-black ${hpScoreColor(quant!)}`}>{quant!.toFixed(2)}</div>
+                  </div>
+                  <div className="bg-white/[0.03] rounded-xl p-3">
+                    <div className="text-[9px] font-black tracking-widest uppercase text-slate-600 mb-1">Verbal</div>
+                    <div className={`text-2xl font-black ${hpScoreColor(verbal!)}`}>{verbal!.toFixed(2)}</div>
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-end gap-3 mb-3">
-                <span className={`text-5xl font-black ${hpColor}`}>{hpScore.toFixed(2)}</span>
-                <span className={`text-sm font-bold mb-1 ${hpColor}`}>{hpLabel}</span>
+                <span className={`text-5xl font-black ${hpColor}`}>{displayScore.toFixed(2)}</span>
+                <div>
+                  <div className={`text-sm font-bold ${hpColor}`}>{hpLabel}</div>
+                  {hasBoth && <div className="text-[10px] text-slate-500 mt-0.5">kombinerat betyg</div>}
+                </div>
               </div>
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
+              <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden mb-2">
                 <div
-                  className={`h-full rounded-full transition-all duration-700 ${hpScore >= 1.80 ? 'bg-emerald-500' : hpScore >= 1.50 ? 'bg-blue-500' : hpScore >= 1.25 ? 'bg-amber-500' : 'bg-red-500'}`}
+                  className={`h-full rounded-full transition-all duration-700 ${displayScore >= 1.80 ? 'bg-emerald-500' : displayScore >= 1.50 ? 'bg-blue-500' : displayScore >= 1.25 ? 'bg-amber-500' : 'bg-red-500'}`}
                   style={{ width: `${hpPct}%` }}
                 />
               </div>
@@ -232,6 +341,35 @@ export default function Results() {
                 <span>1.00</span><span>1.25</span><span>1.50</span><span>1.75</span><span>2.00</span>
               </div>
               <p className="text-[11px] text-slate-500 mt-2">Uppskattning baserad på normdata från tidigare HP-prov.</p>
+
+              <button
+                onClick={() => setShowScale(s => !s)}
+                className="mt-3 text-[11px] text-slate-600 hover:text-slate-400 transition-colors flex items-center gap-1"
+              >
+                Betygsskala {showScale ? '▴' : '▾'}
+              </button>
+
+              {showScale && (
+                <div className="mt-3 space-y-1.5 border-t border-white/[0.05] pt-3">
+                  {([
+                    { range: '1.85–2.00', label: 'Toppresultat', dot: 'bg-emerald-500', text: 'text-emerald-400' },
+                    { range: '1.70–1.85', label: 'Väldigt bra',  dot: 'bg-emerald-600', text: 'text-emerald-300' },
+                    { range: '1.50–1.70', label: 'Bra',           dot: 'bg-blue-500',   text: 'text-blue-400'   },
+                    { range: '1.30–1.50', label: 'Godkänt',       dot: 'bg-amber-500',  text: 'text-amber-400'  },
+                    { range: '1.00–1.30', label: 'Under medel',   dot: 'bg-red-500',    text: 'text-red-400'    },
+                  ] as { range: string; label: string; dot: string; text: string }[]).map(band => {
+                    const isCurrentBand = band.label === hpLabel
+                    return (
+                      <div key={band.range} className="flex items-center gap-2.5 text-xs">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${band.dot}${isCurrentBand ? ' ring-2 ring-white/30' : ''}`} />
+                        <span className="text-slate-600 tabular-nums w-20 shrink-0">{band.range}</span>
+                        <span className={isCurrentBand ? band.text + ' font-bold' : 'text-slate-600'}>{band.label}</span>
+                        {isCurrentBand && <span className="ml-auto text-[10px] text-slate-500">← ditt resultat</span>}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           )
         })()}
@@ -244,17 +382,115 @@ export default function Results() {
               const p = Math.round((v.correct / v.total) * 100)
               const tc = TYPE_COLORS[type]
               return (
-                <div key={type} className="bg-slate-800 rounded-xl p-4">
+                <div key={type} className="glass rounded-xl p-4">
                   <div className={`font-black ${tc.text}`}>{type}</div>
                   <div className="text-2xl font-bold mt-1">{p}%</div>
                   <div className="text-xs text-slate-400">{v.correct}/{v.total} rätt</div>
-                  <div className="mt-2 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="mt-2 h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
                     <div className={`h-full ${tc.bar} rounded-full`} style={{ width: `${p}%` }} />
                   </div>
                 </div>
               )
             })}
         </div>
+
+        {/* Time analysis */}
+        {Object.keys(session.questionTimes ?? {}).length >= 3 && (() => {
+          const qtimes = session.questionTimes!
+          const timedQs = sessionQuestions.filter(q => qtimes[q.id] !== undefined)
+          const overallAvgSecs = Math.round(
+            timedQs.reduce((s, q) => s + qtimes[q.id], 0) / timedQs.length / 1000
+          )
+          const BENCHMARKS: Record<QuestionType, number> = { XYZ: 60, KVA: 60, NOG: 100, DTK: 115, ORD: 45, LAS: 120, MEK: 50, ELF: 120 }
+          const typeAvgs: Partial<Record<QuestionType, number>> = {}
+          ;(['XYZ', 'KVA', 'NOG', 'DTK', 'ORD', 'LAS', 'MEK', 'ELF'] as QuestionType[]).forEach(t => {
+            const tqs = timedQs.filter(q => q.type === t)
+            if (tqs.length > 0)
+              typeAvgs[t] = Math.round(tqs.reduce((s, q) => s + qtimes[q.id], 0) / tqs.length / 1000)
+          })
+          const slowest = [...timedQs]
+            .sort((a, b) => qtimes[b.id] - qtimes[a.id])
+            .slice(0, 3)
+          const fmtSecs = (s: number) => s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`
+          return (
+            <div className="glass rounded-2xl p-5 mb-6">
+              <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-4">Tidanalys</div>
+              <div className="flex items-baseline gap-2 mb-4">
+                <span className="text-2xl font-black text-white">{fmtSecs(overallAvgSecs)}</span>
+                <span className="text-xs text-slate-500">per fråga i snitt</span>
+              </div>
+              <div className="space-y-2 mb-4">
+                {(Object.entries(typeAvgs) as [QuestionType, number][]).map(([t, avg]) => {
+                  const bench = BENCHMARKS[t]
+                  const pct = Math.min(100, Math.round((avg / (bench * 1.5)) * 100))
+                  const overBudget = avg > bench
+                  const tc = TYPE_COLORS[t]
+                  return (
+                    <div key={t} className="flex items-center gap-3">
+                      <span className={`text-[10px] font-black w-8 shrink-0 ${tc.text}`}>{t}</span>
+                      <div className="flex-1 h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${overBudget ? 'bg-red-500' : tc.bar}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className={`text-xs font-mono tabular-nums w-12 text-right ${overBudget ? 'text-red-400' : 'text-slate-400'}`}>
+                        {fmtSecs(avg)}
+                      </span>
+                      <span className="text-[10px] text-slate-600 w-12 shrink-0">/ {fmtSecs(bench)}</span>
+                    </div>
+                  )
+                })}
+              </div>
+              {slowest.length > 0 && (
+                <div className="border-t border-white/[0.05] pt-3">
+                  <div className="text-[10px] text-slate-600 uppercase tracking-widest mb-2">Långsammaste frågor</div>
+                  <div className="space-y-1.5">
+                    {slowest.map(q => (
+                      <div key={q.id} className="flex items-center gap-2 text-xs">
+                        <span className={`font-black w-8 shrink-0 ${TYPE_COLORS[q.type].text}`}>{q.type}</span>
+                        <span className="flex-1 text-slate-400 truncate"><MathText text={q.text.split('\n')[0].replace(/\*\*/g, '')} /></span>
+                        <span className="font-mono text-red-400 shrink-0">{fmtSecs(Math.round(qtimes[q.id] / 1000))}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })()}
+
+        {/* Difficulty breakdown */}
+        {(['easy', 'medium', 'hard'] as const).some(d => sessionQuestions.some(q => q.difficulty === d)) && (() => {
+          const diffData = (['easy', 'medium', 'hard'] as const).map(d => {
+            const dqs = sessionQuestions.filter(q => q.difficulty === d)
+            const correct = dqs.filter(q => session.answers[q.id] === q.answer).length
+            return { d, total: dqs.length, correct }
+          }).filter(x => x.total > 0)
+          const DIFF_LABELS = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' }
+          const DIFF_COLORS = { easy: 'text-emerald-400 bg-emerald-500', medium: 'text-amber-400 bg-amber-500', hard: 'text-red-400 bg-red-500' }
+          return (
+            <div className="glass rounded-2xl p-5 mb-6">
+              <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-4">Resultat per svårighetsgrad</div>
+              <div className="grid grid-cols-3 gap-3">
+                {diffData.map(({ d, total, correct }) => {
+                  const pct = Math.round((correct / total) * 100)
+                  const [textCls, barCls] = DIFF_COLORS[d].split(' ')
+                  return (
+                    <div key={d} className="bg-white/[0.03] rounded-xl p-3 text-center">
+                      <div className={`text-[10px] font-black uppercase tracking-wide mb-1 ${textCls}`}>{DIFF_LABELS[d]}</div>
+                      <div className="text-xl font-black text-white">{pct}%</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">{correct}/{total}</div>
+                      <div className="mt-2 h-1 bg-white/[0.05] rounded-full overflow-hidden">
+                        <div className={`h-full ${barCls} rounded-full`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Exam-specific report */}
         {session.type === 'exam' && (() => {
@@ -299,10 +535,10 @@ export default function Results() {
               {/* Section breakdown table */}
               <div className="mb-8">
                 <h2 className="text-xl font-black mb-4">Avsnittsresultat</h2>
-                <div className="bg-slate-800 rounded-2xl overflow-hidden">
+                <div className="glass rounded-2xl overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wide">
+                      <tr className="border-b border-white/[0.06] text-slate-400 text-xs uppercase tracking-wide">
                         <th className="text-left px-4 py-3">Avsnitt</th>
                         <th className="text-right px-4 py-3">Rätt</th>
                         <th className="text-right px-4 py-3">Resultat</th>
@@ -318,7 +554,7 @@ export default function Results() {
                         const actualMs = sectionEnds[type] - sectionStarts[type]
                         const hasTime = sectionStarts[type] > 0 && sectionEnds[type] > 0
                         return (
-                          <tr key={type} className="border-b border-slate-700/50 last:border-0">
+                          <tr key={type} className="border-b border-white/[0.05] last:border-0">
                             <td className="px-4 py-3">
                               <span className="font-black text-sm">{type}</span>
                               <span className="text-slate-500 text-xs ml-2 hidden sm:inline">{meta?.description}</span>
@@ -344,7 +580,7 @@ export default function Results() {
               </div>
 
               {/* HP average comparison */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5 mb-8">
+              <div className="glass border border-white/[0.06] rounded-2xl p-5 mb-8">
                 <h3 className="font-bold mb-3 text-sm uppercase tracking-widest text-slate-400">Jämförelse med medel</h3>
                 <div className="space-y-3">
                   {SECTION_ORDER.filter(type => byType[type].total > 0).map(type => {
@@ -355,9 +591,9 @@ export default function Results() {
                     return (
                       <div key={type} className="flex items-center gap-3">
                         <span className="w-10 text-xs font-black text-slate-400">{type}</span>
-                        <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden relative">
+                        <div className="flex-1 h-2 bg-white/[0.05] rounded-full overflow-hidden relative">
                           <div
-                            className="absolute h-full bg-slate-600 rounded-full"
+                            className="absolute h-full bg-white/[0.15] rounded-full"
                             style={{ width: `${avg}%` }}
                           />
                           <div
@@ -401,19 +637,19 @@ export default function Results() {
         <div className="flex gap-2 mb-4 flex-wrap">
           <button
             onClick={() => setReviewFilter('all')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-white/[0.08] text-slate-400 hover:border-white/[0.15]'}`}
           >
             Alla ({sessionQuestions.length})
           </button>
           <button
             onClick={() => setReviewFilter('wrong')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'wrong' ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'wrong' ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-white/[0.08] text-slate-400 hover:border-white/[0.15]'}`}
           >
             ✗ Fel ({sessionQuestions.filter(q => !skipped.includes(q.id) && session.answers[q.id] !== q.answer).length})
           </button>
           <button
             onClick={() => setReviewFilter('flagged')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'flagged' ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'flagged' ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-white/[0.08] text-slate-400 hover:border-white/[0.15]'}`}
           >
             ★ Markerade ({(session.flagged ?? []).length})
           </button>
@@ -433,8 +669,8 @@ export default function Results() {
               ANSWER_KEYS.includes(k as AnswerKey)
             ) as [AnswerKey, string][]
 
-            const borderCls = ok ? 'border-emerald-700' : isSkipped ? 'border-slate-600' : 'border-red-700'
-            const bgCls = ok ? 'bg-emerald-900/20' : isSkipped ? 'bg-slate-800/40' : 'bg-red-900/20'
+            const borderCls = ok ? 'border-emerald-700' : isSkipped ? 'border-white/[0.08]' : 'border-red-700'
+            const bgCls = ok ? 'bg-emerald-900/20' : isSkipped ? 'bg-white/[0.03]' : 'bg-red-900/20'
             const indicator = ok ? '✓' : isSkipped ? '→' : '✗'
 
             const questionTimeMs = session.questionTimes?.[q.id]
@@ -474,7 +710,7 @@ export default function Results() {
                         </span>
                       )}
                       {fmtQuestionTime && (
-                        <span className="border border-slate-700 rounded px-1.5 py-0.5 text-[10px] text-slate-500">
+                        <span className="border border-white/[0.08] rounded px-1.5 py-0.5 text-[10px] text-slate-500">
                           ⏱ {fmtQuestionTime}
                         </span>
                       )}
@@ -484,7 +720,7 @@ export default function Results() {
                           const next = toggleBookmark(q.id)
                           setBookmarkState(s => ({ ...s, [q.id]: next }))
                         }}
-                        className={`border rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${bookmarkState[q.id] ? 'border-blue-600 text-blue-400 bg-blue-900/20' : 'border-slate-700 text-slate-500 hover:border-slate-500'}`}
+                        className={`border rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${bookmarkState[q.id] ? 'border-blue-600 text-blue-400 bg-blue-900/20' : 'border-white/[0.1] text-slate-500 hover:border-white/[0.2]'}`}
                       >
                         🔖 {bookmarkState[q.id] ? 'Sparat' : 'Spara'}
                       </button>
@@ -497,11 +733,11 @@ export default function Results() {
                 </button>
 
                 {expanded && (
-                  <div className="px-4 pb-4 bg-slate-800/40">
+                  <div className="px-4 pb-4 bg-white/[0.02]">
                     <div className="grid gap-2 mt-3">
                       {answerOptions.map(([key, text]) => {
-                        let cls = 'border-slate-600 text-slate-400'
-                        let labelCls = 'bg-slate-700 text-slate-400'
+                        let cls = 'border-white/[0.1] text-slate-400'
+                        let labelCls = 'bg-white/[0.08] text-slate-400'
                         if (key === q.answer) { cls = 'border-emerald-500/60 text-slate-200 bg-emerald-900/20'; labelCls = 'bg-emerald-600 text-white' }
                         if (key === userAnswer && key !== q.answer) { cls = 'border-red-500/60 text-slate-200 bg-red-900/20'; labelCls = 'bg-red-600 text-white' }
                         return (
@@ -517,6 +753,15 @@ export default function Results() {
                       correctAnswer={q.answer}
                       explanation={q.explanation}
                       explanationData={q.explanationData}
+                      chosenAnswer={userAnswer as AnswerKey | undefined}
+                      onLearnMore={(isSkipped || userAnswer !== q.answer) ? (() => {
+                        const topic = getTopicForQuestion(q.tags)
+                        navigate(topic ? `/matematik?topic=${topic.id}&inner=lesson` : '/matematik')
+                      }) : undefined}
+                      learnMoreLabel={(isSkipped || userAnswer !== q.answer) ? (() => {
+                        const topic = getTopicForQuestion(q.tags)
+                        return topic ? `Lär dig ${topic.name}` : 'Öppna Matematikguiden'
+                      })() : undefined}
                     />
                   </div>
                 )}
@@ -528,22 +773,24 @@ export default function Results() {
         {/* Share card */}
         <div className="mb-6">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Dela resultat</div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-5">
+          <div className="glass border border-white/[0.06] rounded-2xl p-5">
             {/* Card preview */}
-            <div id="share-card" className="bg-slate-900 rounded-xl p-5 border border-slate-700 mb-4">
+            <div id="share-card" className="bg-black/20 rounded-xl p-5 border border-white/[0.06] mb-4">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-5 h-5 bg-violet-600 rounded-md flex items-center justify-center">
                   <span className="text-[9px] font-black text-white">HP</span>
                 </div>
-                <span className="text-xs font-bold text-slate-400">HP Träning — Kvantitativ del</span>
+                <span className="text-xs font-bold text-slate-400">
+                  HP Träning — {sectionedScore.quant !== null && sectionedScore.verbal !== null ? 'Fullständigt prov' : sectionedScore.verbal !== null ? 'Verbal del' : 'Kvantitativ del'}
+                </span>
               </div>
               <div className="flex items-end gap-4 mb-3">
                 <div className={`text-5xl font-black ${scoreColor}`}>{pct}%</div>
                 <div>
-                  <div className={`text-xl font-black ${hpScoreColor(estimateHpScore(pct))}`}>
-                    {estimateHpScore(pct).toFixed(2)}
+                  <div className={`text-xl font-black ${hpScoreColor(sectionedScore.combined ?? 1.00)}`}>
+                    {(sectionedScore.combined ?? 1.00).toFixed(2)}
                   </div>
-                  <div className="text-xs text-slate-500">{hpScoreLabel(estimateHpScore(pct))}</div>
+                  <div className="text-xs text-slate-500">{hpScoreLabel(sectionedScore.combined ?? 1.00)}</div>
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2 mb-3">
@@ -593,7 +840,7 @@ export default function Results() {
           </button>
           <button
             onClick={() => navigate('/')}
-            className="flex-1 border border-slate-700 hover:bg-slate-800 rounded-xl py-3 font-bold transition-colors"
+            className="flex-1 border border-white/[0.08] hover:glass rounded-xl py-3 font-bold transition-colors"
           >
             Hem
           </button>

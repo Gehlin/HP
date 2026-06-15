@@ -1,14 +1,17 @@
 import MathText from './MathText'
-import type { ExplanationData } from '../types'
+import type { ExplanationData, AnswerKey } from '../types'
 
 interface Props {
   isCorrect: boolean
   correctAnswer: string
   explanation: string
   explanationData?: ExplanationData
+  chosenAnswer?: AnswerKey
+  onLearnMore?: () => void
+  learnMoreLabel?: string
 }
 
-export default function ExplanationCard({ isCorrect, correctAnswer, explanation, explanationData }: Props) {
+export default function ExplanationCard({ isCorrect, correctAnswer, explanation, explanationData, chosenAnswer, onLearnMore, learnMoreLabel }: Props) {
   return (
     <div className={`rounded-2xl overflow-hidden mt-4 border ${isCorrect ? 'border-emerald-700/60' : 'border-red-700/60'}`}>
 
@@ -22,18 +25,37 @@ export default function ExplanationCard({ isCorrect, correctAnswer, explanation,
       {/* Body */}
       <div className="bg-slate-900/80 px-5 py-5 space-y-4">
         {explanationData ? (
-          <StructuredExplanation data={explanationData} />
+          <StructuredExplanation data={explanationData} chosenAnswer={chosenAnswer} />
         ) : (
           <div className="text-sm text-slate-300 leading-relaxed">
             <MathText text={explanation} />
           </div>
+        )}
+
+        {!isCorrect && onLearnMore && (
+          <button
+            onClick={onLearnMore}
+            className="w-full flex items-center justify-between bg-violet-500/10 border border-violet-500/25 hover:bg-violet-500/15 rounded-xl px-4 py-3 transition-colors"
+          >
+            <div className="text-left">
+              <div className="text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-0.5">Lär dig mer</div>
+              <div className="text-sm font-semibold text-violet-200">{learnMoreLabel ?? 'Öppna lektion →'}</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-violet-400 shrink-0">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
         )}
       </div>
     </div>
   )
 }
 
-function StructuredExplanation({ data }: { data: ExplanationData }) {
+function StructuredExplanation({ data, chosenAnswer }: { data: ExplanationData; chosenAnswer?: AnswerKey }) {
+  const distractorEntries = data.distractorNotes
+    ? (Object.entries(data.distractorNotes) as [AnswerKey, string][])
+    : []
+
   return (
     <div className="space-y-4">
 
@@ -75,6 +97,28 @@ function StructuredExplanation({ data }: { data: ExplanationData }) {
             <div className="text-sm text-amber-100 leading-relaxed">
               <MathText text={data.note} />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Distractor notes */}
+      {distractorEntries.length > 0 && (
+        <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl px-4 py-3">
+          <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-2.5">Vanliga fällor</div>
+          <div className="space-y-2">
+            {distractorEntries.map(([key, note]) => {
+              const wasChosen = key === chosenAnswer
+              return (
+                <div key={key} className="flex gap-2.5 text-xs leading-relaxed">
+                  <span className={`font-black shrink-0 mt-0.5 ${wasChosen ? 'text-red-400' : 'text-slate-500'}`}>
+                    {key}
+                  </span>
+                  <span className={wasChosen ? 'text-red-200' : 'text-slate-400'}>
+                    <MathText text={note} />
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

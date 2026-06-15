@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { InlineMath } from './Math'
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 // Splits on $$display$$, $inline$, and **bold** — in that priority order
 const SPLIT_RE = /(\$\$[\s\S]+?\$\$|\$[^$]+\$|\*\*[^*]+\*\*)/
 
-export default function MathText({ text, className }: Props) {
+export default memo(function MathText({ text, className }: Props) {
   const parts = text.split(SPLIT_RE)
   return (
     <span className={className}>
@@ -30,4 +31,4 @@ export default function MathText({ text, className }: Props) {
       })}
     </span>
   )
-}
+})

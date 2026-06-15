@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { AnswerKey } from '../types'
 import { questions } from '../data/questions'
@@ -8,27 +8,36 @@ import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
 import MathText from '../components/MathText'
 import ExplanationCard from '../components/ExplanationCard'
 import FormulaDrawer from '../components/FormulaDrawer'
+import ChartView from '../components/ChartView'
+import { getTopicForQuestion } from '../utils/topicLookup'
 
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
-const TYPE_COLOR: Record<string, string> = {
-  XYZ: 'bg-violet-600',
-  KVA: 'bg-blue-600',
-  NOG: 'bg-emerald-600',
-  DTK: 'bg-amber-600',
+const TYPE_TEXT: Record<string, string> = {
+  XYZ: 'text-violet-400',
+  KVA: 'text-blue-400',
+  NOG: 'text-emerald-400',
+  DTK: 'text-amber-400',
+}
+
+const TYPE_PROGRESS: Record<string, string> = {
+  XYZ: 'bg-violet-500',
+  KVA: 'bg-blue-500',
+  NOG: 'bg-emerald-500',
+  DTK: 'bg-amber-500',
 }
 
 const TYPE_BORDER_L: Record<string, string> = {
-  XYZ: 'border-l-violet-500',
-  KVA: 'border-l-blue-500',
-  NOG: 'border-l-emerald-500',
-  DTK: 'border-l-amber-500',
+  XYZ: 'border-l-violet-500/60',
+  KVA: 'border-l-blue-500/60',
+  NOG: 'border-l-emerald-500/60',
+  DTK: 'border-l-amber-500/60',
 }
 
 const DIFFICULTY_BADGE: Record<string, string> = {
-  hard: 'text-red-400 bg-red-500/10 border-red-700/40',
-  medium: 'text-amber-400 bg-amber-500/10 border-amber-700/40',
-  easy: 'text-emerald-400 bg-emerald-500/10 border-emerald-700/40',
+  hard: 'text-red-400 bg-red-500/10 border-red-500/20',
+  medium: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  easy: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
 }
 
 interface BreakScreenData {
@@ -41,6 +50,57 @@ interface BreakScreenData {
   nextIdx: number
 }
 
+// Traps keyboard focus inside a modal while it is open
+function useFocusTrap(active: boolean) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!active || !ref.current) return
+    const el = ref.current
+    const focusable = el.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length) focusable[0].focus()
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab' || focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus() }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus() }
+      }
+    }
+    el.addEventListener('keydown', onTab)
+    return () => el.removeEventListener('keydown', onTab)
+  }, [active])
+  return ref
+}
+
+const KVA_NOG_HINT: Partial<Record<string, string>> = {
+  KVA: 'A = Kol. I störst · B = Kol. II störst · C = Lika · D = Omöjligt att avgöra',
+  NOG: 'A = Utt. 1 räcker · B = Utt. 2 räcker · C = Båda krävs · D = Ingendera räcker',
+}
+
+const fmtTime = (s: number) => {
+  const m = Math.floor(s / 60)
+  const sec = s % 60
+  return `${m}:${sec.toString().padStart(2, '0')}`
+}
+
+const QuestionTimer = memo(function QuestionTimer({ currentIdx }: { currentIdx: number }) {
+  const [elapsed, setElapsed] = useState(0)
+  useEffect(() => {
+    setElapsed(0)
+    const t = setInterval(() => setElapsed(s => s + 1), 1000)
+    return () => clearInterval(t)
+  }, [currentIdx])
+  return (
+    <span className={`font-mono text-xs tabular-nums shrink-0 ${elapsed >= 120 ? 'text-red-400 timer-warning' : elapsed >= 75 ? 'text-amber-400' : 'text-slate-700'}`}>
+      {fmtTime(elapsed)}
+    </span>
+  )
+})
+
 export default function Session() {
   const navigate = useNavigate()
   const session = loadSession()
@@ -49,13 +109,16 @@ export default function Session() {
   const [answers, setAnswers] = useState<Record<string, AnswerKey>>(session?.answers ?? {})
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
-  const [keyboardUsed, setKeyboardUsed] = useState(false)
   const [flagged, setFlagged] = useState<string[]>(session?.flagged ?? [])
   const [, setSkipped] = useState<string[]>(session?.skipped ?? [])
+  const [undoSkip, setUndoSkip] = useState<{ qId: string; idx: number } | null>(null)
   const [cardAnimClass, setCardAnimClass] = useState('')
   const [breakScreen, setBreakScreen] = useState<BreakScreenData | null>(null)
   const [breakCountdown, setBreakCountdown] = useState(3)
   const [showFormulas, setShowFormulas] = useState(false)
+  const [showJump, setShowJump] = useState(false)
+  const [showFinishModal, setShowFinishModal] = useState(false)
+  const [showKeyGuide, setShowKeyGuide] = useState(false)
   const [bookmarked, setBookmarked] = useState<Record<string, boolean>>(() => {
     const session = loadSession()
     if (!session) return {}
@@ -68,6 +131,10 @@ export default function Session() {
   const questionStartRef = useRef<number>(Date.now())
   const explanationRef = useRef<HTMLDivElement>(null)
   const touchStartXRef = useRef<number | null>(null)
+
+  const finishModalRef = useFocusTrap(showFinishModal)
+  const jumpModalRef   = useFocusTrap(showJump)
+  const keyGuideRef    = useFocusTrap(showKeyGuide)
 
   const isTransitioning = cardAnimClass !== ''
   const isExam = session?.type === 'exam'
@@ -120,10 +187,20 @@ export default function Session() {
   }, [])
 
   const handleFinish = useCallback(() => {
+    setShowFinishModal(false)
     recordCurrentQuestionTime()
     finishSession()
     navigate('/results')
   }, [navigate, recordCurrentQuestionTime])
+
+  const requestFinish = useCallback(() => setShowFinishModal(true), [])
+
+  const jumpTo = useCallback((idx: number) => {
+    recordCurrentQuestionTime()
+    setShowJump(false)
+    setCurrent(idx)
+    questionStartRef.current = Date.now()
+  }, [recordCurrentQuestionTime])
 
   const handleNextQuestion = useCallback(() => {
     const nextIdx = current + 1
@@ -154,7 +231,7 @@ export default function Session() {
     advanceQuestion()
   }, [current, sessionQuestions, isExam, advanceQuestion, handleFinish])
 
-  const pick = (key: AnswerKey) => {
+  const pick = useCallback((key: AnswerKey) => {
     if (!q || isRevealed) return
     const updated = { ...answers, [q.id]: key }
     setAnswers(updated)
@@ -165,30 +242,36 @@ export default function Session() {
         explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
       }, 80)
     }
-  }
+  }, [q, isRevealed, answers, session?.instantFeedback])
 
-  const handleSkip = () => {
+  const handleSkip = useCallback(() => {
     if (!q) return
+    const skippedIdx = current
     skipQuestion(q.id)
     setSkipped(s => [...s, q.id])
     if (current < sessionQuestions.length - 1) {
+      setUndoSkip({ qId: q.id, idx: skippedIdx })
       handleNextQuestion()
     } else {
       handleFinish()
     }
-  }
+  }, [q, current, sessionQuestions.length, handleNextQuestion, handleFinish])
 
-  const handleFlag = () => {
+  const handleUndoSkip = useCallback(() => {
+    if (!undoSkip) return
+    setSkipped(s => s.filter(id => id !== undoSkip.qId))
+    const sess = loadSession()
+    if (sess) saveSession({ ...sess, skipped: (sess.skipped ?? []).filter(id => id !== undoSkip.qId) })
+    setCurrent(undoSkip.idx)
+    questionStartRef.current = Date.now()
+    setUndoSkip(null)
+  }, [undoSkip])
+
+  const handleFlag = useCallback(() => {
     if (!q) return
     toggleFlag(q.id)
     setFlagged(f => f.includes(q.id) ? f.filter(id => id !== q.id) : [...f, q.id])
-  }
-
-  const fmtTime = (s: number) => {
-    const m = Math.floor(s / 60)
-    const sec = s % 60
-    return `${m}:${sec.toString().padStart(2, '0')}`
-  }
+  }, [q])
 
   useEffect(() => {
     if (!session) { navigate('/'); return }
@@ -223,7 +306,13 @@ export default function Session() {
     }
   }, [breakScreen?.nextSection])
 
-  // Keyboard shortcuts: A–E selects answer, Enter/Space reveals or advances
+  useEffect(() => {
+    if (!undoSkip) return
+    const t = setTimeout(() => setUndoSkip(null), 4000)
+    return () => clearTimeout(t)
+  }, [undoSkip])
+
+  // Keyboard shortcuts: A–E selects answer, Enter/Space reveals or advances, ? opens guide
   useEffect(() => {
     if (!session || !q || breakScreen) return
 
@@ -233,15 +322,25 @@ export default function Session() {
 
       const key = e.key.toUpperCase()
 
+      if (e.key === '?') {
+        e.preventDefault()
+        setShowKeyGuide(v => !v)
+        return
+      }
+      if (e.key === 'Escape') {
+        setShowKeyGuide(false)
+        setShowJump(false)
+        setShowFinishModal(false)
+        return
+      }
+
       if (ANSWER_KEYS.includes(key as AnswerKey)) {
         if (!isRevealed && key in q.options) {
           e.preventDefault()
-          setKeyboardUsed(true)
           pick(key as AnswerKey)
         }
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
-        setKeyboardUsed(true)
         if (!session.instantFeedback && chosen && !isRevealed) {
           setRevealed(r => ({ ...r, [q.id]: true }))
         } else if ((chosen || isRevealed) && !isTransitioning) {
@@ -252,55 +351,53 @@ export default function Session() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isRevealed, chosen, current, session?.instantFeedback, q?.id, sessionQuestions.length, isTransitioning, breakScreen, handleNextQuestion])
+  }, [isRevealed, chosen, current, session?.instantFeedback, q?.id, sessionQuestions.length, isTransitioning, breakScreen, handleNextQuestion, pick])
 
   // Early returns after all hooks
   if (!session) return null
 
-  // Section break interstitial
+  // ── Section break interstitial ───────────────────────────────
   if (breakScreen) {
     const completedMeta = SECTION_META[breakScreen.completedSection]
+    const nextColor = TYPE_TEXT[breakScreen.nextSection] ?? 'text-white'
     return (
-      <div className="h-screen bg-slate-900 text-white flex flex-col items-center justify-center px-6">
-        <div className="max-w-md w-full text-center">
-          <div className="text-slate-400 text-sm mb-2 font-semibold uppercase tracking-widest">
-            Avsnitt {breakScreen.completedSectionNumber} av 4 klart
+      <div className="h-screen bg-app text-white flex flex-col items-center justify-center px-6">
+        <div className="max-w-md w-full text-center animate-scale-in">
+          <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-3.5 py-1.5 mb-4">
+            <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest">
+              Avsnitt {breakScreen.completedSectionNumber} av 4 klart
+            </span>
           </div>
-          <div className="text-4xl font-black mb-2 text-emerald-400">✓ {breakScreen.completedSection}</div>
-          <div className="text-slate-400 text-sm mb-10">
-            {completedMeta?.description}
-          </div>
+          <div className="text-5xl font-black mb-2 text-emerald-400">{breakScreen.completedSection}</div>
+          <div className="text-slate-500 text-sm mb-10">{completedMeta?.description}</div>
 
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 mb-8">
-            <div className="text-slate-400 text-xs uppercase tracking-widest mb-3">Nästa avsnitt</div>
-            <div className={`text-3xl font-black mb-1 ${TYPE_COLOR[breakScreen.nextSection]?.replace('bg-', 'text-').replace('-600', '-400') ?? 'text-white'}`}>
-              Avsnitt {breakScreen.nextSectionNumber} — {breakScreen.nextSection}
+          <div className="glass rounded-2xl p-6 mb-8 text-left">
+            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Nästa avsnitt</div>
+            <div className={`text-3xl font-black mb-1 ${nextColor}`}>
+              {breakScreen.nextSection}
             </div>
-            <div className="text-slate-300 text-sm mb-4">
-              {SECTION_META[breakScreen.nextSection]?.description}
-            </div>
-            <div className="flex justify-center gap-6 text-sm">
-              <div className="text-center">
+            <div className="text-slate-400 text-sm mb-5">{SECTION_META[breakScreen.nextSection]?.description}</div>
+            <div className="flex gap-6">
+              <div>
                 <div className="text-2xl font-black text-white">{breakScreen.nextCount}</div>
-                <div className="text-slate-400">frågor</div>
+                <div className="text-xs text-slate-600 mt-0.5">frågor</div>
               </div>
-              <div className="text-slate-700 text-2xl">|</div>
-              <div className="text-center">
-                <div className="text-2xl font-black text-white">~{breakScreen.recommendedMin}</div>
-                <div className="text-slate-400">min rekommenderat</div>
+              <div>
+                <div className="text-2xl font-black text-white">~{breakScreen.recommendedMin} min</div>
+                <div className="text-xs text-slate-600 mt-0.5">rekommenderat</div>
               </div>
             </div>
           </div>
 
           <button
             onClick={() => doBreakContinue(breakScreen, sectionTimestamps)}
-            className="bg-blue-600 hover:bg-blue-500 transition-colors rounded-xl px-10 py-3 font-bold text-lg"
+            className="bg-blue-600 hover:bg-blue-500 transition-colors rounded-2xl px-10 py-3.5 font-bold text-base"
           >
-            Fortsätt → {breakCountdown > 0 && <span className="text-blue-300 text-sm ml-1">({breakCountdown})</span>}
+            Fortsätt{breakCountdown > 0 && <span className="text-blue-300/70 text-sm ml-2">({breakCountdown})</span>}
           </button>
 
           {timeLeft !== null && (
-            <div className={`mt-6 font-mono text-sm ${timeLeft < 120 ? 'text-red-400 timer-warning' : 'text-slate-500'}`}>
+            <div className={`mt-6 font-mono text-sm ${timeLeft < 120 ? 'text-red-400 timer-warning' : 'text-slate-600'}`}>
               {fmtTime(timeLeft)} kvar av provet
             </div>
           )}
@@ -311,73 +408,136 @@ export default function Session() {
 
   if (!q) return null
 
-  const progress = ((current + 1) / sessionQuestions.length) * 100
-  const lastOptionKey = answerOptions[answerOptions.length - 1]?.[0] ?? 'D'
-
   const sectionMeta = SECTION_META[q.type]
+  const typeColor = TYPE_TEXT[q.type] ?? 'text-slate-400'
+
+  // Exam section time budget (recomputed every render; questionElapsed ticks every second)
+  const sectionBudgetSecsLeft: number | null = isExam && sectionMeta && session
+    ? (() => {
+        const sectionStartMs = sectionTimestamps[q.type] ?? session.startTime
+        const budgetSecs = sectionMeta.recommendedMin * 60
+        const elapsedSecs = Math.round((Date.now() - sectionStartMs) / 1000)
+        return budgetSecs - elapsedSecs
+      })()
+    : null
 
   return (
-    <div className="h-screen sm:h-auto sm:min-h-screen bg-slate-900 text-white flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-slate-900 border-b border-slate-800 px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <span className={`text-xs font-black px-2 py-1 rounded shrink-0 ${TYPE_COLOR[q.type] ?? 'bg-slate-700'}`}>
+    <div className="h-screen sm:h-auto sm:min-h-screen bg-app text-white flex flex-col">
+
+      {/* ── Header ────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-10 bg-[#080C14]/95 backdrop-blur-xl border-b border-white/[0.05] px-4 py-1 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Type badge */}
+          <span className={`text-xs font-black shrink-0 ${typeColor}`}>
             {isExam && sectionMeta
-              ? `Avsnitt ${sectionMeta.number}/4 — ${q.type}`
+              ? `${sectionMeta.number}/4 · ${q.type}`
               : q.type}
           </span>
-          <span className="text-slate-400 text-sm shrink-0">
+
+          <button
+            onClick={() => setShowJump(s => !s)}
+            className="text-slate-500 text-xs hover:text-slate-300 transition-colors shrink-0 tabular-nums min-h-[44px] px-1"
+          >
             {current + 1} / {sessionQuestions.length}
-          </span>
+          </button>
+
+          <QuestionTimer currentIdx={current} />
+
+          {sectionBudgetSecsLeft !== null && (
+            <span className={`text-[10px] font-bold tabular-nums shrink-0 px-1.5 py-0.5 rounded ${
+              sectionBudgetSecsLeft < 0
+                ? 'text-red-400 bg-red-500/10'
+                : sectionBudgetSecsLeft < 120
+                ? 'text-amber-400 bg-amber-500/10'
+                : 'text-slate-500 bg-white/[0.04]'
+            }`}>
+              {sectionBudgetSecsLeft < 0
+                ? `+${fmtTime(-sectionBudgetSecsLeft)}`
+                : fmtTime(sectionBudgetSecsLeft)}
+            </span>
+          )}
+
+          {/* Icon buttons */}
           <button
             onClick={handleFlag}
+            aria-label={flagged.includes(q.id) ? 'Ta bort markering' : 'Markera fråga'}
             title={flagged.includes(q.id) ? 'Ta bort markering' : 'Markera fråga'}
-            className={`text-sm px-2 py-1 rounded-lg border transition-colors shrink-0 ${flagged.includes(q.id) ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300'}`}
+            className={`min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg transition-colors shrink-0 ${flagged.includes(q.id) ? 'text-amber-400' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            {flagged.includes(q.id) ? '★' : '☆'}<span className="hidden sm:inline"> Markera</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={flagged.includes(q.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+            </svg>
           </button>
+
           <button
-            onClick={() => {
-              const next = toggleBookmark(q.id)
-              setBookmarked(b => ({ ...b, [q.id]: next }))
-            }}
-            title={bookmarked[q.id] ? 'Ta bort bokmärke' : 'Bokmärk fråga'}
-            className={`text-sm px-2 py-1 rounded-lg border transition-colors shrink-0 ${bookmarked[q.id] ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300'}`}
+            onClick={() => { const next = toggleBookmark(q.id); setBookmarked(b => ({ ...b, [q.id]: next })) }}
+            aria-label={bookmarked[q.id] ? 'Ta bort bokmärke' : 'Bokmärk fråga'}
+            title={bookmarked[q.id] ? 'Ta bort bokmärke' : 'Bokmärk'}
+            className={`min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg transition-colors shrink-0 ${bookmarked[q.id] ? 'text-blue-400' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            {bookmarked[q.id] ? '🔖' : '🔖'}<span className="hidden sm:inline"> {bookmarked[q.id] ? 'Sparat' : 'Spara'}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={bookmarked[q.id] ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
           </button>
+
           <button
             onClick={() => setShowFormulas(true)}
-            title="Formler & strategier"
-            className="text-sm px-2 py-1 rounded-lg border border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300 transition-colors shrink-0"
+            aria-label="Visa formler"
+            title="Formler"
+            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-300 transition-colors shrink-0"
           >
-            📐<span className="hidden sm:inline"> Formler</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+            </svg>
           </button>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+
+        <div className="flex items-center gap-3 shrink-0">
           {timeLeft !== null && (
-            <span className={`font-mono font-bold text-sm sm:text-base ${timeLeft < 120 ? 'text-red-400 timer-warning' : 'text-slate-300'}`}>
+            <span className={`font-mono font-bold text-sm tabular-nums ${timeLeft < 120 ? 'text-red-400 timer-warning' : 'text-slate-400'}`}>
               {fmtTime(timeLeft)}
             </span>
           )}
           <button
-            onClick={handleFinish}
-            className="text-xs text-slate-400 hover:text-white border border-slate-700 rounded-lg px-2 sm:px-3 py-1"
+            onClick={() => setShowKeyGuide(v => !v)}
+            aria-label="Tangentbordsgenvägar"
+            title="Tangentbordsgenvägar (?)"
+            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-300 transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </button>
+          <button
+            onClick={requestFinish}
+            className="text-xs text-slate-500 hover:text-slate-300 transition-colors min-h-[44px] px-1"
           >
             Avsluta
           </button>
         </div>
       </header>
 
-      {/* Progress bar */}
-      <div className="h-1 bg-slate-800 shrink-0">
-        <div
-          className="h-full bg-blue-500 transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
+      {/* ── Segmented progress bar ────────────────────────────── */}
+      <div className="flex h-0.5 shrink-0 overflow-hidden">
+        {(['XYZ', 'KVA', 'NOG', 'DTK'] as const)
+          .map(type => {
+            const typeQs = sessionQuestions.filter(qq => qq.type === type)
+            if (typeQs.length === 0) return null
+            const answered = typeQs.filter(qq => !!answers[qq.id]).length
+            const widthPct = (typeQs.length / sessionQuestions.length) * 100
+            const fillPct = (answered / typeQs.length) * 100
+            return (
+              <div key={type} className="relative bg-white/[0.04]" style={{ width: `${widthPct}%` }}>
+                <div
+                  className={`absolute inset-y-0 left-0 ${TYPE_PROGRESS[type]} transition-all duration-500`}
+                  style={{ width: `${fillPct}%` }}
+                />
+              </div>
+            )
+          })}
       </div>
 
-      {/* Per-type remaining strip — only for mixed-type non-exam sessions */}
+      {/* Per-type remaining strip */}
       {!isExam && (() => {
         const remaining = sessionQuestions.slice(current)
         const counts: Partial<Record<string, number>> = {}
@@ -385,18 +545,18 @@ export default function Session() {
         const types = Object.keys(counts)
         if (types.length <= 1) return null
         return (
-          <div className="flex justify-center gap-3 bg-slate-900 py-1 shrink-0">
+          <div className="flex justify-center gap-4 bg-[#080C14]/80 py-1 shrink-0">
             {types.map(t => (
-              <span key={t} className={`text-[10px] font-bold ${TYPE_COLOR[t]?.replace('bg-', 'text-').replace('-600', '-400') ?? 'text-slate-400'}`}>
-                {t} {counts[t]}
+              <span key={t} className={`text-[10px] font-bold ${TYPE_TEXT[t] ?? 'text-slate-500'}`}>
+                {t}&thinsp;{counts[t]}
               </span>
             ))}
-            <span className="text-[10px] text-slate-600">kvar</span>
+            <span className="text-[10px] text-slate-500">kvar</span>
           </div>
         )
       })()}
 
-      {/* Scrollable question area */}
+      {/* ── Scrollable question area ───────────────────────────── */}
       <main
         className="flex-1 overflow-y-auto"
         onTouchStart={e => { touchStartXRef.current = e.touches[0].clientX }}
@@ -404,52 +564,60 @@ export default function Session() {
           if (touchStartXRef.current === null) return
           const dx = touchStartXRef.current - e.changedTouches[0].clientX
           touchStartXRef.current = null
-          if (dx > 80 && (chosen || isRevealed) && !isTransitioning) {
-            handleNextQuestion()
-          }
+          if (dx > 80 && (chosen || isRevealed) && !isTransitioning) handleNextQuestion()
         }}
       >
-        <div className={`max-w-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8 ${cardAnimClass}`}>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[10px] font-medium text-slate-500 bg-slate-800 border border-slate-700 rounded px-2 py-0.5">
+        <div className={`max-w-2xl mx-auto w-full px-4 py-6 ${cardAnimClass}`}>
+
+          {/* Source + difficulty chips */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-[10px] text-slate-600 bg-white/[0.04] border border-white/[0.05] rounded-md px-2 py-0.5">
               {q.source} · #{q.number}
             </span>
             {q.difficulty !== 'medium' && (
-              <span className={`text-[10px] font-bold border rounded px-2 py-0.5 ${DIFFICULTY_BADGE[q.difficulty] ?? ''}`}>
+              <span className={`text-[10px] font-bold border rounded-md px-2 py-0.5 ${DIFFICULTY_BADGE[q.difficulty] ?? ''}`}>
                 {q.difficulty === 'hard' ? 'Svår' : 'Lätt'}
               </span>
             )}
           </div>
 
+          {/* Context box */}
           {q.context && (
-            <div className="bg-slate-800/80 rounded-xl px-4 py-3 mb-4 text-sm text-slate-300 leading-relaxed border border-slate-700/60">
-              <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-1.5">Kontext</div>
+            <div className="glass rounded-xl px-4 py-3 mb-4 text-sm text-slate-300 leading-relaxed">
+              <div className="text-[9px] font-bold tracking-widest uppercase text-slate-600 mb-1.5">
+                {q.type === 'LAS' ? 'Lästext' : q.type === 'ELF' ? 'Reading passage' : 'Kontext'}
+              </div>
               <MathText text={q.context} />
             </div>
           )}
 
-          <div className={`bg-slate-800 rounded-2xl p-4 sm:p-6 mb-6 text-base sm:text-lg leading-relaxed overflow-x-auto border-l-4 ${TYPE_BORDER_L[q.type] ?? 'border-l-slate-600'}`}>
+          {/* Question text */}
+          <div className={`glass rounded-2xl p-5 mb-5 text-base sm:text-[17px] leading-relaxed overflow-x-auto border-l-[3px] ${TYPE_BORDER_L[q.type] ?? 'border-l-white/10'}`}>
             <MathText text={q.text} />
           </div>
 
+          {/* Chart */}
+          {q.chartData && <ChartView data={q.chartData} />}
+
+          {/* Table */}
           {q.tableData && (
-            <div className="bg-slate-800 rounded-2xl p-4 mb-6 overflow-x-auto">
+            <div className="glass rounded-2xl p-4 mb-5 overflow-x-auto">
               {q.tableData.caption && (
-                <p className="text-xs text-slate-400 mb-3">{q.tableData.caption}</p>
+                <p className="text-xs text-slate-500 mb-3">{q.tableData.caption}</p>
               )}
               <table className="text-sm w-full">
                 <thead>
-                  <tr className="border-b border-slate-600">
+                  <tr className="border-b border-white/[0.06]">
                     {q.tableData.headers.map((h, i) => (
-                      <th key={i} className="text-left py-1 pr-4 text-slate-300 font-bold">{h}</th>
+                      <th key={i} className="text-left py-1.5 pr-4 text-slate-400 font-semibold">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {q.tableData.rows.map((row, i) => (
-                    <tr key={i} className="border-b border-slate-700/50">
+                    <tr key={i} className="border-b border-white/[0.03]">
                       {row.map((cell, j) => (
-                        <td key={j} className="py-1 pr-4 text-slate-200">{cell}</td>
+                        <td key={j} className="py-1.5 pr-4 text-slate-200">{cell}</td>
                       ))}
                     </tr>
                   ))}
@@ -458,47 +626,54 @@ export default function Session() {
             </div>
           )}
 
-          <div className="grid gap-3 mb-2">
+          {/* KVA / NOG answer-key reminder */}
+          {KVA_NOG_HINT[q.type] && (
+            <p className="text-[11px] text-slate-500 text-center mb-3 px-2 leading-snug">
+              {KVA_NOG_HINT[q.type]}
+            </p>
+          )}
+
+          {/* Answer options */}
+          <div className="flex flex-col gap-2.5 mb-3">
             {answerOptions.map(([key, text]) => {
               const isChosen = chosen === key
               const isAnswer = key === q.answer
 
-              let cls = 'border-slate-700 bg-slate-800/80 hover:bg-slate-700/80 hover:border-slate-500 text-slate-200 cursor-pointer'
-              let labelCls = 'bg-slate-700 text-slate-400'
+              let wrapCls = 'border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/[0.12] text-slate-200 cursor-pointer'
+              let keyCls = 'bg-white/[0.06] text-slate-500'
+
               if (isChosen && !isRevealed) {
-                cls = 'border-blue-500 bg-blue-600/20 text-white cursor-pointer'
-                labelCls = 'bg-blue-600 text-white'
+                wrapCls = 'border-blue-500/60 bg-blue-500/10 text-white cursor-pointer'
+                keyCls = 'bg-blue-600 text-white'
               }
               if (isRevealed && isAnswer) {
-                cls = 'border-emerald-500 bg-emerald-600/15 text-white reveal-correct'
-                labelCls = 'bg-emerald-600 text-white'
+                wrapCls = 'border-emerald-500/50 bg-emerald-500/10 text-white reveal-correct'
+                keyCls = 'bg-emerald-600 text-white'
               }
               if (isRevealed && isChosen && !isAnswer) {
-                cls = 'border-red-500 bg-red-600/15 text-white'
-                labelCls = 'bg-red-600 text-white'
+                wrapCls = 'border-red-500/50 bg-red-500/10 text-white'
+                keyCls = 'bg-red-600 text-white'
               }
               if (isRevealed && !isAnswer && !isChosen) {
-                cls = 'border-slate-700/50 bg-slate-800/40 text-slate-500 cursor-default'
-                labelCls = 'bg-slate-700/60 text-slate-500'
+                wrapCls = 'border-white/[0.03] bg-white/[0.01] text-slate-600 cursor-default'
+                keyCls = 'bg-white/[0.04] text-slate-600'
               }
 
-              const badgeLabel = isRevealed && isAnswer
-                ? '✓'
-                : (isRevealed && isChosen && !isAnswer)
-                  ? '✗'
-                  : key
+              const badgeLabel = isRevealed && isAnswer ? '✓'
+                : (isRevealed && isChosen && !isAnswer) ? '✗'
+                : key
 
               return (
                 <button
                   key={key}
                   onClick={() => pick(key)}
                   disabled={isRevealed}
-                  className={`w-full border rounded-xl p-4 text-left flex items-start gap-3 transition-all min-h-14 ${cls}`}
+                  className={`w-full border rounded-xl p-3.5 text-left flex items-start gap-3 transition-all duration-150 min-h-[52px] ${wrapCls}`}
                 >
-                  <span className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black transition-colors ${labelCls}`}>
+                  <span className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black transition-colors ${keyCls}`}>
                     {badgeLabel}
                   </span>
-                  <div className="mt-0.5 flex-1">
+                  <div className="mt-0.5 flex-1 text-[15px] leading-snug">
                     <MathText text={text} />
                   </div>
                 </button>
@@ -507,7 +682,7 @@ export default function Session() {
           </div>
 
           {!chosen && !isRevealed && (
-            <div className="flex justify-center mt-1">
+            <div className="flex justify-center mt-2">
               <button
                 onClick={handleSkip}
                 className="text-xs text-slate-500 hover:text-slate-300 transition-colors py-1"
@@ -517,115 +692,217 @@ export default function Session() {
             </div>
           )}
 
-          {!keyboardUsed && (
-            <p className="text-center text-xs text-slate-600 mt-2 mb-2">
-              Tryck A–{lastOptionKey} för att svara · Enter för att gå vidare
-            </p>
-          )}
-
           {isRevealed && (
-            <div ref={explanationRef}>
+            <div ref={explanationRef} style={{ scrollMarginTop: '64px' }}>
               <ExplanationCard
                 isCorrect={isCorrect}
                 correctAnswer={q.answer}
                 explanation={q.explanation}
                 explanationData={q.explanationData}
+                chosenAnswer={chosen}
+                onLearnMore={!isCorrect ? (() => {
+                  const topic = getTopicForQuestion(q.tags)
+                  if (topic) navigate(`/matematik?topic=${topic.id}&inner=lesson`)
+                  else navigate('/matematik')
+                }) : undefined}
+                learnMoreLabel={!isCorrect ? (() => {
+                  const topic = getTopicForQuestion(q.tags)
+                  return topic ? `Lär dig ${topic.name}` : 'Öppna Matematikguiden'
+                })() : undefined}
               />
             </div>
           )}
 
-          {/* End-of-section footer in exam mode */}
           {isLastInSection && (
-            <div className="mt-6 text-center text-slate-500 text-sm border-t border-slate-700/50 pt-4">
+            <div className="mt-6 text-center text-slate-600 text-xs border-t border-white/[0.04] pt-4">
               Avsnitt {sectionMeta?.number ?? '?'} av 4 klart — {questionsRemaining} frågor kvar
             </div>
           )}
         </div>
       </main>
 
+      {/* ── Skip undo toast ──────────────────────────────────── */}
+      {undoSkip && (
+        <div className="fixed bottom-24 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
+          <div className="pointer-events-auto flex items-center gap-3 bg-slate-800 border border-white/[0.1] rounded-xl px-4 py-2.5 shadow-2xl animate-slide-up">
+            <span className="text-sm text-slate-300">Fråga hoppades över</span>
+            <button
+              onClick={handleUndoSkip}
+              className="text-sm font-bold text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Ångra
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Key guide overlay ─────────────────────────────────── */}
+      {showKeyGuide && (
+        <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowKeyGuide(false)}>
+          <div ref={keyGuideRef} role="dialog" aria-modal="true" aria-label="Tangentbordsgenvägar" className="bg-[#0d1320] border border-white/[0.08] rounded-2xl w-full max-w-xs p-6 animate-scale-in" onClick={e => e.stopPropagation()}>
+            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Tangentbordsgenvägar</div>
+            <div className="space-y-3">
+              {[
+                { key: 'A – E', desc: 'Välj svarsalternativ' },
+                { key: 'Enter / Space', desc: 'Visa svar · Nästa fråga' },
+                { key: 'Escape', desc: 'Stäng overlay' },
+                { key: '?', desc: 'Visa / dölj denna guide' },
+              ].map(s => (
+                <div key={s.key} className="flex items-center justify-between gap-4">
+                  <kbd className="text-xs font-mono bg-white/[0.06] border border-white/[0.1] text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap">{s.key}</kbd>
+                  <span className="text-sm text-slate-400 text-right">{s.desc}</span>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setShowKeyGuide(false)} className="mt-5 w-full text-xs text-slate-600 hover:text-slate-400 transition-colors">Stäng (Esc)</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Finish confirmation modal ──────────────────────────── */}
+      {showFinishModal && (
+        <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onClick={() => setShowFinishModal(false)}>
+          <div ref={finishModalRef} role="dialog" aria-modal="true" aria-label="Avsluta passet" className="bg-[#0d1320] border border-white/[0.08] rounded-2xl w-full max-w-sm p-6 animate-slide-up sm:animate-scale-in" onClick={e => e.stopPropagation()}>
+            <div className="text-base font-black text-white mb-1">Avsluta passet?</div>
+            <p className="text-sm text-slate-500 mb-5">Du kan inte återgå till frågorna efter att du avslutat.</p>
+            <div className="grid grid-cols-3 gap-3 mb-5 text-center">
+              <div className="bg-white/[0.04] rounded-xl py-2.5">
+                <div className="text-lg font-black text-white">{Object.keys(answers).length}</div>
+                <div className="text-[10px] text-slate-600 mt-0.5">Besvarade</div>
+              </div>
+              <div className="bg-white/[0.04] rounded-xl py-2.5">
+                <div className="text-lg font-black text-amber-400">{flagged.length}</div>
+                <div className="text-[10px] text-slate-600 mt-0.5">Markerade</div>
+              </div>
+              <div className="bg-white/[0.04] rounded-xl py-2.5">
+                <div className="text-lg font-black text-slate-400">{sessionQuestions.length - Object.keys(answers).length}</div>
+                <div className="text-[10px] text-slate-600 mt-0.5">Ej besvarade</div>
+              </div>
+            </div>
+            <div className="flex gap-2.5">
+              <button onClick={() => setShowFinishModal(false)} className="flex-1 glass border border-white/[0.08] hover:bg-white/[0.07] rounded-xl py-3 font-bold text-sm transition-colors">
+                Fortsätt
+              </button>
+              <button onClick={handleFinish} className="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-xl py-3 font-bold text-sm transition-colors">
+                Visa resultat →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showJump && (
+        <div
+          className="fixed inset-0 z-20 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+          onClick={() => setShowJump(false)}
+        >
+          <div
+            ref={jumpModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Hoppa till fråga"
+            className="bg-[#0d1320] border border-white/[0.08] rounded-2xl w-full max-w-sm p-5 animate-slide-up sm:animate-scale-in"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-bold text-slate-300">Hoppa till fråga</div>
+              <button onClick={() => setShowJump(false)} className="text-slate-600 hover:text-slate-400 text-xl leading-none">×</button>
+            </div>
+            <div className="grid grid-cols-8 gap-1.5">
+              {sessionQuestions.map((sq, idx) => {
+                const isAnswered = !!answers[sq.id]
+                const isFlagged = flagged.includes(sq.id)
+                const isCurrent = idx === current
+                let cls = 'bg-white/[0.04] text-slate-600 hover:bg-white/[0.08] hover:text-slate-300'
+                if (isCurrent) cls = 'bg-blue-600 text-white'
+                else if (isFlagged) cls = 'bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30'
+                else if (isAnswered) cls = 'bg-white/[0.1] text-slate-200 hover:bg-white/[0.15]'
+                return (
+                  <button
+                    key={sq.id}
+                    onClick={() => jumpTo(idx)}
+                    className={`aspect-square rounded-lg text-xs font-bold transition-colors ${cls}`}
+                  >
+                    {idx + 1}
+                  </button>
+                )
+              })}
+            </div>
+            <div className="flex gap-4 mt-4 text-[10px] text-slate-600">
+              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-white/[0.1]" /> Besvarad</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-amber-500/20 border border-amber-500/30" /> Markerad</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-blue-600" /> Aktuell</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showFormulas && (
         <FormulaDrawer questionType={q.type} onClose={() => setShowFormulas(false)} />
       )}
 
-      {/* Action buttons */}
-      <div className="shrink-0 border-t border-slate-800 bg-slate-900 px-3 sm:px-6 py-3 sm:py-4 pb-safe">
-        <div className="max-w-2xl mx-auto flex gap-3">
+      {/* ── Action bar ────────────────────────────────────────── */}
+      <div className="shrink-0 border-t border-white/[0.05] bg-[#080C14]/95 backdrop-blur-xl px-4 py-3 pb-safe">
+        <div className="max-w-2xl mx-auto flex gap-2.5">
+
           {!session.instantFeedback && chosen && !isRevealed && (
             <button
               onClick={() => {
                 setRevealed(r => ({ ...r, [q.id]: true }))
-                setTimeout(() => {
-                  explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                }, 80)
+                setTimeout(() => explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80)
               }}
-              className="flex-1 border border-slate-600 hover:bg-slate-800 rounded-xl py-3 font-bold transition-colors"
+              className="flex-1 glass border border-white/[0.1] hover:bg-white/[0.07] rounded-xl py-3 font-bold text-sm transition-colors"
             >
               Visa svar
             </button>
           )}
 
-          {/* Study mode: quality rating buttons replace plain Nästa */}
           {session.studyMode && isRevealed && (
             <>
-              <button
-                onClick={() => {
-                  saveQuestionQuality(q.id, isCorrect ? 1 : 0)
-                  current < sessionQuestions.length - 1 ? handleNextQuestion() : handleFinish()
-                }}
-                disabled={isTransitioning}
-                className="flex-1 border border-red-700 bg-red-900/20 hover:bg-red-900/40 text-red-300 rounded-xl py-3 font-bold transition-colors disabled:opacity-40"
-              >
-                Svårt
-              </button>
-              <button
-                onClick={() => {
-                  saveQuestionQuality(q.id, isCorrect ? 2 : 0)
-                  current < sessionQuestions.length - 1 ? handleNextQuestion() : handleFinish()
-                }}
-                disabled={isTransitioning}
-                className="flex-1 border border-amber-700 bg-amber-900/20 hover:bg-amber-900/40 text-amber-300 rounded-xl py-3 font-bold transition-colors disabled:opacity-40"
-              >
-                Ok
-              </button>
-              <button
-                onClick={() => {
-                  saveQuestionQuality(q.id, isCorrect ? 3 : 0)
-                  current < sessionQuestions.length - 1 ? handleNextQuestion() : handleFinish()
-                }}
-                disabled={isTransitioning}
-                className="flex-1 border border-emerald-700 bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-300 rounded-xl py-3 font-bold transition-colors disabled:opacity-40"
-              >
-                Enkelt
-              </button>
+              {[
+                { label: 'Svårt', q: isCorrect ? 1 : 0, cls: 'border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/15' },
+                { label: 'Ok',    q: isCorrect ? 2 : 0, cls: 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/15' },
+                { label: 'Enkelt', q: isCorrect ? 3 : 0, cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15' },
+              ].map(({ label, q: quality, cls }) => (
+                <button
+                  key={label}
+                  onClick={() => {
+                    saveQuestionQuality(q.id, quality)
+                    current < sessionQuestions.length - 1 ? handleNextQuestion() : requestFinish()
+                  }}
+                  disabled={isTransitioning}
+                  className={`flex-1 border rounded-xl py-3 font-bold text-sm transition-colors disabled:opacity-40 ${cls}`}
+                >
+                  {label}
+                </button>
+              ))}
             </>
           )}
 
-          {/* Normal advance button (not study mode) */}
           {!session.studyMode && (
             current < sessionQuestions.length - 1 ? (
               <button
                 onClick={handleNextQuestion}
                 disabled={(!chosen && !isRevealed) || isTransitioning}
-                className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 rounded-xl py-3 font-bold transition-colors"
+                className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:bg-white/[0.05] disabled:text-slate-600 rounded-xl py-3 font-bold text-sm transition-colors"
               >
                 Nästa →
               </button>
             ) : (
               <button
-                onClick={handleFinish}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-xl py-3 font-bold transition-colors"
+                onClick={requestFinish}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-xl py-3 font-bold text-sm transition-colors"
               >
                 Avsluta och visa resultat
               </button>
             )
           )}
 
-          {/* Study mode: finish button on last question */}
           {session.studyMode && !isRevealed && (
             <button
               onClick={handleNextQuestion}
               disabled={!chosen || isTransitioning}
-              className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 rounded-xl py-3 font-bold transition-colors"
+              className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-white/[0.05] disabled:text-slate-600 rounded-xl py-3 font-bold text-sm transition-colors"
             >
               {current < sessionQuestions.length - 1 ? 'Nästa →' : 'Avsluta →'}
             </button>

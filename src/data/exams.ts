@@ -54,6 +54,28 @@ export const exams: ExamDefinition[] = [
       DTK: ['dtk-007', 'dtk-008', 'dtk-009', 'dtk-010', 'dtk-011'],
     },
   },
+  {
+    id: '2025-03-16-pp3',
+    name: '2025-03-16 Provpass 3',
+    date: '2025-03-16',
+    sections: {
+      XYZ: ['xyz-010', 'xyz-011', 'xyz-012', 'xyz-013', 'xyz-014', 'xyz-015', 'xyz-016', 'xyz-017', 'xyz-018', 'xyz-019', 'xyz-020', 'xyz-021'],
+      KVA: ['kva-008', 'kva-009', 'kva-010', 'kva-011', 'kva-012', 'kva-013', 'kva-014', 'kva-015', 'kva-016', 'kva-017'],
+      NOG: ['nog-006', 'nog-007', 'nog-008', 'nog-009', 'nog-010', 'nog-011'],
+      DTK: ['dtk-004', 'dtk-005', 'dtk-006', 'dtk-021', 'dtk-022', 'dtk-023', 'dtk-024', 'dtk-025', 'dtk-026', 'dtk-027', 'dtk-028', 'dtk-029'],
+    },
+  },
+  {
+    id: '2024-10-06-pp4',
+    name: '2024-10-06 Provpass 4',
+    date: '2024-10-06',
+    sections: {
+      XYZ: ['xyz-031', 'xyz-032', 'xyz-033', 'xyz-034', 'xyz-035', 'xyz-036', 'xyz-037', 'xyz-038', 'xyz-039', 'xyz-040', 'xyz-3d01', 'xyz-3d02'],
+      KVA: ['kva-018', 'kva-019', 'kva-020', 'kva-025', 'kva-026', 'kva-027', 'kva-028', 'kva-e01', 'kva-e02', 'kva-e03'],
+      NOG: ['nog-012', 'nog-013', 'nog-014', 'nog-018', 'nog-019', 'nog-020'],
+      DTK: ['dtk-012', 'dtk-013', 'dtk-014', 'dtk-015', 'dtk-031', 'dtk-032', 'dtk-033', 'dtk-034', 'dtk-035', 'dtk-036', 'dtk-037', 'dtk-038'],
+    },
+  },
 ]
 
 function shuffle<T>(arr: T[]): T[] {

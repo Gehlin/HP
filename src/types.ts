@@ -1,4 +1,4 @@
-export type QuestionType = 'XYZ' | 'KVA' | 'NOG' | 'DTK'
+export type QuestionType = 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'ORD' | 'LAS' | 'MEK' | 'ELF'
 export type AnswerKey = 'A' | 'B' | 'C' | 'D' | 'E'
 
 export interface TableData {
@@ -7,10 +7,25 @@ export interface TableData {
   rows: string[][]
 }
 
+export interface ChartSeries {
+  label: string
+  values: number[]
+  color?: string
+}
+
+export interface ChartData {
+  type: 'bar' | 'line'
+  title?: string
+  xLabels: string[]
+  yUnit?: string
+  series: ChartSeries[]
+}
+
 export interface ExplanationData {
-  approach?: string   // one-line method/strategy description
-  steps: string[]     // ordered solution steps (math-aware strings)
-  note?: string       // key insight or common mistake warning
+  approach?: string
+  steps: string[]
+  note?: string
+  distractorNotes?: Partial<Record<AnswerKey, string>>
 }
 
 export interface Question {
@@ -21,6 +36,7 @@ export interface Question {
   text: string
   context?: string
   tableData?: TableData
+  chartData?: ChartData
   requiresImage?: boolean
   options: {
     A: string

@@ -3,87 +3,138 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply bg-[#080C14] text-slate-100 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
+/* ─── Background ─────────────────────────────────────────────── */
+
+.bg-app {
+  background-color: #080C14;
+}
+
+.bg-hero {
+  background-color: #080C14;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(96, 165, 250, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+}
+
+/* subtle dot grid */
+.bg-hero::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 80%);
+}
+
+/* keep legacy alias working */
+.bg-hero-grid {
+  background-color: #080C14;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(96, 165, 250, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+}
+
+/* ─── Glass cards ────────────────────────────────────────────── */
+
+.glass {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-md {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ─── Spacing utility ────────────────────────────────────────── */
+
+.pb-safe {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+/* ─── Question card slide transitions ───────────────────────── */
+
 @keyframes slideOutLeft {
-  from { opacity: 1; transform: translateX(0); }
-  to   { opacity: 0; transform: translateX(-20px); }
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(-24px) scale(0.98); }
 }
 
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes correctPulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-
-@keyframes timerWarning {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.45; }
+  from { opacity: 0; transform: translateX(24px) scale(0.98); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 .slide-out-left {
-  animation: slideOutLeft 150ms ease-in forwards;
+  animation: slideOutLeft 160ms cubic-bezier(0.4, 0, 1, 1) forwards;
   pointer-events: none;
 }
 
 .slide-in-right {
-  animation: slideInRight 150ms ease-out;
+  animation: slideInRight 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ─── Answer feedback ────────────────────────────────────────── */
+
+@keyframes correctPulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
+
+@keyframes revealCorrect {
+  0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  60%  { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
 .correct-pulse {
-  animation: correctPulse 200ms ease-in-out;
+  animation: correctPulse 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reveal-correct {
+  animation: revealCorrect 600ms ease-out;
+}
+
+/* ─── Timer warning ──────────────────────────────────────────── */
+
+@keyframes timerWarning {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
 }
 
 .timer-warning {
   animation: timerWarning 1.2s ease-in-out infinite;
 }
 
-.bg-hero-grid {
-  background-color: #0f172a;
-  background-image:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(30, 41, 59, 0.97) 100%),
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 100% 100%, 48px 48px, 48px 48px;
+/* ─── Page & element entry animations ───────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.fade-up {
-  animation: fadeUp 280ms ease-out forwards;
-}
-
-@keyframes revealCorrect {
-  0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-  60%  { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
-.reveal-correct {
-  animation: revealCorrect 500ms ease-out;
-}
-
-.pb-safe {
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 280ms ease-out;
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes slideUp {
@@ -91,6 +142,91 @@
   to   { transform: translateY(0); }
 }
 
-.animate-slide-up {
-  animation: slideUp 220ms cubic-bezier(0.32, 0.72, 0, 1);
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position: 200% center; }
+}
+
+.animate-fade-in  { animation: fadeIn  240ms cubic-bezier(0, 0, 0.2, 1); }
+.animate-fade-up  { animation: fadeUp  280ms cubic-bezier(0, 0, 0.2, 1); }
+.animate-scale-in { animation: scaleIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.animate-slide-up { animation: slideUp 260ms cubic-bezier(0.32, 0.72, 0, 1); }
+.fade-up          { animation: fadeUp  280ms ease-out forwards; }
+
+/* stagger helpers */
+.stagger-1 { animation-delay: 60ms;  animation-fill-mode: both; }
+.stagger-2 { animation-delay: 120ms; animation-fill-mode: both; }
+.stagger-3 { animation-delay: 180ms; animation-fill-mode: both; }
+.stagger-4 { animation-delay: 240ms; animation-fill-mode: both; }
+
+/* ─── Shimmer skeleton ───────────────────────────────────────── */
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 0%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 1.8s linear infinite;
+}
+
+/* ─── Glow utilities ─────────────────────────────────────────── */
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+.glow-blue {
+  box-shadow: 0 0 20px -4px rgba(96, 165, 250, 0.35);
+}
+
+.glow-violet {
+  box-shadow: 0 0 20px -4px rgba(139, 92, 246, 0.35);
+}
+
+/* ─── Bottom nav pill indicator ──────────────────────────────── */
+
+@keyframes navPillSlide {
+  from { opacity: 0; transform: scaleX(0.6); }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+
+.nav-pill {
+  animation: navPillSlide 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Custom scrollbar ───────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ─── Range input ────────────────────────────────────────────── */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.1);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  transition: box-shadow 150ms;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.25);
 }

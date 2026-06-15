@@ -1,13 +1,11 @@
 import { questions } from '../data/questions'
 import { loadHistory } from './session'
-import { estimateHpScore } from './hpScore'
+import { estimateSectionedScore } from './hpScore'
 import type { QuestionType } from '../types'
 
 const HP_SECONDS_PER_TYPE: Record<QuestionType, number> = {
-  XYZ: 60,
-  KVA: 60,
-  NOG: 100,
-  DTK: 115,
+  XYZ: 60, KVA: 60, NOG: 100, DTK: 115,
+  ORD: 45, LAS: 120, MEK: 50, ELF: 120,
 }
 
 export interface TimeAnalytics {
@@ -18,7 +16,7 @@ export interface TimeAnalytics {
 
 export function timeAnalyticsByType(): Record<QuestionType, TimeAnalytics> {
   const history = loadHistory()
-  const buckets: Record<QuestionType, number[]> = { XYZ: [], KVA: [], NOG: [], DTK: [] }
+  const buckets: Record<QuestionType, number[]> = { XYZ: [], KVA: [], NOG: [], DTK: [], ORD: [], LAS: [], MEK: [], ELF: [] }
 
   history.forEach(s => {
     if (!s.questionTimes) return
@@ -73,6 +71,58 @@ export function accuracyByDifficulty(): Record<'easy' | 'medium' | 'hard', Diffi
   }, {} as Record<'easy' | 'medium' | 'hard', DifficultyAccuracy>)
 }
 
+function buildByType(s: ReturnType<typeof loadHistory>[number]): Record<QuestionType, { correct: number; total: number }> {
+  const bt: Record<QuestionType, { correct: number; total: number }> = {
+    XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
+    NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
+    ORD: { correct: 0, total: 0 }, LAS: { correct: 0, total: 0 },
+    MEK: { correct: 0, total: 0 }, ELF: { correct: 0, total: 0 },
+  }
+  s.questionIds.forEach(id => {
+    const q = questions.find(x => x.id === id)
+    if (!q || !s.answers[id]) return
+    bt[q.type].total++
+    if (s.answers[id] === q.answer) bt[q.type].correct++
+  })
+  return bt
+}
+
+// Per-session HP score history — oldest first, up to n sessions
+export function hpScoreHistory(n = 15): number[] {
+  return loadHistory()
+    .slice(0, n)
+    .reverse()
+    .map(s => {
+      const bt = buildByType(s)
+      const { combined } = estimateSectionedScore(bt)
+      return combined
+    })
+    .filter((v): v is number => v !== null)
+}
+
+// Per-type accuracy per session — oldest first, up to n sessions
+export function typeAccuracyTrend(n = 12): Record<QuestionType, number[]> {
+  const result: Record<QuestionType, number[]> = { XYZ: [], KVA: [], NOG: [], DTK: [], ORD: [], LAS: [], MEK: [], ELF: [] }
+  loadHistory()
+    .slice(0, n)
+    .reverse()
+    .forEach(s => {
+      const typeMap: Partial<Record<QuestionType, { correct: number; total: number }>> = {}
+      s.questionIds.forEach(id => {
+        const q = questions.find(x => x.id === id)
+        if (!q || !s.answers[id]) return
+        if (!typeMap[q.type]) typeMap[q.type] = { correct: 0, total: 0 }
+        typeMap[q.type]!.total++
+        if (s.answers[id] === q.answer) typeMap[q.type]!.correct++
+      })
+      ;(Object.keys(result) as QuestionType[]).forEach(type => {
+        const v = typeMap[type]
+        if (v && v.total >= 2) result[type].push(Math.round((v.correct / v.total) * 100))
+      })
+    })
+  return result
+}
+
 // Weighted rolling HP score — more recent sessions weighted higher
 export function rollingHpScore(n = 10): number | null {
   const history = loadHistory().slice(0, n)
@@ -82,13 +132,11 @@ export function rollingHpScore(n = 10): number | null {
   let weightTotal = 0
 
   history.forEach((s, i) => {
-    const qs = s.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean)
-    if (qs.length === 0) return
-    const correct = qs.filter(q => q && s.answers[q.id] === q.answer).length
-    const pct = Math.round((correct / qs.length) * 100)
-    const hp = estimateHpScore(pct)
+    const bt = buildByType(s)
+    const { combined } = estimateSectionedScore(bt)
+    if (combined === null) return
     const weight = history.length - i  // most recent = highest weight
-    weightedSum += hp * weight
+    weightedSum += combined * weight
     weightTotal += weight
   })
 

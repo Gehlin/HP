@@ -1,15 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import Home from './pages/Home'
-import Practice from './pages/Practice'
-import Session from './pages/Session'
-import Results from './pages/Results'
-import Theory from './pages/Theory'
-import Progress from './pages/Progress'
-import ExamSelect from './pages/ExamSelect'
-import ExamStart from './pages/ExamStart'
-import Settings from './pages/Settings'
-import MathGuide from './pages/MathGuide'
+import ErrorBoundary from './components/ErrorBoundary'
+import InstallBanner from './components/InstallBanner'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
 import BottomNav from './components/BottomNav'
 import { maybeShowDueNotification } from './utils/notifications'
@@ -17,11 +9,34 @@ import { getDueQuestions } from './utils/srs'
 import { questions } from './data/questions'
 import { loadHistory } from './utils/session'
 
+const Home       = lazy(() => import('./pages/Home'))
+const Practice   = lazy(() => import('./pages/Practice'))
+const Session    = lazy(() => import('./pages/Session'))
+const Results    = lazy(() => import('./pages/Results'))
+const Theory     = lazy(() => import('./pages/Theory'))
+const Progress   = lazy(() => import('./pages/Progress'))
+const ExamSelect = lazy(() => import('./pages/ExamSelect'))
+const ExamStart  = lazy(() => import('./pages/ExamStart'))
+const Settings   = lazy(() => import('./pages/Settings'))
+const MathGuide           = lazy(() => import('./pages/MathGuide'))
+const Bookmarks           = lazy(() => import('./pages/Bookmarks'))
+const SrsQueue            = lazy(() => import('./pages/SrsQueue'))
+const LiggandeStolenGuide = lazy(() => import('./pages/LiggandeStolenGuide'))
+const OrdGuide            = lazy(() => import('./pages/OrdGuide'))
+
 const KEYBOARD_SHORTCUTS = [
   { key: 'A – E', desc: 'Välj svarsalternativ' },
   { key: 'Enter / Space', desc: 'Visa svar / Gå till nästa fråga' },
   { key: '?', desc: 'Visa / dölj tangentbordsguide' },
 ]
+
+function PageLoader() {
+  return (
+    <div className="min-h-screen bg-app flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-blue-400 animate-spin" />
+    </div>
+  )
+}
 
 function AppInner() {
   const location = useLocation()
@@ -107,28 +122,37 @@ function AppInner() {
         </div>
       )}
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/practice" element={<Practice />} />
-        <Route path="/session" element={<Session />} />
-        <Route path="/results" element={<Results />} />
-        <Route path="/theory" element={<Theory />} />
-        <Route path="/progress" element={<Progress />} />
-        <Route path="/exam-select" element={<ExamSelect />} />
-        <Route path="/exam/:examId" element={<ExamStart />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/matematik" element={<MathGuide />} />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/practice" element={<Practice />} />
+          <Route path="/session" element={<Session />} />
+          <Route path="/results" element={<Results />} />
+          <Route path="/theory" element={<Theory />} />
+          <Route path="/progress" element={<Progress />} />
+          <Route path="/exam-select" element={<ExamSelect />} />
+          <Route path="/exam/:examId" element={<ExamStart />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/matematik" element={<MathGuide />} />
+          <Route path="/bookmarks" element={<Bookmarks />} />
+          <Route path="/srs" element={<SrsQueue />} />
+          <Route path="/liggande-stolen" element={<LiggandeStolenGuide />} />
+          <Route path="/ord-guide" element={<OrdGuide />} />
+        </Routes>
+      </Suspense>
 
       {!inSession && <BottomNav />}
+      <InstallBanner />
     </>
   )
 }
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AppInner />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AppInner />
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }

@@ -5,14 +5,37 @@
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#0f172a",
-  "background_color": "#0f172a",
+  "theme_color": "#080C14",
+  "background_color": "#080C14",
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daglig utmaning",
+      "short_name": "Daglig",
+      "description": "Starta dagens utmaning direkt",
+      "url": "/practice?daily=1",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Repetera",
+      "short_name": "SRS",
+      "description": "Börja dagens spaced-repetition-session",
+      "url": "/practice?srs=1",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Simulera HP-prov",
+      "short_name": "Prov",
+      "description": "Starta ett fullständigt HP-provsimulering",
+      "url": "/exam-select",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
     }
   ]
 }

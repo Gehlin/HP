@@ -11,18 +11,19 @@ type Mode = 'drill' | 'exam' | 'repetition'
 type Difficulty = 'easy' | 'medium' | 'hard'
 
 const TYPE_INFO: Record<QuestionType, { label: string; desc: string; time: string }> = {
-  XYZ: { label: 'XYZ', desc: 'Matematisk problemlösning', time: '12 min / 12 frågor' },
-  KVA: { label: 'KVA', desc: 'Kvantitativa jämförelser', time: '10 min / 10 frågor' },
-  NOG: { label: 'NOG', desc: 'Kvantitativa resonemang', time: '10 min / 6 frågor' },
-  DTK: { label: 'DTK', desc: 'Diagram, tabeller och kartor', time: '23 min / 12 frågor' },
+  XYZ: { label: 'XYZ', desc: 'Matematisk problemlösning',   time: '12 min / 12 frågor' },
+  KVA: { label: 'KVA', desc: 'Kvantitativa jämförelser',    time: '10 min / 10 frågor' },
+  NOG: { label: 'NOG', desc: 'Kvantitativa resonemang',     time: '10 min / 6 frågor'  },
+  DTK: { label: 'DTK', desc: 'Diagram, tabeller & kartor',  time: '23 min / 12 frågor' },
+  ORD: { label: 'ORD', desc: 'Ordförståelse',               time: '7 min / 10 frågor'  },
+  LAS: { label: 'LÄS', desc: 'Läsförståelse',               time: '26 min / 16 frågor' },
+  MEK: { label: 'MEK', desc: 'Meningskomplettering',        time: '8 min / 10 frågor'  },
+  ELF: { label: 'ELF', desc: 'Engelsk läsförståelse',       time: '26 min / 16 frågor' },
 }
 
-// Seconds per question for each section type (based on HP time allocations)
 const SECONDS_PER_QUESTION: Record<QuestionType, number> = {
-  XYZ: 60,
-  KVA: 60,
-  NOG: 100,
-  DTK: 115,
+  XYZ: 60, KVA: 60, NOG: 100, DTK: 115,
+  ORD: 45, LAS: 120, MEK: 50, ELF: 120,
 }
 
 function computeTimeLimit(ids: string[]): number {
@@ -32,36 +33,51 @@ function computeTimeLimit(ids: string[]): number {
   }, 0)
 }
 
+const TYPE_ACTIVE: Record<QuestionType, string> = {
+  XYZ: 'border-violet-500/60 bg-violet-500/10 text-violet-300',
+  KVA: 'border-blue-500/60   bg-blue-500/10   text-blue-300',
+  NOG: 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300',
+  DTK: 'border-amber-500/60  bg-amber-500/10  text-amber-300',
+  ORD: 'border-rose-500/60   bg-rose-500/10   text-rose-300',
+  LAS: 'border-pink-500/60   bg-pink-500/10   text-pink-300',
+  MEK: 'border-fuchsia-500/60 bg-fuchsia-500/10 text-fuchsia-300',
+  ELF: 'border-purple-500/60 bg-purple-500/10 text-purple-300',
+}
+
+const TYPE_COLOR: Record<QuestionType, string> = {
+  XYZ: 'text-violet-400', KVA: 'text-blue-400',
+  NOG: 'text-emerald-400', DTK: 'text-amber-400',
+  ORD: 'text-rose-400', LAS: 'text-pink-400',
+  MEK: 'text-fuchsia-400', ELF: 'text-purple-400',
+}
+
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: 'Lätt',
-  medium: 'Medel',
-  hard: 'Svår',
-}
-
-const TYPE_SELECTED: Record<QuestionType, string> = {
-  XYZ: 'border-violet-500 bg-violet-600/20 text-white',
-  KVA: 'border-blue-500 bg-blue-600/20 text-white',
-  NOG: 'border-emerald-500 bg-emerald-600/20 text-white',
-  DTK: 'border-amber-500 bg-amber-600/20 text-white',
-}
-
-const TYPE_LABEL_COLOR: Record<QuestionType, string> = {
-  XYZ: 'text-violet-400',
-  KVA: 'text-blue-400',
-  NOG: 'text-emerald-400',
-  DTK: 'text-amber-400',
+  easy: 'Lätt', medium: 'Medel', hard: 'Svår',
 }
 
 const ALL_DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard']
 const ALL_TAGS = Array.from(new Set(questions.flatMap(q => q.tags))).sort()
 
+/* ── tiny reusable toggle row ───────────────────────────────── */
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[10px] font-bold tracking-widest text-slate-600 uppercase mb-2.5">
+      {children}
+    </div>
+  )
+}
+
 export default function Practice() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const tagParam = searchParams.get('tag')
+  const typeParam = searchParams.get('type') as QuestionType | null
 
   const [mode, setMode] = useState<Mode>('drill')
-  const [selectedTypes, setSelectedTypes] = useState<QuestionType[]>(['XYZ', 'KVA', 'NOG', 'DTK'])
+  const QUANT_TYPES: QuestionType[] = ['XYZ', 'KVA', 'NOG', 'DTK']
+  const [selectedTypes, setSelectedTypes] = useState<QuestionType[]>(
+    typeParam && Object.keys(TYPE_INFO).includes(typeParam) ? [typeParam] : QUANT_TYPES
+  )
   const [timed, setTimed] = useState(false)
   const [instantFeedback, setInstantFeedback] = useState(true)
   const [count, setCount] = useState(20)
@@ -72,23 +88,14 @@ export default function Practice() {
   const [tagsOpen, setTagsOpen] = useState(!!tagParam)
   const [studyMode, setStudyMode] = useState(false)
 
-  const toggleType = (t: QuestionType) => {
-    setSelectedTypes(prev =>
-      prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]
-    )
-  }
+  const toggleType = (t: QuestionType) =>
+    setSelectedTypes(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
 
-  const toggleDifficulty = (d: Difficulty) => {
-    setSelectedDifficulties(prev =>
-      prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]
-    )
-  }
+  const toggleDifficulty = (d: Difficulty) =>
+    setSelectedDifficulties(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d])
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(x => x !== tag) : [...prev, tag]
-    )
-  }
+  const toggleTag = (tag: string) =>
+    setSelectedTags(prev => prev.includes(tag) ? prev.filter(x => x !== tag) : [...prev, tag])
 
   const filteredPool = useMemo(() =>
     questions.filter(q =>
@@ -100,11 +107,10 @@ export default function Practice() {
   )
 
   const available = filteredPool.length
-
   const dueIds = useMemo(() => getDueQuestions(questions.map(q => q.id)), [])
 
   const dueByType = useMemo(() => {
-    const counts: Record<QuestionType, number> = { XYZ: 0, KVA: 0, NOG: 0, DTK: 0 }
+    const counts: Record<QuestionType, number> = { XYZ: 0, KVA: 0, NOG: 0, DTK: 0, ORD: 0, LAS: 0, MEK: 0, ELF: 0 }
     dueIds.forEach(id => {
       const q = questions.find(x => x.id === id)
       if (q) counts[q.type]++
@@ -114,8 +120,8 @@ export default function Practice() {
 
   const bookmarkedIds = useMemo(() => getBookmarks().filter(id => questions.some(q => q.id === id)), [])
   const isDaily = searchParams.get('daily') === '1'
+  const isSrs = searchParams.get('srs') === '1'
 
-  // Auto-start daily challenge if navigated with ?daily=1
   useEffect(() => {
     if (!isDaily) return
     const ids = getDailyChallengeIds()
@@ -124,6 +130,15 @@ export default function Practice() {
     markDailyChallengeCompleted()
     navigate('/session', { replace: true })
   }, [])
+
+  useEffect(() => {
+    if (!isSrs) return
+    const pool = questions.filter(q => dueIds.includes(q.id))
+    if (pool.length === 0) return
+    const session = buildSession(pool.map(q => q.id), null, true, 'drill', true)
+    saveSession(session)
+    navigate('/session', { replace: true })
+  }, [dueIds.length])
 
   const wrongQuestionIds = useMemo(() => {
     const history = loadHistory()
@@ -135,6 +150,36 @@ export default function Practice() {
       }
     }
     return Array.from(wrongSet)
+  }, [])
+
+  const adaptiveIds = useMemo(() => {
+    const history = loadHistory()
+    if (history.length === 0) return []
+    const tagAcc: Record<string, { correct: number; total: number }> = {}
+    history.forEach(s => {
+      s.questionIds.forEach(qid => {
+        const q = questions.find(x => x.id === qid)
+        if (!q || !s.answers[qid]) return
+        for (const tag of q.tags) {
+          if (!tagAcc[tag]) tagAcc[tag] = { correct: 0, total: 0 }
+          tagAcc[tag].total++
+          if (s.answers[qid] === q.answer) tagAcc[tag].correct++
+        }
+      })
+    })
+    const weakTags = new Set(
+      Object.entries(tagAcc)
+        .filter(([, v]) => v.total >= 3 && (v.correct / v.total) < 0.70)
+        .sort(([, a], [, b]) => (a.correct / a.total) - (b.correct / b.total))
+        .slice(0, 4)
+        .map(([tag]) => tag)
+    )
+    if (weakTags.size === 0) return []
+    return questions
+      .filter(q => q.tags.some(t => weakTags.has(t)))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 20)
+      .map(q => q.id)
   }, [])
 
   const startWrongDrill = () => {
@@ -170,90 +215,146 @@ export default function Practice() {
   }
 
   const allTagsSelected = selectedTags.length === ALL_TAGS.length
+  const canStart = mode === 'repetition' ? dueIds.length > 0 : (selectedTypes.length > 0 && available > 0)
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
-      <div className="max-w-2xl mx-auto px-6 py-10 pb-24">
-        <button onClick={() => navigate('/')} className="text-slate-400 hover:text-white mb-8 flex items-center gap-2 text-sm">
-          ← Tillbaka
-        </button>
+    <div className="min-h-screen bg-app text-white">
+      <div className="max-w-2xl mx-auto px-4 pt-8 pb-28">
 
-        <h1 className="text-3xl font-black mb-8">Konfigurera träning</h1>
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-8">
+          <button
+            onClick={() => navigate('/')}
+            className="text-slate-600 hover:text-slate-300 transition-colors p-1 -ml-1"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h1 className="text-2xl font-black">Konfigurera träning</h1>
+        </div>
 
         {/* Quick-drill shortcuts */}
-        {(wrongQuestionIds.length > 0 || bookmarkedIds.length > 0) && (
-          <section className="mb-8 space-y-3">
+        {(wrongQuestionIds.length > 0 || bookmarkedIds.length > 0 || adaptiveIds.length > 0) && (
+          <div className="mb-6 space-y-2">
+            {adaptiveIds.length > 0 && (
+              <button
+                onClick={() => {
+                  const session = buildSession(adaptiveIds, null, true, 'drill', true)
+                  saveSession(session)
+                  navigate('/session')
+                }}
+                className="w-full rounded-2xl p-4 border border-violet-500/25 bg-violet-500/8 hover:bg-violet-500/12 text-left transition-colors"
+              >
+                <div className="font-bold text-violet-400 text-sm">Adaptiv drill</div>
+                <div className="text-xs text-violet-400/50 mt-0.5">{adaptiveIds.length} frågor från dina svagaste ämnen · studieläge</div>
+              </button>
+            )}
             {wrongQuestionIds.length > 0 && (
               <button
                 onClick={startWrongDrill}
-                className="w-full rounded-xl p-4 border border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-left transition-colors"
+                className="w-full rounded-2xl p-4 border border-amber-500/25 bg-amber-500/8 hover:bg-amber-500/12 text-left transition-colors"
               >
-                <div className="font-bold text-amber-400">Öva på dina fel — {wrongQuestionIds.length} frågor du svarat fel på</div>
-                <div className="text-xs text-amber-300/70 mt-1">Starta direkt med studieläge och omedelbar återkoppling</div>
+                <div className="font-bold text-amber-400 text-sm">Öva på dina fel</div>
+                <div className="text-xs text-amber-400/50 mt-0.5">{wrongQuestionIds.length} frågor du svarat fel på · studieläge</div>
               </button>
             )}
             {bookmarkedIds.length > 0 && (
-              <button
-                onClick={startBookmarkDrill}
-                className="w-full rounded-xl p-4 border border-blue-600 bg-blue-600/10 hover:bg-blue-600/20 text-left transition-colors"
-              >
-                <div className="font-bold text-blue-400">🔖 Bokmärkta frågor — {bookmarkedIds.length} sparade</div>
-                <div className="text-xs text-blue-300/70 mt-1">Öva på frågor du valt att spara</div>
-              </button>
+              <div className="rounded-2xl border border-blue-500/25 bg-blue-500/8 overflow-hidden">
+                <div className="flex items-center justify-between p-4">
+                  <div>
+                    <div className="font-bold text-blue-400 text-sm">Bokmärkta frågor</div>
+                    <div className="text-xs text-blue-400/50 mt-0.5">{bookmarkedIds.length} sparade frågor</div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => navigate('/bookmarks')}
+                      className="text-xs text-blue-400/70 hover:text-blue-300 border border-blue-500/25 rounded-lg px-2.5 py-1.5 transition-colors"
+                    >
+                      Bläddra
+                    </button>
+                    <button
+                      onClick={startBookmarkDrill}
+                      className="text-xs text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg px-2.5 py-1.5 font-bold transition-colors"
+                    >
+                      Drill →
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
-          </section>
+          </div>
         )}
 
-        {/* Mode */}
-        <section className="mb-8">
-          <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Läge</label>
-          <div className="grid grid-cols-3 gap-3">
-            <button
-              onClick={() => setMode('drill')}
-              className={`rounded-xl p-4 border text-left transition-colors ${mode === 'drill' ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-            >
-              <div className="font-bold">Övning</div>
-              <div className="text-xs text-slate-400 mt-1">Välj delprov och antal frågor</div>
-            </button>
-            <button
-              onClick={() => setMode('exam')}
-              className={`rounded-xl p-4 border text-left transition-colors ${mode === 'exam' ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-            >
-              <div className="font-bold">Provläge</div>
-              <div className="text-xs text-slate-400 mt-1">Fullständigt prov, 40 frågor</div>
-            </button>
-            <button
-              onClick={() => setMode('repetition')}
-              className={`rounded-xl p-4 border text-left transition-colors ${mode === 'repetition' ? 'border-purple-500 bg-purple-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-            >
-              <div className="font-bold">Repetition</div>
-              <div className="text-xs text-slate-400 mt-1">
-                {dueIds.length > 0 ? `${dueIds.length} frågor att repetera` : 'Inga frågor idag'}
-              </div>
-            </button>
+        {/* Section drills */}
+        <div className="mb-6">
+          <SectionLabel>Sektionsträning</SectionLabel>
+          <div className="grid grid-cols-2 gap-2">
+            {(Object.keys(TYPE_INFO) as QuestionType[]).map(t => {
+              const pool = questions.filter(q => q.type === t)
+              const count = { XYZ: 12, KVA: 10, NOG: 6, DTK: 12, ORD: 10, LAS: 16, MEK: 10, ELF: 16 }[t]
+              const timeSecs = { XYZ: 15 * 60, KVA: 10 * 60, NOG: 10 * 60, DTK: 23 * 60, ORD: 7 * 60, LAS: 26 * 60, MEK: 8 * 60, ELF: 26 * 60 }[t]
+              const timeLabel = { XYZ: '15 min', KVA: '10 min', NOG: '10 min', DTK: '23 min', ORD: '7 min', LAS: '26 min', MEK: '8 min', ELF: '26 min' }[t]
+              return (
+                <button
+                  key={t}
+                  onClick={() => {
+                    const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, count)
+                    const session = buildSession(shuffled.map(q => q.id), timeSecs, false, 'drill')
+                    saveSession(session)
+                    navigate('/session')
+                  }}
+                  className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${TYPE_ACTIVE[t]}`}
+                >
+                  <div className={`font-black text-sm ${TYPE_COLOR[t]}`}>{t}</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">{count} frågor · {timeLabel}</div>
+                </button>
+              )
+            })}
           </div>
-        </section>
+        </div>
+
+        {/* Mode */}
+        <div className="mb-6">
+          <SectionLabel>Läge</SectionLabel>
+          <div className="grid grid-cols-3 gap-2">
+            {([['drill', 'Övning', 'Välj filter & antal'], ['exam', 'Provläge', '40 frågor, timed'], ['repetition', 'Repetition', dueIds.length > 0 ? `${dueIds.length} att repetera` : 'Inget idag']] as const).map(([m, label, sub]) => (
+              <button
+                key={m}
+                onClick={() => setMode(m as Mode)}
+                className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
+                  mode === m
+                    ? m === 'repetition' ? 'border-violet-500/50 bg-violet-500/10' : 'border-blue-500/50 bg-blue-500/10'
+                    : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                }`}
+              >
+                <div className={`font-bold text-sm ${mode === m ? m === 'repetition' ? 'text-violet-300' : 'text-blue-300' : 'text-slate-200'}`}>{label}</div>
+                <div className="text-[11px] text-slate-600 mt-0.5">{sub}</div>
+              </button>
+            ))}
+          </div>
+        </div>
 
         {mode === 'repetition' && (
-          <div className="mb-8 rounded-xl border border-slate-700 bg-slate-800 p-5">
+          <div className="mb-6 glass rounded-2xl p-5">
             {dueIds.length === 0 ? (
-              <p className="text-center text-slate-400">Inga frågor att repetera idag — kom tillbaka imorgon!</p>
+              <p className="text-center text-slate-500 text-sm">Inga frågor att repetera idag — kom tillbaka imorgon!</p>
             ) : (
               <>
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">
                   {dueIds.length} frågor att repetera
                 </div>
                 <div className="grid grid-cols-4 gap-2">
                   {(Object.entries(dueByType) as [QuestionType, number][])
                     .filter(([, n]) => n > 0)
                     .map(([type, n]) => (
-                      <div key={type} className={`rounded-lg p-2.5 text-center bg-slate-700/60 border border-slate-600`}>
-                        <div className={`text-xs font-black mb-1 ${TYPE_LABEL_COLOR[type]}`}>{type}</div>
+                      <div key={type} className="bg-white/[0.04] rounded-xl p-2.5 text-center">
+                        <div className={`text-xs font-black mb-1 ${TYPE_COLOR[type]}`}>{type}</div>
                         <div className="text-lg font-black text-white">{n}</div>
                       </div>
                     ))}
                 </div>
-                <p className="text-xs text-slate-500 mt-3">Studieläge aktiveras automatiskt vid repetition.</p>
+                <p className="text-[11px] text-slate-600 mt-3">Studieläge aktiveras automatiskt.</p>
               </>
             )}
           </div>
@@ -262,9 +363,9 @@ export default function Practice() {
         {mode !== 'repetition' && (
           <>
             {/* Question types */}
-            <section className="mb-8">
-              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Delprov</label>
-              <div className="grid grid-cols-2 gap-3">
+            <div className="mb-6">
+              <SectionLabel>Delprov</SectionLabel>
+              <div className="grid grid-cols-2 gap-2">
                 {(Object.keys(TYPE_INFO) as QuestionType[]).map(t => {
                   const cnt = questions.filter(q => q.type === t).length
                   const isSelected = selectedTypes.includes(t)
@@ -272,63 +373,65 @@ export default function Practice() {
                     <button
                       key={t}
                       onClick={() => toggleType(t)}
-                      className={`rounded-xl p-4 border text-left transition-colors ${isSelected ? TYPE_SELECTED[t] : 'border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
+                      className={`rounded-xl p-4 border text-left transition-all duration-150 ${
+                        isSelected ? TYPE_ACTIVE[t] : 'glass border-white/[0.05] hover:border-white/[0.1] text-slate-400'
+                      }`}
                     >
-                      <div className={`font-black text-lg ${isSelected ? TYPE_LABEL_COLOR[t] : 'text-white'}`}>{t}</div>
-                      <div className="text-xs text-slate-400 mt-0.5">{TYPE_INFO[t].desc}</div>
-                      <div className="text-xs text-slate-500 mt-1">{cnt} frågor</div>
+                      <div className={`font-black text-base ${isSelected ? TYPE_COLOR[t] : 'text-slate-300'}`}>{t}</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">{TYPE_INFO[t].desc}</div>
+                      <div className="text-[10px] text-slate-600 mt-1">{cnt} frågor</div>
                     </button>
                   )
                 })}
               </div>
-            </section>
+            </div>
 
-            {/* Difficulty filter */}
-            <section className="mb-8">
-              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Svårighetsgrad</label>
-              <div className="flex gap-3">
+            {/* Difficulty */}
+            <div className="mb-6">
+              <SectionLabel>Svårighetsgrad</SectionLabel>
+              <div className="flex gap-2">
                 {ALL_DIFFICULTIES.map(d => (
                   <button
                     key={d}
                     onClick={() => toggleDifficulty(d)}
-                    className={`flex-1 rounded-xl py-3 px-4 border font-bold transition-colors ${
+                    className={`flex-1 rounded-xl py-2.5 px-3 border text-sm font-semibold transition-all duration-150 ${
                       selectedDifficulties.includes(d)
-                        ? 'border-blue-500 bg-blue-600/20 text-white'
-                        : 'border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
+                        ? 'border-blue-500/50 bg-blue-500/10 text-blue-300'
+                        : 'glass border-white/[0.05] text-slate-500 hover:border-white/[0.1]'
                     }`}
                   >
                     {DIFFICULTY_LABELS[d]}
                   </button>
                 ))}
               </div>
-            </section>
+            </div>
 
-            {/* Topic/tag filter */}
-            <section className="mb-8">
+            {/* Tag filter */}
+            <div className="mb-6">
               <button
                 onClick={() => setTagsOpen(prev => !prev)}
-                className="w-full flex items-center justify-between text-xs font-bold tracking-widest text-slate-400 uppercase mb-3"
+                className="w-full flex items-center justify-between text-[10px] font-bold tracking-widest text-slate-600 uppercase mb-2.5"
               >
                 <span>
                   Ämnesfilter
                   {!allTagsSelected && (
                     <span className="ml-2 text-blue-400 normal-case font-normal tracking-normal">
-                      ({selectedTags.length} av {ALL_TAGS.length})
+                      ({selectedTags.length}/{ALL_TAGS.length})
                     </span>
                   )}
                 </span>
-                <span className="text-slate-500">{tagsOpen ? '▲' : '▼'}</span>
+                <span className="text-slate-700">{tagsOpen ? '▲' : '▼'}</span>
               </button>
               {tagsOpen && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {ALL_TAGS.map(tag => (
                     <button
                       key={tag}
                       onClick={() => toggleTag(tag)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all duration-150 ${
                         selectedTags.includes(tag)
-                          ? 'border-blue-500 bg-blue-600/20 text-white'
-                          : 'border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
+                          ? 'border-blue-500/40 bg-blue-500/10 text-blue-300'
+                          : 'glass border-white/[0.05] text-slate-500 hover:border-white/[0.1]'
                       }`}
                     >
                       {tag}
@@ -336,104 +439,126 @@ export default function Practice() {
                   ))}
                 </div>
               )}
-            </section>
+            </div>
 
-            {/* Count */}
-            <section className="mb-8">
-              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">
-                Antal frågor — {Math.min(count, available)} (av {available} tillgängliga)
-              </label>
+            {/* Count slider */}
+            <div className="mb-6">
+              <SectionLabel>
+                Antal frågor — {Math.min(count, available)}{' '}
+                <span className="text-slate-700 normal-case tracking-normal font-normal">av {available} tillgängliga</span>
+              </SectionLabel>
               <input
                 type="range"
                 min={5}
                 max={Math.max(available, 5)}
                 value={count}
                 onChange={e => setCount(Number(e.target.value))}
-                className="w-full accent-blue-500"
+                className="w-full"
               />
-              <div className="flex justify-between text-xs text-slate-500 mt-1">
+              <div className="flex justify-between text-[10px] text-slate-700 mt-1">
                 <span>5</span><span>{available}</span>
               </div>
-            </section>
+            </div>
 
             {/* Timer */}
-            <section className="mb-8">
-              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Tidsgräns</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => setTimed(false)}
-                  className={`rounded-xl p-4 border text-left transition-colors ${!timed ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-                >
-                  <div className="font-bold">Utan tid</div>
-                  <div className="text-xs text-slate-400 mt-1">Ta den tid du behöver</div>
-                </button>
-                <button
-                  onClick={() => setTimed(true)}
-                  className={`rounded-xl p-4 border text-left transition-colors ${timed ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
-                >
-                  <div className="font-bold">Med tid</div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    {Math.round(computeTimeLimit(filteredPool.slice(0, Math.min(count, filteredPool.length)).map(q => q.id)) / 60)} min (baserat på HP-takt)
-                  </div>
-                </button>
+            <div className="mb-6">
+              <SectionLabel>Tidsgräns</SectionLabel>
+              <div className="grid grid-cols-2 gap-2">
+                {([false, true] as const).map(t => (
+                  <button
+                    key={String(t)}
+                    onClick={() => setTimed(t)}
+                    className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
+                      timed === t
+                        ? 'border-blue-500/50 bg-blue-500/10'
+                        : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                    }`}
+                  >
+                    <div className={`font-bold text-sm ${timed === t ? 'text-blue-300' : 'text-slate-300'}`}>
+                      {t ? 'Med tid' : 'Utan tid'}
+                    </div>
+                    <div className="text-[11px] text-slate-600 mt-0.5">
+                      {t
+                        ? `${Math.round(computeTimeLimit(filteredPool.slice(0, Math.min(count, filteredPool.length)).map(q => q.id)) / 60)} min`
+                        : 'Ta den tid du behöver'}
+                    </div>
+                  </button>
+                ))}
               </div>
-            </section>
+            </div>
 
             {/* Feedback */}
-            <section className="mb-6">
-              <label className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 block">Återkoppling</label>
-              <div className="grid grid-cols-2 gap-3">
+            <div className="mb-6">
+              <SectionLabel>Återkoppling</SectionLabel>
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => { setInstantFeedback(true); setStudyMode(false) }}
-                  className={`rounded-xl p-4 border text-left transition-colors ${instantFeedback && !studyMode ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                  className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
+                    instantFeedback && !studyMode
+                      ? 'border-blue-500/50 bg-blue-500/10'
+                      : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                  }`}
                 >
-                  <div className="font-bold">Direkt</div>
-                  <div className="text-xs text-slate-400 mt-1">Se rätt/fel direkt efter varje svar</div>
+                  <div className={`font-bold text-sm ${instantFeedback && !studyMode ? 'text-blue-300' : 'text-slate-300'}`}>Direkt</div>
+                  <div className="text-[11px] text-slate-600 mt-0.5">Rätt/fel efter varje svar</div>
                 </button>
                 <button
                   onClick={() => { setInstantFeedback(false); setStudyMode(false) }}
-                  className={`rounded-xl p-4 border text-left transition-colors ${!instantFeedback && !studyMode ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                  className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
+                    !instantFeedback && !studyMode
+                      ? 'border-blue-500/50 bg-blue-500/10'
+                      : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                  }`}
                 >
-                  <div className="font-bold">I efterhand</div>
-                  <div className="text-xs text-slate-400 mt-1">Genomgång efter avslutat pass</div>
+                  <div className={`font-bold text-sm ${!instantFeedback && !studyMode ? 'text-blue-300' : 'text-slate-300'}`}>I efterhand</div>
+                  <div className="text-[11px] text-slate-600 mt-0.5">Genomgång efter passet</div>
                 </button>
               </div>
-            </section>
+            </div>
 
-            {/* Study mode */}
-            <section className="mb-10">
+            {/* Study mode toggle */}
+            <div className="mb-8">
               <button
                 onClick={() => setStudyMode(prev => !prev)}
-                className={`w-full rounded-xl p-4 border text-left transition-colors ${studyMode ? 'border-violet-500 bg-violet-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+                className={`w-full rounded-xl p-4 border text-left transition-all duration-150 ${
+                  studyMode
+                    ? 'border-violet-500/40 bg-violet-500/10'
+                    : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className={`font-bold ${studyMode ? 'text-violet-300' : ''}`}>Studieläge</div>
-                    <div className="text-xs text-slate-400 mt-1">
-                      Förklaringar visas alltid — betygsätt svårighetsgraden för att träna SRS-repetition
+                    <div className={`font-bold text-sm ${studyMode ? 'text-violet-300' : 'text-slate-300'}`}>Studieläge</div>
+                    <div className="text-[11px] text-slate-600 mt-0.5">
+                      Förklaringar alltid synliga · betygsätt svårigheten för SRS
                     </div>
                   </div>
-                  <div className={`ml-4 w-10 h-6 rounded-full transition-colors flex items-center shrink-0 ${studyMode ? 'bg-violet-600' : 'bg-slate-600'}`}>
-                    <div className={`w-4 h-4 rounded-full bg-white mx-1 transition-transform ${studyMode ? 'translate-x-4' : 'translate-x-0'}`} />
+                  <div className={`ml-4 w-9 h-5 rounded-full transition-colors flex items-center shrink-0 ${studyMode ? 'bg-violet-600' : 'bg-white/[0.08]'}`}>
+                    <div className={`w-3.5 h-3.5 rounded-full bg-white mx-0.5 transition-transform ${studyMode ? 'translate-x-4' : 'translate-x-0'}`} />
                   </div>
                 </div>
               </button>
-            </section>
+            </div>
 
             {available === 0 && (
-              <p className="text-amber-400 text-sm mb-4">
-                Inga frågor matchar dina filter. Justera svårighetsgrad, ämnen eller delprov.
+              <p className="text-amber-400 text-sm mb-4 text-center">
+                Inga frågor matchar filtren — justera svårighetsgrad, ämnen eller delprov.
               </p>
             )}
           </>
         )}
 
+        {/* Start CTA */}
         <button
           onClick={start}
-          disabled={mode === 'repetition' ? dueIds.length === 0 : (selectedTypes.length === 0 || available === 0)}
-          className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 transition-colors rounded-2xl py-4 font-bold text-lg"
+          disabled={!canStart}
+          className={`w-full rounded-2xl py-4 font-black text-base transition-all duration-200 ${
+            canStart
+              ? 'bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-950/50 hover:shadow-blue-900/50'
+              : 'bg-white/[0.05] text-slate-600 cursor-not-allowed'
+          }`}
         >
-          Starta träning →
+          {canStart ? 'Starta träning →' : 'Inga frågor tillgängliga'}
         </button>
       </div>
     </div>
