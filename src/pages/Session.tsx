@@ -18,6 +18,10 @@ const TYPE_TEXT: Record<string, string> = {
   KVA: 'text-blue-400',
   NOG: 'text-emerald-400',
   DTK: 'text-amber-400',
+  ORD: 'text-rose-400',
+  LAS: 'text-pink-400',
+  MEK: 'text-fuchsia-400',
+  ELF: 'text-purple-400',
 }
 
 const TYPE_PROGRESS: Record<string, string> = {
@@ -25,6 +29,10 @@ const TYPE_PROGRESS: Record<string, string> = {
   KVA: 'bg-blue-500',
   NOG: 'bg-emerald-500',
   DTK: 'bg-amber-500',
+  ORD: 'bg-rose-500',
+  LAS: 'bg-pink-500',
+  MEK: 'bg-fuchsia-500',
+  ELF: 'bg-purple-500',
 }
 
 const TYPE_BORDER_L: Record<string, string> = {
@@ -32,6 +40,10 @@ const TYPE_BORDER_L: Record<string, string> = {
   KVA: 'border-l-blue-500/60',
   NOG: 'border-l-emerald-500/60',
   DTK: 'border-l-amber-500/60',
+  ORD: 'border-l-rose-500/60',
+  LAS: 'border-l-pink-500/60',
+  MEK: 'border-l-fuchsia-500/60',
+  ELF: 'border-l-purple-500/60',
 }
 
 const DIFFICULTY_BADGE: Record<string, string> = {
@@ -76,10 +88,6 @@ function useFocusTrap(active: boolean) {
   return ref
 }
 
-const KVA_NOG_HINT: Partial<Record<string, string>> = {
-  KVA: 'A = Kol. I störst · B = Kol. II störst · C = Lika · D = Omöjligt att avgöra',
-  NOG: 'A = Utt. 1 räcker · B = Utt. 2 räcker · C = Båda krävs · D = Ingendera räcker',
-}
 
 const fmtTime = (s: number) => {
   const m = Math.floor(s / 60)
@@ -626,13 +634,6 @@ export default function Session() {
             </div>
           )}
 
-          {/* KVA / NOG answer-key reminder */}
-          {KVA_NOG_HINT[q.type] && (
-            <p className="text-[11px] text-slate-500 text-center mb-3 px-2 leading-snug">
-              {KVA_NOG_HINT[q.type]}
-            </p>
-          )}
-
           {/* Answer options */}
           <div className="flex flex-col gap-2.5 mb-3">
             {answerOptions.map(([key, text]) => {
@@ -697,6 +698,7 @@ export default function Session() {
               <ExplanationCard
                 isCorrect={isCorrect}
                 correctAnswer={q.answer}
+                correctAnswerText={q.options[q.answer]}
                 explanation={q.explanation}
                 explanationData={q.explanationData}
                 chosenAnswer={chosen}

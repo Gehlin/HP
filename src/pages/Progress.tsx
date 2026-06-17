@@ -4,10 +4,11 @@ import { loadHistory } from '../utils/session'
 import { questions } from '../data/questions'
 import { loadStats, getLevel, LEVELS } from '../utils/gamification'
 import { getStats as getSrsStats } from '../utils/srs'
-import { estimateHpScore, hpScoreColor } from '../utils/hpScore'
+import { estimateHpScore, hpScoreColor, estimateSectionedScore } from '../utils/hpScore'
 import { computeReadiness } from '../utils/readiness'
 import { getExamDate, daysUntilExam } from '../utils/examDate'
 import { getBookmarks, toggleBookmark } from '../utils/bookmarks'
+import { buildSession, saveSession } from '../utils/session'
 import { timeAnalyticsByType, accuracyByDifficulty, rollingHpScore, hpScoreHistory, typeAccuracyTrend } from '../utils/analytics'
 import { ALL_ACHIEVEMENTS, getEarnedIds, RARITY_STYLES } from '../utils/achievements'
 import type { QuestionType } from '../types'
@@ -111,6 +112,8 @@ export default function Progress() {
       }
     })
   })
+
+  const { combined: combinedScore } = estimateSectionedScore(byType)
 
   // Per-tag accuracy
   const byTag: Record<string, { correct: number; total: number }> = {}
@@ -325,6 +328,32 @@ export default function Progress() {
             <span>HP-Legend</span>
           </div>
         </div>
+
+        {/* HP-prognos card */}
+        <button
+          onClick={() => navigate('/score')}
+          className="w-full text-left glass rounded-2xl p-5 mb-4 border border-blue-500/15 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">HP-prognos</div>
+              {combinedScore !== null ? (
+                <div className="flex items-baseline gap-3">
+                  <div className={`text-3xl font-black tabular-nums ${hpScoreColor(combinedScore)}`}>{combinedScore.toFixed(2)}</div>
+                  <div className="text-xs text-slate-500">Estimerat resultat · klicka för fullständig analys</div>
+                </div>
+              ) : (
+                <div>
+                  <div className="text-sm font-bold text-white">Visa din HP-prognos →</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Estimerat resultat & målstyrning</div>
+                </div>
+              )}
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-blue-400 shrink-0 ml-4">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </button>
 
         {/* Streak & General Stats */}
         <div className="glass rounded-2xl p-5 mb-4">
@@ -627,7 +656,13 @@ export default function Progress() {
                     )}
                   </div>
                   <button
-                    onClick={() => navigate('/practice')}
+                    onClick={() => {
+                      const pool = bookmarkIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as typeof questions
+                      const shuffled = [...pool].sort(() => Math.random() - 0.5)
+                      const session = buildSession(shuffled.map(q => q.id), null, true, 'drill')
+                      saveSession(session)
+                      navigate('/session')
+                    }}
                     className="mt-4 w-full border border-blue-500/25 text-blue-400 hover:bg-blue-900/20 rounded-xl py-2.5 text-sm font-bold transition-colors"
                   >
                     Öva på bokmärkta frågor →

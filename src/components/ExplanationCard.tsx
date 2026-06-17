@@ -4,6 +4,7 @@ import type { ExplanationData, AnswerKey } from '../types'
 interface Props {
   isCorrect: boolean
   correctAnswer: string
+  correctAnswerText?: string
   explanation: string
   explanationData?: ExplanationData
   chosenAnswer?: AnswerKey
@@ -11,15 +12,21 @@ interface Props {
   learnMoreLabel?: string
 }
 
-export default function ExplanationCard({ isCorrect, correctAnswer, explanation, explanationData, chosenAnswer, onLearnMore, learnMoreLabel }: Props) {
+export default function ExplanationCard({ isCorrect, correctAnswer, correctAnswerText, explanation, explanationData, chosenAnswer, onLearnMore, learnMoreLabel }: Props) {
   return (
     <div className={`rounded-2xl overflow-hidden mt-4 border ${isCorrect ? 'border-emerald-700/60' : 'border-red-700/60'}`}>
 
       {/* Header */}
       <div className={`px-5 py-3 flex items-center gap-3 ${isCorrect ? 'bg-emerald-900/50' : 'bg-red-900/50'}`}>
-        <span className={`text-lg font-black ${isCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
-          {isCorrect ? '✓ Rätt!' : `✗ Fel — rätt svar: ${correctAnswer}`}
-        </span>
+        {isCorrect ? (
+          <span className="text-lg font-black text-emerald-400">✓ Rätt!</span>
+        ) : correctAnswerText ? (
+          <span className="text-lg font-black text-red-400">
+            ✗ Fel — rätt svar {correctAnswer}:&nbsp;<MathText text={correctAnswerText} />
+          </span>
+        ) : (
+          <span className="text-lg font-black text-red-400">✗ Fel — rätt svar: {correctAnswer}</span>
+        )}
       </div>
 
       {/* Body */}

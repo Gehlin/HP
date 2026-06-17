@@ -29,9 +29,17 @@ export default function ExamSelect() {
             Provsimulering
           </div>
           <h1 className="text-3xl font-black mb-1 tracking-tight">Simulera HP-prov</h1>
-          <p className="text-slate-500 text-sm">
+          <p className="text-slate-500 text-sm mb-3">
             40 frågor · {SECTION_SIZES.XYZ} XYZ + {SECTION_SIZES.KVA} KVA + {SECTION_SIZES.NOG} NOG + {SECTION_SIZES.DTK} DTK · 55 minuter
           </p>
+          <div className="flex items-start gap-2.5 bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400 shrink-0 mt-0.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p className="text-xs text-amber-200/80 leading-relaxed">
+              Simulering täcker det kvantitativa delprovet (XYZ, KVA, NOG, DTK). Verbala avsnitt (ORD, LÄS, MEK, ELF) ingår ännu inte.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-2.5 mb-6">

@@ -23,6 +23,10 @@ const Bookmarks           = lazy(() => import('./pages/Bookmarks'))
 const SrsQueue            = lazy(() => import('./pages/SrsQueue'))
 const LiggandeStolenGuide = lazy(() => import('./pages/LiggandeStolenGuide'))
 const OrdGuide            = lazy(() => import('./pages/OrdGuide'))
+const MekGuide            = lazy(() => import('./pages/MekGuide'))
+const LasGuide            = lazy(() => import('./pages/LasGuide'))
+const ElfGuide            = lazy(() => import('./pages/ElfGuide'))
+const ScorePredictor      = lazy(() => import('./pages/ScorePredictor'))
 
 const KEYBOARD_SHORTCUTS = [
   { key: 'A – E', desc: 'Välj svarsalternativ' },
@@ -138,6 +142,10 @@ function AppInner() {
           <Route path="/srs" element={<SrsQueue />} />
           <Route path="/liggande-stolen" element={<LiggandeStolenGuide />} />
           <Route path="/ord-guide" element={<OrdGuide />} />
+          <Route path="/mek-guide" element={<MekGuide />} />
+          <Route path="/las-guide" element={<LasGuide />} />
+          <Route path="/elf-guide" element={<ElfGuide />} />
+          <Route path="/score" element={<ScorePredictor />} />
         </Routes>
       </Suspense>
 

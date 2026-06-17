@@ -33,7 +33,7 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
   )
 }
 
-type Tab = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'verbal'
+type Tab = 'overview' | 'XYZ' | 'KVA' | 'NOG' | 'DTK' | 'ORD' | 'LAS' | 'MEK' | 'ELF'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Översikt' },
@@ -41,7 +41,10 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'KVA',      label: 'KVA' },
   { id: 'NOG',      label: 'NOG' },
   { id: 'DTK',      label: 'DTK' },
-  { id: 'verbal',   label: 'Verbal' },
+  { id: 'ORD',      label: 'ORD' },
+  { id: 'LAS',      label: 'LÄS' },
+  { id: 'MEK',      label: 'MEK' },
+  { id: 'ELF',      label: 'ELF' },
 ]
 
 const TYPE_COLOR: Record<string, string> = {
@@ -49,6 +52,22 @@ const TYPE_COLOR: Record<string, string> = {
   KVA: 'text-blue-400',
   NOG: 'text-emerald-400',
   DTK: 'text-amber-400',
+  ORD: 'text-rose-400',
+  LAS: 'text-pink-400',
+  MEK: 'text-fuchsia-400',
+  ELF: 'text-purple-400',
+}
+
+const TAB_UNDERLINE: Record<Tab, string> = {
+  overview: 'bg-blue-400',
+  XYZ: 'bg-violet-400',
+  KVA: 'bg-blue-400',
+  NOG: 'bg-emerald-400',
+  DTK: 'bg-amber-400',
+  ORD: 'bg-rose-400',
+  LAS: 'bg-pink-400',
+  MEK: 'bg-fuchsia-400',
+  ELF: 'bg-purple-400',
 }
 
 
@@ -83,6 +102,60 @@ function OrdGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
           <div className="text-xs text-slate-500 mt-0.5">Prefix, suffix och strategier för att knäcka okända ord</div>
         </div>
         <span className="text-rose-400 text-xl shrink-0 ml-3">Aa</span>
+      </div>
+    </button>
+  )
+}
+
+function MekGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <button
+      onClick={() => navigate('/mek-guide')}
+      className="w-full text-left glass rounded-2xl p-4 border border-lime-500/20 bg-lime-500/5 hover:bg-lime-500/8 transition-colors mt-4"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-1">Meningskomplettering</div>
+          <div className="text-sm font-bold text-white">MEK-guide →</div>
+          <div className="text-xs text-slate-500 mt-0.5">10 konjunktionstyper, signalord och interaktiva övningar</div>
+        </div>
+        <span className="text-lime-400 text-xl shrink-0 ml-3">⟷</span>
+      </div>
+    </button>
+  )
+}
+
+function LasGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <button
+      onClick={() => navigate('/las-guide')}
+      className="w-full text-left glass rounded-2xl p-4 border border-pink-500/20 bg-pink-500/5 hover:bg-pink-500/8 transition-colors mt-4"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-1">Läsförståelse</div>
+          <div className="text-sm font-bold text-white">LÄS-guide →</div>
+          <div className="text-xs text-slate-500 mt-0.5">Texttyper, frågekategorier och läsordningsstrategi</div>
+        </div>
+        <span className="text-pink-400 text-xl shrink-0 ml-3">¶</span>
+      </div>
+    </button>
+  )
+}
+
+function ElfGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <button
+      onClick={() => navigate('/elf-guide')}
+      className="w-full text-left glass rounded-2xl p-4 border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/8 transition-colors mt-4"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">Engelsk läsförståelse</div>
+          <div className="text-sm font-bold text-white">ELF-guide →</div>
+          <div className="text-xs text-slate-500 mt-0.5">False friends, akademisk engelska och textstruktur</div>
+        </div>
+        <span className="text-purple-400 text-xl shrink-0 ml-3">En</span>
       </div>
     </button>
   )
@@ -267,6 +340,31 @@ function KVASection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         </p>
       </div>
 
+      {/* Interactive worked example */}
+      <div className="glass rounded-2xl p-5 border border-blue-500/10">
+        <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3">Interaktivt exempel — testa extremvärden</div>
+        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-sm">
+          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Kvantitativa jämförelser</div>
+          <div className="grid grid-cols-2 gap-4 text-center mb-2">
+            <div>
+              <div className="text-[10px] text-slate-600 uppercase tracking-widest mb-1">Kvantitet I</div>
+              <div className="text-slate-200 font-bold">x²</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-slate-600 uppercase tracking-widest mb-1">Kvantitet II</div>
+              <div className="text-slate-200 font-bold">x</div>
+            </div>
+          </div>
+          <div className="text-[10px] text-slate-500 text-center">x är ett reellt tal</div>
+        </div>
+        <StepReveal steps={[
+          { label: 'Testa x = 2', content: 'Kvantitet I: 2² = 4. Kvantitet II: 2. Här är I > II.', result: '→ Preliminärt: A?' },
+          { label: 'Testa x = 0', content: 'Kvantitet I: 0² = 0. Kvantitet II: 0. Här är I = II.', result: '→ Ändrat läge — nu C?' },
+          { label: 'Testa x = 0,5', content: 'Kvantitet I: 0,5² = 0,25. Kvantitet II: 0,5. Här är I < II.', result: '→ Ändrat läge igen — nu B?' },
+          { label: 'Slutsats', content: 'Resultatet skiftar beroende på x: x=2 ger I>II, x=0 ger I=II, x=0,5 ger I<II. Relationen kan inte avgöras entydigt.', result: '→ Svar: D' },
+        ]} />
+      </div>
+
       <MathGuideBanner navigate={navigate} />
     </div>
   )
@@ -447,220 +545,205 @@ function DTKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   )
 }
 
-type VerbalSub = 'ord' | 'las' | 'mek' | 'elf'
-
-function VerbalSection() {
-  const navigate = useNavigate()
-  const [sub, setSub] = useState<VerbalSub>('ord')
-
-  const SUB_TABS: { id: VerbalSub; label: string; color: string }[] = [
-    { id: 'ord', label: 'ORD',  color: 'text-rose-400' },
-    { id: 'las', label: 'LÄS',  color: 'text-sky-400'  },
-    { id: 'mek', label: 'MEK',  color: 'text-lime-400' },
-    { id: 'elf', label: 'ELF',  color: 'text-amber-400'},
-  ]
-
+function ORDSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold uppercase tracking-widest mb-1 text-rose-400">Verbalt delprov — 40 frågor · 55 minuter</div>
+        <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">ORD — Ordförståelse · 10 frågor · ~45 s/fråga · svar A–E</div>
         <p className="text-slate-400 text-sm leading-relaxed">
-          HP:s verbala delprov testar ordförståelse, läsförståelse, meningskomplettering och engelsk läsförståelse. Välj ett avsnitt nedan.
+          Ett ord eller uttryck ges — du väljer det alternativ som bäst har samma innebörd. Testet mäter om du kan förstå ords nyanser och synonymer.
         </p>
       </div>
-
-      {/* Sub-tabs */}
-      <div className="flex gap-1.5 border-b border-white/[0.06] pb-3">
-        {SUB_TABS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setSub(t.id)}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
-              sub === t.id ? `bg-white/[0.08] ${t.color}` : 'text-slate-600 hover:text-slate-400'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="glass rounded-xl p-4">
+        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Exempelformat</div>
+        <div className="text-sm text-slate-200 mb-3 font-medium">SUBTIL betyder ungefär detsamma som:</div>
+        <div className="space-y-1.5 text-sm">
+          {['A — Tydlig', 'B — Fin', 'C — Varsam', 'D — Knappt märkbar', 'E — Komplicerad'].map((opt, i) => (
+            <div key={i} className={`px-3 py-1.5 rounded-lg ${i === 3 ? 'bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 font-bold' : 'text-slate-500'}`}>{opt}</div>
+          ))}
+        </div>
       </div>
-
-      {sub === 'ord' && (
-        <div className="space-y-4">
-          <div>
-            <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">ORD — Ordförståelse · 10 frågor · ~60 s/fråga</div>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Ett ord eller uttryck ges — du väljer det alternativ som bäst har samma innebörd. Testet mäter om du kan förstå ords nyanser och synonymer.
-            </p>
-          </div>
-          <div className="glass rounded-xl p-4">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Exempelformat</div>
-            <div className="text-sm text-slate-200 mb-3 font-medium">SUBTIL betyder ungefär detsamma som:</div>
-            <div className="space-y-1.5 text-sm">
-              {['A — Tydlig', 'B — Fin', 'C — Varsam', 'D — Knappt märkbar', 'E — Komplicerad'].map((opt, i) => (
-                <div key={i} className={`px-3 py-1.5 rounded-lg ${i === 3 ? 'bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 font-bold' : 'text-slate-500'}`}>{opt}</div>
-              ))}
+      <div>
+        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="space-y-2">
+          {[
+            { title: 'Eliminera tydliga fel', body: 'Ta bort de alternativ du är säker på är fel. Bland kvarvaranden väljer du det bäst synonyma.' },
+            { title: 'Sätt in i en mening', body: 'Testa: "Det var ett subtilt leende." → Passar "knappt märkbar" bäst? Ja → D.' },
+            { title: 'Ordets ursprung hjälper', body: '"Sub-" = under, lite. "-til" = fint/tunt. Latin-/grekiska-prefix ger ofta ledtrådar till grundbetydelsen.' },
+            { title: 'Svåra ord — gissa på B eller C', body: 'Statistiskt sett är mitten-alternativen (B–D) vanligare rätta svar i ORD än extremerna (A, E).' },
+          ].map((item, i) => (
+            <div key={i} className="glass rounded-xl p-4 flex gap-3">
+              <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
+              <div>
+                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
+                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
-            <div className="space-y-2">
-              {[
-                { title: 'Eliminera tydliga fel', body: 'Ta bort de alternativ du är säker på är fel. Bland kvarvaranden väljer du det bäst synonyma.' },
-                { title: 'Sätt in i en mening', body: 'Testa: "Det var ett subtilt leende." → Passar "knappt märkbar" bäst? Ja → D.' },
-                { title: 'Ordets ursprung hjälper', body: '"Sub-" = under, lite. "-til" = fint/tunt. Latin-/grekiska-prefix ger ofta ledtrådar till grundbetydelsen.' },
-                { title: 'Svåra ord — gissa på B eller C', body: 'Statistiskt sett är mitten-alternativen (B–D) vanligare rätta svar i ORD än extremerna (A, E).' },
-              ].map((item, i) => (
-                <div key={i} className="glass rounded-xl p-4 flex gap-3">
-                  <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
-                  <div>
-                    <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                    <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="bg-rose-500/8 border border-rose-500/15 rounded-xl p-4">
-            <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1.5">Vanliga kategorier</div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {['Akademiska termer', 'Abstrakta begrepp', 'Litterärt/ålderdomligt språk', 'Fackspråk (juridik, medicin)', 'Idiom & fraser', 'Latinska ord'].map(cat => (
-                <div key={cat} className="text-xs text-slate-400 bg-white/[0.04] rounded-lg px-3 py-2">{cat}</div>
-              ))}
-            </div>
-          </div>
-          <OrdGuideBanner navigate={navigate} />
+          ))}
         </div>
-      )}
-
-      {sub === 'las' && (
-        <div className="space-y-4">
-          <div>
-            <div className="text-[10px] font-bold text-sky-400 uppercase tracking-widest mb-1">LÄS — Läsförståelse · 10 frågor · ~115 s/fråga</div>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              En längre text (200–500 ord) följs av 5 frågor om textens innehåll, slutsatser och ords innebörd i sammanhang.
-            </p>
-          </div>
-          <div>
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
-            <div className="space-y-2">
-              {[
-                { title: 'Läs frågorna först', body: 'Vet du vad du letar efter innan du läser texten. Det sparar tid och fokuserar din läsning på det som testas.' },
-                { title: 'Hitta textbevis', body: 'Rätt svar är alltid förankrat i texten. Om du inte hittar ett direkt citat eller stöd — välj bort alternativet.' },
-                { title: 'Akta "för stark" formulering', body: '"Alltid", "aldrig", "alla", "ingen" — extrema ord är ofta fel. Texten säger sällan absoluta saker.' },
-                { title: 'Gör inte egna slutledningar', body: 'LÄS testar vad texten säger, inte vad du tror/vet om ämnet. Din allmänbildning kan lura dig.' },
-                { title: 'Meningsförståelse i kontext', body: 'Om du ska förklara ett ords innebörd: läs hela meningen och stycket runt det — inte bara ordet isolerat.' },
-              ].map((item, i) => (
-                <div key={i} className="glass rounded-xl p-4 flex gap-3">
-                  <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
-                  <div>
-                    <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                    <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="bg-sky-500/8 border border-sky-500/15 rounded-xl p-4">
-            <div className="text-[10px] font-bold text-sky-400 uppercase tracking-widest mb-1.5">HP-insikt</div>
-            <p className="text-xs text-sky-200/80 leading-relaxed">
-              LÄS är den sektion där läsordning spelar störst roll. Om texten är lång och tät — läs de 5 frågorna på 30 sekunder, markera nyckelord, läs sedan texten. Kom tillbaka till frågorna och hitta textbevis.
-            </p>
-          </div>
+      </div>
+      <div className="bg-rose-500/8 border border-rose-500/15 rounded-xl p-4">
+        <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1.5">Vanliga kategorier</div>
+        <div className="grid grid-cols-2 gap-1.5">
+          {['Akademiska termer', 'Abstrakta begrepp', 'Litterärt/ålderdomligt språk', 'Fackspråk (juridik, medicin)', 'Idiom & fraser', 'Latinska ord'].map(cat => (
+            <div key={cat} className="text-xs text-slate-400 bg-white/[0.04] rounded-lg px-3 py-2">{cat}</div>
+          ))}
         </div>
-      )}
+      </div>
+      <OrdGuideBanner navigate={navigate} />
+    </div>
+  )
+}
 
-      {sub === 'mek' && (
-        <div className="space-y-4">
-          <div>
-            <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-1">MEK — Meningskomplettering · 10 frågor · ~60 s/fråga</div>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              En mening med ett eller två luckor ges. Du väljer det ord eller den fras som bäst kompletterar meningen semantiskt och grammatiskt.
-            </p>
-          </div>
-          <div className="glass rounded-xl p-4">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Exempelformat</div>
-            <div className="text-sm text-slate-200 mb-3">
-              "Trots sina uppenbara <span className="underline underline-offset-2">___</span> lyckades projektet nå ett <span className="underline underline-offset-2">___</span> resultat."
+function LASSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <div className="space-y-5">
+      <div>
+        <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-1">LÄS — Läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
+        <p className="text-slate-400 text-sm leading-relaxed">
+          Tre texter (200–500 ord var) följs av 4–6 frågor vardera om textens innehåll, slutsatser och ords innebörd i sammanhang.
+        </p>
+      </div>
+      <div>
+        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="space-y-2">
+          {[
+            { title: 'Läs frågorna först', body: 'Vet du vad du letar efter innan du läser texten. Det sparar tid och fokuserar din läsning på det som testas.' },
+            { title: 'Hitta textbevis', body: 'Rätt svar är alltid förankrat i texten. Om du inte hittar ett direkt citat eller stöd — välj bort alternativet.' },
+            { title: 'Akta "för stark" formulering', body: '"Alltid", "aldrig", "alla", "ingen" — extrema ord är ofta fel. Texten säger sällan absoluta saker.' },
+            { title: 'Gör inte egna slutledningar', body: 'LÄS testar vad texten säger, inte vad du tror/vet om ämnet. Din allmänbildning kan lura dig.' },
+            { title: 'Meningsförståelse i kontext', body: 'Om du ska förklara ett ords innebörd: läs hela meningen och stycket runt det — inte bara ordet isolerat.' },
+          ].map((item, i) => (
+            <div key={i} className="glass rounded-xl p-4 flex gap-3">
+              <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
+              <div>
+                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
+                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+              </div>
             </div>
-            <div className="space-y-1.5 text-sm">
-              {[
-                'A — framgångar … misslyckat',
-                'B — brister … godtagbart',
-                'C — resurser … dyrt',
-                'D — förseningar … snabbt',
-              ].map((opt, i) => (
-                <div key={i} className={`px-3 py-1.5 rounded-lg ${i === 1 ? 'bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 font-bold' : 'text-slate-500'}`}>{opt}</div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
-            <div className="space-y-2">
-              {[
-                { title: 'Identifiera sambandsordet', body: '"Trots" signalerar kontrast. Det kräver att luckorna bildar en kontrastsituation — problem + positivt utfall.' },
-                { title: 'Koppla luckor till varandra (2-lucksfrågor)', body: 'Orden i de två luckorna måste hänga ihop logiskt och grammatiskt. En lucka som stämmer semantiskt men inte med den andra → fel.' },
-                { title: 'Läs hela meningen högt (mentalt)', body: 'Klistra in alternativet och hör om det låter naturligt. Grammatik och flöde avslöjar fel svar.' },
-                { title: 'Signalord: orsak, kontrast, tillägg', body: '"Därför/eftersom" = orsak. "Trots/men/dock" = kontrast. "Dessutom/och" = tillägg. Identifiera vilket och matcha luckorna.' },
-              ].map((item, i) => (
-                <div key={i} className="glass rounded-xl p-4 flex gap-3">
-                  <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
-                  <div>
-                    <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                    <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
+      <div className="bg-pink-500/8 border border-pink-500/15 rounded-xl p-4">
+        <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-1.5">HP-insikt</div>
+        <p className="text-xs text-pink-200/80 leading-relaxed">
+          LÄS är den sektion där läsordning spelar störst roll. Om texten är lång och tät — läs de 5 frågorna på 30 sekunder, markera nyckelord, läs sedan texten. Kom tillbaka till frågorna och hitta textbevis.
+        </p>
+      </div>
+      <div className="glass rounded-2xl p-5 border border-pink-500/10">
+        <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Interaktivt exempel — hitta textbevis</div>
+        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
+          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (utdrag)</div>
+          <p>Urbaniseringen i Sverige har accelererat under de senaste decennierna. Allt fler väljer att bosätta sig i storstadsregioner, medan landsbygdens befolkning minskar. Forskare pekar på att denna rörelse drivs av tillgång till arbetsmarknaden och utbildning — inte av en vilja att lämna landsbygden.</p>
+        </div>
+        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: Vad är den primära orsaken till urbaniseringen enligt texten?</div>
+        <StepReveal steps={[
+          { label: 'Steg 1 — Läs frågan noggrant', content: 'Frågan frågar efter "primär orsak" och "enligt texten" — inte dina egna kunskaper om urbanisering.', result: '→ Fokus: orsak, textbevis krävs' },
+          { label: 'Steg 2 — Hitta rätt stycke', content: 'Meningen "Forskare pekar på att..." ger svaret direkt: tillgång till arbetsmarknaden och utbildning.', result: '→ Textbevis hittad' },
+          { label: 'Steg 3 — Eliminera fällor', content: 'Texten säger uttryckligen att det INTE handlar om en vilja att lämna landsbygden. Alternativ som säger det är fel.', result: '→ Eliminera "önskan att flytta"' },
+          { label: 'Steg 4 — Välj rätt svar', content: 'Rätt alternativ parafraserar: "Tillgång till arbete och utbildning driver urbaniseringen."', result: '→ Välj alternativet om arbetsmarknad/utbildning' },
+        ]} />
+      </div>
+      <LasGuideBanner navigate={navigate} />
+    </div>
+  )
+}
 
-      {sub === 'elf' && (
-        <div className="space-y-4">
-          <div>
-            <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1">ELF — Engelsk läsförståelse · 10 frågor · ~115 s/fråga</div>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Identisk struktur som LÄS, men texten är på engelska. Frågorna och svarsalternativen är på svenska. Testas din förmåga att förstå akademisk engelska.
-            </p>
-          </div>
-          <div>
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
-            <div className="space-y-2">
-              {[
-                { title: 'Samma metod som LÄS', body: 'Läs frågorna (på svenska) först. Hitta textbevis i den engelska texten. Frågorna är alltid på svenska — lättare att orientera sig.' },
-                { title: 'Akademisk engelska — känn igen mönstren', body: '"However" = kontrast/men. "Therefore/thus" = slutsats. "Although/despite" = kontrast. "Furthermore" = tillägg. Dessa ord guidar textens logik.' },
-                { title: 'Parafrasera — inte citera', body: 'Rätt svar omformulerar textens innehåll. Alternativ som citerar texten ordagrant är ibland fel — de kan sakna rätt kontext.' },
-                { title: 'Falskt bekanta ord', body: '"Eventually" = till slut (inte "eventuellt"). "Actual" = verklig (inte "aktuell"). "Sensible" = förnuftig (inte "sensibel"). Känn igen false friends.' },
-              ].map((item, i) => (
-                <div key={i} className="glass rounded-xl p-4 flex gap-3">
-                  <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
-                  <div>
-                    <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                    <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl p-4">
-            <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1.5">False friends — vanliga misstag</div>
-            <div className="space-y-1.5">
-              {[
-                ['Eventually', 'Till slut', 'Eventuellt (wrong!)'],
-                ['Actual / Actually', 'Verklig / Faktiskt', 'Aktuell (wrong!)'],
-                ['Sensible', 'Förnuftig', 'Sensibel (wrong!)'],
-                ['Sympathetic', 'Förstående/medkännande', 'Sympatisk (wrong!)'],
-              ].map(([eng, right, wrong]) => (
-                <div key={eng} className="grid grid-cols-3 gap-2 text-xs">
-                  <span className="font-bold text-amber-300">{eng}</span>
-                  <span className="text-emerald-400">✓ {right}</span>
-                  <span className="text-red-400">✗ {wrong}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+function MEKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <div className="space-y-5">
+      <div>
+        <div className="text-[10px] font-bold text-fuchsia-400 uppercase tracking-widest mb-1">MEK — Meningskomplettering · 10 frågor · ~50 s/fråga · svar A–D</div>
+        <p className="text-slate-400 text-sm leading-relaxed">
+          En mening med ett eller två luckor ges. Du väljer det ord eller den fras som bäst kompletterar meningen semantiskt och grammatiskt.
+        </p>
+      </div>
+      <div className="glass rounded-xl p-4">
+        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Exempelformat</div>
+        <div className="text-sm text-slate-200 mb-3">
+          "Trots sina uppenbara <span className="underline underline-offset-2">___</span> lyckades projektet nå ett <span className="underline underline-offset-2">___</span> resultat."
         </div>
-      )}
+        <div className="space-y-1.5 text-sm">
+          {[
+            'A — framgångar … misslyckat',
+            'B — brister … godtagbart',
+            'C — resurser … dyrt',
+            'D — förseningar … snabbt',
+          ].map((opt, i) => (
+            <div key={i} className={`px-3 py-1.5 rounded-lg ${i === 1 ? 'bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 font-bold' : 'text-slate-500'}`}>{opt}</div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="space-y-2">
+          {[
+            { title: 'Identifiera sambandsordet', body: '"Trots" signalerar kontrast. Det kräver att luckorna bildar en kontrastsituation — problem + positivt utfall.' },
+            { title: 'Koppla luckor till varandra (2-lucksfrågor)', body: 'Orden i de två luckorna måste hänga ihop logiskt och grammatiskt. En lucka som stämmer semantiskt men inte med den andra → fel.' },
+            { title: 'Läs hela meningen högt (mentalt)', body: 'Klistra in alternativet och hör om det låter naturligt. Grammatik och flöde avslöjar fel svar.' },
+            { title: 'Signalord: orsak, kontrast, tillägg', body: '"Därför/eftersom" = orsak. "Trots/men/dock" = kontrast. "Dessutom/och" = tillägg. Identifiera vilket och matcha luckorna.' },
+          ].map((item, i) => (
+            <div key={i} className="glass rounded-xl p-4 flex gap-3">
+              <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
+              <div>
+                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
+                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <MekGuideBanner navigate={navigate} />
+    </div>
+  )
+}
+
+function ELFSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <div className="space-y-5">
+      <div>
+        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">ELF — Engelsk läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
+        <p className="text-slate-400 text-sm leading-relaxed">
+          Identisk struktur som LÄS, men texten är på engelska. Frågorna och svarsalternativen är på svenska. Testas din förmåga att förstå akademisk engelska.
+        </p>
+      </div>
+      <div>
+        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="space-y-2">
+          {[
+            { title: 'Samma metod som LÄS', body: 'Läs frågorna (på svenska) först. Hitta textbevis i den engelska texten. Frågorna är alltid på svenska — lättare att orientera sig.' },
+            { title: 'Akademisk engelska — känn igen mönstren', body: '"However" = kontrast/men. "Therefore/thus" = slutsats. "Although/despite" = kontrast. "Furthermore" = tillägg. Dessa ord guidar textens logik.' },
+            { title: 'Parafrasera — inte citera', body: 'Rätt svar omformulerar textens innehåll. Alternativ som citerar texten ordagrant är ibland fel — de kan sakna rätt kontext.' },
+            { title: 'Falskt bekanta ord', body: '"Eventually" = till slut (inte "eventuellt"). "Actual" = verklig (inte "aktuell"). "Sensible" = förnuftig (inte "sensibel"). Känn igen false friends.' },
+          ].map((item, i) => (
+            <div key={i} className="glass rounded-xl p-4 flex gap-3">
+              <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
+              <div>
+                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
+                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="bg-purple-500/8 border border-purple-500/20 rounded-xl p-4">
+        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1.5">False friends — vanliga misstag</div>
+        <div className="space-y-1.5">
+          {[
+            ['Eventually', 'Till slut', 'Eventuellt (wrong!)'],
+            ['Actual / Actually', 'Verklig / Faktiskt', 'Aktuell (wrong!)'],
+            ['Sensible', 'Förnuftig', 'Sensibel (wrong!)'],
+            ['Sympathetic', 'Förstående/medkännande', 'Sympatisk (wrong!)'],
+          ].map(([eng, right, wrong]) => (
+            <div key={eng} className="grid grid-cols-3 gap-2 text-xs">
+              <span className="font-bold text-purple-300">{eng}</span>
+              <span className="text-emerald-400">✓ {right}</span>
+              <span className="text-red-400">✗ {wrong}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <ElfGuideBanner navigate={navigate} />
     </div>
   )
 }
@@ -679,9 +762,9 @@ export default function Theory() {
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
             Provguide
           </div>
-          <h1 className="text-4xl font-black mb-2 tracking-tight">HP Kvantitativt</h1>
+          <h1 className="text-4xl font-black mb-2 tracking-tight">HP Provguide</h1>
           <p className="text-slate-400 text-sm leading-relaxed">
-            Struktur, svarsscheman och strategi för alla fyra avsnitt. Matematik och formler hittar du i <button onClick={() => navigate('/matematik')} className="text-violet-400 hover:text-violet-300 underline underline-offset-2 transition-colors">Matematikguiden</button>.
+            Struktur, svarsscheman och strategi för alla åtta avsnitt. Matematik och formler hittar du i <button onClick={() => navigate('/matematik')} className="text-violet-400 hover:text-violet-300 underline underline-offset-2 transition-colors">Matematikguiden</button>.
           </p>
         </div>
       </div>
@@ -697,13 +780,7 @@ export default function Theory() {
             >
               {t.label}
               {tab === t.id && (
-                <span className={`absolute bottom-0 inset-x-2 h-[2px] rounded-full ${
-                  t.id === 'overview' ? 'bg-blue-400' :
-                  t.id === 'XYZ' ? 'bg-violet-400' :
-                  t.id === 'KVA' ? 'bg-blue-400' :
-                  t.id === 'NOG' ? 'bg-emerald-400' :
-                  t.id === 'DTK' ? 'bg-amber-400' : 'bg-rose-400'
-                }`} />
+                <span className={`absolute bottom-0 inset-x-2 h-[2px] rounded-full ${TAB_UNDERLINE[t.id]}`} />
               )}
             </button>
           ))}
@@ -716,7 +793,10 @@ export default function Theory() {
         {tab === 'KVA'      && <KVASection navigate={navigate} />}
         {tab === 'NOG'      && <NOGSection navigate={navigate} />}
         {tab === 'DTK'      && <DTKSection navigate={navigate} />}
-        {tab === 'verbal'   && <VerbalSection />}
+        {tab === 'ORD'      && <ORDSection navigate={navigate} />}
+        {tab === 'LAS'      && <LASSection navigate={navigate} />}
+        {tab === 'MEK'      && <MEKSection navigate={navigate} />}
+        {tab === 'ELF'      && <ELFSection navigate={navigate} />}
       </div>
 
     </div>

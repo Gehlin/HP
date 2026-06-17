@@ -63,6 +63,22 @@ export function hpScoreLabel(score: number): string {
   return 'Under medel'
 }
 
+// Reverse-maps a target HP score to the % accuracy needed to achieve it
+export function requiredAccuracy(targetScore: number): number {
+  const clamped = Math.max(1.00, Math.min(2.00, targetScore))
+  for (let i = 0; i < SCORE_TABLE.length - 1; i++) {
+    const [lo_pct, lo_score] = SCORE_TABLE[i]
+    const [hi_pct, hi_score] = SCORE_TABLE[i + 1]
+    if (clamped >= lo_score && clamped <= hi_score) {
+      const scoreRange = hi_score - lo_score
+      if (scoreRange === 0) return hi_pct
+      const t = (clamped - lo_score) / scoreRange
+      return Math.ceil(lo_pct + t * (hi_pct - lo_pct))
+    }
+  }
+  return 100
+}
+
 export function estimateSectionedScore(
   byType: Record<QuestionType, { correct: number; total: number }>
 ): { quant: number | null; verbal: number | null; combined: number | null } {

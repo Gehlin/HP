@@ -123,6 +123,31 @@ export function typeAccuracyTrend(n = 12): Record<QuestionType, number[]> {
   return result
 }
 
+// Returns up to 3 question types where accuracy < 75% with sufficient data
+export function weakTypeSummary(): { type: QuestionType; pct: number }[] {
+  const history = loadHistory()
+  const byType: Record<QuestionType, { correct: number; total: number }> = {
+    XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
+    NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
+    ORD: { correct: 0, total: 0 }, LAS: { correct: 0, total: 0 },
+    MEK: { correct: 0, total: 0 }, ELF: { correct: 0, total: 0 },
+  }
+  history.forEach(s => {
+    s.questionIds.forEach(id => {
+      const q = questions.find(x => x.id === id)
+      if (!q || !s.answers[id]) return
+      byType[q.type].total++
+      if (s.answers[id] === q.answer) byType[q.type].correct++
+    })
+  })
+  return (Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
+    .filter(([, v]) => v.total >= 5)
+    .map(([type, v]) => ({ type, pct: Math.round((v.correct / v.total) * 100) }))
+    .sort((a, b) => a.pct - b.pct)
+    .filter(x => x.pct < 75)
+    .slice(0, 3)
+}
+
 // Weighted rolling HP score — more recent sessions weighted higher
 export function rollingHpScore(n = 10): number | null {
   const history = loadHistory().slice(0, n)

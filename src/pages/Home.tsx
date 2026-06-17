@@ -10,10 +10,14 @@ import { isDailyChallengeCompleted, CHALLENGE_SIZE } from '../utils/dailyChallen
 import type { ExamSession, QuestionType } from '../types'
 
 const TYPE_ACCENTS: Record<string, { color: string; border: string; borderFull: string; bg: string; glow: string }> = {
-  XYZ: { color: 'text-violet-400', border: 'border-t-violet-500', borderFull: 'border-violet-500/30', bg: 'bg-violet-500/10', glow: 'shadow-violet-900/40' },
-  KVA: { color: 'text-blue-400',   border: 'border-t-blue-500',   borderFull: 'border-blue-500/30',   bg: 'bg-blue-500/10',   glow: 'shadow-blue-900/40'   },
+  XYZ: { color: 'text-violet-400',  border: 'border-t-violet-500',  borderFull: 'border-violet-500/30',  bg: 'bg-violet-500/10',  glow: 'shadow-violet-900/40'  },
+  KVA: { color: 'text-blue-400',    border: 'border-t-blue-500',    borderFull: 'border-blue-500/30',    bg: 'bg-blue-500/10',    glow: 'shadow-blue-900/40'    },
   NOG: { color: 'text-emerald-400', border: 'border-t-emerald-500', borderFull: 'border-emerald-500/30', bg: 'bg-emerald-500/10', glow: 'shadow-emerald-900/40' },
-  DTK: { color: 'text-amber-400',  border: 'border-t-amber-500',  borderFull: 'border-amber-500/30',  bg: 'bg-amber-500/10',  glow: 'shadow-amber-900/40'  },
+  DTK: { color: 'text-amber-400',   border: 'border-t-amber-500',   borderFull: 'border-amber-500/30',   bg: 'bg-amber-500/10',   glow: 'shadow-amber-900/40'   },
+  ORD: { color: 'text-rose-400',    border: 'border-t-rose-500',    borderFull: 'border-rose-500/30',    bg: 'bg-rose-500/10',    glow: 'shadow-rose-900/40'    },
+  LAS: { color: 'text-pink-400',    border: 'border-t-pink-500',    borderFull: 'border-pink-500/30',    bg: 'bg-pink-500/10',    glow: 'shadow-pink-900/40'    },
+  MEK: { color: 'text-fuchsia-400', border: 'border-t-fuchsia-500', borderFull: 'border-fuchsia-500/30', bg: 'bg-fuchsia-500/10', glow: 'shadow-fuchsia-900/40' },
+  ELF: { color: 'text-purple-400',  border: 'border-t-purple-500',  borderFull: 'border-purple-500/30',  bg: 'bg-purple-500/10',  glow: 'shadow-purple-900/40'  },
 }
 
 const TYPE_INFO: Record<string, {
@@ -24,6 +28,8 @@ const TYPE_INFO: Record<string, {
   topics: string[]
   answerScheme?: { key: string; label: string }[]
   tips: string[]
+  guideRoute?: string
+  guideLabel?: string
 }> = {
   XYZ: {
     desc: 'Matematisk problemlösning',
@@ -86,6 +92,62 @@ const TYPE_INFO: Record<string, {
       'DTK ger mest tid per fråga (~115s) — ta dig tid att läsa ordentligt',
     ],
   },
+  ORD: {
+    desc: 'Ordförståelse',
+    questions: 10,
+    timePerQ: '~45s',
+    totalTime: '~7 min',
+    topics: ['Latinska & grekiska rötter', 'Prefix & suffix', 'Synonymer i kontext', 'Akademiskt ordförråd'],
+    tips: [
+      'Bryt ner okända ord i prefix + rot + suffix — etymologi hjälper mer än gissning',
+      'Testa varje alternativ i originalmeningen — synonymen ska passa grammatiskt',
+      'ORD är delprovets snabbaste sektion — fart är viktigare än perfektionism',
+    ],
+    guideRoute: '/ord-guide',
+    guideLabel: 'ORD-guide',
+  },
+  LAS: {
+    desc: 'Läsförståelse',
+    questions: 16,
+    timePerQ: '~120s',
+    totalTime: '~26 min',
+    topics: ['Huvudpoäng & struktur', 'Detaljfrågor', 'Inferens & slutledning', 'Författarens syfte', 'Texttyper'],
+    tips: [
+      'Skanna rubriker och första meningen i varje stycke — bygg en mental karta innan du läser frågorna',
+      'Svaret finns alltid i texten — filtrera bort "sunda förnuftssvar" som inte stöds av texten',
+      'LÄS är tidsmässigt tyngst (~26 min) — hoppa inte direkt till frågorna utan att ha kontext',
+    ],
+    guideRoute: '/las-guide',
+    guideLabel: 'LÄS-guide',
+  },
+  MEK: {
+    desc: 'Meningskomplettering',
+    questions: 10,
+    timePerQ: '~50s',
+    totalTime: '~8 min',
+    topics: ['Konjunktioner & signalord', 'Kausal logik', 'Kontrast & koncession', 'Additiva samband', 'Grammatisk kongruens'],
+    tips: [
+      'Identifiera signalordet (trots/dock/eftersom/dels) — det avslöjar relationen',
+      'Eliminera alternativ som ger fel logisk riktning, välj sedan det semantiskt starkaste',
+      'Ordparets interna logik är viktigare än varje ord för sig',
+    ],
+    guideRoute: '/mek-guide',
+    guideLabel: 'MEK-guide',
+  },
+  ELF: {
+    desc: 'Engelsk läsförståelse',
+    questions: 16,
+    timePerQ: '~120s',
+    totalTime: '~26 min',
+    topics: ['Main idea & argument', 'Detail retrieval', 'Vocabulary in context', 'Passage structure', 'Inference'],
+    tips: [
+      'Read the question first, then locate the relevant paragraph — avoid re-reading the whole passage',
+      '"According to the passage" questions have a direct textual answer — don\'t infer',
+      'For structure questions, map what each paragraph does before answering',
+    ],
+    guideRoute: '/elf-guide',
+    guideLabel: 'ELF-guide',
+  },
 }
 
 const RING_R = 28
@@ -99,6 +161,10 @@ export default function Home() {
     KVA: questions.filter(q => q.type === 'KVA').length,
     NOG: questions.filter(q => q.type === 'NOG').length,
     DTK: questions.filter(q => q.type === 'DTK').length,
+    ORD: questions.filter(q => q.type === 'ORD').length,
+    LAS: questions.filter(q => q.type === 'LAS').length,
+    MEK: questions.filter(q => q.type === 'MEK').length,
+    ELF: questions.filter(q => q.type === 'ELF').length,
   }
 
   const [stats, setStats] = useState<GameStats | null>(null)
@@ -723,12 +789,22 @@ export default function Home() {
                           </ul>
                         </div>
 
-                        <button
-                          onClick={() => navigate(`/practice?type=${type}`)}
-                          className={`w-full rounded-xl py-2.5 text-sm font-bold transition-opacity hover:opacity-75 ${accent?.bg ?? 'bg-white/[0.05]'} ${accent?.color ?? 'text-white'} border ${accent?.borderFull ?? 'border-white/10'}`}
-                        >
-                          Öva {type} →
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => navigate(`/practice?type=${type}`)}
+                            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-opacity hover:opacity-75 ${accent?.bg ?? 'bg-white/[0.05]'} ${accent?.color ?? 'text-white'} border ${accent?.borderFull ?? 'border-white/10'}`}
+                          >
+                            Öva {type} →
+                          </button>
+                          {info.guideRoute && (
+                            <button
+                              onClick={() => navigate(info.guideRoute!)}
+                              className={`rounded-xl px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-75 bg-white/[0.04] ${accent?.color ?? 'text-white'} border border-white/[0.08]`}
+                            >
+                              {info.guideLabel}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}

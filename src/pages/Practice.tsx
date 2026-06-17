@@ -6,6 +6,7 @@ import { buildSession, saveSession, loadHistory } from '../utils/session'
 import { getDueQuestions } from '../utils/srs'
 import { getBookmarks } from '../utils/bookmarks'
 import { getDailyChallengeIds, markDailyChallengeCompleted } from '../utils/dailyChallenge'
+import { weakTypeSummary } from '../utils/analytics'
 
 type Mode = 'drill' | 'exam' | 'repetition'
 type Difficulty = 'easy' | 'medium' | 'hard'
@@ -182,6 +183,8 @@ export default function Practice() {
       .map(q => q.id)
   }, [])
 
+  const weakTypes = useMemo(() => weakTypeSummary(), [])
+
   const startWrongDrill = () => {
     const pool = questions.filter(q => wrongQuestionIds.includes(q.id))
     const shuffled = [...pool].sort(() => Math.random() - 0.5)
@@ -246,8 +249,19 @@ export default function Practice() {
                 }}
                 className="w-full rounded-2xl p-4 border border-violet-500/25 bg-violet-500/8 hover:bg-violet-500/12 text-left transition-colors"
               >
-                <div className="font-bold text-violet-400 text-sm">Adaptiv drill</div>
-                <div className="text-xs text-violet-400/50 mt-0.5">{adaptiveIds.length} frågor från dina svagaste ämnen · studieläge</div>
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <div className="font-bold text-violet-400 text-sm">Fokusträning</div>
+                  {weakTypes.length > 0 && (
+                    <div className="flex gap-1 flex-wrap justify-end">
+                      {weakTypes.map(({ type, pct }) => (
+                        <span key={type} className="text-[10px] font-bold bg-violet-500/15 text-violet-300 border border-violet-500/20 px-1.5 py-0.5 rounded-md">
+                          {type} {pct}%
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-violet-400/50">{adaptiveIds.length} frågor · svagaste ämnen · studieläge</div>
               </button>
             )}
             {wrongQuestionIds.length > 0 && (
@@ -292,14 +306,14 @@ export default function Practice() {
           <div className="grid grid-cols-2 gap-2">
             {(Object.keys(TYPE_INFO) as QuestionType[]).map(t => {
               const pool = questions.filter(q => q.type === t)
-              const count = { XYZ: 12, KVA: 10, NOG: 6, DTK: 12, ORD: 10, LAS: 16, MEK: 10, ELF: 16 }[t]
+              const sectionCount = { XYZ: 12, KVA: 10, NOG: 6, DTK: 12, ORD: 10, LAS: 16, MEK: 10, ELF: 16 }[t]
               const timeSecs = { XYZ: 15 * 60, KVA: 10 * 60, NOG: 10 * 60, DTK: 23 * 60, ORD: 7 * 60, LAS: 26 * 60, MEK: 8 * 60, ELF: 26 * 60 }[t]
               const timeLabel = { XYZ: '15 min', KVA: '10 min', NOG: '10 min', DTK: '23 min', ORD: '7 min', LAS: '26 min', MEK: '8 min', ELF: '26 min' }[t]
               return (
                 <button
                   key={t}
                   onClick={() => {
-                    const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, count)
+                    const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, sectionCount)
                     const session = buildSession(shuffled.map(q => q.id), timeSecs, false, 'drill')
                     saveSession(session)
                     navigate('/session')
@@ -307,7 +321,7 @@ export default function Practice() {
                   className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${TYPE_ACTIVE[t]}`}
                 >
                   <div className={`font-black text-sm ${TYPE_COLOR[t]}`}>{t}</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">{count} frågor · {timeLabel}</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">{sectionCount} frågor · {timeLabel}</div>
                 </button>
               )
             })}
