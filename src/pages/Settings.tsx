@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { questions } from '../data/questions'
+import { getFocusPreference, setFocusPreference, type FocusPreference } from '../utils/focusPreference'
 import { loadStats } from '../utils/gamification'
 import { loadHistory } from '../utils/session'
 import { getBookmarks } from '../utils/bookmarks'
@@ -56,6 +57,7 @@ export default function Settings() {
   const [confirming, setConfirming] = useState<Confirming>(null)
   const [done, setDone] = useState<string | null>(null)
   const [notifOn, setNotifOn] = useState(() => notificationsEnabled())
+  const [focus, setFocus] = useState<FocusPreference | null>(() => getFocusPreference())
 
   const stats = loadStats()
   const history = loadHistory()
@@ -255,6 +257,31 @@ export default function Settings() {
           />
         </div>
 
+        {/* Focus preference */}
+        <div className="mb-8">
+          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Träningsfokus</div>
+          <div className="glass rounded-xl p-4 border border-white/[0.06]">
+            <div className="text-sm font-semibold text-slate-200 mb-1">Vad vill du fokusera på?</div>
+            <div className="text-xs text-slate-500 mb-3">Styr startsidan och rekommendationer</div>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { value: 'quant' as FocusPreference, label: 'Kvantitativt', sub: 'XYZ·KVA·NOG·DTK', color: 'border-blue-500/50 bg-blue-500/10 text-blue-300' },
+                { value: 'verbal' as FocusPreference, label: 'Verbalt', sub: 'ORD·LÄS·MEK·ELF', color: 'border-rose-500/50 bg-rose-500/10 text-rose-300' },
+                { value: 'both' as FocusPreference, label: 'Hela provet', sub: 'Alla 8 delproven', color: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300' },
+              ] as const).map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => { setFocusPreference(opt.value); setFocus(opt.value); flash('Fokus uppdaterat') }}
+                  className={`rounded-xl px-2 py-3 text-center border transition-all ${focus === opt.value ? opt.color : 'border-white/[0.07] bg-white/[0.02] text-slate-500 hover:text-slate-300 hover:bg-white/[0.05]'}`}
+                >
+                  <div className={`text-xs font-black ${focus === opt.value ? '' : 'text-slate-400'}`}>{opt.label}</div>
+                  <div className="text-[9px] mt-0.5 opacity-70">{opt.sub}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Misc */}
         <div className="mb-8">
           <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Övrigt</div>
@@ -284,7 +311,7 @@ export default function Settings() {
         </div>
 
         <div className="mt-8 text-center space-y-1">
-          <p className="text-xs text-slate-600">HP Träning — Kvantitativ del</p>
+          <p className="text-xs text-slate-600">HP Träning — Kvantitativt &amp; Verbalt</p>
           <p className="text-xs text-slate-600">{questions.length} frågor · Verkliga HP-prov 2025–2026</p>
         </div>
       </div>
