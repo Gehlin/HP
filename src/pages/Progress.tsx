@@ -113,7 +113,7 @@ export default function Progress() {
     })
   })
 
-  const { combined: combinedScore } = estimateSectionedScore(byType)
+  const { combined: combinedScore, quant: quantScore, verbal: verbalScore } = estimateSectionedScore(byType)
 
   // Per-tag accuracy
   const byTag: Record<string, { correct: number; total: number }> = {}
@@ -334,7 +334,7 @@ export default function Progress() {
           onClick={() => navigate('/score')}
           className="w-full text-left glass rounded-2xl p-5 mb-4 border border-blue-500/15 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex-1 min-w-0">
               <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">HP-prognos</div>
               {combinedScore !== null ? (
@@ -353,6 +353,28 @@ export default function Progress() {
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
           </div>
+          {(quantScore !== null || verbalScore !== null) && (
+            <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/[0.05]">
+              <div>
+                <div className="text-[10px] text-slate-600 mb-1">Kvantitativt</div>
+                {quantScore !== null ? (
+                  <div className={`text-xl font-black tabular-nums ${hpScoreColor(quantScore)}`}>{quantScore.toFixed(2)}</div>
+                ) : (
+                  <div className="text-sm text-slate-600">—</div>
+                )}
+                <div className="text-[10px] text-slate-700 mt-0.5">XYZ · KVA · NOG · DTK</div>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-600 mb-1">Verbalt</div>
+                {verbalScore !== null ? (
+                  <div className={`text-xl font-black tabular-nums ${hpScoreColor(verbalScore)}`}>{verbalScore.toFixed(2)}</div>
+                ) : (
+                  <div className="text-sm text-slate-600">—</div>
+                )}
+                <div className="text-[10px] text-slate-700 mt-0.5">ORD · LÄS · MEK · ELF</div>
+              </div>
+            </div>
+          )}
         </button>
 
         {/* Streak & General Stats */}

@@ -90,6 +90,28 @@ export const exams: ExamDefinition[] = [
       DTK: ['dtk-012', 'dtk-013', 'dtk-014', 'dtk-015', 'dtk-031', 'dtk-032', 'dtk-033', 'dtk-034', 'dtk-035', 'dtk-036', 'dtk-037', 'dtk-038'],
     },
   },
+  {
+    id: 'ovning-medel',
+    name: 'Övningsexamen — Medel',
+    date: 'Blandat urval · medelnivå',
+    sections: {
+      XYZ: ['xyz-e01', 'xyz-e02', 'xyz-e03', 'xyz-e04', 'xyz-e05', 'xyz-e06', 'xyz-e07', 'xyz-e08', 'xyz-e09'],
+      KVA: ['kva-e04', 'kva-e05', 'kva-e06', 'kva-e07', 'kva-e08', 'kva-e09', 'kva-e10'],
+      NOG: ['nog-e01', 'nog-e02', 'nog-e03', 'nog-e04', 'nog-e05'],
+      DTK: ['dtk-016', 'dtk-017', 'dtk-018', 'dtk-039', 'dtk-040'],
+    },
+  },
+  {
+    id: 'ovning-svår',
+    name: 'Övningsexamen — Svår',
+    date: 'Blandat urval · hög svårighetsgrad',
+    sections: {
+      XYZ: ['xyz-e10', 'xyz-e11', 'xyz-e12', 'xyz-e13', 'xyz-e14', 'xyz-e15', 'xyz-e16', 'xyz-e17', 'xyz-e18'],
+      KVA: ['kva-e11', 'kva-e12', 'kva-e13', 'kva-e14', 'kva-e15', 'kva-e16', 'kva-e17'],
+      NOG: ['nog-e06', 'nog-e07', 'nog-e08', 'nog-e09', 'nog-e10'],
+      DTK: ['dtk-019', 'dtk-020', 'dtk-041', 'dtk-042', 'dtk-043'],
+    },
+  },
 ]
 
 function shuffle<T>(arr: T[]): T[] {

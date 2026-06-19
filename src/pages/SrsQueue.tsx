@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getDueQuestions, getStats } from '../utils/srs'
+import { buildSession, saveSession } from '../utils/session'
 import { questions } from '../data/questions'
 import type { QuestionType } from '../types'
 
@@ -20,6 +21,7 @@ const DAY_MS = 24 * 60 * 60 * 1000
 export default function SrsQueue() {
   const navigate = useNavigate()
   const now = Date.now()
+  const [typeFilter, setTypeFilter] = useState<QuestionType | 'alla'>('alla')
 
   const allIds = useMemo(() => questions.map(q => q.id), [])
   const dueIds = useMemo(() => getDueQuestions(allIds), [])
@@ -127,27 +129,58 @@ export default function SrsQueue() {
                 )}
               </div>
               <button
-                onClick={() => navigate('/practice?srs=1')}
+                onClick={() => {
+                  const pool = questions.filter(q => dueIds.includes(q.id))
+                  const session = buildSession(pool.map(q => q.id), null, true, 'drill', true)
+                  saveSession(session)
+                  navigate('/session')
+                }}
                 className="bg-amber-500 hover:bg-amber-400 transition-colors rounded-2xl px-6 py-3.5 font-black text-base text-black shadow-lg shadow-amber-950/40"
               >
-                Starta →
+                Alla →
               </button>
             </div>
 
-            {/* By type */}
+            {/* By type — clickable to start per-type SRS drill */}
             <div className="grid grid-cols-4 gap-2">
               {(Object.entries(stats.byType) as [QuestionType, { due: number }][])
                 .filter(([, v]) => v.due > 0)
                 .map(([type, v]) => {
                   const tc = TYPE_COLORS[type]
+                  const isSelected = typeFilter === type
                   return (
-                    <div key={type} className={`rounded-xl p-2.5 text-center ${tc.bg} border ${tc.border}`}>
+                    <button
+                      key={type}
+                      onClick={() => setTypeFilter(prev => prev === type ? 'alla' : type)}
+                      className={`rounded-xl p-2.5 text-center transition-all ${tc.bg} border ${isSelected ? tc.bar.replace('bg-', 'border-') : tc.border} ${isSelected ? 'ring-1 ring-inset ring-white/20' : ''}`}
+                    >
                       <div className={`text-xs font-black ${tc.text}`}>{type}</div>
                       <div className="text-lg font-black text-white">{v.due}</div>
-                    </div>
+                    </button>
                   )
                 })}
             </div>
+
+            {typeFilter !== 'alla' && (
+              <div className="mt-4 flex items-center justify-between gap-3 pt-4 border-t border-white/[0.05]">
+                <div className="text-sm text-slate-400">
+                  Öva bara <span className={`font-black ${TYPE_COLORS[typeFilter].text}`}>{typeFilter}</span>
+                  {' '}({stats.byType[typeFilter]?.due ?? 0} frågor)
+                </div>
+                <button
+                  onClick={() => {
+                    const pool = questions.filter(q => dueIds.includes(q.id) && q.type === typeFilter)
+                    if (pool.length === 0) return
+                    const session = buildSession(pool.map(q => q.id), null, true, 'drill', true)
+                    saveSession(session)
+                    navigate('/session')
+                  }}
+                  className="bg-amber-500 hover:bg-amber-400 transition-colors rounded-xl px-4 py-2 font-black text-sm text-black"
+                >
+                  Starta {typeFilter} →
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="glass rounded-2xl p-8 mb-6 text-center">

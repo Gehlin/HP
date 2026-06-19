@@ -58,51 +58,88 @@ export default function ExamSelect() {
 
         {section === 'quant' && (
           <>
-            <div className="space-y-2.5 mb-6">
-              {exams.map((exam, i) => (
-                <div key={exam.id} className="glass rounded-2xl p-5 border border-white/[0.06] hover:border-white/[0.1] transition-colors animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-black text-base text-white mb-0.5">{exam.name}</div>
-                      <div className="text-slate-500 text-xs mb-3">{exam.date}</div>
-                      <div className="flex gap-1.5 flex-wrap">
-                        {([
-                          ['XYZ', exam.sections.XYZ.length, SECTION_SIZES.XYZ],
-                          ['KVA', exam.sections.KVA.length, SECTION_SIZES.KVA],
-                          ['NOG', exam.sections.NOG.length, SECTION_SIZES.NOG],
-                          ['DTK', exam.sections.DTK.length, SECTION_SIZES.DTK],
-                        ] as [string, number, number][]).map(([type, real, total]) => (
-                          <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
-                            {type} {real}+{total - real}
-                          </span>
-                        ))}
+            {(() => {
+              const realExams = exams.filter(e => !e.id.startsWith('ovning-'))
+              const practiceExams = exams.filter(e => e.id.startsWith('ovning-'))
+              return (
+                <>
+                  <div className="space-y-2.5 mb-6">
+                    {realExams.map((exam, i) => (
+                      <div key={exam.id} className="glass rounded-2xl p-5 border border-white/[0.06] hover:border-white/[0.1] transition-colors animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-black text-base text-white mb-0.5">{exam.name}</div>
+                            <div className="text-slate-500 text-xs mb-3">{exam.date}</div>
+                            <div className="flex gap-1.5 flex-wrap">
+                              {([
+                                ['XYZ', exam.sections.XYZ.length, SECTION_SIZES.XYZ],
+                                ['KVA', exam.sections.KVA.length, SECTION_SIZES.KVA],
+                                ['NOG', exam.sections.NOG.length, SECTION_SIZES.NOG],
+                                ['DTK', exam.sections.DTK.length, SECTION_SIZES.DTK],
+                              ] as [string, number, number][]).map(([type, real, total]) => (
+                                <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
+                                  {type} {real}+{total - real}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => navigate(`/exam/${exam.id}`)}
+                            className="shrink-0 bg-blue-600 hover:bg-blue-500 transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
+                          >
+                            Starta →
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <button
-                      onClick={() => navigate(`/exam/${exam.id}`)}
-                      className="shrink-0 bg-blue-600 hover:bg-blue-500 transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
-                    >
-                      Starta →
-                    </button>
+                    ))}
                   </div>
-                </div>
-              ))}
-            </div>
 
-            <div className="border-t border-white/[0.05] pt-6">
-              <div className="glass rounded-2xl p-5 flex items-center justify-between gap-4">
-                <div>
-                  <div className="font-black text-base text-white mb-0.5">Slumpmässigt prov</div>
-                  <div className="text-slate-500 text-xs">40 frågor slumpmässigt valda från hela frågebanken</div>
-                </div>
-                <button
-                  onClick={() => navigate('/exam/random')}
-                  className="shrink-0 glass hover:bg-white/[0.08] border border-white/[0.1] transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
-                >
-                  Starta →
-                </button>
-              </div>
-            </div>
+                  <div className="border-t border-white/[0.05] pt-6 space-y-2.5 mb-6">
+                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Övningsprov</div>
+                    {practiceExams.map(exam => (
+                      <div key={exam.id} className="glass rounded-2xl p-5 border border-amber-500/10 hover:border-amber-500/20 transition-colors">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-black text-base text-white mb-0.5">{exam.name}</div>
+                            <div className="text-slate-500 text-xs mb-3">{exam.date}</div>
+                            <div className="flex gap-1.5 flex-wrap">
+                              {([
+                                ['XYZ', exam.sections.XYZ.length, SECTION_SIZES.XYZ],
+                                ['KVA', exam.sections.KVA.length, SECTION_SIZES.KVA],
+                                ['NOG', exam.sections.NOG.length, SECTION_SIZES.NOG],
+                                ['DTK', exam.sections.DTK.length, SECTION_SIZES.DTK],
+                              ] as [string, number, number][]).map(([type, real, total]) => (
+                                <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
+                                  {type} {real}+{total - real}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => navigate(`/exam/${exam.id}`)}
+                            className="shrink-0 bg-amber-600 hover:bg-amber-500 transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
+                          >
+                            Starta →
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="glass rounded-2xl p-5 flex items-center justify-between gap-4">
+                      <div>
+                        <div className="font-black text-base text-white mb-0.5">Slumpmässigt prov</div>
+                        <div className="text-slate-500 text-xs">40 frågor slumpmässigt valda från hela frågebanken</div>
+                      </div>
+                      <button
+                        onClick={() => navigate('/exam/random')}
+                        className="shrink-0 glass hover:bg-white/[0.08] border border-white/[0.1] transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
+                      >
+                        Starta →
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )
+            })()}
           </>
         )}
 
