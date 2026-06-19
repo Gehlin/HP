@@ -23,12 +23,26 @@ export const SECTION_META: Record<string, { number: number; recommendedMin: numb
   DTK: { number: 4, recommendedMin: 20, description: 'Diagram, tabeller och kartor' },
 }
 
+export const VERBAL_SECTION_SIZES = { ORD: 10, LAS: 16, MEK: 10, ELF: 16 } as const
+export const VERBAL_SECTION_ORDER = ['ORD', 'LAS', 'MEK', 'ELF'] as const
+
+export const VERBAL_SECTION_META: Record<string, { number: number; recommendedMin: number; description: string }> = {
+  ORD: { number: 1, recommendedMin: 8,  description: 'Ordförståelse' },
+  LAS: { number: 2, recommendedMin: 16, description: 'Läsförståelse (svenska)' },
+  MEK: { number: 3, recommendedMin: 9,  description: 'Meningskomplettering' },
+  ELF: { number: 4, recommendedMin: 16, description: 'Engelsk läsförståelse' },
+}
+
 // HP population averages per section (approximate)
 export const HP_AVERAGES: Record<string, number> = {
   XYZ: 55,
   KVA: 60,
   NOG: 50,
   DTK: 65,
+  ORD: 60,
+  LAS: 55,
+  MEK: 65,
+  ELF: 50,
 }
 
 export const exams: ExamDefinition[] = [
@@ -112,5 +126,15 @@ export function getExamQuestions(examId: string): Question[] {
     }
   }
 
+  return result
+}
+
+export function getVerbalExamQuestions(): Question[] {
+  const result: Question[] = []
+  for (const type of VERBAL_SECTION_ORDER) {
+    const target = VERBAL_SECTION_SIZES[type]
+    const pool = shuffle(allQuestions.filter(q => q.type === type))
+    for (const q of pool.slice(0, target)) result.push(q)
+  }
   return result
 }
