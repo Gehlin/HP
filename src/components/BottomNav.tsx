@@ -46,7 +46,7 @@ const TABS = [
   { path: '/theory',   label: 'Teori',    Icon: TheoryIcon   },
 ] as const
 
-const MORE_PATHS = ['/settings', '/bookmarks', '/srs', '/verbalt']
+const MORE_PATHS = ['/settings', '/bookmarks', '/srs', '/verbalt', '/kvantitativt']
 
 export default function BottomNav() {
   const location = useLocation()
@@ -106,6 +106,15 @@ export default function BottomNav() {
               {dueCount > 0 && (
                 <span className="text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-md animate-pulse">{dueCount}</span>
               )}
+            </button>
+            <button
+              onClick={() => go('/kvantitativt')}
+              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.05] transition-colors text-left border-b border-white/[0.05]"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="text-blue-400 shrink-0">
+                <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-sm font-semibold text-slate-200">Kvantitativ träning</span>
             </button>
             <button
               onClick={() => go('/verbalt')}

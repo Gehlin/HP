@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getExamQuestions, getVerbalExamQuestions, exams, SECTION_META, SECTION_ORDER, VERBAL_SECTION_META, VERBAL_SECTION_ORDER } from '../data/exams'
+import { getExamQuestions, getVerbalExamQuestions, getQuantExamQuestions, exams, SECTION_META, SECTION_ORDER, VERBAL_SECTION_META, VERBAL_SECTION_ORDER } from '../data/exams'
 import { buildSession, saveSession } from '../utils/session'
 
 const TYPE_COLORS: Record<string, { text: string; border: string; bg: string }> = {
@@ -39,9 +39,10 @@ export default function ExamStart() {
 
   const id = examId ?? 'random'
   const isVerbal = id === 'verbal-random'
+  const isQuant  = id === 'quant-random'
 
-  const exam = (!isVerbal && id !== 'random') ? exams.find(e => e.id === id) ?? null : null
-  const qs = isVerbal ? getVerbalExamQuestions() : getExamQuestions(id)
+  const exam = (!isVerbal && !isQuant && id !== 'random') ? exams.find(e => e.id === id) ?? null : null
+  const qs = isVerbal ? getVerbalExamQuestions() : isQuant ? getQuantExamQuestions() : getExamQuestions(id)
 
   const sectionOrder = isVerbal ? VERBAL_SECTION_ORDER : SECTION_ORDER
   const sectionMeta  = isVerbal ? VERBAL_SECTION_META  : SECTION_META
@@ -76,13 +77,13 @@ export default function ExamStart() {
         <div className="mb-8">
           <div className={`inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4 ${isVerbal ? 'bg-rose-500/10 border border-rose-500/20 text-rose-300' : 'bg-blue-500/10 border border-blue-500/20 text-blue-300'}`}>
             <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isVerbal ? 'bg-rose-400' : 'bg-blue-400'}`} />
-            {isVerbal ? 'Verbalt delprov' : 'HP-Provsimulering'}
+            {isVerbal ? 'Verbalt delprov' : isQuant ? 'Kvantitativt delprov' : 'HP-Provsimulering'}
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">
-            {isVerbal ? 'Verbalt delprov' : exam ? exam.name : 'Slumpmässigt prov'}
+            {isVerbal ? 'Verbalt delprov' : isQuant ? 'Kvantitativt delprov' : exam ? exam.name : 'Slumpmässigt prov'}
           </h1>
           <p className="text-slate-500 text-sm">
-            {isVerbal ? 'Slumpmässigt urval från frågebanken' : exam ? exam.date : 'Frågor slumpvis valda från hela banken'}
+            {isVerbal || isQuant ? 'Slumpmässigt urval från frågebanken' : exam ? exam.date : 'Frågor slumpvis valda från hela banken'}
             {' · '}{qs.length} frågor · 55 minuter
           </p>
         </div>

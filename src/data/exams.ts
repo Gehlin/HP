@@ -160,3 +160,13 @@ export function getVerbalExamQuestions(): Question[] {
   }
   return result
 }
+
+export function getQuantExamQuestions(): Question[] {
+  const result: Question[] = []
+  for (const type of SECTION_ORDER) {
+    const target = SECTION_SIZES[type]
+    const pool = shuffle(allQuestions.filter(q => q.type === type))
+    for (const q of pool.slice(0, target)) result.push(q)
+  }
+  return result
+}

@@ -735,17 +735,23 @@ export default function Home() {
             )
           })()}
 
-          {/* Math guide */}
-          <button
-            onClick={() => navigate('/matematik')}
-            className="w-full glass rounded-2xl p-4 text-left group hover:bg-white/[0.06] transition-all duration-200 flex items-center justify-between"
-          >
-            <div>
-              <div className="text-base font-bold text-slate-200">Matematik på HP</div>
-              <div className="text-xs text-slate-500 mt-0.5">10 ämnen · formler · din personliga prioritering</div>
-            </div>
-            <span className="text-slate-600 group-hover:translate-x-0.5 transition-transform">→</span>
-          </button>
+          {/* Section hubs */}
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              onClick={() => navigate('/kvantitativt')}
+              className="glass rounded-2xl p-4 text-left group hover:bg-white/[0.06] transition-all duration-200 border border-blue-500/10 hover:border-blue-500/20"
+            >
+              <div className="text-sm font-bold text-blue-300 mb-0.5">Kvantitativt</div>
+              <div className="text-[11px] text-slate-500">XYZ · KVA · NOG · DTK</div>
+            </button>
+            <button
+              onClick={() => navigate('/verbalt')}
+              className="glass rounded-2xl p-4 text-left group hover:bg-white/[0.06] transition-all duration-200 border border-rose-500/10 hover:border-rose-500/20"
+            >
+              <div className="text-sm font-bold text-rose-300 mb-0.5">Verbalt</div>
+              <div className="text-[11px] text-slate-500">ORD · LÄS · MEK · ELF</div>
+            </button>
+          </div>
         </div>
 
         {/* ── Type cards accordion ───────────────────────────── */}

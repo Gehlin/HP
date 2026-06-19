@@ -28,6 +28,7 @@ const LasGuide            = lazy(() => import('./pages/LasGuide'))
 const ElfGuide            = lazy(() => import('./pages/ElfGuide'))
 const ScorePredictor      = lazy(() => import('./pages/ScorePredictor'))
 const VerbalHub           = lazy(() => import('./pages/VerbalHub'))
+const QuantHub            = lazy(() => import('./pages/QuantHub'))
 
 const KEYBOARD_SHORTCUTS = [
   { key: 'A – E', desc: 'Välj svarsalternativ' },
@@ -148,6 +149,7 @@ function AppInner() {
           <Route path="/elf-guide" element={<ElfGuide />} />
           <Route path="/score" element={<ScorePredictor />} />
           <Route path="/verbalt" element={<VerbalHub />} />
+          <Route path="/kvantitativt" element={<QuantHub />} />
         </Routes>
       </Suspense>
 
