@@ -74,11 +74,15 @@ export default function Practice() {
   const tagParam = searchParams.get('tag')
   const typeParam = searchParams.get('type') as QuestionType | null
 
+  const sectionParam = searchParams.get('section')
   const [mode, setMode] = useState<Mode>('drill')
   const QUANT_TYPES: QuestionType[] = ['XYZ', 'KVA', 'NOG', 'DTK']
-  const [selectedTypes, setSelectedTypes] = useState<QuestionType[]>(
-    typeParam && Object.keys(TYPE_INFO).includes(typeParam) ? [typeParam] : QUANT_TYPES
-  )
+  const VERBAL_TYPES: QuestionType[] = ['ORD', 'LAS', 'MEK', 'ELF']
+  const [selectedTypes, setSelectedTypes] = useState<QuestionType[]>(() => {
+    if (typeParam && Object.keys(TYPE_INFO).includes(typeParam)) return [typeParam]
+    if (sectionParam === 'verbal') return VERBAL_TYPES
+    return QUANT_TYPES
+  })
   const [timed, setTimed] = useState(false)
   const [instantFeedback, setInstantFeedback] = useState(true)
   const [count, setCount] = useState(20)

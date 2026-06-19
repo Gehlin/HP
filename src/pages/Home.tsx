@@ -7,6 +7,7 @@ import { getDueQuestions } from '../utils/srs'
 import { getExamDate, setExamDate, clearExamDate, daysUntilExam, urgencyLabel, dailyTarget, KNOWN_HP_DATES } from '../utils/examDate'
 import { computeReadiness } from '../utils/readiness'
 import { isDailyChallengeCompleted, CHALLENGE_SIZE } from '../utils/dailyChallenge'
+import { getFocusPreference, type FocusPreference } from '../utils/focusPreference'
 import type { ExamSession, QuestionType } from '../types'
 
 const TYPE_ACCENTS: Record<string, { color: string; border: string; borderFull: string; bg: string; glow: string }> = {
@@ -68,16 +69,16 @@ const TYPE_INFO: Record<string, {
     totalTime: '~10 min',
     topics: ['Algebra & system', 'Geometri', 'Sannolikhet & logik', 'Aritmetik'],
     answerScheme: [
-      { key: 'A', label: 'Påstående 1 räcker, inte 2' },
-      { key: 'B', label: 'Påstående 2 räcker, inte 1' },
-      { key: 'C', label: 'Båda påståenden behövs' },
-      { key: 'D', label: 'Varken 1 eller 2 räcker' },
-      { key: 'E', label: 'Inget påstående behövs' },
+      { key: 'A', label: 'Påstående (1) räcker, inte (2)' },
+      { key: 'B', label: 'Påstående (2) räcker, inte (1)' },
+      { key: 'C', label: 'Båda påståenden behövs tillsammans' },
+      { key: 'D', label: 'Vardera av (1) och (2) räcker var för sig' },
+      { key: 'E', label: 'Varken (1) och (2) tillsammans räcker' },
     ],
     tips: [
-      'Du behöver INTE lösa uppgiften — bara avgöra om det GÅR att lösa',
-      'Testa: "Om jag visste X, skulle svaret vara unikt?" — det är allt NOG frågar',
-      'E väljs om frågan kan besvaras utan något av påståendena',
+      'Du behöver INTE lösa uppgiften — bara avgöra om det GÅR att lösa den entydigt',
+      'Testa varje påstående separat först — det avgör om svaret är A, B, C eller D',
+      'E väljs om uppgiften inte kan lösas ens med båda påståendena kombinerade',
     ],
   },
   DTK: {
@@ -178,6 +179,7 @@ export default function Home() {
   const [dailyDone, setDailyDone] = useState(false)
   const [expandedType, setExpandedType] = useState<string | null>(null)
   const [dueCount, setDueCount] = useState(0)
+  const [focusPreference, setFocusPrefState] = useState<FocusPreference | null>(null)
   const [recommendation, setRecommendation] = useState<{
     title: string; desc: string; to: string; btnLabel: string
     accent: string; borderAccent: string; bgAccent: string
@@ -186,6 +188,7 @@ export default function Home() {
 
   useEffect(() => {
     setStats(loadStats())
+    setFocusPrefState(getFocusPreference())
 
     const today = new Date().toISOString().slice(0, 10)
     const count = loadHistory()
@@ -505,22 +508,61 @@ export default function Home() {
         {/* ── Primary CTAs ──────────────────────────────────── */}
         <div className="space-y-2.5 mb-3 animate-fade-up stagger-3">
 
-          {/* Start practising */}
-          <button
-            onClick={() => navigate('/practice')}
-            className="relative w-full overflow-hidden rounded-2xl p-5 text-left group bg-blue-600 hover:bg-blue-500 transition-all duration-200 shadow-lg shadow-blue-950/40"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <div className="text-lg font-black">Börja öva</div>
-                <div className="text-blue-100/80 text-xs mt-0.5">Välj delprov, svårighetsgrad och läge</div>
-              </div>
-              <span className="text-2xl opacity-80 group-hover:translate-x-1 transition-transform duration-200">→</span>
+          {/* Quant/Verbal split CTA when focus is set */}
+          {focusPreference === 'both' || focusPreference === null ? (
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                onClick={() => navigate('/practice?section=quant')}
+                className="relative overflow-hidden rounded-2xl p-4 text-left group bg-blue-600 hover:bg-blue-500 transition-all duration-200 shadow-lg shadow-blue-950/40"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative">
+                  <div className="text-base font-black">Kvantitativt</div>
+                  <div className="text-blue-100/70 text-[11px] mt-0.5">XYZ · KVA · NOG · DTK</div>
+                </div>
+              </button>
+              <button
+                onClick={() => navigate('/practice?section=verbal')}
+                className="relative overflow-hidden rounded-2xl p-4 text-left group bg-rose-700 hover:bg-rose-600 transition-all duration-200 shadow-lg shadow-rose-950/40"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative">
+                  <div className="text-base font-black">Verbalt</div>
+                  <div className="text-rose-100/70 text-[11px] mt-0.5">ORD · LÄS · MEK · ELF</div>
+                </div>
+              </button>
             </div>
-          </button>
+          ) : focusPreference === 'quant' ? (
+            <button
+              onClick={() => navigate('/practice?section=quant')}
+              className="relative w-full overflow-hidden rounded-2xl p-5 text-left group bg-blue-600 hover:bg-blue-500 transition-all duration-200 shadow-lg shadow-blue-950/40"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <div className="text-lg font-black">Börja öva kvantitativt</div>
+                  <div className="text-blue-100/80 text-xs mt-0.5">XYZ · KVA · NOG · DTK</div>
+                </div>
+                <span className="text-2xl opacity-80 group-hover:translate-x-1 transition-transform duration-200">→</span>
+              </div>
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/practice?section=verbal')}
+              className="relative w-full overflow-hidden rounded-2xl p-5 text-left group bg-rose-700 hover:bg-rose-600 transition-all duration-200 shadow-lg shadow-rose-950/40"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <div className="text-lg font-black">Börja öva verbalt</div>
+                  <div className="text-rose-100/80 text-xs mt-0.5">ORD · LÄS · MEK · ELF</div>
+                </div>
+                <span className="text-2xl opacity-80 group-hover:translate-x-1 transition-transform duration-200">→</span>
+              </div>
+            </button>
+          )}
 
-          {/* Daily challenge + exam sim side by side */}
+          {/* Secondary row: daily challenge + exam sim */}
           <div className="grid grid-cols-2 gap-2.5">
             <button
               onClick={() => navigate('/practice?daily=1')}
