@@ -283,6 +283,23 @@ export default function VerbalHub() {
           })}
         </div>
 
+        {/* ORD Builder */}
+        <div className="glass rounded-2xl p-5 mb-4 border border-rose-500/10">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Vokabulärbyggaren</div>
+              <div className="font-black text-base text-white mb-0.5">Ordbyggaren</div>
+              <div className="text-slate-500 text-xs">Lär dig HP:s ordförråd med flashcards och egenbedömning</div>
+            </div>
+            <button
+              onClick={() => navigate('/ord-builder')}
+              className="shrink-0 bg-rose-700 hover:bg-rose-600 transition-colors rounded-xl px-4 py-2.5 font-bold text-sm"
+            >
+              Öppna →
+            </button>
+          </div>
+        </div>
+
         {/* Full verbal session */}
         <div className="glass rounded-2xl p-5 border border-white/[0.05]">
           <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Simulera verbalt provpass</div>

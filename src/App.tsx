@@ -31,6 +31,9 @@ const VerbalHub           = lazy(() => import('./pages/VerbalHub'))
 const QuantHub            = lazy(() => import('./pages/QuantHub'))
 const KvaGuide            = lazy(() => import('./pages/KvaGuide'))
 const DtkGuide            = lazy(() => import('./pages/DtkGuide'))
+const NogGuide            = lazy(() => import('./pages/NogGuide'))
+const XyzGuide            = lazy(() => import('./pages/XyzGuide'))
+const OrdBuilder          = lazy(() => import('./pages/OrdBuilder'))
 
 const KEYBOARD_SHORTCUTS = [
   { key: 'A – E', desc: 'Välj svarsalternativ' },
@@ -154,6 +157,9 @@ function AppInner() {
           <Route path="/kvantitativt" element={<QuantHub />} />
           <Route path="/kva-guide" element={<KvaGuide />} />
           <Route path="/dtk-guide" element={<DtkGuide />} />
+          <Route path="/nog-guide" element={<NogGuide />} />
+          <Route path="/xyz-guide" element={<XyzGuide />} />
+          <Route path="/ord-builder" element={<OrdBuilder />} />
         </Routes>
       </Suspense>
 

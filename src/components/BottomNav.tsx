@@ -46,7 +46,7 @@ const TABS = [
   { path: '/theory',   label: 'Teori',    Icon: TheoryIcon   },
 ] as const
 
-const MORE_PATHS = ['/settings', '/bookmarks', '/srs', '/verbalt', '/kvantitativt']
+const MORE_PATHS = ['/settings', '/bookmarks', '/srs', '/verbalt', '/kvantitativt', '/ord-builder']
 
 export default function BottomNav() {
   const location = useLocation()
@@ -143,7 +143,7 @@ export default function BottomNav() {
       <div className="mx-0 border-t border-white/[0.06] bg-[#080C14]/90 backdrop-blur-xl">
         <div className="flex max-w-2xl mx-auto">
           {TABS.map(tab => {
-            const THEORY_PREFIXES = ['/matematik', '/ord-guide', '/mek-guide', '/las-guide', '/elf-guide', '/liggande-stolen', '/kva-guide', '/dtk-guide']
+            const THEORY_PREFIXES = ['/matematik', '/ord-guide', '/mek-guide', '/las-guide', '/elf-guide', '/liggande-stolen', '/kva-guide', '/dtk-guide', '/nog-guide', '/xyz-guide']
             const isActive = tab.path === '/'
               ? location.pathname === '/'
               : location.pathname.startsWith(tab.path) || (tab.path === '/theory' && THEORY_PREFIXES.some(p => location.pathname.startsWith(p)))

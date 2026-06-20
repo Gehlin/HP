@@ -35,6 +35,7 @@ export interface Question {
   number: number
   text: string
   context?: string
+  passageId?: string
   tableData?: TableData
   chartData?: ChartData
   requiresImage?: boolean
@@ -72,6 +73,8 @@ export interface ExamSession {
   questionTimes?: Record<string, number>
   questionQualities?: Record<string, number>
   studyMode?: boolean
+  fullDayPass?: 1 | 2
+  fullDayGroupId?: string
 }
 
 export interface SessionResult {

@@ -40,6 +40,32 @@ export default function ExamSelect() {
           <p className="text-slate-500 text-sm">Välj delprov att simulera — kvantitativt eller verbalt.</p>
         </div>
 
+        {/* Full HP Day hero */}
+        <div className="glass rounded-2xl p-5 mb-6 border border-indigo-500/20">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1.5">Komplett simulering</div>
+              <div className="font-black text-lg text-white mb-0.5">Full HP-dag</div>
+              <div className="text-slate-500 text-xs mb-3">Verbalt pass + paus + kvantitativt pass · ~110 min</div>
+              <div className="flex flex-wrap gap-1.5">
+                {(['ORD','LÄS','MEK','ELF'] as const).map(t => (
+                  <span key={t} className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-rose-500/20 bg-rose-500/10 text-rose-300">{t}</span>
+                ))}
+                <span className="text-[10px] text-slate-600 self-center">+</span>
+                {(['XYZ','KVA','NOG','DTK'] as const).map(t => (
+                  <span key={t} className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-500/20 bg-blue-500/10 text-blue-300">{t}</span>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/exam/full-hp')}
+              className="shrink-0 bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-xl px-4 py-2.5 font-bold text-sm"
+            >
+              Starta →
+            </button>
+          </div>
+        </div>
+
         {/* Section toggle */}
         <div className="flex gap-2 mb-6">
           <button

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { loadSession, saveSession, buildSession } from '../utils/session'
+import { loadSession, saveSession, buildSession, loadHistory } from '../utils/session'
 import { questions } from '../data/questions'
 import type { QuestionType, AnswerKey } from '../types'
 import MathText from '../components/MathText'
@@ -7,7 +7,7 @@ import ExplanationCard from '../components/ExplanationCard'
 import { useState, useEffect } from 'react'
 import { loadStats, saveStats, getLevel } from '../utils/gamification'
 import { getStats as getSrsStats } from '../utils/srs'
-import { SECTION_META, HP_AVERAGES, SECTION_ORDER } from '../data/exams'
+import { SECTION_META, HP_AVERAGES, SECTION_ORDER, getQuantExamQuestions } from '../data/exams'
 import { hpScoreColor, hpScoreLabel, estimateSectionedScore } from '../utils/hpScore'
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
 import { checkAchievements } from '../utils/achievements'
@@ -370,6 +370,86 @@ export default function Results() {
                   })}
                 </div>
               )}
+            </div>
+          )
+        })()}
+
+        {/* Full HP Day — pass 1 break card */}
+        {session.fullDayPass === 1 && (
+          <div className="glass rounded-2xl p-5 mb-6 border border-indigo-500/25">
+            <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2">Pass 1 klart — halvtid!</div>
+            <h2 className="text-xl font-black mb-1">Dags för paus</h2>
+            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
+              Ta 10–15 minuters paus. Drick vatten, sträck på dig. Starta sedan det kvantitativa passet när du är redo.
+            </p>
+            <div className="flex gap-3 mb-4 text-xs text-slate-500">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Verbalt klart</span>
+              <span>·</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500/40 border border-blue-500/50 inline-block" /> Kvantitativt återstår</span>
+            </div>
+            <button
+              onClick={() => {
+                const quantQs = getQuantExamQuestions()
+                const s = buildSession(quantQs.map(q => q.id), 55 * 60, false, 'exam')
+                saveSession({ ...s, examId: 'full-hp-pass2', fullDayPass: 2, fullDayGroupId: session.fullDayGroupId })
+                navigate('/session', { replace: true })
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-500 transition-colors rounded-xl py-3 font-bold text-sm"
+            >
+              Starta kvantitativt pass →
+            </button>
+          </div>
+        )}
+
+        {/* Full HP Day — pass 2 combined score */}
+        {session.fullDayPass === 2 && (() => {
+          const history = loadHistory()
+          const pass1 = history.find(s => s.fullDayGroupId === session.fullDayGroupId && s.fullDayPass === 1)
+          if (!pass1) return null
+          const pass1Qs = pass1.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as typeof questions
+          const combinedByType: Record<QuestionType, { correct: number; total: number }> = {
+            XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
+            NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
+            ORD: { correct: 0, total: 0 }, LAS: { correct: 0, total: 0 },
+            MEK: { correct: 0, total: 0 }, ELF: { correct: 0, total: 0 },
+          }
+          pass1Qs.forEach(q => {
+            combinedByType[q.type].total++
+            if (pass1.answers[q.id] === q.answer) combinedByType[q.type].correct++
+          })
+          sessionQuestions.forEach(q => {
+            combinedByType[q.type].total++
+            if (session.answers[q.id] === q.answer) combinedByType[q.type].correct++
+          })
+          const combinedScore = estimateSectionedScore(combinedByType)
+          const combinedTotal = pass1Qs.length + sessionQuestions.length
+          const combinedCorrect = pass1Qs.filter(q => pass1.answers[q.id] === q.answer).length +
+            sessionQuestions.filter(q => session.answers[q.id] === q.answer).length
+          const combinedPct = Math.round((combinedCorrect / combinedTotal) * 100)
+          const { quant, verbal, combined } = combinedScore
+          const displayScore = combined ?? 1.00
+          return (
+            <div className="glass rounded-2xl p-5 mb-6 border border-indigo-500/25">
+              <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-3">Komplett HP-dag — sammanlagt resultat</div>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-white/[0.03] rounded-xl p-3 text-center">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-rose-400 mb-1">Verbalt</div>
+                  <div className={`text-2xl font-black ${verbal !== null ? hpScoreColor(verbal) : 'text-slate-500'}`}>
+                    {verbal !== null ? verbal.toFixed(2) : '—'}
+                  </div>
+                </div>
+                <div className="bg-white/[0.03] rounded-xl p-3 text-center">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-blue-400 mb-1">Kvant.</div>
+                  <div className={`text-2xl font-black ${quant !== null ? hpScoreColor(quant) : 'text-slate-500'}`}>
+                    {quant !== null ? quant.toFixed(2) : '—'}
+                  </div>
+                </div>
+                <div className="bg-white/[0.04] rounded-xl p-3 text-center border border-indigo-500/20">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-indigo-400 mb-1">Totalt</div>
+                  <div className={`text-2xl font-black ${hpScoreColor(displayScore)}`}>{displayScore.toFixed(2)}</div>
+                </div>
+              </div>
+              <div className="text-xs text-slate-500 text-center">{combinedCorrect}/{combinedTotal} rätt ({combinedPct}%) totalt · {hpScoreLabel(displayScore)}</div>
             </div>
           )
         })()}

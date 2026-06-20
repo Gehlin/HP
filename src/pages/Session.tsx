@@ -10,6 +10,7 @@ import ExplanationCard from '../components/ExplanationCard'
 import FormulaDrawer from '../components/FormulaDrawer'
 import ChartView from '../components/ChartView'
 import { getTopicForQuestion } from '../utils/topicLookup'
+import { getPassage } from '../data/passages'
 
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
@@ -590,14 +591,18 @@ export default function Session() {
           </div>
 
           {/* Context box */}
-          {q.context && (
-            <div className="glass rounded-xl px-4 py-3 mb-4 text-sm text-slate-300 leading-relaxed">
-              <div className="text-[9px] font-bold tracking-widest uppercase text-slate-600 mb-1.5">
-                {q.type === 'LAS' ? 'Lästext' : q.type === 'ELF' ? 'Reading passage' : 'Kontext'}
+          {(q.context || q.passageId) && (() => {
+            const passageText = q.passageId ? getPassage(q.passageId)?.text : undefined
+            const displayText = passageText ?? q.context ?? ''
+            return (
+              <div className="glass rounded-xl px-4 py-3 mb-4 text-sm text-slate-300 leading-relaxed">
+                <div className="text-[9px] font-bold tracking-widest uppercase text-slate-600 mb-1.5">
+                  {q.type === 'LAS' ? 'Lästext' : q.type === 'ELF' ? 'Reading passage' : 'Kontext'}
+                </div>
+                <MathText text={displayText} />
               </div>
-              <MathText text={q.context} />
-            </div>
-          )}
+            )
+          })()}
 
           {/* Question text */}
           <div className={`glass rounded-2xl p-5 mb-5 text-base sm:text-[17px] leading-relaxed overflow-x-auto border-l-[3px] ${TYPE_BORDER_L[q.type] ?? 'border-l-white/10'}`}>
