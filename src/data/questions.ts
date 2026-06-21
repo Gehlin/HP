@@ -17797,7 +17797,7 @@ const _q2: Question[] = [
   // ─── NOG extra (nog-e41 – nog-e48) ───────────────────────────────────────
 
   {
-    id: 'nog-e41',
+    id: 'nog-e106',
     type: 'NOG',
     source: 'Övning',
     number: 41,
@@ -17817,7 +17817,7 @@ const _q2: Question[] = [
     difficulty: 'medium',
   },
   {
-    id: 'nog-e42',
+    id: 'nog-e107',
     type: 'NOG',
     source: 'Övning',
     number: 42,
@@ -17837,7 +17837,7 @@ const _q2: Question[] = [
     difficulty: 'easy',
   },
   {
-    id: 'nog-e43',
+    id: 'nog-e108',
     type: 'NOG',
     source: 'Övning',
     number: 43,
@@ -17857,7 +17857,7 @@ const _q2: Question[] = [
     difficulty: 'medium',
   },
   {
-    id: 'nog-e44',
+    id: 'nog-e109',
     type: 'NOG',
     source: 'Övning',
     number: 44,
@@ -17878,7 +17878,7 @@ const _q2: Question[] = [
     difficulty: 'medium',
   },
   {
-    id: 'nog-e45',
+    id: 'nog-e110',
     type: 'NOG',
     source: 'Övning',
     number: 45,
@@ -17898,7 +17898,7 @@ const _q2: Question[] = [
     difficulty: 'easy',
   },
   {
-    id: 'nog-e46',
+    id: 'nog-e111',
     type: 'NOG',
     source: 'Övning',
     number: 46,
@@ -17919,7 +17919,7 @@ const _q2: Question[] = [
     difficulty: 'hard',
   },
   {
-    id: 'nog-e47',
+    id: 'nog-e112',
     type: 'NOG',
     source: 'Övning',
     number: 47,
@@ -17939,7 +17939,7 @@ const _q2: Question[] = [
     difficulty: 'easy',
   },
   {
-    id: 'nog-e48',
+    id: 'nog-e113',
     type: 'NOG',
     source: 'Övning',
     number: 48,
