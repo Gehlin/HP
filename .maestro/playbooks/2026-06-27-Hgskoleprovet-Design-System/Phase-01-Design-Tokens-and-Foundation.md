@@ -14,7 +14,7 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
   - Keep `antialiased` and `-webkit-tap-highlight-color: transparent`
   <!-- Done: Replaced @apply bg-[#080C14] text-slate-100 with explicit background-color/color/font-family using CSS custom properties; kept antialiased and -webkit-tap-highlight-color. -->
 
-- [ ] Add a CSS custom properties block at the very top of `src/index.css` (before `@import "tailwindcss"` or right after it, inside a `:root` rule) defining the full design token palette:
+- [x] Add a CSS custom properties block at the very top of `src/index.css` (before `@import "tailwindcss"` or right after it, inside a `:root` rule) defining the full design token palette:
   ```
   --color-paper: #F1ECE3
   --color-paper-dark: #E6DFD4
@@ -38,6 +38,7 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
   --font-serif: 'Newsreader', Georgia, serif
   --font-sans: 'Hanken Grotesk', system-ui, sans-serif
   ```
+  <!-- Done: Added :root block with all 23 design tokens (colors, alpha variants, and font-family variables) immediately after the @import statements in src/index.css. -->
 
 - [ ] Replace the `.bg-app`, `.bg-hero`, `.bg-hero::before`, and `.bg-hero-grid` classes in `src/index.css` with light-theme equivalents:
   - `.bg-app` → `background-color: var(--color-paper)`

@@ -1,6 +1,30 @@
 @import "tailwindcss";
 @import "katex/dist/katex.min.css";
 
+:root {
+  --color-paper: #F1ECE3;
+  --color-paper-dark: #E6DFD4;
+  --color-paper-darker: #D8CFC3;
+  --color-green: #224A3A;
+  --color-green-light: #2D6150;
+  --color-green-muted: rgba(34, 74, 58, 0.08);
+  --color-terracotta: #BF5A33;
+  --color-terracotta-muted: rgba(191, 90, 51, 0.1);
+  --color-gold: #E4C66A;
+  --color-gold-muted: rgba(228, 198, 106, 0.15);
+  --color-ink: #1A1A18;
+  --color-ink-muted: #4A4A45;
+  --color-ink-faint: #9A9A92;
+  --color-card: #FDFAF6;
+  --color-card-border: rgba(34, 74, 58, 0.10);
+  --color-success: #2D6150;
+  --color-success-bg: rgba(45, 97, 80, 0.10);
+  --color-error: #BF5A33;
+  --color-error-bg: rgba(191, 90, 51, 0.10);
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+}
+
 @layer base {
   body {
     @apply antialiased;
