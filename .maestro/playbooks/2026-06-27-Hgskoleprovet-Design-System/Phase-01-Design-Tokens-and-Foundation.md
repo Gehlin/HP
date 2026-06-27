@@ -64,13 +64,14 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
   - `.answer-option-wrong`: border `var(--color-error)` (2px), `background: var(--color-error-bg)`
   <!-- Done: Added .btn-primary, .btn-ghost, .streak-pill, .answer-option, .answer-option-selected, .answer-option-correct, and .answer-option-wrong classes to src/index.css using design tokens. -->
 
-- [ ] Update scrollbar, range input, and shimmer skeleton styles in `src/index.css` for the light theme:
+- [x] Update scrollbar, range input, and shimmer skeleton styles in `src/index.css` for the light theme:
   - Scrollbar thumb: `background: rgba(34, 74, 58, 0.20)` (was white/transparent)
   - Scrollbar thumb hover: `background: rgba(34, 74, 58, 0.35)`
   - Range input background: `rgba(34, 74, 58, 0.12)` (was white/transparent)
   - Range thumb: `background: var(--color-green)` (was blue)
   - Range thumb ring: `rgba(34, 74, 58, 0.20)`
   - Shimmer gradient: use paper tones `rgba(34,74,58,0.04)` → `rgba(34,74,58,0.08)` → `rgba(34,74,58,0.04)` (was white-on-dark)
+  <!-- Done: Updated scrollbar thumb/hover from white-on-dark to green-tinted rgba; updated range input background, thumb color, and ring shadow from blue to var(--color-green) values; updated shimmer gradient from white-on-dark to green-on-paper tones. -->
 
 - [ ] Update `.glow-blue` and `.glow-violet` to warm equivalents in `src/index.css`:
   - `.glow-green`: `box-shadow: 0 4px 24px -4px rgba(34, 74, 58, 0.20)`
