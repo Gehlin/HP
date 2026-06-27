@@ -3,7 +3,10 @@
 
 @layer base {
   body {
-    @apply bg-[#080C14] text-slate-100 antialiased;
+    @apply antialiased;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: 'Hanken Grotesk', system-ui, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 

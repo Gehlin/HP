@@ -7,11 +7,12 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
 - [x] Read `index.html` and `src/index.css` to understand current imports. Then update `index.html`: add a `<link>` tag in `<head>` importing the two Google Fonts used in the design — **Newsreader** (weights 400, 500, 600, italic) and **Hanken Grotesk** (weights 400, 500, 600, 700) — using `https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap`. Add `preconnect` hints for `https://fonts.googleapis.com` and `https://fonts.gstatic.com`.
   <!-- Done: Added preconnect hints and Google Fonts stylesheet link to index.html; also updated theme-color meta from #080C14 to #F1ECE3 for the new light theme. -->
 
-- [ ] Replace the entire `@layer base` block in `src/index.css`. The new `body` style must use:
+- [x] Replace the entire `@layer base` block in `src/index.css`. The new `body` style must use:
   - `background-color: var(--color-paper)` — the warm cream page background
   - `color: var(--color-ink)` — dark almost-black text
   - `font-family: 'Hanken Grotesk', system-ui, sans-serif` — the primary sans-serif
   - Keep `antialiased` and `-webkit-tap-highlight-color: transparent`
+  <!-- Done: Replaced @apply bg-[#080C14] text-slate-100 with explicit background-color/color/font-family using CSS custom properties; kept antialiased and -webkit-tap-highlight-color. -->
 
 - [ ] Add a CSS custom properties block at the very top of `src/index.css` (before `@import "tailwindcss"` or right after it, inside a `:root` rule) defining the full design token palette:
   ```
