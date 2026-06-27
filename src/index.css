@@ -60,20 +60,30 @@
   background-image: radial-gradient(ellipse 80% 40% at 50% -5%, rgba(34,74,58,0.06) 0%, transparent 70%);
 }
 
-/* ─── Glass cards ────────────────────────────────────────────── */
+/* ─── Cards (light theme) ────────────────────────────────────── */
 
 .glass {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  border-radius: 16px;
 }
 
 .glass-md {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  border-radius: 20px;
+}
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  border-radius: 16px;
+}
+
+.card-green {
+  background: var(--color-green);
+  border-radius: 20px;
+  color: #FDFAF6;
 }
 
 /* ─── Spacing utility ────────────────────────────────────────── */

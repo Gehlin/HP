@@ -47,11 +47,12 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
   - `.bg-hero-grid` → same as new `.bg-hero`
   <!-- Done: Replaced dark #080C14 backgrounds with var(--color-paper); replaced blue/violet gradients with a subtle green wash; set .bg-hero::before { content: none } to disable the dot-grid. -->
 
-- [ ] Replace `.glass` and `.glass-md` in `src/index.css` with warm card variants:
+- [x] Replace `.glass` and `.glass-md` in `src/index.css` with warm card variants:
   - `.glass` → `background: var(--color-card); border: 1px solid var(--color-card-border); border-radius: 16px;` (no blur needed on light theme)
   - `.glass-md` → `background: var(--color-card); border: 1px solid var(--color-card-border); border-radius: 20px;`
   - Add a new `.card` class: same as `.glass`
   - Add `.card-green`: `background: var(--color-green); border-radius: 20px; color: #FDFAF6;`
+  <!-- Done: Replaced dark glass-morphism backdrop-filter styles with warm card variants using design tokens; added .card (alias of .glass) and .card-green classes. -->
 
 - [ ] Add new utility classes to `src/index.css` for the primary UI components that all pages will use:
   - `.btn-primary`: green background `var(--color-green)`, white text, `border-radius: 12px`, `font-family: var(--font-sans)`, `font-weight: 600`, `padding: 14px 24px`, `transition: opacity 150ms`
