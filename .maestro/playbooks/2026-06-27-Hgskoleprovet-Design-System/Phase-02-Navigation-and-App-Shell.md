@@ -15,7 +15,7 @@ This phase rebuilds the bottom navigation bar from the current 5-tab dark design
   - Keep `pb-safe` utility on the nav wrapper
   - Keep hiding the nav when `location.pathname.startsWith('/session')`
 
-- [ ] Create `src/pages/Profil.tsx` as a scaffold placeholder. It should render a minimal warm-themed page:
+- [x] Create `src/pages/Profil.tsx` as a scaffold placeholder. It should render a minimal warm-themed page:
   - Same `bg-app` + `min-h-screen` + `pb-24` wrapper as other pages
   - A top heading "Profil" in `font-[var(--font-serif)]` text-2xl text-`[var(--color-ink)]`
   - Three tappable rows in an iOS-style list card (white background, green borders):

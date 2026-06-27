@@ -34,6 +34,7 @@ const DtkGuide            = lazy(() => import('./pages/DtkGuide'))
 const NogGuide            = lazy(() => import('./pages/NogGuide'))
 const XyzGuide            = lazy(() => import('./pages/XyzGuide'))
 const OrdBuilder          = lazy(() => import('./pages/OrdBuilder'))
+const Profil              = lazy(() => import('./pages/Profil'))
 
 const KEYBOARD_SHORTCUTS = [
   { key: 'A – E', desc: 'Välj svarsalternativ' },
@@ -160,6 +161,7 @@ function AppInner() {
           <Route path="/nog-guide" element={<NogGuide />} />
           <Route path="/xyz-guide" element={<XyzGuide />} />
           <Route path="/ord-builder" element={<OrdBuilder />} />
+          <Route path="/profil" element={<Profil />} />
         </Routes>
       </Suspense>
 
