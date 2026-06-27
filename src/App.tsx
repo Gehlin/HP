@@ -44,7 +44,7 @@ const KEYBOARD_SHORTCUTS = [
 function PageLoader() {
   return (
     <div className="min-h-screen bg-app flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-blue-400 animate-spin" />
+      <div className="w-8 h-8 rounded-full border-2 border-[var(--color-paper-dark)] border-t-[var(--color-green)] animate-spin" />
     </div>
   )
 }
@@ -92,7 +92,7 @@ function AppInner() {
   return (
     <>
       {!isOnline && (
-        <div className="fixed top-0 inset-x-0 z-[300] bg-amber-600 text-white text-center text-xs py-1.5 font-semibold">
+        <div className="fixed top-0 inset-x-0 z-[300] bg-[var(--color-terracotta)] text-white text-center text-xs py-1.5 font-semibold">
           Ingen internetanslutning — appen fungerar offline
         </div>
       )}
@@ -107,25 +107,25 @@ function AppInner() {
           onClick={() => setShowKeyGuide(false)}
         >
           <div
-            className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xs shadow-2xl p-6 animate-fade-in"
+            className="bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl w-full max-w-xs shadow-2xl p-6 animate-fade-in"
             onClick={e => e.stopPropagation()}
           >
-            <h2 className="text-sm font-black text-slate-300 uppercase tracking-widest mb-4">
+            <h2 className="text-sm font-black text-[var(--color-ink-muted)] uppercase tracking-widest mb-4">
               Tangentbordsgenvägar
             </h2>
             <div className="flex flex-col gap-3">
               {KEYBOARD_SHORTCUTS.map(s => (
                 <div key={s.key} className="flex items-center justify-between gap-4">
-                  <kbd className="text-xs font-mono bg-slate-800 border border-slate-600 text-slate-200 px-2.5 py-1 rounded-lg whitespace-nowrap">
+                  <kbd className="text-xs font-mono bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] text-[var(--color-ink)] px-2.5 py-1 rounded-lg whitespace-nowrap">
                     {s.key}
                   </kbd>
-                  <span className="text-sm text-slate-400 text-right">{s.desc}</span>
+                  <span className="text-sm text-[var(--color-ink-muted)] text-right">{s.desc}</span>
                 </div>
               ))}
             </div>
             <button
               onClick={() => setShowKeyGuide(false)}
-              className="mt-6 w-full text-xs text-slate-500 hover:text-slate-300 transition-colors"
+              className="mt-6 w-full text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] transition-colors"
             >
               Stäng (Esc)
             </button>
