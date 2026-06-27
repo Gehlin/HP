@@ -40,11 +40,12 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
   ```
   <!-- Done: Added :root block with all 23 design tokens (colors, alpha variants, and font-family variables) immediately after the @import statements in src/index.css. -->
 
-- [ ] Replace the `.bg-app`, `.bg-hero`, `.bg-hero::before`, and `.bg-hero-grid` classes in `src/index.css` with light-theme equivalents:
+- [x] Replace the `.bg-app`, `.bg-hero`, `.bg-hero::before`, and `.bg-hero-grid` classes in `src/index.css` with light-theme equivalents:
   - `.bg-app` → `background-color: var(--color-paper)`
   - `.bg-hero` → `background-color: var(--color-paper); background-image: radial-gradient(ellipse 80% 40% at 50% -5%, rgba(34,74,58,0.06) 0%, transparent 70%)` (subtle green wash at top instead of blue)
   - Remove the dot-grid `::before` pseudo-element (it's a dark-theme effect) — just set `content: none` on it or delete the block
   - `.bg-hero-grid` → same as new `.bg-hero`
+  <!-- Done: Replaced dark #080C14 backgrounds with var(--color-paper); replaced blue/violet gradients with a subtle green wash; set .bg-hero::before { content: none } to disable the dot-grid. -->
 
 - [ ] Replace `.glass` and `.glass-md` in `src/index.css` with warm card variants:
   - `.glass` → `background: var(--color-card); border: 1px solid var(--color-card-border); border-radius: 16px;` (no blur needed on light theme)
