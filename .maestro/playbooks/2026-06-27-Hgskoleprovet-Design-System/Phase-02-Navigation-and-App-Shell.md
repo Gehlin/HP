@@ -27,10 +27,11 @@ This phase rebuilds the bottom navigation bar from the current 5-tab dark design
   - Wrap rows in a `div` with `bg-[var(--color-card)] rounded-2xl border border-[var(--color-card-border)]`
   - Add `px-4 pt-14 pb-8` padding and `max-w-2xl mx-auto`
 
-- [ ] Register the `/profil` route in `src/App.tsx`:
+- [x] Register the `/profil` route in `src/App.tsx`:
   - Import `Profil` lazily: `const Profil = lazy(() => import('./pages/Profil'))`
   - Add `<Route path="/profil" element={<Profil />} />` inside the `<Routes>` block
   - Keep all existing routes unchanged
+  - _Note: Already present from previous run (Phase 02 task 2). Verified at App.tsx:37 (import) and App.tsx:164 (route)._
 
 - [ ] Update `MORE_PATHS` active-detection logic removal: since the Mer tab is gone, remove the `isMoreActive` logic and the separate "Mer" button from the old BottomNav. The new `/profil` path should be considered active when `location.pathname === '/profil'` — handled naturally by the generic tab active check in the rewritten component.
 
