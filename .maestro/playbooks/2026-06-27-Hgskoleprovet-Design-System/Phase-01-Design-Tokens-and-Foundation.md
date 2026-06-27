@@ -54,7 +54,7 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
   - Add `.card-green`: `background: var(--color-green); border-radius: 20px; color: #FDFAF6;`
   <!-- Done: Replaced dark glass-morphism backdrop-filter styles with warm card variants using design tokens; added .card (alias of .glass) and .card-green classes. -->
 
-- [ ] Add new utility classes to `src/index.css` for the primary UI components that all pages will use:
+- [x] Add new utility classes to `src/index.css` for the primary UI components that all pages will use:
   - `.btn-primary`: green background `var(--color-green)`, white text, `border-radius: 12px`, `font-family: var(--font-sans)`, `font-weight: 600`, `padding: 14px 24px`, `transition: opacity 150ms`
   - `.btn-ghost`: transparent background, `color: var(--color-ink-muted)`, `border: 1px solid var(--color-card-border)`, same radius/padding
   - `.streak-pill`: `background: var(--color-terracotta)`, white text, `border-radius: 100px`, `font-size: 13px`, `font-weight: 600`, `padding: 4px 12px`
@@ -62,6 +62,7 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
   - `.answer-option-selected`: border becomes `var(--color-green)` (2px), `background: var(--color-green-muted)`
   - `.answer-option-correct`: border `var(--color-green)` (2px), `background: var(--color-success-bg)`
   - `.answer-option-wrong`: border `var(--color-error)` (2px), `background: var(--color-error-bg)`
+  <!-- Done: Added .btn-primary, .btn-ghost, .streak-pill, .answer-option, .answer-option-selected, .answer-option-correct, and .answer-option-wrong classes to src/index.css using design tokens. -->
 
 - [ ] Update scrollbar, range input, and shimmer skeleton styles in `src/index.css` for the light theme:
   - Scrollbar thumb: `background: rgba(34, 74, 58, 0.20)` (was white/transparent)

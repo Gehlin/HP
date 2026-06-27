@@ -86,6 +86,66 @@
   color: #FDFAF6;
 }
 
+/* ─── Buttons ────────────────────────────────────────────────── */
+
+.btn-primary {
+  background: var(--color-green);
+  color: #FDFAF6;
+  border-radius: 12px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  padding: 14px 24px;
+  transition: opacity 150ms;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-ink-muted);
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  padding: 14px 24px;
+  transition: opacity 150ms;
+}
+
+/* ─── Badges ─────────────────────────────────────────────────── */
+
+.streak-pill {
+  background: var(--color-terracotta);
+  color: #FDFAF6;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 12px;
+}
+
+/* ─── Answer options ─────────────────────────────────────────── */
+
+.answer-option {
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 150ms;
+}
+
+.answer-option-selected {
+  border: 2px solid var(--color-green);
+  background: var(--color-green-muted);
+}
+
+.answer-option-correct {
+  border: 2px solid var(--color-green);
+  background: var(--color-success-bg);
+}
+
+.answer-option-wrong {
+  border: 2px solid var(--color-error);
+  background: var(--color-error-bg);
+}
+
 /* ─── Spacing utility ────────────────────────────────────────── */
 
 .pb-safe {
