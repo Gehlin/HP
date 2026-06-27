@@ -73,10 +73,11 @@ This phase replaces the dark `#080C14` glass-morphism theme with the new warm, p
   - Shimmer gradient: use paper tones `rgba(34,74,58,0.04)` → `rgba(34,74,58,0.08)` → `rgba(34,74,58,0.04)` (was white-on-dark)
   <!-- Done: Updated scrollbar thumb/hover from white-on-dark to green-tinted rgba; updated range input background, thumb color, and ring shadow from blue to var(--color-green) values; updated shimmer gradient from white-on-dark to green-on-paper tones. -->
 
-- [ ] Update `.glow-blue` and `.glow-violet` to warm equivalents in `src/index.css`:
+- [x] Update `.glow-blue` and `.glow-violet` to warm equivalents in `src/index.css`:
   - `.glow-green`: `box-shadow: 0 4px 24px -4px rgba(34, 74, 58, 0.20)`
   - `.glow-terracotta`: `box-shadow: 0 4px 24px -4px rgba(191, 90, 51, 0.20)`
   - Keep the original `.glow-blue` and `.glow-violet` as no-ops (or remove) since they'll be replaced progressively
+  <!-- Done: Added .glow-green and .glow-terracotta with warm box-shadow values; set .glow-blue and .glow-violet to box-shadow: none so they become inert no-ops. -->
 
 - [ ] Update `src/App.tsx`: change `PageLoader` spinner colors from `border-slate-700 border-t-blue-400` to `border-[var(--color-paper-dark)] border-t-[var(--color-green)]`. Update the keyboard shortcut overlay modal: change `bg-slate-900 border-slate-700` to `bg-[var(--color-card)] border-[var(--color-card-border)]`, `text-slate-300` to `text-[var(--color-ink-muted)]`, `bg-slate-800 border-slate-600 text-slate-200` kbd style to `bg-[var(--color-paper-dark)] border-[var(--color-card-border)] text-[var(--color-ink)]`, `text-slate-400` to `text-[var(--color-ink-muted)]`, `text-slate-500` to `text-[var(--color-ink-faint)]`. Also update the offline banner from `bg-amber-600` to `bg-[var(--color-terracotta)]`.
 
