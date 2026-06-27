@@ -33,6 +33,7 @@ This phase rebuilds the bottom navigation bar from the current 5-tab dark design
   - Keep all existing routes unchanged
   - _Note: Already present from previous run (Phase 02 task 2). Verified at App.tsx:37 (import) and App.tsx:164 (route)._
 
-- [ ] Update `MORE_PATHS` active-detection logic removal: since the Mer tab is gone, remove the `isMoreActive` logic and the separate "Mer" button from the old BottomNav. The new `/profil` path should be considered active when `location.pathname === '/profil'` — handled naturally by the generic tab active check in the rewritten component.
+- [x] Update `MORE_PATHS` active-detection logic removal: since the Mer tab is gone, remove the `isMoreActive` logic and the separate "Mer" button from the old BottomNav. The new `/profil` path should be considered active when `location.pathname === '/profil'` — handled naturally by the generic tab active check in the rewritten component.
+  - _Note: Fully resolved by the BottomNav rewrite in task 1. `grep` confirms zero references to `MORE_PATHS`, `isMoreActive`, `showMore`, or `moreRef` anywhere in `src/`. The generic `location.pathname.startsWith(tab.path)` check in the rewritten component handles `/profil` active state correctly._
 
 - [ ] Verify the navigation works: run the dev server (`npm run dev`) and confirm all 4 tabs are visible with warm paper background, tapping each tab navigates correctly, the active tab shows a green top indicator and green text, and the Profil tab opens the placeholder page with its menu rows.
