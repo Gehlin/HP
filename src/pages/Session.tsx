@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { AnswerKey } from '../types'
+import type { AnswerKey, QuestionType } from '../types'
 import { questions } from '../data/questions'
 import { SECTION_META } from '../data/exams'
 import { loadSession, updateAnswer, finishSession, toggleFlag, skipQuestion, saveSession, saveQuestionTime, saveQuestionQuality } from '../utils/session'
@@ -14,43 +14,21 @@ import { getPassage } from '../data/passages'
 
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
-const TYPE_TEXT: Record<string, string> = {
-  XYZ: 'text-violet-400',
-  KVA: 'text-blue-400',
-  NOG: 'text-emerald-400',
-  DTK: 'text-amber-400',
-  ORD: 'text-rose-400',
-  LAS: 'text-pink-400',
-  MEK: 'text-fuchsia-400',
-  ELF: 'text-purple-400',
+const TYPE_ACCENTS: Record<QuestionType, { color: string; bg: string }> = {
+  XYZ: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+  KVA: { color: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
+  NOG: { color: '#224A3A', bg: 'rgba(34,74,58,0.08)' },
+  DTK: { color: '#D97706', bg: 'rgba(217,119,6,0.08)' },
+  ORD: { color: '#DC2626', bg: 'rgba(220,38,38,0.08)' },
+  LAS: { color: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
+  MEK: { color: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
+  ELF: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
 }
 
-const TYPE_PROGRESS: Record<string, string> = {
-  XYZ: 'bg-violet-500',
-  KVA: 'bg-blue-500',
-  NOG: 'bg-emerald-500',
-  DTK: 'bg-amber-500',
-  ORD: 'bg-rose-500',
-  LAS: 'bg-pink-500',
-  MEK: 'bg-fuchsia-500',
-  ELF: 'bg-purple-500',
-}
-
-const TYPE_BORDER_L: Record<string, string> = {
-  XYZ: 'border-l-violet-500/60',
-  KVA: 'border-l-blue-500/60',
-  NOG: 'border-l-emerald-500/60',
-  DTK: 'border-l-amber-500/60',
-  ORD: 'border-l-rose-500/60',
-  LAS: 'border-l-pink-500/60',
-  MEK: 'border-l-fuchsia-500/60',
-  ELF: 'border-l-purple-500/60',
-}
-
-const DIFFICULTY_BADGE: Record<string, string> = {
-  hard: 'text-red-400 bg-red-500/10 border-red-500/20',
-  medium: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
-  easy: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+const DIFFICULTY_ACCENTS: Record<string, { color: string; bg: string; ring: string }> = {
+  easy:   { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.10)' },
+  medium: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.10)' },
+  hard:   { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.10)' },
 }
 
 interface BreakScreenData {
@@ -368,7 +346,7 @@ export default function Session() {
   // ── Section break interstitial ───────────────────────────────
   if (breakScreen) {
     const completedMeta = SECTION_META[breakScreen.completedSection]
-    const nextColor = TYPE_TEXT[breakScreen.nextSection] ?? 'text-white'
+    const nextAccent = TYPE_ACCENTS[breakScreen.nextSection as QuestionType]
     return (
       <div className="h-screen bg-app text-white flex flex-col items-center justify-center px-6">
         <div className="max-w-md w-full text-center animate-scale-in">
@@ -382,7 +360,7 @@ export default function Session() {
 
           <div className="glass rounded-2xl p-6 mb-8 text-left">
             <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Nästa avsnitt</div>
-            <div className={`text-3xl font-black mb-1 ${nextColor}`}>
+            <div className="text-3xl font-black mb-1" style={{ color: nextAccent?.color ?? '#fff' }}>
               {breakScreen.nextSection}
             </div>
             <div className="text-slate-400 text-sm mb-5">{SECTION_META[breakScreen.nextSection]?.description}</div>
@@ -418,7 +396,6 @@ export default function Session() {
   if (!q) return null
 
   const sectionMeta = SECTION_META[q.type]
-  const typeColor = TYPE_TEXT[q.type] ?? 'text-slate-400'
 
   // Exam section time budget (recomputed every render; questionElapsed ticks every second)
   const sectionBudgetSecsLeft: number | null = isExam && sectionMeta && session
@@ -473,7 +450,7 @@ export default function Session() {
 
       {/* ── Scrollable question area ───────────────────────────── */}
       <main
-        className="flex-1 overflow-y-auto pt-[72px]"
+        className="flex-1 overflow-y-auto pt-[72px] pb-[96px] px-4 max-w-2xl mx-auto w-full"
         onTouchStart={e => { touchStartXRef.current = e.touches[0].clientX }}
         onTouchEnd={e => {
           if (touchStartXRef.current === null) return
@@ -482,18 +459,24 @@ export default function Session() {
           if (dx > 80 && (chosen || isRevealed) && !isTransitioning) handleNextQuestion()
         }}
       >
-        <div className={`max-w-2xl mx-auto w-full px-4 py-6 ${cardAnimClass}`}>
+        <div className={`py-6 ${cardAnimClass}`}>
 
           {/* Source + difficulty chips */}
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-[10px] text-slate-600 bg-white/[0.04] border border-white/[0.05] rounded-md px-2 py-0.5">
+            <span className="text-[10px] text-[var(--color-ink-faint)] bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-md px-2 py-0.5">
               {q.source} · #{q.number}
             </span>
-            {q.difficulty !== 'medium' && (
-              <span className={`text-[10px] font-bold border rounded-md px-2 py-0.5 ${DIFFICULTY_BADGE[q.difficulty] ?? ''}`}>
-                {q.difficulty === 'hard' ? 'Svår' : 'Lätt'}
-              </span>
-            )}
+            {q.difficulty !== 'medium' && (() => {
+              const da = DIFFICULTY_ACCENTS[q.difficulty]
+              return (
+                <span
+                  className="text-[10px] font-bold border rounded-md px-2 py-0.5"
+                  style={{ color: da?.color, backgroundColor: da?.bg, borderColor: da?.ring }}
+                >
+                  {q.difficulty === 'hard' ? 'Svår' : 'Lätt'}
+                </span>
+              )
+            })()}
           </div>
 
           {/* Context box */}
@@ -501,8 +484,8 @@ export default function Session() {
             const passageText = q.passageId ? getPassage(q.passageId)?.text : undefined
             const displayText = passageText ?? q.context ?? ''
             return (
-              <div className="glass rounded-xl px-4 py-3 mb-4 text-sm text-slate-300 leading-relaxed">
-                <div className="text-[9px] font-bold tracking-widest uppercase text-slate-600 mb-1.5">
+              <div className="card p-4 mb-4 text-sm text-[var(--color-ink-muted)] leading-relaxed">
+                <div className="text-[9px] font-bold tracking-widest uppercase text-[var(--color-ink-faint)] mb-1.5">
                   {q.type === 'LAS' ? 'Lästext' : q.type === 'ELF' ? 'Reading passage' : 'Kontext'}
                 </div>
                 <MathText text={displayText} />
@@ -511,7 +494,7 @@ export default function Session() {
           })()}
 
           {/* Question text */}
-          <div className={`glass rounded-2xl p-5 mb-5 text-base sm:text-[17px] leading-relaxed overflow-x-auto border-l-[3px] ${TYPE_BORDER_L[q.type] ?? 'border-l-white/10'}`}>
+          <div className="text-base leading-relaxed text-[var(--color-ink)] font-[var(--font-sans)] mb-6">
             <MathText text={q.text} />
           </div>
 
@@ -520,23 +503,23 @@ export default function Session() {
 
           {/* Table */}
           {q.tableData && (
-            <div className="glass rounded-2xl p-4 mb-5 overflow-x-auto">
+            <div className="card p-4 mb-5 overflow-x-auto">
               {q.tableData.caption && (
-                <p className="text-xs text-slate-500 mb-3">{q.tableData.caption}</p>
+                <p className="text-xs text-[var(--color-ink-faint)] mb-3">{q.tableData.caption}</p>
               )}
               <table className="text-sm w-full">
                 <thead>
-                  <tr className="border-b border-white/[0.06]">
+                  <tr className="border-b border-[var(--color-card-border)]">
                     {q.tableData.headers.map((h, i) => (
-                      <th key={i} className="text-left py-1.5 pr-4 text-slate-400 font-semibold">{h}</th>
+                      <th key={i} className="text-left py-1.5 pr-4 text-[var(--color-ink-muted)] font-semibold">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {q.tableData.rows.map((row, i) => (
-                    <tr key={i} className="border-b border-white/[0.03]">
+                    <tr key={i} className="border-b border-[var(--color-card-border)]">
                       {row.map((cell, j) => (
-                        <td key={j} className="py-1.5 pr-4 text-slate-200">{cell}</td>
+                        <td key={j} className="py-1.5 pr-4 text-[var(--color-ink)]">{cell}</td>
                       ))}
                     </tr>
                   ))}
@@ -551,25 +534,18 @@ export default function Session() {
               const isChosen = chosen === key
               const isAnswer = key === q.answer
 
-              let wrapCls = 'border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/[0.12] text-slate-200 cursor-pointer'
-              let keyCls = 'bg-white/[0.06] text-slate-500'
+              const optionClasses = [
+                'answer-option',
+                !isRevealed && isChosen ? 'answer-option-selected' : '',
+                isRevealed && isAnswer ? 'answer-option-correct reveal-correct' : '',
+                isRevealed && isChosen && !isAnswer ? 'answer-option-wrong' : '',
+                isRevealed && !isAnswer && !isChosen ? 'opacity-50' : '',
+              ].filter(Boolean).join(' ')
 
-              if (isChosen && !isRevealed) {
-                wrapCls = 'border-blue-500/60 bg-blue-500/10 text-white cursor-pointer'
-                keyCls = 'bg-blue-600 text-white'
-              }
-              if (isRevealed && isAnswer) {
-                wrapCls = 'border-emerald-500/50 bg-emerald-500/10 text-white reveal-correct'
-                keyCls = 'bg-emerald-600 text-white'
-              }
-              if (isRevealed && isChosen && !isAnswer) {
-                wrapCls = 'border-red-500/50 bg-red-500/10 text-white'
-                keyCls = 'bg-red-600 text-white'
-              }
-              if (isRevealed && !isAnswer && !isChosen) {
-                wrapCls = 'border-white/[0.03] bg-white/[0.01] text-slate-600 cursor-default'
-                keyCls = 'bg-white/[0.04] text-slate-600'
-              }
+              let badgeBg = 'bg-[var(--color-paper-dark)]'
+              let badgeColor = 'text-[var(--color-ink)]'
+              if (isRevealed && isAnswer) { badgeBg = 'bg-[var(--color-green)]'; badgeColor = 'text-white' }
+              if (isRevealed && isChosen && !isAnswer) { badgeBg = 'bg-[var(--color-error)]'; badgeColor = 'text-white' }
 
               const badgeLabel = isRevealed && isAnswer ? '✓'
                 : (isRevealed && isChosen && !isAnswer) ? '✗'
@@ -580,12 +556,12 @@ export default function Session() {
                   key={key}
                   onClick={() => pick(key)}
                   disabled={isRevealed}
-                  className={`w-full border rounded-xl p-3.5 text-left flex items-start gap-3 transition-all duration-150 min-h-[52px] ${wrapCls}`}
+                  className={`w-full text-left flex items-start gap-3 min-h-[52px] ${optionClasses}`}
                 >
-                  <span className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black transition-colors ${keyCls}`}>
+                  <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${badgeBg} ${badgeColor}`}>
                     {badgeLabel}
                   </span>
-                  <div className="mt-0.5 flex-1 text-[15px] leading-snug">
+                  <div className="mt-0.5 flex-1 text-sm text-[var(--color-ink)]">
                     <MathText text={text} />
                   </div>
                 </button>
@@ -597,7 +573,7 @@ export default function Session() {
             <div className="flex justify-center mt-2">
               <button
                 onClick={handleSkip}
-                className="text-xs text-slate-500 hover:text-slate-300 transition-colors py-1"
+                className="text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors py-1"
               >
                 Hoppa över →
               </button>
@@ -627,7 +603,7 @@ export default function Session() {
           )}
 
           {isLastInSection && (
-            <div className="mt-6 text-center text-slate-600 text-xs border-t border-white/[0.04] pt-4">
+            <div className="mt-6 text-center text-[var(--color-ink-faint)] text-xs border-t border-[var(--color-card-border)] pt-4">
               Avsnitt {sectionMeta?.number ?? '?'} av 4 klart — {questionsRemaining} frågor kvar
             </div>
           )}
