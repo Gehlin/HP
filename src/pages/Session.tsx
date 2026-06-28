@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { AnswerKey, QuestionType } from '../types'
 import { questions } from '../data/questions'
 import { SECTION_META } from '../data/exams'
-import { loadSession, updateAnswer, finishSession, toggleFlag, skipQuestion, saveSession, saveQuestionTime, saveQuestionQuality } from '../utils/session'
+import { loadSession, updateAnswer, finishSession, skipQuestion, saveSession, saveQuestionTime, saveQuestionQuality } from '../utils/session'
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
 import MathText from '../components/MathText'
 import ExplanationCard from '../components/ExplanationCard'
@@ -96,7 +96,7 @@ export default function Session() {
   const [answers, setAnswers] = useState<Record<string, AnswerKey>>(session?.answers ?? {})
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
-  const [flagged, setFlagged] = useState<string[]>(session?.flagged ?? [])
+  const [flagged] = useState<string[]>(session?.flagged ?? [])
   const [, setSkipped] = useState<string[]>(session?.skipped ?? [])
   const [undoSkip, setUndoSkip] = useState<{ qId: string; idx: number } | null>(null)
   const [cardAnimClass, setCardAnimClass] = useState('')
@@ -254,11 +254,6 @@ export default function Session() {
     setUndoSkip(null)
   }, [undoSkip])
 
-  const handleFlag = useCallback(() => {
-    if (!q) return
-    toggleFlag(q.id)
-    setFlagged(f => f.includes(q.id) ? f.filter(id => id !== q.id) : [...f, q.id])
-  }, [q])
 
   const handleBookmark = useCallback(() => {
     if (!q) return
@@ -403,15 +398,6 @@ export default function Session() {
 
   const sectionMeta = SECTION_META[q.type]
 
-  // Exam section time budget (recomputed every render; questionElapsed ticks every second)
-  const sectionBudgetSecsLeft: number | null = isExam && sectionMeta && session
-    ? (() => {
-        const sectionStartMs = sectionTimestamps[q.type] ?? session.startTime
-        const budgetSecs = sectionMeta.recommendedMin * 60
-        const elapsedSecs = Math.round((Date.now() - sectionStartMs) / 1000)
-        return budgetSecs - elapsedSecs
-      })()
-    : null
 
   return (
     <div className="min-h-screen bg-[var(--color-paper)] flex flex-col">
