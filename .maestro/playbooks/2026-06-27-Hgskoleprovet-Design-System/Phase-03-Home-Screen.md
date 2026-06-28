@@ -44,11 +44,12 @@ This phase redesigns `src/pages/Home.tsx` — the first thing users see. The cur
   - Right side: an SVG score ring — an 80px circle with `stroke-dasharray` and `stroke-dashoffset` computed from the percentage (use `readiness.score / 2.0` as a 0–100 percentage). Ring track: `rgba(255,255,255,0.15)`, ring fill: `white`, `stroke-linecap: round`
   <!-- Done. Added HERO_R=36/HERO_C constants, `totalCorrect` state (computed from full history), and `heroScorePct`/`heroRingOffset` vars. Hero card renders as forest-green `.card-green p-6` div: label + big score on left, 3 mini-stats (Rätt totalt, Streak, Dagar kvar till HP) below, and 80px SVG ring on right. TypeScript clean. -->
 
-- [ ] Build the "Fortsätt" continue card. After the hero card, conditionally render (only if `loadSession()` returns a session in progress) a white `.card` div with:
+- [x] Build the "Fortsätt" continue card. After the hero card, conditionally render (only if `loadSession()` returns a session in progress) a white `.card` div with:
   - Label: "Fortsätt där du slutade" in `text-xs uppercase tracking-widest text-[var(--color-ink-faint)] font-semibold`
   - Session type + number of remaining questions in `text-base font-semibold text-[var(--color-ink)]`
   - A `btn-primary` button "Fortsätt" that navigates to `/session`
   - Layout: flex row, text on left, button on right
+  <!-- Done. Replaced the old dark-blue resume banner (bg-blue-500/10) with a white `.card p-4` div. Label "Fortsätt där du slutade" in ink-faint uppercase, session type + remaining count (tot - answered) in ink-colored text, and a `btn-primary` "Fortsätt" button on the right navigating to /session. TypeScript clean. -->
 
 - [ ] Build the 8-section grid. After the continue card (or hero card if no session), render a 2-column grid (`grid grid-cols-2 gap-3`). For each question type (XYZ, KVA, NOG, DTK, ORD, LAS, MEK, ELF), render a `.card` div with `p-4`:
   - A conic-gradient SVG progress ring (48px): compute `accuracy` for this type from session history (reuse existing `computeTypeStats` or equivalent logic in the file). Ring background: `var(--color-paper-dark)`, ring fill: the type's `ring` color. The SVG should use a `circle` with `stroke-dasharray="circumference"` and `stroke-dashoffset` computed from accuracy percentage.

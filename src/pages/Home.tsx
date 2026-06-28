@@ -361,34 +361,28 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── Resume banner ─────────────────────────────────── */}
+        {/* ── Fortsätt card ─────────────────────────────────── */}
         {resumeSession && (() => {
           const answered = Object.keys(resumeSession.answers).length
           const tot = resumeSession.questionIds.length
+          const remaining = tot - answered
           const sessionType = resumeSession.type === 'exam' ? 'HP-prov' : resumeSession.studyMode ? 'Studieläge' : 'Övning'
-          const elapsed = Math.round((Date.now() - resumeSession.startTime) / 60000)
           return (
-            <div className="rounded-2xl p-4 mb-3 flex items-center gap-4 bg-blue-500/10 border border-blue-500/20 animate-fade-up stagger-1">
+            <div className="card p-4 mb-4 flex items-center justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-0.5">Pågående pass</div>
-                <div className="text-sm text-white font-semibold">
-                  {sessionType} · {answered}/{tot} frågor · {elapsed} min sedan
+                <div className="text-xs uppercase tracking-widest text-[var(--color-ink-faint)] font-semibold mb-1">
+                  Fortsätt där du slutade
+                </div>
+                <div className="text-base font-semibold text-[var(--color-ink)]">
+                  {sessionType} · {remaining} frågor kvar
                 </div>
               </div>
-              <div className="flex gap-2 shrink-0">
-                <button
-                  onClick={() => { saveSession({ ...resumeSession, endTime: undefined }); navigate('/session') }}
-                  className="bg-blue-500 hover:bg-blue-400 transition-colors rounded-xl px-4 py-2 text-sm font-bold"
-                >
-                  Fortsätt
-                </button>
-                <button
-                  onClick={() => { localStorage.removeItem('hp_current_session'); setResumeSession(null) }}
-                  className="text-slate-500 hover:text-slate-300 transition-colors px-3 py-2 text-sm"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                onClick={() => { saveSession({ ...resumeSession, endTime: undefined }); navigate('/session') }}
+                className="btn-primary shrink-0"
+              >
+                Fortsätt
+              </button>
             </div>
           )
         })()}
