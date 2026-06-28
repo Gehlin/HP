@@ -319,6 +319,63 @@ export default function Progress() {
         })}
       </div>
 
+      {/* HP Score card */}
+      <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-xs text-[var(--color-ink-faint)] mb-1">Uppskattat HP-poäng</div>
+            <div className={`text-4xl font-[var(--font-serif)] ${combinedScore !== null ? 'text-[var(--color-ink)]' : 'text-[var(--color-ink-faint)]'}`}>
+              {combinedScore !== null ? combinedScore.toFixed(2) : '—'}
+            </div>
+            {combinedScore !== null && (
+              <div className="text-xs text-[var(--color-ink-faint)] mt-1">av 2,00</div>
+            )}
+          </div>
+          {(() => {
+            const HP_RING_R = 28
+            const HP_RING_C = 2 * Math.PI * HP_RING_R
+            const progress = combinedScore !== null ? Math.max(0, Math.min(1, (combinedScore - 1.0) / 1.0)) : 0
+            const offset = HP_RING_C * (1 - progress)
+            return (
+              <svg width="72" height="72" viewBox="0 0 72 72" className="shrink-0">
+                <circle cx="36" cy="36" r={HP_RING_R} fill="none" stroke="var(--color-paper-dark)" strokeWidth="6" />
+                <circle
+                  cx="36" cy="36" r={HP_RING_R}
+                  fill="none"
+                  stroke="var(--color-green)"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={HP_RING_C}
+                  strokeDashoffset={offset}
+                  transform="rotate(-90 36 36)"
+                />
+              </svg>
+            )
+          })()}
+        </div>
+      </div>
+
+      {/* XP / Level card */}
+      <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
+        <div className="flex items-baseline gap-2 mb-1">
+          <span className="text-4xl font-[var(--font-serif)] text-[var(--color-green)]">{levelInfo.level}</span>
+          <span className="text-sm text-[var(--color-ink-faint)]">Nivå {levelInfo.level} – {levelInfo.label}</span>
+        </div>
+        <div className="text-xs text-[var(--color-ink-faint)] mb-3">
+          {isMaxLevel ? 'Maxnivå uppnådd!' : `${levelInfo.nextLevelXp - stats.xp} XP → nästa nivå`}
+        </div>
+        <div className="h-2 rounded-full bg-[var(--color-paper-dark)] overflow-hidden">
+          <div
+            className="h-full rounded-full bg-[var(--color-gold)]"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+        <div className="flex justify-between mt-1 text-[10px] text-[var(--color-ink-faint)]">
+          <span>{stats.xp} XP</span>
+          {!isMaxLevel && <span>{levelInfo.nextLevelXp} XP</span>}
+        </div>
+      </div>
+
       <div className="max-w-2xl mx-auto px-4 pb-4">
 
         {/* Readiness card */}

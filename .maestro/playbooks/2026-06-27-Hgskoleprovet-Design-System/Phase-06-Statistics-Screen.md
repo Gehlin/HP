@@ -35,9 +35,10 @@ This phase redesigns `src/pages/Progress.tsx` — the Statistik tab that shows o
   - Replace `TYPE_COLORS` map with the warm-palette accent hex map
   <!-- Done: inserted "Per delprovstyp" card after the weekly activity bar chart. Added `WARM_TYPE_HEX` module-level const (matching Phase 3/Results.tsx hex palette). Bar fill uses `style={{ backgroundColor: tc.color }}` inline for warm hex colors. Reuses existing `byType` computed from `filteredHistory` (already time-range filtered). TYPE_COLORS retained for existing dark-theme sparkline/class usages — full replacement deferred to task 6 (dark-theme class removal). TypeScript clean. -->
 
-- [ ] Build the HP score and XP/level section in `Progress.tsx`. Add below the type bars:
+- [x] Build the HP score and XP/level section in `Progress.tsx`. Add below the type bars:
   - HP Score card: `.card mx-4 p-4 mb-4 max-w-2xl mx-auto` — left side has "Uppskattat HP-poäng" label + large score number in `font-[var(--font-serif)]`, right side has a small gauge or donut ring (same SVG ring pattern as Phase 3 hero) showing score out of 2.0 scale
   - XP/Level card: `.card mx-4 p-4 mb-4` — level number in `text-4xl font-[var(--font-serif)] text-[var(--color-green)]`, label "Nivå X – [level name]" in `text-sm text-[var(--color-ink-faint)]`, XP progress bar `bg-[var(--color-paper-dark)]` with `bg-[var(--color-gold)]` fill, "X XP → nästa nivå" label
+  <!-- Done: inserted HP Score card (72×72 SVG donut ring, r=28, stroke=var(--color-green), progress=(score-1)/1 on 1.0–2.0 scale, IIFE to keep constants local) and XP/Level card (serif level number in green, gold XP progress bar, "X XP → nästa nivå" footer) after the per-section accuracy bars. Reuses `combinedScore`, `levelInfo`, `isMaxLevel`, `progressPercent`, `stats.xp` already computed. Build clean. -->
 
 - [ ] Remove or replace all dark-theme classes in `Progress.tsx`: `bg-[#080C14]`, `bg-slate-900`, `bg-white/[0.03]`, `glass`, `glass-md`, `text-slate-100`, `text-slate-300`, `text-slate-500`, `border-white/[0.06]` — replace with the warm palette tokens. Also update `ChartView` usage: if `src/components/ChartView.tsx` exists, read it and update its stroke/fill colors to use the green (`#224A3A`) and paper tones instead of blue/violet.
 
