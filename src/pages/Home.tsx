@@ -10,15 +10,15 @@ import { isDailyChallengeCompleted, CHALLENGE_SIZE } from '../utils/dailyChallen
 import { getFocusPreference, type FocusPreference } from '../utils/focusPreference'
 import type { ExamSession, QuestionType } from '../types'
 
-const TYPE_ACCENTS: Record<string, { color: string; border: string; borderFull: string; bg: string; glow: string }> = {
-  XYZ: { color: 'text-violet-400',  border: 'border-t-violet-500',  borderFull: 'border-violet-500/30',  bg: 'bg-violet-500/10',  glow: 'shadow-violet-900/40'  },
-  KVA: { color: 'text-blue-400',    border: 'border-t-blue-500',    borderFull: 'border-blue-500/30',    bg: 'bg-blue-500/10',    glow: 'shadow-blue-900/40'    },
-  NOG: { color: 'text-emerald-400', border: 'border-t-emerald-500', borderFull: 'border-emerald-500/30', bg: 'bg-emerald-500/10', glow: 'shadow-emerald-900/40' },
-  DTK: { color: 'text-amber-400',   border: 'border-t-amber-500',   borderFull: 'border-amber-500/30',   bg: 'bg-amber-500/10',   glow: 'shadow-amber-900/40'   },
-  ORD: { color: 'text-rose-400',    border: 'border-t-rose-500',    borderFull: 'border-rose-500/30',    bg: 'bg-rose-500/10',    glow: 'shadow-rose-900/40'    },
-  LAS: { color: 'text-pink-400',    border: 'border-t-pink-500',    borderFull: 'border-pink-500/30',    bg: 'bg-pink-500/10',    glow: 'shadow-pink-900/40'    },
-  MEK: { color: 'text-fuchsia-400', border: 'border-t-fuchsia-500', borderFull: 'border-fuchsia-500/30', bg: 'bg-fuchsia-500/10', glow: 'shadow-fuchsia-900/40' },
-  ELF: { color: 'text-purple-400',  border: 'border-t-purple-500',  borderFull: 'border-purple-500/30',  bg: 'bg-purple-500/10',  glow: 'shadow-purple-900/40'  },
+const TYPE_ACCENTS: Record<string, { color: string; ring: string; bg: string }> = {
+  XYZ: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+  KVA: { color: '#2563EB', ring: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
+  NOG: { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.08)' },
+  DTK: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.08)' },
+  ORD: { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.08)' },
+  LAS: { color: '#DB2777', ring: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
+  MEK: { color: '#9333EA', ring: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
+  ELF: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
 }
 
 const TYPE_INFO: Record<string, {
@@ -767,7 +767,7 @@ export default function Home() {
                   key={type}
                   className={`rounded-2xl border transition-all duration-200 ${
                     isOpen
-                      ? `${accent?.borderFull ?? 'border-white/10'} ${accent?.bg ?? ''}`
+                      ? `border-white/10 ${accent?.bg ?? ''}`
                       : 'glass border-white/[0.05] hover:border-white/[0.1]'
                   }`}
                 >
@@ -840,7 +840,7 @@ export default function Home() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => navigate(`/practice?type=${type}`)}
-                            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-opacity hover:opacity-75 ${accent?.bg ?? 'bg-white/[0.05]'} ${accent?.color ?? 'text-white'} border ${accent?.borderFull ?? 'border-white/10'}`}
+                            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-opacity hover:opacity-75 ${accent?.bg ?? 'bg-white/[0.05]'} ${accent?.color ?? 'text-white'} border border-white/10`}
                           >
                             Öva {type} →
                           </button>

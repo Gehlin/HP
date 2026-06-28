@@ -17,7 +17,7 @@ This phase redesigns `src/pages/Home.tsx` — the first thing users see. The cur
     All useEffect state hooks live lines 171–188; data-fetching useEffect lines 189–268. JSX starts at line 292. All hooks preserved; only JSX replaced in subsequent tasks. -->
 
 
-- [ ] Replace the `TYPE_ACCENTS` color map at the top of `Home.tsx` with a new map that uses the warm palette. The map should define per-type accent colors compatible with light backgrounds:
+- [x] Replace the `TYPE_ACCENTS` color map at the top of `Home.tsx` with a new map that uses the warm palette. The map should define per-type accent colors compatible with light backgrounds:
   ```
   XYZ: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' }
   KVA: { color: '#2563EB', ring: '#2563EB', bg: 'rgba(37,99,235,0.08)' }
