@@ -154,6 +154,9 @@ const TYPE_INFO: Record<string, {
 const RING_R = 28
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_R
 
+const HERO_R = 36
+const HERO_C = 2 * Math.PI * HERO_R
+
 export default function Home() {
   const navigate = useNavigate()
   const byType = {
@@ -184,6 +187,7 @@ export default function Home() {
     accent: string; borderAccent: string; bgAccent: string
   } | null>(null)
   const [weakTags, setWeakTags] = useState<{ tag: string; pct: number }[]>([])
+  const [totalCorrect, setTotalCorrect] = useState(0)
 
   useEffect(() => {
     setStats(loadStats())
@@ -208,6 +212,15 @@ export default function Home() {
     const dueIds = getDueQuestions(questions.map(q => q.id))
     setDueCount(dueIds.length)
     const history = loadHistory()
+
+    let tc = 0
+    history.forEach(s => {
+      s.questionIds.forEach(id => {
+        const q = questions.find(x => x.id === id)
+        if (q && s.answers[id] === q.answer) tc++
+      })
+    })
+    setTotalCorrect(tc)
     const attempted = new Set<string>()
     history.forEach(sess => Object.keys(sess.answers).forEach(id => attempted.add(id)))
     const unseen = questions.filter(q => !attempted.has(q.id)).length
@@ -269,6 +282,9 @@ export default function Home() {
   const days = examDate ? daysUntilExam() : null
   const urgency = days !== null ? urgencyLabel(days) : null
 
+  const heroScorePct = (readiness?.score ?? 0) / 2.0
+  const heroRingOffset = HERO_C * (1 - heroScorePct / 100)
+
   const goalReached = todayCount >= dynamicTarget
   const ringProgress = Math.min(1, todayCount / dynamicTarget)
   const ringOffset = RING_CIRCUMFERENCE * (1 - ringProgress)
@@ -305,6 +321,45 @@ export default function Home() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4">
+
+        {/* ── Hero score card ───────────────────────────────── */}
+        <div className="card-green p-6 mb-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-white/70 font-[var(--font-sans)] mb-1">Uppskattat HP-poäng</p>
+              <div className="text-5xl font-[var(--font-serif)] text-white leading-none mb-4">
+                {readiness?.score ?? 0}
+              </div>
+              <div className="flex gap-5">
+                <div>
+                  <div className="text-base text-white font-semibold">{totalCorrect}</div>
+                  <div className="text-xs text-white/60">Rätt totalt</div>
+                </div>
+                <div>
+                  <div className="text-base text-white font-semibold">{stats?.streak ?? '–'}</div>
+                  <div className="text-xs text-white/60">Streak</div>
+                </div>
+                <div>
+                  <div className="text-base text-white font-semibold">{days ?? '–'}</div>
+                  <div className="text-xs text-white/60">Dagar kvar till HP</div>
+                </div>
+              </div>
+            </div>
+            <svg width="80" height="80" viewBox="0 0 80 80" className="shrink-0">
+              <circle cx="40" cy="40" r={HERO_R} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="6" />
+              <circle
+                cx="40" cy="40" r={HERO_R}
+                fill="none"
+                stroke="white"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={HERO_C}
+                strokeDashoffset={heroRingOffset}
+                transform="rotate(-90 40 40)"
+              />
+            </svg>
+          </div>
+        </div>
 
         {/* ── Resume banner ─────────────────────────────────── */}
         {resumeSession && (() => {

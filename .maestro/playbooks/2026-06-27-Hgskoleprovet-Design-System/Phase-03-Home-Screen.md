@@ -36,12 +36,13 @@ This phase redesigns `src/pages/Home.tsx` — the first thing users see. The cur
   - Keep all existing `useEffect` and state hooks unchanged; only the returned JSX changes
   <!-- Done. Root div changed to `min-h-screen bg-app pb-28`; old dark hero/title section removed. New header added with time-based Swedish greeting (God morgon/dag/kväll), streak-pill, and Swedish date. Inner content wrapped in `max-w-2xl mx-auto px-4`. Unused `const total` removed. TypeScript clean. -->
 
-- [ ] Build the hero score card. Inside the page's `max-w-2xl mx-auto px-4` container, after the header, add a `card-green` div (uses the `.card-green` class from Phase 1):
+- [x] Build the hero score card. Inside the page's `max-w-2xl mx-auto px-4` container, after the header, add a `card-green` div (uses the `.card-green` class from Phase 1):
   - Padding: `p-6`
   - Top row: small label "Uppskattat HP-poäng" in `text-sm text-white/70 font-[var(--font-sans)]`
   - Large score number: pull from `computeReadiness` or `hpScore` utility — display as `text-5xl font-[var(--font-serif)] text-white`
   - Below score: a row of 3 mini-stats (Rätt total, Streak, Dagar kvar till HP) in `text-xs text-white/60` with values in `text-base text-white font-semibold`
   - Right side: an SVG score ring — an 80px circle with `stroke-dasharray` and `stroke-dashoffset` computed from the percentage (use `readiness.score / 2.0` as a 0–100 percentage). Ring track: `rgba(255,255,255,0.15)`, ring fill: `white`, `stroke-linecap: round`
+  <!-- Done. Added HERO_R=36/HERO_C constants, `totalCorrect` state (computed from full history), and `heroScorePct`/`heroRingOffset` vars. Hero card renders as forest-green `.card-green p-6` div: label + big score on left, 3 mini-stats (Rätt totalt, Streak, Dagar kvar till HP) below, and 80px SVG ring on right. TypeScript clean. -->
 
 - [ ] Build the "Fortsätt" continue card. After the hero card, conditionally render (only if `loadSession()` returns a session in progress) a white `.card` div with:
   - Label: "Fortsätt där du slutade" in `text-xs uppercase tracking-widest text-[var(--color-ink-faint)] font-semibold`
