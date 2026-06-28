@@ -287,7 +287,29 @@ export default function Results() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-6 pb-24">
+      <div className="bg-[var(--color-paper)] px-4 pt-6 pb-28">
+        <div className="max-w-2xl mx-auto">
+
+        {/* ── Streak achievement card ──────────────── */}
+        {xpInfo?.streakIncreased && (
+          <div className="card p-4 mb-4" style={{ borderLeft: '4px solid var(--color-terracotta)' }}>
+            <div className="flex items-center gap-3">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-[var(--color-terracotta)] shrink-0">
+                <path d="M12 23c-4.97 0-9-3.58-9-8 0-2.39 1.05-4.55 2.86-6.12C7.1 7.77 8 6.15 8 4.25c0-.41.34-.75.75-.75.19 0 .37.07.5.2C10.68 5.16 11.5 6.77 11.5 8.5c0 .69-.14 1.35-.39 1.94C11.85 10.17 12.5 9.33 12.5 8c0-.32.2-.61.5-.72.29-.11.62-.03.84.2C15.23 9.18 16.5 11.09 16.5 13c0 .78-.16 1.52-.43 2.2.75-.62 1.2-1.48 1.3-2.4.04-.36.27-.67.61-.79.33-.12.7-.03.93.23C20.22 13.96 21 15.9 21 17.5c0 3.03-4.03 5.5-9 5.5z"/>
+              </svg>
+              <div>
+                <div className="font-semibold text-[var(--color-ink)]">Streak! {xpInfo.stats.streak} dagar i rad</div>
+                <div className="text-sm text-[var(--color-ink-faint)]">Fortsätt så — du bygger upp en fin vana!</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Action buttons ───────────────────────── */}
+        <div className="flex gap-3 mb-6">
+          <button onClick={() => navigate('/practice')} className="btn-primary flex-1">Öva igen</button>
+          <button onClick={() => navigate('/')} className="btn-ghost flex-1">Hem</button>
+        </div>
 
         {/* XP earned card */}
         {xpInfo && (
@@ -295,11 +317,6 @@ export default function Results() {
             {xpInfo.leveledUp && (
               <div className="bg-amber-500/20 border border-amber-500 rounded-xl px-4 py-3 mb-3 text-center">
                 <span className="text-amber-400 font-bold">⭐ Ny nivå uppnådd! Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
-              </div>
-            )}
-            {xpInfo.streakIncreased && (
-              <div className="bg-orange-500/20 border border-orange-500 rounded-xl px-4 py-3 mb-3 text-center">
-                <span className="text-orange-400 font-bold">🔥 {xpInfo.stats.streak} dagars streak!</span>
               </div>
             )}
             <div className="glass border border-blue-500/20 rounded-2xl p-5">
@@ -949,19 +966,6 @@ export default function Results() {
           )
         })()}
 
-        <div className="flex gap-3">
-          <button
-            onClick={() => navigate('/practice')}
-            className="flex-1 bg-blue-600 hover:bg-blue-500 rounded-xl py-3 font-bold transition-colors"
-          >
-            Ny träning
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="flex-1 border border-white/[0.08] hover:glass rounded-xl py-3 font-bold transition-colors"
-          >
-            Hem
-          </button>
         </div>
       </div>
     </div>
