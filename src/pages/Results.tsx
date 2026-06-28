@@ -787,33 +787,33 @@ export default function Results() {
         })()}
 
         {/* Review */}
-        <h2 className="text-xl font-black mb-4">Genomgång</h2>
+        <div className="text-sm font-semibold text-[var(--color-ink-muted)] uppercase tracking-widest mb-3">Genomgång</div>
         <div className="flex gap-2 mb-4 flex-wrap">
           <button
             onClick={() => setReviewFilter('all')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-white/[0.08] text-slate-400 hover:border-white/[0.15]'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-[var(--color-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
           >
             Alla ({sessionQuestions.length})
           </button>
           <button
             onClick={() => setReviewFilter('wrong')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'wrong' ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-white/[0.08] text-slate-400 hover:border-white/[0.15]'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'wrong' ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-[var(--color-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
           >
-            ✗ Fel ({sessionQuestions.filter(q => !skipped.includes(q.id) && session.answers[q.id] !== q.answer).length})
+            Fel ({sessionQuestions.filter(q => !skipped.includes(q.id) && session.answers[q.id] !== q.answer).length})
           </button>
           <button
             onClick={() => setReviewFilter('flagged')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'flagged' ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-white/[0.08] text-slate-400 hover:border-white/[0.15]'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'flagged' ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-[var(--color-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
           >
             ★ Markerade ({(session.flagged ?? []).length})
           </button>
         </div>
-        <div className="space-y-3 mb-8">
+        <div className="mb-8">
           {sessionQuestions.filter(q => {
             if (reviewFilter === 'wrong') return !skipped.includes(q.id) && session.answers[q.id] !== q.answer
             if (reviewFilter === 'flagged') return (session.flagged ?? []).includes(q.id)
             return true
-          }).map(q => {
+          }).map((q, index) => {
             const isSkipped = skipped.includes(q.id)
             const userAnswer = session.answers[q.id]
             const ok = !isSkipped && userAnswer === q.answer
@@ -822,10 +822,6 @@ export default function Results() {
             const answerOptions = Object.entries(q.options).filter(([k]) =>
               ANSWER_KEYS.includes(k as AnswerKey)
             ) as [AnswerKey, string][]
-
-            const borderCls = ok ? 'border-emerald-700' : isSkipped ? 'border-white/[0.08]' : 'border-red-700'
-            const bgCls = ok ? 'bg-emerald-900/20' : isSkipped ? 'bg-white/[0.03]' : 'bg-red-900/20'
-            const indicator = ok ? '✓' : isSkipped ? '→' : '✗'
 
             const questionTimeMs = session.questionTimes?.[q.id]
             const fmtQuestionTime = questionTimeMs
@@ -838,62 +834,80 @@ export default function Results() {
             const srsPill = (() => {
               if (!srs) return null
               if (srs.timesWrong > srs.timesCorrect)
-                return { label: 'Repeteras', cls: 'bg-red-900/40 text-red-400 border-red-700' }
+                return { label: 'Repeteras', cls: 'bg-red-500/10 text-red-500 border-red-500/40' }
               if (srs.timesCorrect >= 3 && ok)
-                return { label: 'Kan detta', cls: 'bg-emerald-900/40 text-emerald-400 border-emerald-700' }
-              return { label: 'Övar', cls: 'bg-amber-900/40 text-amber-400 border-amber-700' }
+                return { label: 'Kan detta', cls: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/40' }
+              return { label: 'Övar', cls: 'bg-amber-500/10 text-amber-600 border-amber-500/40' }
             })()
 
+            const accent = WARM_TYPE_COLORS[q.type]
+
             return (
-              <div
-                key={q.id}
-                className={`rounded-xl border overflow-hidden ${borderCls}`}
-              >
+              <div key={q.id} className="card p-3 mb-2">
                 <button
                   onClick={() => setExpandedId(expanded ? null : q.id)}
-                  className={`w-full flex items-start gap-3 p-4 text-left ${bgCls}`}
+                  className="w-full flex items-center gap-3 text-left"
                 >
-                  <span className={`text-lg ${isSkipped ? 'text-slate-400' : ''}`}>{indicator}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs text-slate-400 mb-1 flex items-center gap-2 flex-wrap">
-                      {q.type} · {q.source}
-                      {isFlagged && <span className="text-amber-400">★</span>}
-                      {srsPill && (
-                        <span className={`border rounded px-1.5 py-0.5 text-xs font-medium ${srsPill.cls}`}>
-                          {srsPill.label}
-                        </span>
-                      )}
-                      {fmtQuestionTime && (
-                        <span className="border border-white/[0.08] rounded px-1.5 py-0.5 text-[10px] text-slate-500">
-                          ⏱ {fmtQuestionTime}
-                        </span>
-                      )}
-                      <button
-                        onClick={e => {
-                          e.stopPropagation()
-                          const next = toggleBookmark(q.id)
-                          setBookmarkState(s => ({ ...s, [q.id]: next }))
-                        }}
-                        className={`border rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${bookmarkState[q.id] ? 'border-blue-600 text-blue-400 bg-blue-900/20' : 'border-white/[0.1] text-slate-500 hover:border-white/[0.2]'}`}
-                      >
-                        🔖 {bookmarkState[q.id] ? 'Sparat' : 'Spara'}
-                      </button>
-                    </div>
-                    <div className="text-sm line-clamp-2">
-                      <MathText text={q.text} />
-                    </div>
+                  <div className="shrink-0 flex flex-col items-center gap-1 w-10">
+                    <span className="text-[10px] text-[var(--color-ink-faint)]">#{index + 1}</span>
+                    <span
+                      className="text-xs font-bold px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: accent.bg, color: accent.color }}
+                    >
+                      {q.type}
+                    </span>
                   </div>
-                  <span className="text-slate-500 text-sm shrink-0">{expanded ? '▲' : '▼'}</span>
+                  <div className="flex-1 min-w-0 text-sm text-[var(--color-ink)] line-clamp-2">
+                    <MathText text={q.text} />
+                  </div>
+                  {ok ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500 shrink-0">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  ) : isSkipped ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-faint)] shrink-0">
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-500 shrink-0">
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  )}
                 </button>
 
+                <div className="flex items-center gap-2 mt-1.5 flex-wrap pl-[52px]">
+                  <span className="text-[10px] text-[var(--color-ink-faint)]">{q.source}</span>
+                  {isFlagged && <span className="text-amber-500 text-xs">★</span>}
+                  {srsPill && (
+                    <span className={`border rounded px-1.5 py-0.5 text-[10px] font-medium ${srsPill.cls}`}>
+                      {srsPill.label}
+                    </span>
+                  )}
+                  {fmtQuestionTime && (
+                    <span className="border border-[var(--color-border)] rounded px-1.5 py-0.5 text-[10px] text-[var(--color-ink-faint)]">
+                      ⏱ {fmtQuestionTime}
+                    </span>
+                  )}
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      const next = toggleBookmark(q.id)
+                      setBookmarkState(s => ({ ...s, [q.id]: next }))
+                    }}
+                    className={`border rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${bookmarkState[q.id] ? 'border-blue-600 text-blue-400 bg-blue-500/10' : 'border-[var(--color-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
+                  >
+                    🔖 {bookmarkState[q.id] ? 'Sparat' : 'Spara'}
+                  </button>
+                </div>
+
                 {expanded && (
-                  <div className="px-4 pb-4 bg-white/[0.02]">
-                    <div className="grid gap-2 mt-3">
+                  <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 mt-2">
+                    <div className="grid gap-2">
                       {answerOptions.map(([key, text]) => {
-                        let cls = 'border-white/[0.1] text-slate-400'
-                        let labelCls = 'bg-white/[0.08] text-slate-400'
-                        if (key === q.answer) { cls = 'border-emerald-500/60 text-slate-200 bg-emerald-900/20'; labelCls = 'bg-emerald-600 text-white' }
-                        if (key === userAnswer && key !== q.answer) { cls = 'border-red-500/60 text-slate-200 bg-red-900/20'; labelCls = 'bg-red-600 text-white' }
+                        let cls = 'border-[var(--color-border)] text-[var(--color-ink-faint)]'
+                        let labelCls = 'bg-[var(--color-paper-dark)] text-[var(--color-ink-muted)]'
+                        if (key === q.answer) { cls = 'border-emerald-500/60 text-[var(--color-ink)] bg-emerald-500/10'; labelCls = 'bg-emerald-600 text-white' }
+                        if (key === userAnswer && key !== q.answer) { cls = 'border-red-500/60 text-[var(--color-ink)] bg-red-500/10'; labelCls = 'bg-red-600 text-white' }
                         return (
                           <div key={key} className={`border rounded-xl px-3 py-2.5 text-sm flex gap-3 items-start ${cls}`}>
                             <span className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-black ${labelCls}`}>{key}</span>

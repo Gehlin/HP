@@ -32,11 +32,12 @@ This phase redesigns `src/pages/Results.tsx` — the screen shown after completi
   - Remove any dark background classes (`bg-slate-900/50`, `bg-white/[0.03]`, etc.)
   <!-- Added WARM_TYPE_COLORS map (warm hex per Phase 3 accent map: XYZ=#7C3AED, KVA=#2563EB, NOG=#224A3A, DTK=#D97706, ORD=#DC2626, LAS=#DB2777, MEK=#9333EA, ELF=#7C3AED) alongside existing TYPE_COLORS. Replaced 2-col glass grid with a flat list: section heading + .card rows each showing a colored pill badge, paper-dark track bar with ring-color fill, and right-aligned % label. TypeScript clean. -->
 
-- [ ] Rewrite the per-question breakdown list in `Results.tsx`. Each question row should be a warm card:
+- [x] Rewrite the per-question breakdown list in `Results.tsx`. Each question row should be a warm card:
   - `.card p-3 mb-2` wrapper
   - Left: question number + type badge
   - Middle: truncated question text in `text-sm text-[var(--color-ink)]`
   - Right: green checkmark SVG if correct, red X SVG if wrong
   - Expandable detail (if already implemented): keep the toggle logic, update the expanded explanation area to use `bg-[var(--color-paper-dark)] rounded-xl p-3 mt-2` instead of dark glass
+  <!-- Each card uses .card p-3 mb-2. Left col: "#N" number + colored type pill (WARM_TYPE_COLORS). Middle: line-clamp-2 question text in --color-ink. Right: emerald checkmark SVG / red ✕ SVG / muted arrow for skipped. Secondary meta row (source, flagged star, SRS pill, time pill, bookmark) shown below with pl-[52px] indent. Expanded area uses bg-[var(--color-paper-dark)] rounded-xl p-3 mt-2 with warm answer option borders. Filter buttons updated to use --color-border / --color-ink-faint inactive states. Heading changed to uppercase tracking-widest warm style. TypeScript clean. -->
 
 - [ ] Run `npm run dev`, complete a short drill session (pick any type, 5 questions), and verify the Results screen: green hero with score ring, three-stat strip, warm scrollable section with streak card, action buttons, type bars, and question list. No dark backgrounds should remain.
