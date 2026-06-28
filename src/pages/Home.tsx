@@ -156,7 +156,6 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * RING_R
 
 export default function Home() {
   const navigate = useNavigate()
-  const total = questions.length
   const byType = {
     XYZ: questions.filter(q => q.type === 'XYZ').length,
     KVA: questions.filter(q => q.type === 'KVA').length,
@@ -289,21 +288,23 @@ export default function Home() {
     setDynamicTarget(days !== null && days > 0 ? dailyTarget(days, dueIds.length, unseen) : 15)
   }
 
-  return (
-    <div className="min-h-screen bg-hero text-white">
-      <div className="max-w-2xl mx-auto px-4 pt-10 pb-28">
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'God morgon' : hour < 17 ? 'God dag' : 'God kväll'
 
-        {/* ── Hero ──────────────────────────────────────────── */}
-        <div className="text-center mb-10 animate-fade-up">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] font-bold tracking-[0.12em] uppercase px-3.5 py-1.5 rounded-full mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            Högskoleprov · Kvantitativ &amp; Verbal
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-black mb-3 tracking-tight leading-none">
-            HP&nbsp;<span className="text-slate-400 font-light">Träning</span>
-          </h1>
-          <p className="text-slate-500 text-sm mt-2">{total} frågor · XYZ · KVA · NOG · DTK · ORD · LÄS · MEK · ELF</p>
+  return (
+    <div className="min-h-screen bg-app pb-28">
+      {/* ── Header ────────────────────────────────────────── */}
+      <div className="px-4 pt-12 pb-4 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)]">{greeting}</h1>
+          {stats && <span className="streak-pill">🔥 {stats.streak}</span>}
         </div>
+        <p className="text-sm text-[var(--color-ink-faint)]">
+          {new Date().toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' })}
+        </p>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4">
 
         {/* ── Resume banner ─────────────────────────────────── */}
         {resumeSession && (() => {

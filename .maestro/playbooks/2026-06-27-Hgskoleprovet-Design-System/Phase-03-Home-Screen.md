@@ -30,10 +30,11 @@ This phase redesigns `src/pages/Home.tsx` — the first thing users see. The cur
   ```
   Each entry: `{ color: string, ring: string, bg: string }`
 
-- [ ] Rewrite the outer page wrapper and header section of `Home.tsx`. The page root div should use `className="min-h-screen bg-app pb-28"`. The header block (top of the scroll area) should be `px-4 pt-12 pb-4 max-w-2xl mx-auto`:
+- [x] Rewrite the outer page wrapper and header section of `Home.tsx`. The page root div should use `className="min-h-screen bg-app pb-28"`. The header block (top of the scroll area) should be `px-4 pt-12 pb-4 max-w-2xl mx-auto`:
   - First line: flex row with greeting on left (`text-2xl font-[var(--font-serif)] text-[var(--color-ink)]` — e.g. "God morgon, Sebastian") and the streak pill on the right (`className="streak-pill"` with a flame emoji and streak count)
   - Second line: today's date in Swedish format (`new Date().toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' })`) in `text-sm text-[var(--color-ink-faint)]`
   - Keep all existing `useEffect` and state hooks unchanged; only the returned JSX changes
+  <!-- Done. Root div changed to `min-h-screen bg-app pb-28`; old dark hero/title section removed. New header added with time-based Swedish greeting (God morgon/dag/kväll), streak-pill, and Swedish date. Inner content wrapped in `max-w-2xl mx-auto px-4`. Unused `const total` removed. TypeScript clean. -->
 
 - [ ] Build the hero score card. Inside the page's `max-w-2xl mx-auto px-4` container, after the header, add a `card-green` div (uses the `.card-green` class from Phase 1):
   - Padding: `p-6`
