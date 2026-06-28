@@ -104,7 +104,7 @@ const QuestionTimer = memo(function QuestionTimer({ currentIdx }: { currentIdx: 
     return () => clearInterval(t)
   }, [currentIdx])
   return (
-    <span className={`font-mono text-xs tabular-nums shrink-0 ${elapsed >= 120 ? 'text-red-400 timer-warning' : elapsed >= 75 ? 'text-amber-400' : 'text-slate-700'}`}>
+    <span className={`font-mono text-sm tabular-nums shrink-0 ${elapsed >= 120 ? 'text-[var(--color-error)] timer-warning' : 'text-[var(--color-ink-muted)]'}`}>
       {fmtTime(elapsed)}
     </span>
   )
@@ -431,143 +431,49 @@ export default function Session() {
     : null
 
   return (
-    <div className="h-screen sm:h-auto sm:min-h-screen bg-app text-white flex flex-col">
+    <div className="min-h-screen bg-[var(--color-paper)] flex flex-col">
 
       {/* ── Header ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-10 bg-[#080C14]/95 backdrop-blur-xl border-b border-white/[0.05] px-4 py-1 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3 min-w-0">
-          {/* Type badge */}
-          <span className={`text-xs font-black shrink-0 ${typeColor}`}>
-            {isExam && sectionMeta
-              ? `${sectionMeta.number}/4 · ${q.type}`
-              : q.type}
-          </span>
-
-          <button
-            onClick={() => setShowJump(s => !s)}
-            className="text-slate-500 text-xs hover:text-slate-300 transition-colors shrink-0 tabular-nums min-h-[44px] px-1"
-          >
-            {current + 1} / {sessionQuestions.length}
-          </button>
-
-          <QuestionTimer currentIdx={current} />
-
-          {sectionBudgetSecsLeft !== null && (
-            <span className={`text-[10px] font-bold tabular-nums shrink-0 px-1.5 py-0.5 rounded ${
-              sectionBudgetSecsLeft < 0
-                ? 'text-red-400 bg-red-500/10'
-                : sectionBudgetSecsLeft < 120
-                ? 'text-amber-400 bg-amber-500/10'
-                : 'text-slate-500 bg-white/[0.04]'
-            }`}>
-              {sectionBudgetSecsLeft < 0
-                ? `+${fmtTime(-sectionBudgetSecsLeft)}`
-                : fmtTime(sectionBudgetSecsLeft)}
-            </span>
-          )}
-
-          {/* Icon buttons */}
-          <button
-            onClick={handleFlag}
-            aria-label={flagged.includes(q.id) ? 'Ta bort markering' : 'Markera fråga'}
-            title={flagged.includes(q.id) ? 'Ta bort markering' : 'Markera fråga'}
-            className={`min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg transition-colors shrink-0 ${flagged.includes(q.id) ? 'text-amber-400' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill={flagged.includes(q.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
-            </svg>
-          </button>
-
-          <button
-            onClick={() => { const next = toggleBookmark(q.id); setBookmarked(b => ({ ...b, [q.id]: next })) }}
-            aria-label={bookmarked[q.id] ? 'Ta bort bokmärke' : 'Bokmärk fråga'}
-            title={bookmarked[q.id] ? 'Ta bort bokmärke' : 'Bokmärk'}
-            className={`min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg transition-colors shrink-0 ${bookmarked[q.id] ? 'text-blue-400' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill={bookmarked[q.id] ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-            </svg>
-          </button>
-
-          <button
-            onClick={() => setShowFormulas(true)}
-            aria-label="Visa formler"
-            title="Formler"
-            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-300 transition-colors shrink-0"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
-            </svg>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0">
-          {timeLeft !== null && (
-            <span className={`font-mono font-bold text-sm tabular-nums ${timeLeft < 120 ? 'text-red-400 timer-warning' : 'text-slate-400'}`}>
-              {fmtTime(timeLeft)}
-            </span>
-          )}
-          <button
-            onClick={() => setShowKeyGuide(v => !v)}
-            aria-label="Tangentbordsgenvägar"
-            title="Tangentbordsgenvägar (?)"
-            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-300 transition-colors"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-          </button>
+      <header className="fixed top-0 inset-x-0 z-40 bg-[var(--color-paper)] border-b border-[var(--color-card-border)]">
+        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+          {/* Left: close button */}
           <button
             onClick={requestFinish}
-            className="text-xs text-slate-500 hover:text-slate-300 transition-colors min-h-[44px] px-1"
+            aria-label="Avsluta"
+            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors"
           >
-            Avsluta
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
           </button>
+
+          {/* Center: question counter */}
+          <span className="text-sm font-semibold text-[var(--color-ink)]">
+            {current + 1} / {sessionQuestions.length}
+          </span>
+
+          {/* Right: exam timer or per-question elapsed timer */}
+          {timeLeft !== null ? (
+            <span className={`font-mono text-sm text-[var(--color-ink-muted)] tabular-nums${timeLeft < 30 ? ' timer-warning' : ''}`}>
+              {fmtTime(timeLeft)}
+            </span>
+          ) : (
+            <QuestionTimer currentIdx={current} />
+          )}
+        </div>
+
+        {/* Linear progress bar */}
+        <div className="h-1 bg-[var(--color-paper-dark)]">
+          <div
+            className="h-full bg-[var(--color-green)] transition-all duration-300"
+            style={{ width: `${(current / sessionQuestions.length) * 100}%` }}
+          />
         </div>
       </header>
 
-      {/* ── Segmented progress bar ────────────────────────────── */}
-      <div className="flex h-0.5 shrink-0 overflow-hidden">
-        {(['XYZ', 'KVA', 'NOG', 'DTK'] as const)
-          .map(type => {
-            const typeQs = sessionQuestions.filter(qq => qq.type === type)
-            if (typeQs.length === 0) return null
-            const answered = typeQs.filter(qq => !!answers[qq.id]).length
-            const widthPct = (typeQs.length / sessionQuestions.length) * 100
-            const fillPct = (answered / typeQs.length) * 100
-            return (
-              <div key={type} className="relative bg-white/[0.04]" style={{ width: `${widthPct}%` }}>
-                <div
-                  className={`absolute inset-y-0 left-0 ${TYPE_PROGRESS[type]} transition-all duration-500`}
-                  style={{ width: `${fillPct}%` }}
-                />
-              </div>
-            )
-          })}
-      </div>
-
-      {/* Per-type remaining strip */}
-      {!isExam && (() => {
-        const remaining = sessionQuestions.slice(current)
-        const counts: Partial<Record<string, number>> = {}
-        remaining.forEach(qq => { counts[qq.type] = (counts[qq.type] ?? 0) + 1 })
-        const types = Object.keys(counts)
-        if (types.length <= 1) return null
-        return (
-          <div className="flex justify-center gap-4 bg-[#080C14]/80 py-1 shrink-0">
-            {types.map(t => (
-              <span key={t} className={`text-[10px] font-bold ${TYPE_TEXT[t] ?? 'text-slate-500'}`}>
-                {t}&thinsp;{counts[t]}
-              </span>
-            ))}
-            <span className="text-[10px] text-slate-500">kvar</span>
-          </div>
-        )
-      })()}
-
       {/* ── Scrollable question area ───────────────────────────── */}
       <main
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto pt-[72px]"
         onTouchStart={e => { touchStartXRef.current = e.touches[0].clientX }}
         onTouchEnd={e => {
           if (touchStartXRef.current === null) return
