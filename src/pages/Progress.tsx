@@ -232,6 +232,25 @@ export default function Progress() {
           ))}
         </div>
       </div>
+
+      {/* Summary stat cards */}
+      <div className="grid grid-cols-3 gap-2 px-4 max-w-2xl mx-auto mb-4">
+        <div className="card p-3 text-center">
+          <div className="text-xl font-semibold text-[var(--color-ink)]">{filteredHistory.length}</div>
+          <div className="text-xs text-[var(--color-ink-faint)]">Sessioner</div>
+        </div>
+        <div className="card p-3 text-center">
+          <div className="text-xl font-semibold text-[var(--color-ink)]">
+            {totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0}%
+          </div>
+          <div className="text-xs text-[var(--color-ink-faint)]">Rätt</div>
+        </div>
+        <div className="card p-3 text-center">
+          <div className="text-xl font-semibold text-[var(--color-ink)]">🔥{stats.streak}</div>
+          <div className="text-xs text-[var(--color-ink-faint)]">Streak</div>
+        </div>
+      </div>
+
       <div className="max-w-2xl mx-auto px-4 pb-4">
 
         {/* Readiness card */}

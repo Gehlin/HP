@@ -7,15 +7,16 @@ This phase redesigns `src/pages/Progress.tsx` — the Statistik tab that shows o
 - [x] Read `src/pages/Progress.tsx` fully (it's ~46KB — read in two passes: first 200 lines, then the rest). Identify: the data loaded (`loadStats`, `loadHistory`, `computeReadiness`, `getHPScore`), existing chart components used (search for `ChartView` import), the `TYPE_COLORS` map, and any achievement-rendering logic.
   <!-- Findings: Data loaded: loadHistory, loadStats, computeReadiness, estimateHpScore (estimateSectionedScore), getExamDate, daysUntilExam, timeAnalyticsByType, accuracyByDifficulty, rollingHpScore, hpScoreHistory, typeAccuracyTrend, ALL_ACHIEVEMENTS/getEarnedIds/RARITY_STYLES, getSrsStats. ChartView is NOT imported here — Progress.tsx uses its own inline Sparkline SVG component (lines 16-32); ChartView appears in Session.tsx. TYPE_COLORS map on lines 34-43: 8 types → { text, bar } using dark-theme Tailwind classes (violet, blue, emerald, amber, rose, pink, fuchsia, purple). Achievement rendering at lines 831-853 using earnedIds set and RARITY_STYLES. CSS tokens confirmed: --color-green #224A3A, --color-paper #F1ECE3, --color-paper-dark #E6DFD4, --color-paper-darker #D8CFC3, --color-gold #E4C66A, --color-ink #1A1A18, --color-ink-faint #9A9A92, --font-serif Newsreader. -->
 
-- [ ] Rewrite the page header and segmented control in `Progress.tsx`. Page root: `min-h-screen bg-app pb-28`. Header section: `px-4 pt-12 pb-4 max-w-2xl mx-auto`:
+- [x] Rewrite the page header and segmented control in `Progress.tsx`. Page root: `min-h-screen bg-app pb-28`. Header section: `px-4 pt-12 pb-4 max-w-2xl mx-auto`:
   - Title: "Statistik" in `text-2xl font-[var(--font-serif)] text-[var(--color-ink)]`
   - Segmented control below title: a `flex rounded-xl p-1 bg-[var(--color-paper-dark)] w-fit` container with three buttons ("Vecka", "Månad", "Allt"). Active segment: `bg-white rounded-lg px-4 py-1.5 text-sm font-semibold text-[var(--color-ink)] shadow-sm`. Inactive: `px-4 py-1.5 text-sm text-[var(--color-ink-faint)]`. Use a `timeRange` state: `'week' | 'month' | 'all'`.
   - Filter the history data displayed based on `timeRange` (week = last 7 days, month = last 30 days, all = all time)
 
-- [ ] Build the summary stat cards row in `Progress.tsx`. Below the segmented control, render a `grid grid-cols-3 gap-2 px-4 max-w-2xl mx-auto mb-4`:
+- [x] Build the summary stat cards row in `Progress.tsx`. Below the segmented control, render a `grid grid-cols-3 gap-2 px-4 max-w-2xl mx-auto mb-4`:
   - Card 1: "Sessioner" → count of sessions in range — `.card p-3 text-center`: value in `text-xl font-semibold text-[var(--color-ink)]`, label in `text-xs text-[var(--color-ink-faint)]`
   - Card 2: "Rätt" → overall accuracy in range — same card format, value with `%`
   - Card 3: "Streak" → current streak from `loadStats()` — same format with flame emoji before value
+  <!-- Done: inserted 3-column stat card row after the segmented control header, before existing content. Reuses already-computed filteredHistory.length, totalCorrect/totalAnswered, and stats.streak. -->
 
 - [ ] Build the weekly activity bar chart in `Progress.tsx`. Add a `.card mx-4 p-4 mb-4 max-w-2xl mx-auto` card:
   - Title: "Aktivitet" in `text-sm font-semibold text-[var(--color-ink)] mb-3`
