@@ -120,7 +120,6 @@ export default function Results() {
   const skipped = session.skipped ?? []
   const correct = sessionQuestions.filter(q => session.answers[q.id] === q.answer).length
   const total = sessionQuestions.length
-  const skippedCount = sessionQuestions.filter(q => skipped.includes(q.id)).length
   const pct = Math.round((correct / total) * 100)
 
   const byType: Record<QuestionType, { correct: number; total: number }> = {
@@ -143,9 +142,7 @@ export default function Results() {
   const duration = session.endTime ? Math.round((session.endTime - session.startTime) / 1000) : 0
   const fmtDuration = `${Math.floor(duration / 60)}m ${duration % 60}s`
 
-  const scoreLabel = pct >= 85 ? 'Utmärkt!' : pct >= 65 ? 'Bra jobbat' : pct >= 45 ? 'Fortsätt öva' : 'Mer träning krävs'
   const scoreColor = pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'
-  const scoreBarColor = pct >= 70 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'
 
   const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
     XYZ: { text: 'text-violet-400',  bar: 'bg-violet-500'  },
@@ -205,31 +202,67 @@ export default function Results() {
     : 0
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-[var(--color-paper)]">
       {newAchievements.length > 0 && (
         <AchievementToast newIds={newAchievements} onDone={() => setNewAchievements([])} />
       )}
-      <div className="max-w-2xl mx-auto px-6 py-10 pb-24">
-        <div className="flex items-start justify-between gap-4 mb-2">
-          <h1 className="text-3xl font-black">Resultat</h1>
-          <button
-            onClick={handleShare}
-            className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors glass border border-white/[0.08] rounded-xl px-3 py-2"
+
+      {/* ── Hero ─────────────────────────────────── */}
+      <div className="bg-[var(--color-green)] px-4 pt-16 pb-10 flex flex-col items-center relative">
+        <button
+          onClick={handleShare}
+          className="absolute top-4 right-4 flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white/90 transition-colors"
+        >
+          {shareFeedback === 'copied' ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Kopierat!
+            </>
+          ) : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              Dela
+            </>
+          )}
+        </button>
+
+        {isNewBest && (
+          <div className="inline-flex items-center gap-1.5 bg-white/10 text-white/80 text-[11px] font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-3">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
+            Nytt personbästa!
+          </div>
+        )}
+
+        <p className="text-xs uppercase tracking-[0.15em] text-white/60 font-[var(--font-sans)] mb-4">Resultat</p>
+
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" stroke="rgba(255,255,255,0.15)" strokeWidth="8" fill="none" />
+          <circle
+            cx="60" cy="60" r="52"
+            stroke="white" strokeWidth="8" fill="none"
+            strokeLinecap="round"
+            strokeDasharray="326.73"
+            strokeDashoffset={326.73 * (1 - pct / 100)}
+            transform="rotate(-90 60 60)"
+          />
+          <text
+            x="60" y="60"
+            textAnchor="middle"
+            dominantBaseline="central"
+            fill="white"
+            fontSize="22"
+            fontFamily="var(--font-serif)"
+            fontWeight="bold"
           >
-            {shareFeedback === 'copied' ? (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Kopierat!
-              </>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                Dela
-              </>
-            )}
-          </button>
-        </div>
-        <p className="text-slate-400 mb-8">{scoreLabel}</p>
+            {pct}%
+          </text>
+        </svg>
+
+        <div className="text-4xl font-[var(--font-serif)] text-white mt-4">{pct}%</div>
+        <div className="text-base text-white/70">{correct} av {total} rätt</div>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-6 py-6 pb-24">
 
         {/* XP earned card */}
         {xpInfo && (
@@ -278,26 +311,6 @@ export default function Results() {
             </div>
           </div>
         )}
-
-        {/* Score card */}
-        <div className="glass rounded-2xl p-6 mb-4 text-center">
-          {isNewBest && (
-            <div className="inline-flex items-center gap-1.5 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-3">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
-              Nytt personbästa!
-            </div>
-          )}
-          <div className={`text-7xl font-black ${scoreColor}`}>{pct}%</div>
-          <div className="text-slate-400 mt-1">
-            {correct} av {total} rätt{skippedCount > 0 && ` · ${skippedCount} hoppade`} · {fmtDuration}
-          </div>
-          <div className="mt-4 h-3 bg-white/[0.05] rounded-full overflow-hidden">
-            <div
-              className={`h-full ${scoreBarColor} rounded-full transition-all`}
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-        </div>
 
         {/* HP Score Predictor */}
         {(() => {
