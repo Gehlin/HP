@@ -34,22 +34,15 @@ function computeTimeLimit(ids: string[]): number {
   }, 0)
 }
 
-const TYPE_ACTIVE: Record<QuestionType, string> = {
-  XYZ: 'border-violet-500/60 bg-violet-500/10 text-violet-300',
-  KVA: 'border-blue-500/60   bg-blue-500/10   text-blue-300',
-  NOG: 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300',
-  DTK: 'border-amber-500/60  bg-amber-500/10  text-amber-300',
-  ORD: 'border-rose-500/60   bg-rose-500/10   text-rose-300',
-  LAS: 'border-pink-500/60   bg-pink-500/10   text-pink-300',
-  MEK: 'border-fuchsia-500/60 bg-fuchsia-500/10 text-fuchsia-300',
-  ELF: 'border-purple-500/60 bg-purple-500/10 text-purple-300',
-}
-
-const TYPE_COLOR: Record<QuestionType, string> = {
-  XYZ: 'text-violet-400', KVA: 'text-blue-400',
-  NOG: 'text-emerald-400', DTK: 'text-amber-400',
-  ORD: 'text-rose-400', LAS: 'text-pink-400',
-  MEK: 'text-fuchsia-400', ELF: 'text-purple-400',
+const TYPE_ACCENTS: Record<QuestionType, { color: string; ring: string; bg: string }> = {
+  XYZ: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+  KVA: { color: '#2563EB', ring: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
+  NOG: { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.08)' },
+  DTK: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.08)' },
+  ORD: { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.08)' },
+  LAS: { color: '#DB2777', ring: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
+  MEK: { color: '#9333EA', ring: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
+  ELF: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
 }
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -62,7 +55,7 @@ const ALL_TAGS = Array.from(new Set(questions.flatMap(q => q.tags))).sort()
 /* ── tiny reusable toggle row ───────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="text-[10px] font-bold tracking-widest text-slate-600 uppercase mb-2.5">
+    <div className="text-[10px] font-bold tracking-widest text-[var(--color-ink-faint)] uppercase mb-2.5">
       {children}
     </div>
   )
@@ -358,6 +351,7 @@ export default function Practice() {
               const sectionCount = { XYZ: 12, KVA: 10, NOG: 6, DTK: 12, ORD: 10, LAS: 16, MEK: 10, ELF: 16 }[t]
               const timeSecs = { XYZ: 15 * 60, KVA: 10 * 60, NOG: 10 * 60, DTK: 23 * 60, ORD: 7 * 60, LAS: 26 * 60, MEK: 8 * 60, ELF: 26 * 60 }[t]
               const timeLabel = { XYZ: '15 min', KVA: '10 min', NOG: '10 min', DTK: '23 min', ORD: '7 min', LAS: '26 min', MEK: '8 min', ELF: '26 min' }[t]
+              const accent = TYPE_ACCENTS[t]
               return (
                 <button
                   key={t}
@@ -367,10 +361,11 @@ export default function Practice() {
                     saveSession(session)
                     navigate('/session')
                   }}
-                  className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${TYPE_ACTIVE[t]}`}
+                  className="rounded-xl p-3.5 border text-left transition-all duration-150"
+                  style={{ borderColor: accent.ring, backgroundColor: accent.bg }}
                 >
-                  <div className={`font-black text-sm ${TYPE_COLOR[t]}`}>{t}</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">{sectionCount} frågor · {timeLabel}</div>
+                  <div className="font-black text-sm" style={{ color: accent.color }}>{t}</div>
+                  <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">{sectionCount} frågor · {timeLabel}</div>
                 </button>
               )
             })}
@@ -378,25 +373,25 @@ export default function Practice() {
         </div>
 
 {mode === 'repetition' && (
-          <div className="mb-6 glass rounded-2xl p-5">
+          <div className="mb-6 bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl p-5">
             {dueIds.length === 0 ? (
-              <p className="text-center text-slate-500 text-sm">Inga frågor att repetera idag — kom tillbaka imorgon!</p>
+              <p className="text-center text-[var(--color-ink-faint)] text-sm">Inga frågor att repetera idag — kom tillbaka imorgon!</p>
             ) : (
               <>
-                <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">
+                <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">
                   {dueIds.length} frågor att repetera
                 </div>
                 <div className="grid grid-cols-4 gap-2">
                   {(Object.entries(dueByType) as [QuestionType, number][])
                     .filter(([, n]) => n > 0)
                     .map(([type, n]) => (
-                      <div key={type} className="bg-white/[0.04] rounded-xl p-2.5 text-center">
-                        <div className={`text-xs font-black mb-1 ${TYPE_COLOR[type]}`}>{type}</div>
-                        <div className="text-lg font-black text-white">{n}</div>
+                      <div key={type} className="bg-[var(--color-paper-dark)] rounded-xl p-2.5 text-center">
+                        <div className="text-xs font-black mb-1" style={{ color: TYPE_ACCENTS[type].color }}>{type}</div>
+                        <div className="text-lg font-black text-[var(--color-ink)]">{n}</div>
                       </div>
                     ))}
                 </div>
-                <p className="text-[11px] text-slate-600 mt-3">Studieläge aktiveras automatiskt.</p>
+                <p className="text-[11px] text-[var(--color-ink-faint)] mt-3">Studieläge aktiveras automatiskt.</p>
               </>
             )}
           </div>
@@ -407,21 +402,33 @@ export default function Practice() {
             {/* Question types */}
             <div className="mb-6">
               <SectionLabel>Delprov</SectionLabel>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => {
+                    const allTypes = Object.keys(TYPE_INFO) as QuestionType[]
+                    setSelectedTypes(selectedTypes.length === allTypes.length ? [] : allTypes)
+                  }}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold border transition-all duration-150 ${
+                    selectedTypes.length === Object.keys(TYPE_INFO).length
+                      ? 'border-2 border-[var(--color-green)] bg-[var(--color-green-muted)] text-[var(--color-green-light)]'
+                      : 'bg-[var(--color-paper-dark)] border-transparent text-[var(--color-ink-muted)]'
+                  }`}
+                >
+                  Alla
+                </button>
                 {(Object.keys(TYPE_INFO) as QuestionType[]).map(t => {
-                  const cnt = questions.filter(q => q.type === t).length
                   const isSelected = selectedTypes.includes(t)
+                  const accent = TYPE_ACCENTS[t]
                   return (
                     <button
                       key={t}
                       onClick={() => toggleType(t)}
-                      className={`rounded-xl p-4 border text-left transition-all duration-150 ${
-                        isSelected ? TYPE_ACTIVE[t] : 'glass border-white/[0.05] hover:border-white/[0.1] text-slate-400'
+                      className={`rounded-full px-3 py-1.5 text-xs font-semibold border transition-all duration-150 ${
+                        isSelected ? 'border-2' : 'bg-[var(--color-paper-dark)] border-transparent text-[var(--color-ink-muted)]'
                       }`}
+                      style={isSelected ? { borderColor: accent.ring, backgroundColor: accent.bg, color: accent.color } : undefined}
                     >
-                      <div className={`font-black text-base ${isSelected ? TYPE_COLOR[t] : 'text-slate-300'}`}>{t}</div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">{TYPE_INFO[t].desc}</div>
-                      <div className="text-[10px] text-slate-600 mt-1">{cnt} frågor</div>
+                      {t}
                     </button>
                   )
                 })}
