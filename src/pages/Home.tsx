@@ -157,6 +157,9 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * RING_R
 const HERO_R = 36
 const HERO_C = 2 * Math.PI * HERO_R
 
+const SECT_R = 20
+const SECT_C = 2 * Math.PI * SECT_R
+
 export default function Home() {
   const navigate = useNavigate()
   const byType = {
@@ -188,6 +191,7 @@ export default function Home() {
   } | null>(null)
   const [weakTags, setWeakTags] = useState<{ tag: string; pct: number }[]>([])
   const [totalCorrect, setTotalCorrect] = useState(0)
+  const [typeAccuracy, setTypeAccuracy] = useState<Record<string, { correct: number; total: number }>>({})
 
   useEffect(() => {
     setStats(loadStats())
@@ -213,14 +217,26 @@ export default function Home() {
     setDueCount(dueIds.length)
     const history = loadHistory()
 
+    const fullTypeAcc: Record<string, { correct: number; total: number }> = {
+      XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
+      NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
+      ORD: { correct: 0, total: 0 }, LAS: { correct: 0, total: 0 },
+      MEK: { correct: 0, total: 0 }, ELF: { correct: 0, total: 0 },
+    }
     let tc = 0
     history.forEach(s => {
       s.questionIds.forEach(id => {
         const q = questions.find(x => x.id === id)
-        if (q && s.answers[id] === q.answer) tc++
+        if (!q || !s.answers[id]) return
+        fullTypeAcc[q.type].total++
+        if (s.answers[id] === q.answer) {
+          tc++
+          fullTypeAcc[q.type].correct++
+        }
       })
     })
     setTotalCorrect(tc)
+    setTypeAccuracy(fullTypeAcc)
     const attempted = new Set<string>()
     history.forEach(sess => Object.keys(sess.answers).forEach(id => attempted.add(id)))
     const unseen = questions.filter(q => !attempted.has(q.id)).length
@@ -386,6 +402,46 @@ export default function Home() {
             </div>
           )
         })()}
+
+        {/* ── Section grid ─────────────────────────────────── */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {(Object.keys(TYPE_ACCENTS) as string[]).map(type => {
+            const accent = TYPE_ACCENTS[type]
+            const acc = typeAccuracy[type]
+            const pct = acc && acc.total > 0 ? Math.round((acc.correct / acc.total) * 100) : 0
+            const count = byType[type as keyof typeof byType] ?? 0
+            const sectOffset = SECT_C * (1 - pct / 100)
+            return (
+              <button
+                key={type}
+                onClick={() => navigate('/practice', { state: { defaultType: type } })}
+                className="card p-4 text-left"
+                style={{ backgroundColor: accent.bg }}
+              >
+                <div className="flex items-start gap-3 mb-1">
+                  <svg width="48" height="48" viewBox="0 0 48 48" className="shrink-0">
+                    <circle cx="24" cy="24" r={SECT_R} fill="none" stroke="var(--color-paper-dark)" strokeWidth="4" />
+                    <circle
+                      cx="24" cy="24" r={SECT_R}
+                      fill="none"
+                      stroke={accent.ring}
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeDasharray={SECT_C}
+                      strokeDashoffset={sectOffset}
+                      transform="rotate(-90 24 24)"
+                    />
+                  </svg>
+                  <div className="flex-1 min-w-0 pt-1">
+                    <div className="text-sm font-semibold text-[var(--color-ink)]">{type}</div>
+                    <div className="text-xs text-[var(--color-ink-faint)]">{pct}% rätt</div>
+                    <div className="text-xs text-[var(--color-ink-faint)]">{count} frågor</div>
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
 
         {/* ── Exam countdown ────────────────────────────────── */}
         {examDate && days !== null ? (

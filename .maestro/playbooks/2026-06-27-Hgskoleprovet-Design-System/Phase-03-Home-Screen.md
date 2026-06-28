@@ -51,13 +51,14 @@ This phase redesigns `src/pages/Home.tsx` — the first thing users see. The cur
   - Layout: flex row, text on left, button on right
   <!-- Done. Replaced the old dark-blue resume banner (bg-blue-500/10) with a white `.card p-4` div. Label "Fortsätt där du slutade" in ink-faint uppercase, session type + remaining count (tot - answered) in ink-colored text, and a `btn-primary` "Fortsätt" button on the right navigating to /session. TypeScript clean. -->
 
-- [ ] Build the 8-section grid. After the continue card (or hero card if no session), render a 2-column grid (`grid grid-cols-2 gap-3`). For each question type (XYZ, KVA, NOG, DTK, ORD, LAS, MEK, ELF), render a `.card` div with `p-4`:
+- [x] Build the 8-section grid. After the continue card (or hero card if no session), render a 2-column grid (`grid grid-cols-2 gap-3`). For each question type (XYZ, KVA, NOG, DTK, ORD, LAS, MEK, ELF), render a `.card` div with `p-4`:
   - A conic-gradient SVG progress ring (48px): compute `accuracy` for this type from session history (reuse existing `computeTypeStats` or equivalent logic in the file). Ring background: `var(--color-paper-dark)`, ring fill: the type's `ring` color. The SVG should use a `circle` with `stroke-dasharray="circumference"` and `stroke-dashoffset` computed from accuracy percentage.
   - Section name: `text-sm font-semibold text-[var(--color-ink)]`
   - Accuracy: `text-xs text-[var(--color-ink-faint)]` — e.g. "72% rätt"
   - Question count: `text-xs text-[var(--color-ink-faint)]` — e.g. "12 frågor"
   - Tap the card → navigate to `/practice` with a type filter (use navigate with state: `{ defaultType: type }`)
   - Card background: the type's `bg` color
+  <!-- Done. Added `typeAccuracy` state and `SECT_R`/`SECT_C` constants. Extended the useEffect tc-loop to also tally per-type correct/total across all history and call `setTypeAccuracy`. Grid renders 8 `.card` buttons (2 cols, gap-3) each showing a 48px SVG ring (paper-dark track, type ring fill, stroke-dashoffset from accuracy%), type name, accuracy %, and question count. Tap navigates to /practice with `{ state: { defaultType: type } }`. TypeScript clean. -->
 
 - [ ] Remove the daily challenge card, recommendation cards, theory link rows, and exam-date widgets from the old Home.tsx JSX — the new design focuses on the score hero + section grid. Keep the streak count and history data being loaded (for the hero card), but strip out any JSX blocks that render those older cards (they were the dark `glass` cards with blue gradients). After stripping, make sure no import is left unused (remove from import list if removed from JSX).
 
