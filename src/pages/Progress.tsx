@@ -54,16 +54,24 @@ export default function Progress() {
   const [showAllHistory, setShowAllHistory] = useState(false)
   const [tagSort, setTagSort] = useState<'asc' | 'desc' | 'count'>('asc')
   const [tagTypeFilter, setTagTypeFilter] = useState<'alla' | QuestionType>('alla')
+  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week')
   const timeAnalytics = timeAnalyticsByType()
   const difficultyAcc = accuracyByDifficulty()
   const rollingHp = rollingHpScore()
   const hpHistory = hpScoreHistory()
   const typeTrend = typeAccuracyTrend()
   const DIFFICULTY_LABELS = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' } as const
+
+  const now = Date.now()
+  const filteredHistory = history.filter(s => {
+    if (timeRange === 'week') return s.startTime >= now - 7 * 24 * 60 * 60 * 1000
+    if (timeRange === 'month') return s.startTime >= now - 30 * 24 * 60 * 60 * 1000
+    return true
+  })
   const earnedIds = new Set(getEarnedIds())
 
   const allAnswers: { qid: string; correct: boolean }[] = []
-  history.forEach(s => {
+  filteredHistory.forEach(s => {
     s.questionIds.forEach(qid => {
       const q = questions.find(x => x.id === qid)
       if (q && s.answers[qid]) {
@@ -96,7 +104,7 @@ export default function Progress() {
 
   // Per-type personal best (sessions with ≥3 questions of that type)
   const bestPerType: Record<QuestionType, number> = { XYZ: 0, KVA: 0, NOG: 0, DTK: 0, ORD: 0, LAS: 0, MEK: 0, ELF: 0 }
-  history.forEach(s => {
+  filteredHistory.forEach(s => {
     const typeMap: Partial<Record<QuestionType, { correct: number; total: number }>> = {}
     s.questionIds.forEach(qid => {
       const q = questions.find(x => x.id === qid)
@@ -159,7 +167,7 @@ export default function Progress() {
   const srsLearning = questions.length - srsNew - srsMastered
 
   // Accuracy trend — last 15 sessions (most recent last)
-  const trendSessions = history
+  const trendSessions = filteredHistory
     .slice(0, 15)
     .reverse()
     .map(s => {
@@ -207,13 +215,24 @@ export default function Progress() {
   const progressPercent = isMaxLevel ? 100 : Math.min(100, Math.round((xpInCurrentLevel / xpNeededForCurrentLevel) * 100))
 
   return (
-    <div className="min-h-screen bg-app text-white">
-      <div className="max-w-2xl mx-auto px-6 py-10 pb-24">
-        <button onClick={() => navigate('/')} className="text-slate-400 hover:text-white mb-8 flex items-center gap-2 text-sm">
-          ← Tillbaka
-        </button>
-
-        <h1 className="text-3xl font-black mb-8">Min statistik</h1>
+    <div className="min-h-screen bg-app pb-28">
+      <div className="px-4 pt-12 pb-4 max-w-2xl mx-auto">
+        <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)]">Statistik</h1>
+        <div className="flex rounded-xl p-1 bg-[var(--color-paper-dark)] w-fit mt-3">
+          {(['week', 'month', 'all'] as const).map((range, i) => (
+            <button
+              key={range}
+              onClick={() => setTimeRange(range)}
+              className={timeRange === range
+                ? 'bg-white rounded-lg px-4 py-1.5 text-sm font-semibold text-[var(--color-ink)] shadow-sm'
+                : 'px-4 py-1.5 text-sm text-[var(--color-ink-faint)]'}
+            >
+              {(['Vecka', 'Månad', 'Allt'] as const)[i]}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="max-w-2xl mx-auto px-4 pb-4">
 
         {/* Readiness card */}
         <div className="glass rounded-2xl p-6 mb-4">
@@ -424,7 +443,7 @@ export default function Progress() {
           </div>
         </div>
 
-        {history.length === 0 ? (
+        {filteredHistory.length === 0 ? (
           <div className="glass rounded-2xl p-10 text-center mb-4">
             <div className="text-4xl font-black text-slate-700 mb-3">—</div>
             <div className="text-slate-400 font-semibold mb-1">Inga träningspass ännu</div>
@@ -766,10 +785,10 @@ export default function Progress() {
             {/* History */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-black">Tidigare pass</h2>
-              <span className="text-xs text-slate-600">{history.length} pass totalt</span>
+              <span className="text-xs text-slate-600">{filteredHistory.length} pass totalt</span>
             </div>
             <div className="space-y-2.5 mb-8">
-              {history.slice(0, showAllHistory ? history.length : 10).map(s => {
+              {filteredHistory.slice(0, showAllHistory ? filteredHistory.length : 10).map(s => {
                 const qs = s.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean)
                 const c = qs.filter(q => q && s.answers[q!.id] === q!.answer).length
                 const p = qs.length > 0 ? Math.round((c / qs.length) * 100) : 0
@@ -817,12 +836,12 @@ export default function Progress() {
                   </div>
                 )
               })}
-              {history.length > 10 && (
+              {filteredHistory.length > 10 && (
                 <button
                   onClick={() => setShowAllHistory(v => !v)}
                   className="w-full text-center text-xs text-slate-600 hover:text-slate-400 py-2 transition-colors"
                 >
-                  {showAllHistory ? 'Visa färre ▴' : `Visa alla ${history.length} pass ▾`}
+                  {showAllHistory ? 'Visa färre ▴' : `Visa alla ${filteredHistory.length} pass ▾`}
                 </button>
               )}
             </div>
