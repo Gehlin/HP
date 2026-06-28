@@ -214,6 +214,20 @@ export default function Progress() {
   const xpNeededForCurrentLevel = isMaxLevel ? 1 : levelInfo.nextLevelXp - levelInfo.currentLevelXp
   const progressPercent = isMaxLevel ? 100 : Math.min(100, Math.round((xpInCurrentLevel / xpNeededForCurrentLevel) * 100))
 
+  const sevenDayActivityRaw = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(todayMidnight)
+    d.setDate(d.getDate() - (6 - i))
+    const key = d.toISOString().slice(0, 10)
+    const count = questionsByDay[key] ?? 0
+    const dayLabel = d.toLocaleDateString('sv-SE', { weekday: 'short' }).slice(0, 2).toUpperCase()
+    return { dayLabel, count }
+  })
+  const maxActivity = Math.max(1, ...sevenDayActivityRaw.map(d => d.count))
+  const sevenDayActivity = sevenDayActivityRaw.map(d => ({
+    ...d,
+    barHeightPx: d.count > 0 ? Math.max(8, Math.round((d.count / maxActivity) * 48)) : 0,
+  }))
+
   return (
     <div className="min-h-screen bg-app pb-28">
       <div className="px-4 pt-12 pb-4 max-w-2xl mx-auto">
@@ -248,6 +262,26 @@ export default function Progress() {
         <div className="card p-3 text-center">
           <div className="text-xl font-semibold text-[var(--color-ink)]">🔥{stats.streak}</div>
           <div className="text-xs text-[var(--color-ink-faint)]">Streak</div>
+        </div>
+      </div>
+
+      {/* Weekly activity bar chart */}
+      <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
+        <div className="text-sm font-semibold text-[var(--color-ink)] mb-3">Aktivitet</div>
+        <div className="flex items-end justify-between gap-1 h-16">
+          {sevenDayActivity.map(({ dayLabel, count, barHeightPx }) => (
+            <div key={dayLabel} className="flex flex-col items-center gap-1 flex-1">
+              {count > 0 ? (
+                <div
+                  className="w-full rounded-t-md bg-[var(--color-green)]"
+                  style={{ height: `${barHeightPx}px` }}
+                />
+              ) : (
+                <div className="w-full h-2 rounded-t-md bg-[var(--color-paper-darker)]" />
+              )}
+              <span className="text-[10px] text-[var(--color-ink-faint)]">{dayLabel}</span>
+            </div>
+          ))}
         </div>
       </div>
 

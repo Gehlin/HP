@@ -18,11 +18,12 @@ This phase redesigns `src/pages/Progress.tsx` — the Statistik tab that shows o
   - Card 3: "Streak" → current streak from `loadStats()` — same format with flame emoji before value
   <!-- Done: inserted 3-column stat card row after the segmented control header, before existing content. Reuses already-computed filteredHistory.length, totalCorrect/totalAnswered, and stats.streak. -->
 
-- [ ] Build the weekly activity bar chart in `Progress.tsx`. Add a `.card mx-4 p-4 mb-4 max-w-2xl mx-auto` card:
+- [x] Build the weekly activity bar chart in `Progress.tsx`. Add a `.card mx-4 p-4 mb-4 max-w-2xl mx-auto` card:
   - Title: "Aktivitet" in `text-sm font-semibold text-[var(--color-ink)] mb-3`
   - 7-column bar chart (last 7 days): `flex items-end justify-between gap-1 h-16`
   - Each bar: a `flex flex-col items-center gap-1` div. Bar itself: `w-full rounded-t-md bg-[var(--color-green)]` at height proportional to sessions or questions answered that day (max bar = tallest day = `h-16`, others scaled proportionally). Days with 0 activity: `h-2 bg-[var(--color-paper-darker)]`. Day label below: `text-[10px] text-[var(--color-ink-faint)]` (Mon/Tue/Wed etc. in Swedish: Mån/Tis/Ons/Tor/Fre/Lör/Sön).
   - Compute the 7-day data from `loadHistory()`: group sessions by date, count questions answered per day
+  <!-- Done: inserted after summary stat cards. Reuses existing `questionsByDay` (built from `history`) and `todayMidnight`. `sevenDayActivityRaw` builds 7 entries (oldest→newest), `sevenDayActivity` adds `barHeightPx` (max 48px for tallest day, min 8px for any active day). Swedish day labels via `toLocaleDateString('sv-SE', { weekday: 'short' }).slice(0, 2).toUpperCase()`. -->
 
 - [ ] Build the per-section accuracy bars in `Progress.tsx`. Add a `.card mx-4 p-4 mb-4 max-w-2xl mx-auto` card:
   - Title: "Per delprovstyp" in `text-sm font-semibold text-[var(--color-ink)] mb-3`
