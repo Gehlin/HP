@@ -155,6 +155,17 @@ export default function Results() {
     ELF: { text: 'text-purple-400',  bar: 'bg-purple-500'  },
   }
 
+  const WARM_TYPE_COLORS: Record<QuestionType, { color: string; ring: string; bg: string }> = {
+    XYZ: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+    KVA: { color: '#2563EB', ring: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
+    NOG: { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.08)' },
+    DTK: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.08)' },
+    ORD: { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.08)' },
+    LAS: { color: '#DB2777', ring: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
+    MEK: { color: '#9333EA', ring: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
+    ELF: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+  }
+
   const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
   const handleShare = async () => {
@@ -509,21 +520,29 @@ export default function Results() {
           )
         })()}
 
-        {/* By type */}
-        <div className="grid grid-cols-2 gap-3 mb-8">
+        {/* Per delprovstyp */}
+        <div className="mb-8">
+          <div className="text-sm font-semibold text-[var(--color-ink-muted)] uppercase tracking-widest mb-3">Per delprovstyp</div>
           {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
             .filter(([, v]) => v.total > 0)
             .map(([type, v]) => {
               const p = Math.round((v.correct / v.total) * 100)
-              const tc = TYPE_COLORS[type]
+              const accent = WARM_TYPE_COLORS[type]
               return (
-                <div key={type} className="glass rounded-xl p-4">
-                  <div className={`font-black ${tc.text}`}>{type}</div>
-                  <div className="text-2xl font-bold mt-1">{p}%</div>
-                  <div className="text-xs text-slate-400">{v.correct}/{v.total} rätt</div>
-                  <div className="mt-2 h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
-                    <div className={`h-full ${tc.bar} rounded-full`} style={{ width: `${p}%` }} />
+                <div key={type} className="card p-3 mb-2 flex items-center gap-3">
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
+                    style={{ backgroundColor: accent.bg, color: accent.color }}
+                  >
+                    {type}
+                  </span>
+                  <div className="flex-1 h-2 rounded-full bg-[var(--color-paper-dark)] overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${p}%`, backgroundColor: accent.ring }}
+                    />
                   </div>
+                  <span className="text-sm font-semibold text-[var(--color-ink)] shrink-0 w-10 text-right">{p}%</span>
                 </div>
               )
             })}
