@@ -260,6 +260,12 @@ export default function Session() {
     setFlagged(f => f.includes(q.id) ? f.filter(id => id !== q.id) : [...f, q.id])
   }, [q])
 
+  const handleBookmark = useCallback(() => {
+    if (!q) return
+    toggleBookmark(q.id)
+    setBookmarked(b => ({ ...b, [q.id]: !b[q.id] }))
+  }, [q])
+
   useEffect(() => {
     if (!session) { navigate('/'); return }
     if (session.mode === 'timed' && session.timeLimitSeconds) {
@@ -730,72 +736,64 @@ export default function Session() {
         <FormulaDrawer questionType={q.type} onClose={() => setShowFormulas(false)} />
       )}
 
-      {/* ── Action bar ────────────────────────────────────────── */}
-      <div className="shrink-0 border-t border-white/[0.05] bg-[#080C14]/95 backdrop-blur-xl px-4 py-3 pb-safe">
-        <div className="max-w-2xl mx-auto flex gap-2.5">
+      {/* ── Fixed footer ──────────────────────────────────────── */}
+      <div className="fixed bottom-0 inset-x-0 z-40 bg-[var(--color-paper)] border-t border-[var(--color-card-border)] pb-safe">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
 
-          {!session.instantFeedback && chosen && !isRevealed && (
-            <button
-              onClick={() => {
-                setRevealed(r => ({ ...r, [q.id]: true }))
-                setTimeout(() => explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80)
-              }}
-              className="flex-1 glass border border-white/[0.1] hover:bg-white/[0.07] rounded-xl py-3 font-bold text-sm transition-colors"
-            >
-              Visa svar
-            </button>
-          )}
+          {/* Left: bookmark toggle */}
+          <button
+            onClick={handleBookmark}
+            aria-label={q && bookmarked[q.id] ? 'Ta bort bokmärke' : 'Bokmärk fråga'}
+            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] transition-colors"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={q && bookmarked[q.id] ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
 
-          {session.studyMode && isRevealed && (
-            <>
-              {[
-                { label: 'Svårt', q: isCorrect ? 1 : 0, cls: 'border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/15' },
-                { label: 'Ok',    q: isCorrect ? 2 : 0, cls: 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/15' },
-                { label: 'Enkelt', q: isCorrect ? 3 : 0, cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15' },
-              ].map(({ label, q: quality, cls }) => (
-                <button
-                  key={label}
-                  onClick={() => {
-                    saveQuestionQuality(q.id, quality)
-                    current < sessionQuestions.length - 1 ? handleNextQuestion() : requestFinish()
-                  }}
-                  disabled={isTransitioning}
-                  className={`flex-1 border rounded-xl py-3 font-bold text-sm transition-colors disabled:opacity-40 ${cls}`}
-                >
-                  {label}
-                </button>
-              ))}
-            </>
-          )}
-
-          {!session.studyMode && (
-            current < sessionQuestions.length - 1 ? (
+          {/* Right: action buttons */}
+          <div className="flex gap-2">
+            {session.studyMode && isRevealed ? (
+              <>
+                {[
+                  { label: 'Svårt',  quality: isCorrect ? 1 : 0, color: 'var(--color-error)',   bg: 'var(--color-error-bg)' },
+                  { label: 'Ok',     quality: isCorrect ? 2 : 0, color: '#D97706',              bg: 'rgba(217,119,6,0.10)' },
+                  { label: 'Enkelt', quality: isCorrect ? 3 : 0, color: 'var(--color-success)', bg: 'var(--color-success-bg)' },
+                ].map(({ label, quality, color, bg }) => (
+                  <button
+                    key={label}
+                    onClick={() => {
+                      saveQuestionQuality(q.id, quality)
+                      current < sessionQuestions.length - 1 ? handleNextQuestion() : requestFinish()
+                    }}
+                    disabled={isTransitioning}
+                    style={{ color, backgroundColor: bg, borderColor: color }}
+                    className="border rounded-xl px-4 py-2.5 font-bold text-sm transition-colors disabled:opacity-40"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </>
+            ) : !session.instantFeedback && !!chosen && !isRevealed ? (
               <button
-                onClick={handleNextQuestion}
-                disabled={(!chosen && !isRevealed) || isTransitioning}
-                className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:bg-white/[0.05] disabled:text-slate-600 rounded-xl py-3 font-bold text-sm transition-colors"
+                onClick={() => {
+                  setRevealed(r => ({ ...r, [q.id]: true }))
+                  setTimeout(() => explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80)
+                }}
+                className="btn-primary px-8"
               >
-                Nästa →
+                Visa svar
               </button>
             ) : (
               <button
-                onClick={requestFinish}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-xl py-3 font-bold text-sm transition-colors"
+                onClick={current < sessionQuestions.length - 1 ? handleNextQuestion : requestFinish}
+                disabled={(!chosen && !isRevealed) || isTransitioning}
+                className="btn-primary px-8 disabled:opacity-40"
               >
-                Avsluta och visa resultat
+                {current < sessionQuestions.length - 1 ? 'Nästa' : 'Slutför'}
               </button>
-            )
-          )}
-
-          {session.studyMode && !isRevealed && (
-            <button
-              onClick={handleNextQuestion}
-              disabled={!chosen || isTransitioning}
-              className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-white/[0.05] disabled:text-slate-600 rounded-xl py-3 font-bold text-sm transition-colors"
-            >
-              {current < sessionQuestions.length - 1 ? 'Nästa →' : 'Avsluta →'}
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
