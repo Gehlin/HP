@@ -42,6 +42,17 @@ const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
   ELF: { text: 'text-purple-400',  bar: 'bg-purple-500'  },
 }
 
+const WARM_TYPE_HEX: Record<QuestionType, { color: string; bg: string }> = {
+  XYZ: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+  KVA: { color: '#2563EB', bg: 'rgba(37,99,235,0.08)'  },
+  NOG: { color: '#224A3A', bg: 'rgba(34,74,58,0.08)'   },
+  DTK: { color: '#D97706', bg: 'rgba(217,119,6,0.08)'  },
+  ORD: { color: '#DC2626', bg: 'rgba(220,38,38,0.08)'  },
+  LAS: { color: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
+  MEK: { color: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
+  ELF: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+}
+
 export default function Progress() {
   const navigate = useNavigate()
   const history = loadHistory()
@@ -283,6 +294,29 @@ export default function Progress() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Per-section accuracy bars */}
+      <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
+        <div className="text-sm font-semibold text-[var(--color-ink)] mb-3">Per delprovstyp</div>
+        {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][]).map(([type, v]) => {
+          const pct = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0
+          const tc = WARM_TYPE_HEX[type]
+          return (
+            <div key={type} className="flex items-center gap-3 mb-2">
+              <span className="text-xs font-semibold text-[var(--color-ink)] w-8">{type}</span>
+              <div className="flex-1 h-2 rounded-full bg-[var(--color-paper-dark)]">
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${pct}%`, backgroundColor: tc.color }}
+                />
+              </div>
+              <span className="text-xs text-[var(--color-ink-faint)] w-8 text-right">
+                {v.total > 0 ? `${pct}%` : '—'}
+              </span>
+            </div>
+          )
+        })}
       </div>
 
       <div className="max-w-2xl mx-auto px-4 pb-4">

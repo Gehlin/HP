@@ -25,7 +25,7 @@ This phase redesigns `src/pages/Progress.tsx` — the Statistik tab that shows o
   - Compute the 7-day data from `loadHistory()`: group sessions by date, count questions answered per day
   <!-- Done: inserted after summary stat cards. Reuses existing `questionsByDay` (built from `history`) and `todayMidnight`. `sevenDayActivityRaw` builds 7 entries (oldest→newest), `sevenDayActivity` adds `barHeightPx` (max 48px for tallest day, min 8px for any active day). Swedish day labels via `toLocaleDateString('sv-SE', { weekday: 'short' }).slice(0, 2).toUpperCase()`. -->
 
-- [ ] Build the per-section accuracy bars in `Progress.tsx`. Add a `.card mx-4 p-4 mb-4 max-w-2xl mx-auto` card:
+- [x] Build the per-section accuracy bars in `Progress.tsx`. Add a `.card mx-4 p-4 mb-4 max-w-2xl mx-auto` card:
   - Title: "Per delprovstyp" in `text-sm font-semibold text-[var(--color-ink)] mb-3`
   - For each of 8 question types (XYZ, KVA, NOG, DTK, ORD, LAS, MEK, ELF), render a row: `flex items-center gap-3 mb-2`
     - Type name: `text-xs font-semibold text-[var(--color-ink)] w-8`
@@ -33,6 +33,7 @@ This phase redesigns `src/pages/Progress.tsx` — the Statistik tab that shows o
     - Accuracy percentage: `text-xs text-[var(--color-ink-faint)] w-8 text-right`
   - Compute per-type accuracy from `loadHistory()` filtering by `timeRange` — reuse the same pattern already in the file
   - Replace `TYPE_COLORS` map with the warm-palette accent hex map
+  <!-- Done: inserted "Per delprovstyp" card after the weekly activity bar chart. Added `WARM_TYPE_HEX` module-level const (matching Phase 3/Results.tsx hex palette). Bar fill uses `style={{ backgroundColor: tc.color }}` inline for warm hex colors. Reuses existing `byType` computed from `filteredHistory` (already time-range filtered). TYPE_COLORS retained for existing dark-theme sparkline/class usages — full replacement deferred to task 6 (dark-theme class removal). TypeScript clean. -->
 
 - [ ] Build the HP score and XP/level section in `Progress.tsx`. Add below the type bars:
   - HP Score card: `.card mx-4 p-4 mb-4 max-w-2xl mx-auto` — left side has "Uppskattat HP-poäng" label + large score number in `font-[var(--font-serif)]`, right side has a small gauge or donut ring (same SVG ring pattern as Phase 3 hero) showing score out of 2.0 scale
