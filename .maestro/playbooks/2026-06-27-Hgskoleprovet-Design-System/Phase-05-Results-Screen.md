@@ -14,7 +14,7 @@ This phase redesigns `src/pages/Results.tsx` — the screen shown after completi
   - Score percentage label: `text-4xl font-[var(--font-serif)] text-white mt-4` — e.g. "78%"
   - Subtitle: number of correct answers "14 av 20 rätt" in `text-base text-white/70`
 
-- [ ] Build the three-stat strip below the hero. Use a `bg-[var(--color-green-light)] px-4 py-4` div (slightly lighter green):
+- [x] Build the three-stat strip below the hero. Use a `bg-[var(--color-green-light)] px-4 py-4` div (slightly lighter green):
   - Three equal-width columns in a `grid grid-cols-3 divide-x divide-white/20 max-w-2xl mx-auto`
   - Each column: centered, label in `text-xs text-white/60` above value in `text-lg font-semibold text-white`
   - Stat 1: "Rätt svar" → correct count (e.g. "14")

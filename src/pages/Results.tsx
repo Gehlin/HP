@@ -262,6 +262,31 @@ export default function Results() {
         <div className="text-base text-white/70">{correct} av {total} rätt</div>
       </div>
 
+      {/* ── Three-stat strip ─────────────────────── */}
+      <div className="bg-[var(--color-green-light)] px-4 py-4">
+        <div className="grid grid-cols-3 divide-x divide-white/20 max-w-2xl mx-auto">
+          <div className="flex flex-col items-center py-1">
+            <span className="text-xs text-white/60">Rätt svar</span>
+            <span className="text-lg font-semibold text-white">{correct}</span>
+          </div>
+          <div className="flex flex-col items-center py-1">
+            <span className="text-xs text-white/60">Tid</span>
+            <span className="text-lg font-semibold text-white">
+              {String(Math.floor(duration / 60)).padStart(2, '0')}:{String(duration % 60).padStart(2, '0')}
+            </span>
+          </div>
+          <div className="flex flex-col items-center py-1">
+            <span className="text-xs text-white/60">Streak</span>
+            <span className="text-lg font-semibold text-white flex items-center gap-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-orange-400">
+                <path d="M12 23c-4.97 0-9-3.58-9-8 0-2.39 1.05-4.55 2.86-6.12C7.1 7.77 8 6.15 8 4.25c0-.41.34-.75.75-.75.19 0 .37.07.5.2C10.68 5.16 11.5 6.77 11.5 8.5c0 .69-.14 1.35-.39 1.94C11.85 10.17 12.5 9.33 12.5 8c0-.32.2-.61.5-.72.29-.11.62-.03.84.2C15.23 9.18 16.5 11.09 16.5 13c0 .78-.16 1.52-.43 2.2.75-.62 1.2-1.48 1.3-2.4.04-.36.27-.67.61-.79.33-.12.7-.03.93.23C20.22 13.96 21 15.9 21 17.5c0 3.03-4.03 5.5-9 5.5z"/>
+              </svg>
+              {xpInfo?.stats.streak ?? '—'}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-2xl mx-auto px-6 py-6 pb-24">
 
         {/* XP earned card */}
