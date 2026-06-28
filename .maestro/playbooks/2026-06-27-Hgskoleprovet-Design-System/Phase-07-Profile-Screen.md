@@ -7,8 +7,9 @@ This phase builds out the full Profil screen (currently a placeholder from Phase
 - [x] Read `src/pages/Settings.tsx` fully to understand all settings controls: exam date picker, notification toggle, focus preference selector, data export/import/reset buttons. Also read the placeholder `src/pages/Profil.tsx` from Phase 2. You'll move relevant settings logic into Profil.tsx and keep Settings.tsx for deep-link compatibility.
   <!-- Done: Read both files. Settings.tsx exports data via exportData(), handles import via FileReader, toggles notifications with requestNotificationPermission()/disableNotifications(), and manages focus via setFocusPreference(). Profil.tsx is a minimal placeholder with 4 nav rows. BottomNav.tsx already has no THEORY_PREFIXES — active detection is already clean. loadStats() returns {xp,streak,lastPracticeDate,longestStreak}; sessions count from loadHistory().length. -->
 
-- [ ] Rewrite `src/pages/Profil.tsx` with a proper page structure. Page root: `min-h-screen bg-app pb-28`. All content inside `max-w-2xl mx-auto px-4 pt-12`:
+- [x] Rewrite `src/pages/Profil.tsx` with a proper page structure. Page root: `min-h-screen bg-app pb-28`. All content inside `max-w-2xl mx-auto px-4 pt-12`:
   - Page title section: `flex items-center justify-between mb-6` — "Profil" in `text-2xl font-[var(--font-serif)] text-[var(--color-ink)]`
+  <!-- Done: Replaced old MENU_ROWS placeholder with clean page shell — min-h-screen bg-app pb-28 root, max-w-2xl mx-auto px-4 pt-12 inner wrapper, and title h1 with correct font/color tokens. Content sections to be added in subsequent tasks. -->
 
 - [ ] Build the profile card in `Profil.tsx`. A `.card p-5 mb-4` white card:
   - Avatar: a 64px circle `bg-[var(--color-green)]` with initials "HP" in white serif text (no real user account needed — it's a local app)
