@@ -1,6 +1,6 @@
 import type { ChartData } from '../types'
 
-const PALETTE = ['#8b5cf6', '#f59e0b', '#10b981', '#38bdf8']
+const PALETTE = ['#224A3A', '#E4C66A', '#BF5A33', '#2563EB']
 const W = 360, H = 220, mL = 50, mR = 10, mT = 28, mB = 32
 const pW = W - mL - mR, pH = H - mT - mB
 
@@ -29,7 +29,7 @@ function Legend({ series }: { series: ChartData['series'] }) {
       {series.map((s, i) => (
         <g key={i} transform={`translate(${mL + i * 85}, 6)`}>
           <rect x={0} y={1} width={10} height={10} fill={s.color ?? PALETTE[i % 4]} rx={2} />
-          <text x={14} y={10} fontSize={10} fill="#94a3b8">{s.label}</text>
+          <text x={14} y={10} fontSize={10} fill="#9A9A92">{s.label}</text>
         </g>
       ))}
     </>
@@ -45,8 +45,8 @@ function YAxis({ min, max, step, ticks }: { min: number; max: number; step: numb
         const y = mT + pH - ((v - min) / range) * pH
         return (
           <g key={i}>
-            <line x1={mL} x2={W - mR} y1={y} y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
-            <text x={mL - 4} y={y + 3.5} textAnchor="end" fontSize={9} fill="#64748b">{fmt(v)}</text>
+            <line x1={mL} x2={W - mR} y1={y} y2={y} stroke="rgba(26,26,24,0.08)" strokeWidth={1} />
+            <text x={mL - 4} y={y + 3.5} textAnchor="end" fontSize={9} fill="#9A9A92">{fmt(v)}</text>
           </g>
         )
       })}
@@ -78,7 +78,7 @@ function BarChart({ data }: { data: ChartData }) {
         })
       })}
       {data.xLabels.map((lbl, i) => (
-        <text key={i} x={mL + i * groupW + groupW / 2} y={H - mB + 16} textAnchor="middle" fontSize={9} fill="#64748b">{lbl}</text>
+        <text key={i} x={mL + i * groupW + groupW / 2} y={H - mB + 16} textAnchor="middle" fontSize={9} fill="#9A9A92">{lbl}</text>
       ))}
     </svg>
   )
@@ -110,7 +110,7 @@ function LineChart({ data }: { data: ChartData }) {
         )
       })}
       {data.xLabels.map((lbl, i) => (
-        <text key={i} x={toX(i)} y={H - mB + 16} textAnchor="middle" fontSize={9} fill="#64748b">{lbl}</text>
+        <text key={i} x={toX(i)} y={H - mB + 16} textAnchor="middle" fontSize={9} fill="#9A9A92">{lbl}</text>
       ))}
     </svg>
   )
@@ -118,8 +118,8 @@ function LineChart({ data }: { data: ChartData }) {
 
 export default function ChartView({ data }: { data: ChartData }) {
   return (
-    <div className="glass rounded-2xl p-4 mb-5 overflow-x-auto">
-      {data.title && <p className="text-xs text-slate-500 mb-3">{data.title}</p>}
+    <div className="card rounded-2xl p-4 mb-5 overflow-x-auto">
+      {data.title && <p className="text-xs text-[#9A9A92] mb-3">{data.title}</p>}
       {data.type === 'bar' ? <BarChart data={data} /> : <LineChart data={data} />}
     </div>
   )
