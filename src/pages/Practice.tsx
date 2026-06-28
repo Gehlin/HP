@@ -49,6 +49,12 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   easy: 'Lätt', medium: 'Medel', hard: 'Svår',
 }
 
+const DIFFICULTY_ACCENTS: Record<Difficulty, { color: string; ring: string; bg: string }> = {
+  easy:   { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.10)' },
+  medium: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.10)' },
+  hard:   { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.10)' },
+}
+
 const ALL_DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard']
 const ALL_TAGS = Array.from(new Set(questions.flatMap(q => q.tags))).sort()
 
@@ -439,19 +445,22 @@ export default function Practice() {
             <div className="mb-6">
               <SectionLabel>Svårighetsgrad</SectionLabel>
               <div className="flex gap-2">
-                {ALL_DIFFICULTIES.map(d => (
-                  <button
-                    key={d}
-                    onClick={() => toggleDifficulty(d)}
-                    className={`flex-1 rounded-xl py-2.5 px-3 border text-sm font-semibold transition-all duration-150 ${
-                      selectedDifficulties.includes(d)
-                        ? 'border-blue-500/50 bg-blue-500/10 text-blue-300'
-                        : 'glass border-white/[0.05] text-slate-500 hover:border-white/[0.1]'
-                    }`}
-                  >
-                    {DIFFICULTY_LABELS[d]}
-                  </button>
-                ))}
+                {ALL_DIFFICULTIES.map(d => {
+                  const isSelected = selectedDifficulties.includes(d)
+                  const accent = DIFFICULTY_ACCENTS[d]
+                  return (
+                    <button
+                      key={d}
+                      onClick={() => toggleDifficulty(d)}
+                      className={`flex-1 rounded-full px-3 py-1.5 text-xs font-semibold border transition-all duration-150 ${
+                        isSelected ? 'border-2' : 'bg-[var(--color-paper-dark)] border-transparent text-[var(--color-ink-muted)]'
+                      }`}
+                      style={isSelected ? { borderColor: accent.ring, backgroundColor: accent.bg, color: accent.color } : undefined}
+                    >
+                      {DIFFICULTY_LABELS[d]}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
@@ -601,11 +610,7 @@ export default function Practice() {
         <button
           onClick={start}
           disabled={!canStart}
-          className={`w-full rounded-2xl py-4 font-black text-base transition-all duration-200 ${
-            canStart
-              ? 'bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-950/50 hover:shadow-blue-900/50'
-              : 'bg-white/[0.05] text-slate-600 cursor-not-allowed'
-          }`}
+          className="btn-primary w-full mt-6 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {canStart ? 'Starta träning →' : 'Inga frågor tillgängliga'}
         </button>
