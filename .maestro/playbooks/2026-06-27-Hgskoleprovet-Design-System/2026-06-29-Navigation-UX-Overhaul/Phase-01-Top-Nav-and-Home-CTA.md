@@ -61,4 +61,5 @@ This phase delivers the biggest visible transformation: ripping out the bottom t
   - Same pattern — replace bottom nav clearance `pb-28` with `pb-8`, and add `pt-topnav` to the outermost div. Read the file to identify exact class strings.
   <!-- Done: outer div `min-h-screen bg-app pb-28` → `min-h-screen bg-app pb-8 pt-topnav`; inner div `max-w-2xl mx-auto px-4 pt-12` → `max-w-2xl mx-auto px-4` (pt-12 removed, topnav offset now on outermost wrapper). -->
 
-- [ ] Run `npm run build` in the project root to verify no TypeScript or Tailwind errors. Fix any import errors or type issues that surface.
+- [x] Run `npm run build` in the project root to verify no TypeScript or Tailwind errors. Fix any import errors or type issues that surface.
+  <!-- Done: build succeeded cleanly (78 modules transformed, no TS errors). Only pre-existing chunk size warning for index bundle — unrelated to Phase 01. -->
