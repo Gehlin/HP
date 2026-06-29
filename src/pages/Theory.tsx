@@ -1,33 +1,41 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+function ChevronRight() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-faint)] shrink-0">
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  )
+}
+
 function StepReveal({ steps }: { steps: { label: string; content: string; result?: string }[] }) {
   const [revealed, setRevealed] = useState(0)
   return (
     <div className="space-y-2">
       {steps.map((step, i) => (
-        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-white/[0.08] bg-white/[0.03]' : 'border-white/[0.04] bg-white/[0.01]'} p-3.5`}>
+        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-paper)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-emerald-600 text-white' : 'bg-white/[0.07] text-slate-600'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-[var(--color-green)] text-[var(--color-card)]' : 'bg-[var(--color-paper-darker)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-400 mb-0.5">{step.label}</div>
+              <div className="text-xs font-bold text-[var(--color-ink-faint)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
-                  <div className="text-sm text-slate-300 leading-relaxed">{step.content}</div>
-                  {step.result && <div className="mt-1.5 text-xs font-bold text-emerald-400">{step.result}</div>}
+                  <div className="text-sm text-[var(--color-ink)] leading-relaxed">{step.content}</div>
+                  {step.result && <div className="mt-1.5 text-xs font-bold text-[var(--color-green-light)]">{step.result}</div>}
                 </>
               ) : (
-                <div className="text-xs text-slate-700">Klicka för att avslöja</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
-              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-blue-400 border border-blue-500/30 rounded-lg px-2 py-1 hover:bg-blue-500/10 transition-colors">Visa</button>
+              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-[#2563EB] border border-[rgba(37,99,235,0.30)] rounded-lg px-2 py-1 hover:bg-[rgba(37,99,235,0.08)] transition-colors">Visa</button>
             )}
           </div>
         </div>
       ))}
       {revealed === steps.length && (
-        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-slate-600 hover:text-slate-400 py-1.5 transition-colors">Återställ ↺</button>
+        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] py-1.5 transition-colors">Återställ ↺</button>
       )}
     </div>
   )
@@ -48,26 +56,26 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 const TYPE_COLOR: Record<string, string> = {
-  XYZ: 'text-violet-400',
-  KVA: 'text-blue-400',
-  NOG: 'text-emerald-400',
-  DTK: 'text-amber-400',
-  ORD: 'text-rose-400',
-  LAS: 'text-pink-400',
-  MEK: 'text-fuchsia-400',
-  ELF: 'text-purple-400',
+  XYZ: 'text-[#7C3AED]',
+  KVA: 'text-[#2563EB]',
+  NOG: 'text-[var(--color-green)]',
+  DTK: 'text-[#D97706]',
+  ORD: 'text-[#DC2626]',
+  LAS: 'text-[#DB2777]',
+  MEK: 'text-[#9333EA]',
+  ELF: 'text-[#7C3AED]',
 }
 
 const TAB_UNDERLINE: Record<Tab, string> = {
-  overview: 'bg-blue-400',
-  XYZ: 'bg-violet-400',
-  KVA: 'bg-blue-400',
-  NOG: 'bg-emerald-400',
-  DTK: 'bg-amber-400',
-  ORD: 'bg-rose-400',
-  LAS: 'bg-pink-400',
-  MEK: 'bg-fuchsia-400',
-  ELF: 'bg-purple-400',
+  overview: 'bg-[#2563EB]',
+  XYZ: 'bg-[#7C3AED]',
+  KVA: 'bg-[#2563EB]',
+  NOG: 'bg-[var(--color-green)]',
+  DTK: 'bg-[#D97706]',
+  ORD: 'bg-[#DC2626]',
+  LAS: 'bg-[#DB2777]',
+  MEK: 'bg-[#9333EA]',
+  ELF: 'bg-[#7C3AED]',
 }
 
 
@@ -75,16 +83,14 @@ function MathGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate
   return (
     <button
       onClick={() => navigate('/matematik')}
-      className="w-full text-left glass rounded-2xl p-4 border border-violet-500/20 bg-violet-500/5 hover:bg-violet-500/8 transition-colors mt-6"
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-6"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-1">Matematikguide</div>
-          <div className="text-sm font-bold text-white">Formler, teori & begrepp →</div>
-          <div className="text-xs text-slate-500 mt-0.5">10 ämnesområden med övade exempel, formelblad och ordlista</div>
-        </div>
-        <span className="text-violet-400 text-xl shrink-0 ml-3">∑</span>
+      <span className="w-2 h-2 rounded-full bg-[#7C3AED] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">Matematikguide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Formler, teori & begrepp — 10 ämnesområden</div>
       </div>
+      <ChevronRight />
     </button>
   )
 }
@@ -93,16 +99,14 @@ function OrdGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
   return (
     <button
       onClick={() => navigate('/ord-guide')}
-      className="w-full text-left glass rounded-2xl p-4 border border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/8 transition-colors mt-4"
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Ordförståelse</div>
-          <div className="text-sm font-bold text-white">ORD-guide →</div>
-          <div className="text-xs text-slate-500 mt-0.5">Prefix, suffix och strategier för att knäcka okända ord</div>
-        </div>
-        <span className="text-rose-400 text-xl shrink-0 ml-3">Aa</span>
+      <span className="w-2 h-2 rounded-full bg-[#DC2626] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">ORD-guide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Prefix, suffix och strategier för okända ord</div>
       </div>
+      <ChevronRight />
     </button>
   )
 }
@@ -111,16 +115,14 @@ function MekGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
   return (
     <button
       onClick={() => navigate('/mek-guide')}
-      className="w-full text-left glass rounded-2xl p-4 border border-lime-500/20 bg-lime-500/5 hover:bg-lime-500/8 transition-colors mt-4"
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-1">Meningskomplettering</div>
-          <div className="text-sm font-bold text-white">MEK-guide →</div>
-          <div className="text-xs text-slate-500 mt-0.5">10 konjunktionstyper, signalord och interaktiva övningar</div>
-        </div>
-        <span className="text-lime-400 text-xl shrink-0 ml-3">⟷</span>
+      <span className="w-2 h-2 rounded-full bg-[#9333EA] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">MEK-guide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">10 konjunktionstyper, signalord och övningar</div>
       </div>
+      <ChevronRight />
     </button>
   )
 }
@@ -129,16 +131,14 @@ function LasGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
   return (
     <button
       onClick={() => navigate('/las-guide')}
-      className="w-full text-left glass rounded-2xl p-4 border border-pink-500/20 bg-pink-500/5 hover:bg-pink-500/8 transition-colors mt-4"
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-1">Läsförståelse</div>
-          <div className="text-sm font-bold text-white">LÄS-guide →</div>
-          <div className="text-xs text-slate-500 mt-0.5">Texttyper, frågekategorier och läsordningsstrategi</div>
-        </div>
-        <span className="text-pink-400 text-xl shrink-0 ml-3">¶</span>
+      <span className="w-2 h-2 rounded-full bg-[#DB2777] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">LÄS-guide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Texttyper, frågekategorier och läsordningsstrategi</div>
       </div>
+      <ChevronRight />
     </button>
   )
 }
@@ -147,16 +147,14 @@ function ElfGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
   return (
     <button
       onClick={() => navigate('/elf-guide')}
-      className="w-full text-left glass rounded-2xl p-4 border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/8 transition-colors mt-4"
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">Engelsk läsförståelse</div>
-          <div className="text-sm font-bold text-white">ELF-guide →</div>
-          <div className="text-xs text-slate-500 mt-0.5">False friends, akademisk engelska och textstruktur</div>
-        </div>
-        <span className="text-purple-400 text-xl shrink-0 ml-3">En</span>
+      <span className="w-2 h-2 rounded-full bg-[#7C3AED] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">ELF-guide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">False friends, akademisk engelska och textstruktur</div>
       </div>
+      <ChevronRight />
     </button>
   )
 }
@@ -165,16 +163,14 @@ function LiggandeStolenBanner({ navigate }: { navigate: ReturnType<typeof useNav
   return (
     <button
       onClick={() => navigate('/liggande-stolen')}
-      className="w-full text-left glass rounded-2xl p-4 border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/8 transition-colors mt-3"
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-3"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Räkna utan miniräknare</div>
-          <div className="text-sm font-bold text-white">Liggande stolen →</div>
-          <div className="text-xs text-slate-500 mt-0.5">Multiplikation, division, kvadratrötter och estimering för hand</div>
-        </div>
-        <span className="text-blue-400 text-xl shrink-0 ml-3">✎</span>
+      <span className="w-2 h-2 rounded-full bg-[#2563EB] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">Liggande stolen</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Multiplikation, division och estimering för hand</div>
       </div>
+      <ChevronRight />
     </button>
   )
 }
@@ -182,14 +178,14 @@ function LiggandeStolenBanner({ navigate }: { navigate: ReturnType<typeof useNav
 function Overview({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
   return (
     <div className="space-y-6">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         Det kvantitativa delprovet (DTK) består av 40 frågor i fyra avsnitt och har en provtid på 55 minuter.
         Ingen miniräknare är tillåten — men det behövs heller inte.
       </p>
 
       {/* Structure table */}
-      <div className="glass rounded-2xl overflow-hidden">
-        <div className="px-4 py-2.5 border-b border-white/[0.06] flex gap-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      <div className="card rounded-2xl overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-[var(--color-card-border)] flex gap-3 text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-faint)]">
           <span className="flex-1">Delprov</span>
           <span className="w-20 text-right">Frågor</span>
           <span className="w-16 text-right">Tid</span>
@@ -200,11 +196,11 @@ function Overview({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
           { id: 'NOG', name: 'NOG – Kvantitativa resonemang',   q: '6 (23–28)',  t: '~10 min' },
           { id: 'DTK', name: 'DTK – Diagram, tabeller & kartor', q: '12 (29–40)', t: '~23 min' },
         ].map(row => (
-          <div key={row.id} className="px-4 py-3 flex gap-3 items-center border-t border-white/[0.04] text-sm">
+          <div key={row.id} className="px-4 py-3 flex gap-3 items-center border-t border-[var(--color-card-border)] text-sm">
             <span className={`font-black w-8 shrink-0 ${TYPE_COLOR[row.id]}`}>{row.id}</span>
-            <span className="flex-1 text-slate-300 text-xs">{row.name.replace(/^[A-Z]+ – /, '')}</span>
-            <span className="w-20 text-right text-xs text-slate-500">{row.q}</span>
-            <span className="w-16 text-right text-xs text-slate-500">{row.t}</span>
+            <span className="flex-1 text-[var(--color-ink)] text-xs">{row.name.replace(/^[A-Z]+ – /, '')}</span>
+            <span className="w-20 text-right text-xs text-[var(--color-ink-faint)]">{row.q}</span>
+            <span className="w-16 text-right text-xs text-[var(--color-ink-faint)]">{row.t}</span>
           </div>
         ))}
       </div>
@@ -217,9 +213,9 @@ function Overview({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
           { title: 'Tid är din fiende', body: 'XYZ/KVA ger ~60 s/fråga. Fastnar du efter 60 s? Gissa och gå vidare — en halvdan gissning + tid för nästa är bättre än ett perfekt svar och en tom.' },
           { title: 'Matematik är förbättringsbart', body: 'Verbal förmåga förbättras långsamt. Formler + mönsterigenkänning kan ge märkbar förbättring på 2–3 månader.' },
         ].map(item => (
-          <div key={item.title} className="glass rounded-xl p-4">
-            <div className="text-sm font-bold text-slate-200 mb-1">{item.title}</div>
-            <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+          <div key={item.title} className="card rounded-xl p-4">
+            <div className="text-sm font-bold text-[var(--color-ink)] mb-1">{item.title}</div>
+            <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
           </div>
         ))}
       </div>
@@ -235,13 +231,13 @@ function XYZSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
     <div className="space-y-5">
       <div>
         <div className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${TYPE_COLOR.XYZ}`}>12 frågor · ~60 s/fråga · svar A–D</div>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Matematisk problemlösning. Varje fråga har fyra svarsalternativ. Du väljer det som passar bäst.
         </p>
       </div>
 
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Ämnesfördelning (ungefärlig)</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Ämnesfördelning (ungefärlig)</div>
         <div className="grid grid-cols-2 gap-1.5">
           {[
             ['Algebra & ekvationer', '~3 frågor'],
@@ -251,16 +247,16 @@ function XYZSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             ['Statistik', '~2 frågor'],
             ['Talteori & övrigt', '~1 fråga'],
           ].map(([ämne, antal]) => (
-            <div key={ämne} className="glass rounded-xl px-3.5 py-2.5">
-              <div className="text-xs font-semibold text-slate-300">{ämne}</div>
-              <div className="text-[10px] text-slate-600 mt-0.5">{antal}</div>
+            <div key={ämne} className="card rounded-xl px-3.5 py-2.5">
+              <div className="text-xs font-semibold text-[var(--color-ink)]">{ämne}</div>
+              <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">{antal}</div>
             </div>
           ))}
         </div>
       </div>
 
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Strategi</div>
         <div className="space-y-2">
           {[
             { n: '1', title: 'Rita alltid en figur vid geometriuppgifter', body: 'En korrekt figur avslöjar lösningsvägen. Räknar du utan figur vid geometri förlorar du troligen uppgiften.' },
@@ -268,11 +264,11 @@ function XYZSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             { n: '3', title: 'Uppskatta för att eliminera', body: 'Räkna inte exakt om en grov uppskattning kan eliminera 2–3 alternativ. HP-tal är gjorda för att gå upp jämnt.' },
             { n: '4', title: '60-sekundersregeln', body: 'Fastnar du mer än 60 s? Gör din bästa gissning och gå vidare. Ingen minuspoäng.' },
           ].map(item => (
-            <div key={item.n} className="glass rounded-xl p-4 flex gap-3">
-              <span className="text-slate-700 font-black text-sm shrink-0 tabular-nums w-4">{item.n}</span>
+            <div key={item.n} className="card rounded-xl p-4 flex gap-3">
+              <span className="text-[var(--color-ink-faint)] font-black text-sm shrink-0 tabular-nums w-4">{item.n}</span>
               <div>
-                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
               </div>
             </div>
           ))}
@@ -290,14 +286,14 @@ function KVASection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
     <div className="space-y-5">
       <div>
         <div className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${TYPE_COLOR.KVA}`}>10 frågor · ~60 s/fråga · svar alltid A–D</div>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Jämför Kvantitet I (vänster) med Kvantitet II (höger). Svarsalternativen är alltid desamma.
         </p>
       </div>
 
       {/* Fixed answer scheme */}
-      <div className="glass rounded-2xl overflow-hidden">
-        <div className="px-4 py-2.5 border-b border-white/[0.06] text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      <div className="card rounded-2xl overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-[var(--color-card-border)] text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-faint)]">
           Svarsschema — alltid
         </div>
         {[
@@ -306,15 +302,15 @@ function KVASection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
           ['C', 'Kvantiteterna är lika stora'],
           ['D', 'Informationen är otillräcklig för att avgöra'],
         ].map(([key, label]) => (
-          <div key={key} className="flex items-center gap-3 px-4 py-3 border-t border-white/[0.04] text-sm">
+          <div key={key} className="flex items-center gap-3 px-4 py-3 border-t border-[var(--color-card-border)] text-sm">
             <span className={`font-black w-5 shrink-0 ${TYPE_COLOR.KVA}`}>{key}</span>
-            <span className="text-slate-400 text-xs">{label}</span>
+            <span className="text-[var(--color-ink-muted)] text-xs">{label}</span>
           </div>
         ))}
       </div>
 
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Strategi</div>
         <div className="space-y-2">
           {[
             { title: 'Förenkla, räkna inte exakt', body: 'Subtrahera eller dividera båda kvantiteterna med samma positiva tal. Du behöver bara avgöra vilket som är störst — inte beräkna exakta värden.' },
@@ -322,40 +318,40 @@ function KVASection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             { title: 'D är vanligare än man tror', body: 'Hittar du ett fall där I > II och ett fall där II > I? Svaret är D. Välj inte D av rädsla, men räkna inte bort det tidigt.' },
             { title: 'Negativa tal och rötter', body: 'Var extra försiktig: x² = 4 → x = ±2. √x kräver x ≥ 0. Negativa tal beter sig annorlunda vid upphöjning till jämna potenser.' },
           ].map((item, i) => (
-            <div key={i} className="glass rounded-xl p-4 flex gap-3">
-              <span className="text-slate-700 font-black text-sm shrink-0 tabular-nums w-4">{i + 1}</span>
+            <div key={i} className="card rounded-xl p-4 flex gap-3">
+              <span className="text-[var(--color-ink-faint)] font-black text-sm shrink-0 tabular-nums w-4">{i + 1}</span>
               <div>
-                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl p-4">
-        <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1.5">Vanlig fälla</div>
-        <p className="text-xs text-amber-200/80 leading-relaxed">
+      <div className="bg-[rgba(217,119,6,0.08)] border border-[rgba(217,119,6,0.20)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[#D97706] uppercase tracking-widest mb-1.5">Vanlig fälla</div>
+        <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
           Om x² = 4 kan x vara 2 <strong>eller</strong> −2. Testa alltid båda. Detsamma gäller alla jämnpotensuations — glöm inte den negativa roten.
         </p>
       </div>
 
       {/* Interactive worked example */}
-      <div className="glass rounded-2xl p-5 border border-blue-500/10">
-        <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3">Interaktivt exempel — testa extremvärden</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-sm">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Kvantitativa jämförelser</div>
+      <div className="card rounded-2xl p-5">
+        <div className="text-[10px] font-bold text-[#2563EB] uppercase tracking-widest mb-3">Interaktivt exempel — testa extremvärden</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-sm">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Kvantitativa jämförelser</div>
           <div className="grid grid-cols-2 gap-4 text-center mb-2">
             <div>
-              <div className="text-[10px] text-slate-600 uppercase tracking-widest mb-1">Kvantitet I</div>
-              <div className="text-slate-200 font-bold">x²</div>
+              <div className="text-[10px] text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Kvantitet I</div>
+              <div className="text-[var(--color-ink)] font-bold">x²</div>
             </div>
             <div>
-              <div className="text-[10px] text-slate-600 uppercase tracking-widest mb-1">Kvantitet II</div>
-              <div className="text-slate-200 font-bold">x</div>
+              <div className="text-[10px] text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Kvantitet II</div>
+              <div className="text-[var(--color-ink)] font-bold">x</div>
             </div>
           </div>
-          <div className="text-[10px] text-slate-500 text-center">x är ett reellt tal</div>
+          <div className="text-[10px] text-[var(--color-ink-faint)] text-center">x är ett reellt tal</div>
         </div>
         <StepReveal steps={[
           { label: 'Testa x = 2', content: 'Kvantitet I: 2² = 4. Kvantitet II: 2. Här är I > II.', result: '→ Preliminärt: A?' },
@@ -375,15 +371,15 @@ function NOGSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
     <div className="space-y-5">
       <div>
         <div className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${TYPE_COLOR.NOG}`}>6 frågor · ~100 s/fråga · svar alltid A–E</div>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Avgör om påstående (1) och/eller (2) ger <em>tillräcklig</em> information för att besvara frågan entydigt.
-          Du behöver <strong className="text-white">inte</strong> lösa problemet — bara avgöra om det <em>går</em> att lösa.
+          Du behöver <strong className="text-[var(--color-ink)]">inte</strong> lösa problemet — bara avgöra om det <em>går</em> att lösa.
         </p>
       </div>
 
       {/* Fixed answer scheme */}
-      <div className="glass rounded-2xl overflow-hidden">
-        <div className="px-4 py-2.5 border-b border-white/[0.06] text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      <div className="card rounded-2xl overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-[var(--color-card-border)] text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-faint)]">
           Svarsschema — alltid
         </div>
         {[
@@ -393,32 +389,32 @@ function NOGSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
           ['D', 'Varje påstående räcker för sig'],
           ['E', 'Ej tillräcklig information ens med båda'],
         ].map(([key, label]) => (
-          <div key={key} className="flex items-center gap-3 px-4 py-3 border-t border-white/[0.04] text-sm">
+          <div key={key} className="flex items-center gap-3 px-4 py-3 border-t border-[var(--color-card-border)] text-sm">
             <span className={`font-black w-5 shrink-0 ${TYPE_COLOR.NOG}`}>{key}</span>
-            <span className="text-slate-400 text-xs">{label}</span>
+            <span className="text-[var(--color-ink-muted)] text-xs">{label}</span>
           </div>
         ))}
       </div>
 
       {/* 3-step method */}
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Metod — tre steg</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Metod — tre steg</div>
         <div className="space-y-1.5">
           {[
             ['Steg 1', 'Prova (1) ensamt. Ger det ett unikt svar på frågan?'],
             ['Steg 2', 'Prova (2) ensamt. Ger det ett unikt svar på frågan?'],
             ['Steg 3', 'Om inget räckte: prova (1) + (2) tillsammans. Räcker de nu?'],
           ].map(([step, desc]) => (
-            <div key={step} className="glass rounded-xl px-4 py-3 flex gap-3 items-start text-sm">
+            <div key={step} className="card rounded-xl px-4 py-3 flex gap-3 items-start text-sm">
               <span className={`font-black shrink-0 text-xs ${TYPE_COLOR.NOG}`}>{step}</span>
-              <span className="text-slate-400 text-xs leading-relaxed">{desc}</span>
+              <span className="text-[var(--color-ink-muted)] text-xs leading-relaxed">{desc}</span>
             </div>
           ))}
         </div>
       </div>
 
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Strategi</div>
         <div className="space-y-2">
           {[
             { title: '"Entydigt" är nyckeln', body: 'Ett unikt svar på frågan — inte nödvändigtvis ett numeriskt svar. Om svaret alltid är "Nej" är det fortfarande entydigt!' },
@@ -426,11 +422,11 @@ function NOGSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             { title: 'E är ovanligt', body: 'Välj E bara om du verkligen kan visa att (1) + (2) tillsammans fortfarande inte ger ett unikt svar. E väljs felaktigt oftare än A–D.' },
             { title: 'D kräver oberoende tillräcklighet', body: 'D väljs om (1) räcker OCH (2) räcker — var för sig. Om båda leder till samma unika svar → D.' },
           ].map((item, i) => (
-            <div key={i} className="glass rounded-xl p-4 flex gap-3">
-              <span className="text-slate-700 font-black text-sm shrink-0 tabular-nums w-4">{i + 1}</span>
+            <div key={i} className="card rounded-xl p-4 flex gap-3">
+              <span className="text-[var(--color-ink-faint)] font-black text-sm shrink-0 tabular-nums w-4">{i + 1}</span>
               <div>
-                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
               </div>
             </div>
           ))}
@@ -438,14 +434,14 @@ function NOGSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
       </div>
 
       {/* Interactive worked example */}
-      <div className="glass rounded-2xl p-5 border border-emerald-500/10">
-        <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Interaktivt exempel — följ 3-stegsmetoden</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-sm">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Fråga</div>
-          <p className="text-slate-200 mb-3">Är x² {'>'} 4?</p>
-          <div className="space-y-1.5 text-xs text-slate-400">
-            <div className="flex gap-2"><span className="font-bold text-emerald-400 shrink-0">(1)</span> x {'>'} 2</div>
-            <div className="flex gap-2"><span className="font-bold text-emerald-400 shrink-0">(2)</span> x {'<'} −3</div>
+      <div className="card rounded-2xl p-5">
+        <div className="text-[10px] font-bold text-[var(--color-green-light)] uppercase tracking-widest mb-3">Interaktivt exempel — följ 3-stegsmetoden</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-sm">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Fråga</div>
+          <p className="text-[var(--color-ink)] mb-3">Är x² {'>'} 4?</p>
+          <div className="space-y-1.5 text-xs text-[var(--color-ink-muted)]">
+            <div className="flex gap-2"><span className="font-bold text-[var(--color-green-light)] shrink-0">(1)</span> x {'>'} 2</div>
+            <div className="flex gap-2"><span className="font-bold text-[var(--color-green-light)] shrink-0">(2)</span> x {'<'} −3</div>
           </div>
         </div>
         <StepReveal steps={[
@@ -465,14 +461,14 @@ function DTKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
     <div className="space-y-5">
       <div>
         <div className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${TYPE_COLOR.DTK}`}>12 frågor · ~115 s/fråga · svar A–E</div>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Läs av och räkna utifrån presenterat datamaterial — stapeldiagram, linjediagram, tabeller, kartfrågor
           och cirkeldiagram. DTK ger mest tid per fråga av alla avsnitt.
         </p>
       </div>
 
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Vanliga datatyper</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Vanliga datatyper</div>
         <div className="grid grid-cols-2 gap-1.5">
           {[
             ['Stapeldiagram', 'Stapelhöjder, skillnader, procent'],
@@ -482,16 +478,16 @@ function DTKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             ['Cirkeldiagram', 'Sektorers andel av helhet'],
             ['Kombinerade', 'Flera diagram om samma dataset'],
           ].map(([t, d]) => (
-            <div key={t} className="glass rounded-xl px-3.5 py-2.5">
-              <div className="text-xs font-semibold text-slate-300">{t}</div>
-              <div className="text-[10px] text-slate-600 mt-0.5">{d}</div>
+            <div key={t} className="card rounded-xl px-3.5 py-2.5">
+              <div className="text-xs font-semibold text-[var(--color-ink)]">{t}</div>
+              <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">{d}</div>
             </div>
           ))}
         </div>
       </div>
 
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Strategi</div>
         <div className="space-y-2">
           {[
             { title: 'Läs titel och enheter först', body: 'Titta alltid på rubriken, axlarnas etiketter och enheter innan frågorna. Missar du y-axelns enhet förlorar du uppgiften.' },
@@ -499,39 +495,39 @@ function DTKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             { title: 'Ta den tid DTK ger dig', body: 'Du har ~115 s/fråga — mer än dubbelt mot XYZ. Stressa inte. Läs ordentligt och kontrollräkna om tid finns.' },
             { title: 'Procentuell förändring', body: '(Nytt − Gammalt) / Gammalt × 100. Den vanligaste beräkningstypen i DTK. Känn igen mönstret direkt.' },
           ].map((item, i) => (
-            <div key={i} className="glass rounded-xl p-4 flex gap-3">
-              <span className="text-slate-700 font-black text-sm shrink-0 tabular-nums w-4">{i + 1}</span>
+            <div key={i} className="card rounded-xl p-4 flex gap-3">
+              <span className="text-[var(--color-ink-faint)] font-black text-sm shrink-0 tabular-nums w-4">{i + 1}</span>
               <div>
-                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-blue-500/8 border border-blue-500/15 rounded-xl p-4">
-        <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1.5">HP-insikt</div>
-        <p className="text-xs text-blue-200/80 leading-relaxed">
+      <div className="bg-[rgba(37,99,235,0.08)] border border-[rgba(37,99,235,0.15)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[#2563EB] uppercase tracking-widest mb-1.5">HP-insikt</div>
+        <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
           DTK-frågor letar efter om du kan läsa och beräkna från data — inte om du kan avancerad matematik.
           De flesta fel beror på att man läser diagrammet fel, inte att man räknar fel.
         </p>
       </div>
 
       {/* Interactive worked example */}
-      <div className="glass rounded-2xl p-5 border border-amber-500/10">
-        <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-3">Interaktivt exempel — läs diagrammet rätt</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Diagram — Försäljning (tusental enheter)</div>
+      <div className="card rounded-2xl p-5">
+        <div className="text-[10px] font-bold text-[#D97706] uppercase tracking-widest mb-3">Interaktivt exempel — läs diagrammet rätt</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Diagram — Försäljning (tusental enheter)</div>
           <div className="flex items-end gap-2 h-20 mb-1">
             {[{ y: 2020, v: 100 }, { y: 2021, v: 145 }, { y: 2022, v: 90 }, { y: 2023, v: 120 }].map(bar => (
               <div key={bar.y} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full bg-amber-500/60 rounded-t" style={{ height: `${(bar.v / 145) * 72}px` }} />
-                <div className="text-[9px] text-slate-600">{bar.y}</div>
+                <div className="w-full bg-[rgba(217,119,6,0.60)] rounded-t" style={{ height: `${(bar.v / 145) * 72}px` }} />
+                <div className="text-[9px] text-[var(--color-ink-faint)]">{bar.y}</div>
               </div>
             ))}
           </div>
-          <div className="text-[9px] text-slate-600 mt-1">Y-axel: Sålda enheter (tusental). Varje enhet = 1 000 st.</div>
+          <div className="text-[9px] text-[var(--color-ink-faint)] mt-1">Y-axel: Sålda enheter (tusental). Varje enhet = 1 000 st.</div>
         </div>
         <StepReveal steps={[
           { label: 'Fråga 1 — Vilket år var försäljningen lägst?', content: 'Titta på staplarnas höjd: 2020 (100), 2021 (145), 2022 (90), 2023 (120). Lägst stapel = 2022 med 90 000 enheter.', result: '→ Svar: 2022' },
@@ -549,22 +545,22 @@ function ORDSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">ORD — Ordförståelse · 10 frågor · ~45 s/fråga · svar A–E</div>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <div className="text-[10px] font-bold text-[#DC2626] uppercase tracking-widest mb-1">ORD — Ordförståelse · 10 frågor · ~45 s/fråga · svar A–E</div>
+        <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Ett ord eller uttryck ges — du väljer det alternativ som bäst har samma innebörd. Testet mäter om du kan förstå ords nyanser och synonymer.
         </p>
       </div>
-      <div className="glass rounded-xl p-4">
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Exempelformat</div>
-        <div className="text-sm text-slate-200 mb-3 font-medium">SUBTIL betyder ungefär detsamma som:</div>
+      <div className="card rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Exempelformat</div>
+        <div className="text-sm text-[var(--color-ink)] mb-3 font-medium">SUBTIL betyder ungefär detsamma som:</div>
         <div className="space-y-1.5 text-sm">
           {['A — Tydlig', 'B — Fin', 'C — Varsam', 'D — Knappt märkbar', 'E — Komplicerad'].map((opt, i) => (
-            <div key={i} className={`px-3 py-1.5 rounded-lg ${i === 3 ? 'bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 font-bold' : 'text-slate-500'}`}>{opt}</div>
+            <div key={i} className={`px-3 py-1.5 rounded-lg ${i === 3 ? 'bg-[var(--color-green-muted)] border border-[var(--color-card-border)] text-[var(--color-green-light)] font-bold' : 'text-[var(--color-ink-faint)]'}`}>{opt}</div>
           ))}
         </div>
       </div>
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Strategi</div>
         <div className="space-y-2">
           {[
             { title: 'Eliminera tydliga fel', body: 'Ta bort de alternativ du är säker på är fel. Bland kvarvaranden väljer du det bäst synonyma.' },
@@ -572,21 +568,21 @@ function ORDSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             { title: 'Ordets ursprung hjälper', body: '"Sub-" = under, lite. "-til" = fint/tunt. Latin-/grekiska-prefix ger ofta ledtrådar till grundbetydelsen.' },
             { title: 'Svåra ord — gissa på B eller C', body: 'Statistiskt sett är mitten-alternativen (B–D) vanligare rätta svar i ORD än extremerna (A, E).' },
           ].map((item, i) => (
-            <div key={i} className="glass rounded-xl p-4 flex gap-3">
-              <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
+            <div key={i} className="card rounded-xl p-4 flex gap-3">
+              <span className="text-[var(--color-ink-faint)] font-black text-sm shrink-0 w-4">{i + 1}</span>
               <div>
-                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="bg-rose-500/8 border border-rose-500/15 rounded-xl p-4">
-        <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1.5">Vanliga kategorier</div>
+      <div className="bg-[rgba(220,38,38,0.08)] border border-[rgba(220,38,38,0.15)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[#DC2626] uppercase tracking-widest mb-1.5">Vanliga kategorier</div>
         <div className="grid grid-cols-2 gap-1.5">
           {['Akademiska termer', 'Abstrakta begrepp', 'Litterärt/ålderdomligt språk', 'Fackspråk (juridik, medicin)', 'Idiom & fraser', 'Latinska ord'].map(cat => (
-            <div key={cat} className="text-xs text-slate-400 bg-white/[0.04] rounded-lg px-3 py-2">{cat}</div>
+            <div key={cat} className="text-xs text-[var(--color-ink-muted)] bg-[var(--color-paper-dark)] rounded-lg px-3 py-2">{cat}</div>
           ))}
         </div>
       </div>
@@ -599,13 +595,13 @@ function LASSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-1">LÄS — Läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <div className="text-[10px] font-bold text-[#DB2777] uppercase tracking-widest mb-1">LÄS — Läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
+        <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Tre texter (200–500 ord var) följs av 4–6 frågor vardera om textens innehåll, slutsatser och ords innebörd i sammanhang.
         </p>
       </div>
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Strategi</div>
         <div className="space-y-2">
           {[
             { title: 'Läs frågorna först', body: 'Vet du vad du letar efter innan du läser texten. Det sparar tid och fokuserar din läsning på det som testas.' },
@@ -614,29 +610,29 @@ function LASSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             { title: 'Gör inte egna slutledningar', body: 'LÄS testar vad texten säger, inte vad du tror/vet om ämnet. Din allmänbildning kan lura dig.' },
             { title: 'Meningsförståelse i kontext', body: 'Om du ska förklara ett ords innebörd: läs hela meningen och stycket runt det — inte bara ordet isolerat.' },
           ].map((item, i) => (
-            <div key={i} className="glass rounded-xl p-4 flex gap-3">
-              <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
+            <div key={i} className="card rounded-xl p-4 flex gap-3">
+              <span className="text-[var(--color-ink-faint)] font-black text-sm shrink-0 w-4">{i + 1}</span>
               <div>
-                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="bg-pink-500/8 border border-pink-500/15 rounded-xl p-4">
-        <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-1.5">HP-insikt</div>
-        <p className="text-xs text-pink-200/80 leading-relaxed">
+      <div className="bg-[rgba(219,39,119,0.08)] border border-[rgba(219,39,119,0.15)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[#DB2777] uppercase tracking-widest mb-1.5">HP-insikt</div>
+        <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
           LÄS är den sektion där läsordning spelar störst roll. Om texten är lång och tät — läs de 5 frågorna på 30 sekunder, markera nyckelord, läs sedan texten. Kom tillbaka till frågorna och hitta textbevis.
         </p>
       </div>
-      <div className="glass rounded-2xl p-5 border border-pink-500/10">
-        <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Interaktivt exempel — hitta textbevis</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (utdrag)</div>
+      <div className="card rounded-2xl p-5">
+        <div className="text-[10px] font-bold text-[#DB2777] uppercase tracking-widest mb-3">Interaktivt exempel — hitta textbevis</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (utdrag)</div>
           <p>Urbaniseringen i Sverige har accelererat under de senaste decennierna. Allt fler väljer att bosätta sig i storstadsregioner, medan landsbygdens befolkning minskar. Forskare pekar på att denna rörelse drivs av tillgång till arbetsmarknaden och utbildning — inte av en vilja att lämna landsbygden.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: Vad är den primära orsaken till urbaniseringen enligt texten?</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fråga: Vad är den primära orsaken till urbaniseringen enligt texten?</div>
         <StepReveal steps={[
           { label: 'Steg 1 — Läs frågan noggrant', content: 'Frågan frågar efter "primär orsak" och "enligt texten" — inte dina egna kunskaper om urbanisering.', result: '→ Fokus: orsak, textbevis krävs' },
           { label: 'Steg 2 — Hitta rätt stycke', content: 'Meningen "Forskare pekar på att..." ger svaret direkt: tillgång till arbetsmarknaden och utbildning.', result: '→ Textbevis hittad' },
@@ -653,14 +649,14 @@ function MEKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold text-fuchsia-400 uppercase tracking-widest mb-1">MEK — Meningskomplettering · 10 frågor · ~50 s/fråga · svar A–D</div>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <div className="text-[10px] font-bold text-[#9333EA] uppercase tracking-widest mb-1">MEK — Meningskomplettering · 10 frågor · ~50 s/fråga · svar A–D</div>
+        <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           En mening med ett eller två luckor ges. Du väljer det ord eller den fras som bäst kompletterar meningen semantiskt och grammatiskt.
         </p>
       </div>
-      <div className="glass rounded-xl p-4">
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Exempelformat</div>
-        <div className="text-sm text-slate-200 mb-3">
+      <div className="card rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Exempelformat</div>
+        <div className="text-sm text-[var(--color-ink)] mb-3">
           "Trots sina uppenbara <span className="underline underline-offset-2">___</span> lyckades projektet nå ett <span className="underline underline-offset-2">___</span> resultat."
         </div>
         <div className="space-y-1.5 text-sm">
@@ -670,12 +666,12 @@ function MEKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             'C — resurser … dyrt',
             'D — förseningar … snabbt',
           ].map((opt, i) => (
-            <div key={i} className={`px-3 py-1.5 rounded-lg ${i === 1 ? 'bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 font-bold' : 'text-slate-500'}`}>{opt}</div>
+            <div key={i} className={`px-3 py-1.5 rounded-lg ${i === 1 ? 'bg-[var(--color-green-muted)] border border-[var(--color-card-border)] text-[var(--color-green-light)] font-bold' : 'text-[var(--color-ink-faint)]'}`}>{opt}</div>
           ))}
         </div>
       </div>
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Strategi</div>
         <div className="space-y-2">
           {[
             { title: 'Identifiera sambandsordet', body: '"Trots" signalerar kontrast. Det kräver att luckorna bildar en kontrastsituation — problem + positivt utfall.' },
@@ -683,11 +679,11 @@ function MEKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             { title: 'Läs hela meningen högt (mentalt)', body: 'Klistra in alternativet och hör om det låter naturligt. Grammatik och flöde avslöjar fel svar.' },
             { title: 'Signalord: orsak, kontrast, tillägg', body: '"Därför/eftersom" = orsak. "Trots/men/dock" = kontrast. "Dessutom/och" = tillägg. Identifiera vilket och matcha luckorna.' },
           ].map((item, i) => (
-            <div key={i} className="glass rounded-xl p-4 flex gap-3">
-              <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
+            <div key={i} className="card rounded-xl p-4 flex gap-3">
+              <span className="text-[var(--color-ink-faint)] font-black text-sm shrink-0 w-4">{i + 1}</span>
               <div>
-                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
               </div>
             </div>
           ))}
@@ -702,13 +698,13 @@ function ELFSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">ELF — Engelsk läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <div className="text-[10px] font-bold text-[#7C3AED] uppercase tracking-widest mb-1">ELF — Engelsk läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
+        <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Identisk struktur som LÄS, men texten är på engelska. Frågorna och svarsalternativen är på svenska. Testas din förmåga att förstå akademisk engelska.
         </p>
       </div>
       <div>
-        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Strategi</div>
+        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Strategi</div>
         <div className="space-y-2">
           {[
             { title: 'Samma metod som LÄS', body: 'Läs frågorna (på svenska) först. Hitta textbevis i den engelska texten. Frågorna är alltid på svenska — lättare att orientera sig.' },
@@ -716,18 +712,18 @@ function ELFSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             { title: 'Parafrasera — inte citera', body: 'Rätt svar omformulerar textens innehåll. Alternativ som citerar texten ordagrant är ibland fel — de kan sakna rätt kontext.' },
             { title: 'Falskt bekanta ord', body: '"Eventually" = till slut (inte "eventuellt"). "Actual" = verklig (inte "aktuell"). "Sensible" = förnuftig (inte "sensibel"). Känn igen false friends.' },
           ].map((item, i) => (
-            <div key={i} className="glass rounded-xl p-4 flex gap-3">
-              <span className="text-slate-700 font-black text-sm shrink-0 w-4">{i + 1}</span>
+            <div key={i} className="card rounded-xl p-4 flex gap-3">
+              <span className="text-[var(--color-ink-faint)] font-black text-sm shrink-0 w-4">{i + 1}</span>
               <div>
-                <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-                <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="bg-purple-500/8 border border-purple-500/20 rounded-xl p-4">
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1.5">False friends — vanliga misstag</div>
+      <div className="bg-[rgba(124,58,237,0.08)] border border-[rgba(124,58,237,0.20)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[#7C3AED] uppercase tracking-widest mb-1.5">False friends — vanliga misstag</div>
         <div className="space-y-1.5">
           {[
             ['Eventually', 'Till slut', 'Eventuellt (wrong!)'],
@@ -736,9 +732,9 @@ function ELFSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             ['Sympathetic', 'Förstående/medkännande', 'Sympatisk (wrong!)'],
           ].map(([eng, right, wrong]) => (
             <div key={eng} className="grid grid-cols-3 gap-2 text-xs">
-              <span className="font-bold text-purple-300">{eng}</span>
-              <span className="text-emerald-400">✓ {right}</span>
-              <span className="text-red-400">✗ {wrong}</span>
+              <span className="font-bold text-[#7C3AED]">{eng}</span>
+              <span className="text-[var(--color-green-light)]">✓ {right}</span>
+              <span className="text-[var(--color-error)]">✗ {wrong}</span>
             </div>
           ))}
         </div>
@@ -753,30 +749,27 @@ export default function Theory() {
   const [tab, setTab] = useState<Tab>('overview')
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app">
 
       {/* ── Hero ────────────────────────────────────────────────── */}
-      <div className="border-b border-white/[0.06]">
-        <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            Provguide
-          </div>
-          <h1 className="text-4xl font-black mb-2 tracking-tight">HP Provguide</h1>
-          <p className="text-slate-400 text-sm leading-relaxed">
-            Struktur, svarsscheman och strategi för alla åtta avsnitt. Matematik och formler hittar du i <button onClick={() => navigate('/matematik')} className="text-violet-400 hover:text-violet-300 underline underline-offset-2 transition-colors">Matematikguiden</button>.
+      <div className="border-b border-[var(--color-card-border)]">
+        <div className="max-w-2xl mx-auto px-4 pt-12 pb-6">
+          <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)] mb-2">Teori</h1>
+          <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
+            Struktur, svarsscheman och strategi för alla åtta avsnitt. Matematik och formler hittar du i{' '}
+            <button onClick={() => navigate('/matematik')} className="text-[#7C3AED] hover:text-[#6d28d9] underline underline-offset-2 transition-colors">Matematikguiden</button>.
           </p>
         </div>
       </div>
 
       {/* ── Top tabs ────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 bg-[#080C14]/95 backdrop-blur-xl border-b border-white/[0.05]">
+      <div className="sticky top-0 z-20 bg-[var(--color-paper)]/95 backdrop-blur-sm border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 flex gap-0 overflow-x-auto">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors relative whitespace-nowrap px-2 ${tab === t.id ? (t.id === 'overview' ? 'text-white' : TYPE_COLOR[t.id]) : 'text-slate-600 hover:text-slate-400'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors relative whitespace-nowrap px-2 ${tab === t.id ? (t.id === 'overview' ? 'text-[var(--color-ink)]' : TYPE_COLOR[t.id]) : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
               {tab === t.id && (
