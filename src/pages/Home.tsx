@@ -85,9 +85,9 @@ export default function Home() {
   const greeting = hour < 12 ? 'God morgon' : hour < 17 ? 'God dag' : 'God kväll'
 
   return (
-    <div className="min-h-screen bg-app pb-28">
+    <div className="min-h-screen bg-app pb-8 pt-topnav">
       {/* ── Header ────────────────────────────────────────── */}
-      <div className="px-4 pt-12 pb-4 max-w-2xl mx-auto">
+      <div className="px-4 pt-6 pb-4 max-w-2xl mx-auto">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)]">{greeting}</h1>
           {stats && <span className="streak-pill">🔥 {stats.streak}</span>}
@@ -98,6 +98,14 @@ export default function Home() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4">
+
+        {/* ── CTA hero ──────────────────────────────────────── */}
+        <button
+          onClick={() => navigate('/practice')}
+          className="w-full btn-primary py-4 text-base font-bold mb-4 rounded-2xl"
+        >
+          Starta träning →
+        </button>
 
         {/* ── Hero score card ───────────────────────────────── */}
         <div className="card-green p-6 mb-4">

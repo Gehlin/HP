@@ -34,7 +34,7 @@ This phase delivers the biggest visible transformation: ripping out the bottom t
   - Replace `{!inSession && <BottomNav />}` → `<TopNav />` (TopNav handles its own visibility via the null return)
   - No other changes needed
 
-- [ ] Update `src/pages/Home.tsx` layout and add the CTA hero:
+- [x] Update `src/pages/Home.tsx` layout and add the CTA hero:
   - Change the outer div from `min-h-screen bg-app pb-28` → `min-h-screen bg-app pb-8`
   - Change the header div from `px-4 pt-12 pb-4 max-w-2xl mx-auto` → `px-4 pt-6 pb-4 max-w-2xl mx-auto` — the `pt-topnav` goes on the outermost div instead. So outer div becomes `min-h-screen bg-app pb-8 pt-topnav`
   - Directly after the opening `<div className="max-w-2xl mx-auto px-4">` (i.e., before the hero score card), insert a prominent CTA card:
