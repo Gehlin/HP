@@ -19,11 +19,11 @@ export default class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen bg-app flex flex-col items-center justify-center p-8 text-center">
           <div className="text-5xl mb-5 select-none">⚠️</div>
-          <h1 className="text-xl font-black text-white mb-2 tracking-tight">Något gick fel</h1>
-          <p className="text-slate-400 text-sm mb-1 max-w-xs leading-relaxed">
+          <h1 className="text-xl font-black text-[var(--color-ink)] mb-2 tracking-tight">Något gick fel</h1>
+          <p className="text-[var(--color-ink-muted)] text-sm mb-1 max-w-xs leading-relaxed">
             Ett oväntat fel inträffade. Dina svar och framsteg är sparade.
           </p>
-          <p className="text-slate-600 text-xs mb-8 font-mono break-all max-w-xs">
+          <p className="text-[var(--color-ink-faint)] text-xs mb-8 font-mono break-all max-w-xs">
             {this.state.error.message}
           </p>
           <button

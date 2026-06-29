@@ -31,12 +31,12 @@ export function daysUntilExam(): number | null {
 }
 
 export function urgencyLabel(days: number): { text: string; color: string } {
-  if (days < 0)  return { text: 'Provet har passerat', color: 'text-slate-400' }
-  if (days === 0) return { text: 'Provet är idag!', color: 'text-emerald-400' }
-  if (days <= 7)  return { text: 'Sista veckan — kör hårt!', color: 'text-red-400' }
-  if (days <= 14) return { text: 'Två veckor kvar — intensifiera nu', color: 'text-amber-400' }
-  if (days <= 30) return { text: 'En månad kvar — bygg momentum', color: 'text-blue-400' }
-  return { text: 'God tid kvar — var konsekvent', color: 'text-slate-300' }
+  if (days < 0)  return { text: 'Provet har passerat', color: 'text-[var(--color-ink-faint)]' }
+  if (days === 0) return { text: 'Provet är idag!', color: 'text-emerald-700' }
+  if (days <= 7)  return { text: 'Sista veckan — kör hårt!', color: 'text-red-600' }
+  if (days <= 14) return { text: 'Två veckor kvar — intensifiera nu', color: 'text-amber-600' }
+  if (days <= 30) return { text: 'En månad kvar — bygg momentum', color: 'text-blue-700' }
+  return { text: 'God tid kvar — var konsekvent', color: 'text-[var(--color-ink-muted)]' }
 }
 
 // Recommended daily question count given days left and backlog

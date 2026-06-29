@@ -279,17 +279,17 @@ export default function DtkGuide() {
             <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Vanliga fallgropar</div>
             {TRAPS.map(trap => (
               <div key={trap.name} className={`card rounded-2xl p-4 border ${
-                trap.severity === 'hög' ? 'border-red-500/20' : trap.severity === 'medel' ? 'border-amber-500/20' : 'border-[var(--color-card-border)]'
+                trap.severity === 'hög' ? 'border-red-200' : trap.severity === 'medel' ? 'border-amber-200' : 'border-[var(--color-card-border)]'
               }`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                    trap.severity === 'hög' ? 'bg-red-500/15 text-red-400' : trap.severity === 'medel' ? 'bg-amber-500/15 text-amber-400' : 'bg-slate-700/50 text-[var(--color-ink-faint)]'
+                    trap.severity === 'hög' ? 'bg-red-50 text-red-700' : trap.severity === 'medel' ? 'bg-amber-50 text-amber-700' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'
                   }`}>{trap.severity}</span>
                   <span className="text-sm font-bold text-[var(--color-ink)]">{trap.name}</span>
                 </div>
                 <p className="text-xs text-[var(--color-ink-muted)] mb-3 leading-relaxed">{trap.desc}</p>
-                <div className="flex items-start gap-2 bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-2.5">
-                  <span className="text-emerald-400 text-xs shrink-0 mt-0.5">✓</span>
+                <div className="flex items-start gap-2 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5">
+                  <span className="text-emerald-700 text-xs shrink-0 mt-0.5">✓</span>
                   <span className="text-[11px] text-[var(--color-ink-muted)]">{trap.fix}</span>
                 </div>
               </div>

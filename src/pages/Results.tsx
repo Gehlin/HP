@@ -105,12 +105,12 @@ export default function Results() {
   }, [])
 
   if (!session) return (
-    <div className="min-h-screen bg-app text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] flex items-center justify-center px-4">
       <div className="text-center">
-        <div className="text-5xl font-black text-slate-700 mb-4">—</div>
-        <div className="text-slate-400 font-semibold mb-1">Ingen session hittades</div>
-        <p className="text-slate-600 text-sm mb-6">Starta ett träningspass för att se resultat.</p>
-        <button onClick={() => navigate('/practice')} className="bg-blue-600 hover:bg-blue-500 transition-colors px-6 py-3 rounded-xl font-bold text-sm">
+        <div className="text-5xl font-black text-[var(--color-ink-faint)] mb-4">—</div>
+        <div className="text-[var(--color-ink-muted)] font-semibold mb-1">Ingen session hittades</div>
+        <p className="text-[var(--color-ink-faint)] text-sm mb-6">Starta ett träningspass för att se resultat.</p>
+        <button onClick={() => navigate('/practice')} className="btn-primary px-6 py-3 rounded-xl font-bold text-sm">
           Starta träning →
         </button>
       </div>
@@ -330,24 +330,24 @@ export default function Results() {
                 <span className="text-amber-400 font-bold">⭐ Ny nivå uppnådd! Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
               </div>
             )}
-            <div className="glass border border-blue-500/20 rounded-2xl p-5">
+            <div className="card border border-blue-200 rounded-2xl p-5">
               <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-4xl font-black text-blue-400">+{xpInfo.earned} XP</span>
-                <span className="text-slate-400 text-sm">intjänat</span>
+                <span className="text-4xl font-black text-blue-700">+{xpInfo.earned} XP</span>
+                <span className="text-[var(--color-ink-muted)] text-sm">intjänat</span>
               </div>
-              <div className="space-y-0.5 mb-4 text-sm text-slate-400">
+              <div className="space-y-0.5 mb-4 text-sm text-[var(--color-ink-muted)]">
                 {xpInfo.easy > 0 && (
-                  <div>{xpInfo.easy} lätt × 10 = <span className="text-slate-300">{xpInfo.easy * 10} XP</span></div>
+                  <div>{xpInfo.easy} lätt × 10 = <span className="text-[var(--color-ink)]">{xpInfo.easy * 10} XP</span></div>
                 )}
                 {xpInfo.medium > 0 && (
-                  <div>{xpInfo.medium} medel × 15 = <span className="text-slate-300">{xpInfo.medium * 15} XP</span></div>
+                  <div>{xpInfo.medium} medel × 15 = <span className="text-[var(--color-ink)]">{xpInfo.medium * 15} XP</span></div>
                 )}
                 {xpInfo.hard > 0 && (
-                  <div>{xpInfo.hard} svår × 25 = <span className="text-slate-300">{xpInfo.hard * 25} XP</span></div>
+                  <div>{xpInfo.hard} svår × 25 = <span className="text-[var(--color-ink)]">{xpInfo.hard * 25} XP</span></div>
                 )}
-                <div>Sessionbonus = <span className="text-slate-300">20 XP</span></div>
+                <div>Sessionbonus = <span className="text-[var(--color-ink)]">20 XP</span></div>
               </div>
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+              <div className="flex items-center justify-between text-xs text-[var(--color-ink-muted)] mb-1.5">
                 <span>Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
                 {xpInfo.level.level < 10 && (
                   <span>
@@ -355,7 +355,7 @@ export default function Results() {
                   </span>
                 )}
               </div>
-              <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden">
+              <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-blue-500 rounded-full transition-all duration-1000"
                   style={{ width: `${xpProgress}%` }}
@@ -374,17 +374,17 @@ export default function Results() {
           const hpLabel = hpScoreLabel(displayScore)
           const hpPct = ((displayScore - 1.00) / 1.00) * 100
           return (
-            <div className="glass border border-white/[0.08] rounded-2xl p-5 mb-6">
-              <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-3">Estimerat HP-betyg</div>
+            <div className="card border border-[var(--color-card-border)] rounded-2xl p-5 mb-6">
+              <div className="text-[10px] font-black tracking-widest uppercase text-[var(--color-ink-faint)] mb-3">Estimerat HP-betyg</div>
 
               {hasBoth && (
                 <div className="grid grid-cols-2 gap-2 mb-4">
-                  <div className="bg-white/[0.03] rounded-xl p-3">
-                    <div className="text-[9px] font-black tracking-widest uppercase text-slate-600 mb-1">Kvantitativ</div>
+                  <div className="bg-[var(--color-paper-dark)] rounded-xl p-3">
+                    <div className="text-[9px] font-black tracking-widest uppercase text-[var(--color-ink-faint)] mb-1">Kvantitativ</div>
                     <div className={`text-2xl font-black ${hpScoreColor(quant!)}`}>{quant!.toFixed(2)}</div>
                   </div>
-                  <div className="bg-white/[0.03] rounded-xl p-3">
-                    <div className="text-[9px] font-black tracking-widest uppercase text-slate-600 mb-1">Verbal</div>
+                  <div className="bg-[var(--color-paper-dark)] rounded-xl p-3">
+                    <div className="text-[9px] font-black tracking-widest uppercase text-[var(--color-ink-faint)] mb-1">Verbal</div>
                     <div className={`text-2xl font-black ${hpScoreColor(verbal!)}`}>{verbal!.toFixed(2)}</div>
                   </div>
                 </div>
@@ -394,43 +394,43 @@ export default function Results() {
                 <span className={`text-5xl font-black ${hpColor}`}>{displayScore.toFixed(2)}</span>
                 <div>
                   <div className={`text-sm font-bold ${hpColor}`}>{hpLabel}</div>
-                  {hasBoth && <div className="text-[10px] text-slate-500 mt-0.5">kombinerat betyg</div>}
+                  {hasBoth && <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">kombinerat betyg</div>}
                 </div>
               </div>
-              <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden mb-2">
+              <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden mb-2">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${displayScore >= 1.80 ? 'bg-emerald-500' : displayScore >= 1.50 ? 'bg-blue-500' : displayScore >= 1.25 ? 'bg-amber-500' : 'bg-red-500'}`}
                   style={{ width: `${hpPct}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] text-slate-600">
+              <div className="flex justify-between text-[10px] text-[var(--color-ink-faint)]">
                 <span>1.00</span><span>1.25</span><span>1.50</span><span>1.75</span><span>2.00</span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-2">Uppskattning baserad på normdata från tidigare HP-prov.</p>
+              <p className="text-[11px] text-[var(--color-ink-faint)] mt-2">Uppskattning baserad på normdata från tidigare HP-prov.</p>
 
               <button
                 onClick={() => setShowScale(s => !s)}
-                className="mt-3 text-[11px] text-slate-600 hover:text-slate-400 transition-colors flex items-center gap-1"
+                className="mt-3 text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors flex items-center gap-1"
               >
                 Betygsskala {showScale ? '▴' : '▾'}
               </button>
 
               {showScale && (
-                <div className="mt-3 space-y-1.5 border-t border-white/[0.05] pt-3">
+                <div className="mt-3 space-y-1.5 border-t border-[var(--color-card-border)] pt-3">
                   {([
-                    { range: '1.85–2.00', label: 'Toppresultat', dot: 'bg-emerald-500', text: 'text-emerald-400' },
-                    { range: '1.70–1.85', label: 'Väldigt bra',  dot: 'bg-emerald-600', text: 'text-emerald-300' },
-                    { range: '1.50–1.70', label: 'Bra',           dot: 'bg-blue-500',   text: 'text-blue-400'   },
-                    { range: '1.30–1.50', label: 'Godkänt',       dot: 'bg-amber-500',  text: 'text-amber-400'  },
-                    { range: '1.00–1.30', label: 'Under medel',   dot: 'bg-red-500',    text: 'text-red-400'    },
+                    { range: '1.85–2.00', label: 'Toppresultat', dot: 'bg-emerald-500', text: 'text-emerald-600' },
+                    { range: '1.70–1.85', label: 'Väldigt bra',  dot: 'bg-emerald-600', text: 'text-emerald-700' },
+                    { range: '1.50–1.70', label: 'Bra',           dot: 'bg-blue-500',   text: 'text-blue-600'   },
+                    { range: '1.30–1.50', label: 'Godkänt',       dot: 'bg-amber-500',  text: 'text-amber-600'  },
+                    { range: '1.00–1.30', label: 'Under medel',   dot: 'bg-red-500',    text: 'text-red-600'    },
                   ] as { range: string; label: string; dot: string; text: string }[]).map(band => {
                     const isCurrentBand = band.label === hpLabel
                     return (
                       <div key={band.range} className="flex items-center gap-2.5 text-xs">
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${band.dot}${isCurrentBand ? ' ring-2 ring-white/30' : ''}`} />
-                        <span className="text-slate-600 tabular-nums w-20 shrink-0">{band.range}</span>
-                        <span className={isCurrentBand ? band.text + ' font-bold' : 'text-slate-600'}>{band.label}</span>
-                        {isCurrentBand && <span className="ml-auto text-[10px] text-slate-500">← ditt resultat</span>}
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${band.dot}${isCurrentBand ? ' ring-2 ring-[var(--color-card-border)]' : ''}`} />
+                        <span className="text-[var(--color-ink-faint)] tabular-nums w-20 shrink-0">{band.range}</span>
+                        <span className={isCurrentBand ? band.text + ' font-bold' : 'text-[var(--color-ink-faint)]'}>{band.label}</span>
+                        {isCurrentBand && <span className="ml-auto text-[10px] text-[var(--color-ink-faint)]">← ditt resultat</span>}
                       </div>
                     )
                   })}
@@ -442,13 +442,13 @@ export default function Results() {
 
         {/* Full HP Day — pass 1 break card */}
         {session.fullDayPass === 1 && (
-          <div className="glass rounded-2xl p-5 mb-6 border border-indigo-500/25">
-            <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2">Pass 1 klart — halvtid!</div>
+          <div className="card rounded-2xl p-5 mb-6 border border-indigo-200">
+            <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">Pass 1 klart — halvtid!</div>
             <h2 className="text-xl font-black mb-1">Dags för paus</h2>
-            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
+            <p className="text-sm text-[var(--color-ink-muted)] mb-4 leading-relaxed">
               Ta 10–15 minuters paus. Drick vatten, sträck på dig. Starta sedan det kvantitativa passet när du är redo.
             </p>
-            <div className="flex gap-3 mb-4 text-xs text-slate-500">
+            <div className="flex gap-3 mb-4 text-xs text-[var(--color-ink-faint)]">
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Verbalt klart</span>
               <span>·</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500/40 border border-blue-500/50 inline-block" /> Kvantitativt återstår</span>
@@ -495,27 +495,27 @@ export default function Results() {
           const { quant, verbal, combined } = combinedScore
           const displayScore = combined ?? 1.00
           return (
-            <div className="glass rounded-2xl p-5 mb-6 border border-indigo-500/25">
-              <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-3">Komplett HP-dag — sammanlagt resultat</div>
+            <div className="card rounded-2xl p-5 mb-6 border border-indigo-200">
+              <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-3">Komplett HP-dag — sammanlagt resultat</div>
               <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="bg-white/[0.03] rounded-xl p-3 text-center">
-                  <div className="text-[9px] font-black tracking-widest uppercase text-rose-400 mb-1">Verbalt</div>
-                  <div className={`text-2xl font-black ${verbal !== null ? hpScoreColor(verbal) : 'text-slate-500'}`}>
+                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-rose-600 mb-1">Verbalt</div>
+                  <div className={`text-2xl font-black ${verbal !== null ? hpScoreColor(verbal) : 'text-[var(--color-ink-faint)]'}`}>
                     {verbal !== null ? verbal.toFixed(2) : '—'}
                   </div>
                 </div>
-                <div className="bg-white/[0.03] rounded-xl p-3 text-center">
-                  <div className="text-[9px] font-black tracking-widest uppercase text-blue-400 mb-1">Kvant.</div>
-                  <div className={`text-2xl font-black ${quant !== null ? hpScoreColor(quant) : 'text-slate-500'}`}>
+                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-blue-600 mb-1">Kvant.</div>
+                  <div className={`text-2xl font-black ${quant !== null ? hpScoreColor(quant) : 'text-[var(--color-ink-faint)]'}`}>
                     {quant !== null ? quant.toFixed(2) : '—'}
                   </div>
                 </div>
-                <div className="bg-white/[0.04] rounded-xl p-3 text-center border border-indigo-500/20">
-                  <div className="text-[9px] font-black tracking-widest uppercase text-indigo-400 mb-1">Totalt</div>
+                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center border border-indigo-200">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-indigo-600 mb-1">Totalt</div>
                   <div className={`text-2xl font-black ${hpScoreColor(displayScore)}`}>{displayScore.toFixed(2)}</div>
                 </div>
               </div>
-              <div className="text-xs text-slate-500 text-center">{combinedCorrect}/{combinedTotal} rätt ({combinedPct}%) totalt · {hpScoreLabel(displayScore)}</div>
+              <div className="text-xs text-[var(--color-ink-faint)] text-center">{combinedCorrect}/{combinedTotal} rätt ({combinedPct}%) totalt · {hpScoreLabel(displayScore)}</div>
             </div>
           )
         })()}
@@ -567,11 +567,11 @@ export default function Results() {
             .slice(0, 3)
           const fmtSecs = (s: number) => s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`
           return (
-            <div className="glass rounded-2xl p-5 mb-6">
-              <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-4">Tidanalys</div>
+            <div className="card rounded-2xl p-5 mb-6">
+              <div className="text-[10px] font-black tracking-widest uppercase text-[var(--color-ink-faint)] mb-4">Tidanalys</div>
               <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-2xl font-black text-white">{fmtSecs(overallAvgSecs)}</span>
-                <span className="text-xs text-slate-500">per fråga i snitt</span>
+                <span className="text-2xl font-black text-[var(--color-ink)]">{fmtSecs(overallAvgSecs)}</span>
+                <span className="text-xs text-[var(--color-ink-faint)]">per fråga i snitt</span>
               </div>
               <div className="space-y-2 mb-4">
                 {(Object.entries(typeAvgs) as [QuestionType, number][]).map(([t, avg]) => {
@@ -582,29 +582,29 @@ export default function Results() {
                   return (
                     <div key={t} className="flex items-center gap-3">
                       <span className={`text-[10px] font-black w-8 shrink-0 ${tc.text}`}>{t}</span>
-                      <div className="flex-1 h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
+                      <div className="flex-1 h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${overBudget ? 'bg-red-500' : tc.bar}`}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <span className={`text-xs font-mono tabular-nums w-12 text-right ${overBudget ? 'text-red-400' : 'text-slate-400'}`}>
+                      <span className={`text-xs font-mono tabular-nums w-12 text-right ${overBudget ? 'text-red-600' : 'text-[var(--color-ink-muted)]'}`}>
                         {fmtSecs(avg)}
                       </span>
-                      <span className="text-[10px] text-slate-600 w-12 shrink-0">/ {fmtSecs(bench)}</span>
+                      <span className="text-[10px] text-[var(--color-ink-faint)] w-12 shrink-0">/ {fmtSecs(bench)}</span>
                     </div>
                   )
                 })}
               </div>
               {slowest.length > 0 && (
-                <div className="border-t border-white/[0.05] pt-3">
-                  <div className="text-[10px] text-slate-600 uppercase tracking-widest mb-2">Långsammaste frågor</div>
+                <div className="border-t border-[var(--color-card-border)] pt-3">
+                  <div className="text-[10px] text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Långsammaste frågor</div>
                   <div className="space-y-1.5">
                     {slowest.map(q => (
                       <div key={q.id} className="flex items-center gap-2 text-xs">
                         <span className={`font-black w-8 shrink-0 ${TYPE_COLORS[q.type].text}`}>{q.type}</span>
-                        <span className="flex-1 text-slate-400 truncate"><MathText text={q.text.split('\n')[0].replace(/\*\*/g, '')} /></span>
-                        <span className="font-mono text-red-400 shrink-0">{fmtSecs(Math.round(qtimes[q.id] / 1000))}</span>
+                        <span className="flex-1 text-[var(--color-ink-muted)] truncate"><MathText text={q.text.split('\n')[0].replace(/\*\*/g, '')} /></span>
+                        <span className="font-mono text-red-600 shrink-0">{fmtSecs(Math.round(qtimes[q.id] / 1000))}</span>
                       </div>
                     ))}
                   </div>
@@ -624,18 +624,18 @@ export default function Results() {
           const DIFF_LABELS = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' }
           const DIFF_COLORS = { easy: 'text-emerald-400 bg-emerald-500', medium: 'text-amber-400 bg-amber-500', hard: 'text-red-400 bg-red-500' }
           return (
-            <div className="glass rounded-2xl p-5 mb-6">
-              <div className="text-[10px] font-black tracking-widest uppercase text-slate-500 mb-4">Resultat per svårighetsgrad</div>
+            <div className="card rounded-2xl p-5 mb-6">
+              <div className="text-[10px] font-black tracking-widest uppercase text-[var(--color-ink-faint)] mb-4">Resultat per svårighetsgrad</div>
               <div className="grid grid-cols-3 gap-3">
                 {diffData.map(({ d, total, correct }) => {
                   const pct = Math.round((correct / total) * 100)
                   const [textCls, barCls] = DIFF_COLORS[d].split(' ')
                   return (
-                    <div key={d} className="bg-white/[0.03] rounded-xl p-3 text-center">
+                    <div key={d} className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center">
                       <div className={`text-[10px] font-black uppercase tracking-wide mb-1 ${textCls}`}>{DIFF_LABELS[d]}</div>
-                      <div className="text-xl font-black text-white">{pct}%</div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">{correct}/{total}</div>
-                      <div className="mt-2 h-1 bg-white/[0.05] rounded-full overflow-hidden">
+                      <div className="text-xl font-black text-[var(--color-ink)]">{pct}%</div>
+                      <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">{correct}/{total}</div>
+                      <div className="mt-2 h-1 bg-[var(--color-paper)] rounded-full overflow-hidden">
                         <div className={`h-full ${barCls} rounded-full`} style={{ width: `${pct}%` }} />
                       </div>
                     </div>
@@ -689,10 +689,10 @@ export default function Results() {
               {/* Section breakdown table */}
               <div className="mb-8">
                 <h2 className="text-xl font-black mb-4">Avsnittsresultat</h2>
-                <div className="glass rounded-2xl overflow-hidden">
+                <div className="card rounded-2xl overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-white/[0.06] text-slate-400 text-xs uppercase tracking-wide">
+                      <tr className="border-b border-[var(--color-card-border)] text-[var(--color-ink-muted)] text-xs uppercase tracking-wide">
                         <th className="text-left px-4 py-3">Avsnitt</th>
                         <th className="text-right px-4 py-3">Rätt</th>
                         <th className="text-right px-4 py-3">Resultat</th>
@@ -708,21 +708,21 @@ export default function Results() {
                         const actualMs = sectionEnds[type] - sectionStarts[type]
                         const hasTime = sectionStarts[type] > 0 && sectionEnds[type] > 0
                         return (
-                          <tr key={type} className="border-b border-white/[0.05] last:border-0">
+                          <tr key={type} className="border-b border-[var(--color-card-border)] last:border-0">
                             <td className="px-4 py-3">
                               <span className="font-black text-sm">{type}</span>
-                              <span className="text-slate-500 text-xs ml-2 hidden sm:inline">{meta?.description}</span>
+                              <span className="text-[var(--color-ink-faint)] text-xs ml-2 hidden sm:inline">{meta?.description}</span>
                             </td>
-                            <td className="px-4 py-3 text-right text-slate-300">{v.correct}/{v.total}</td>
+                            <td className="px-4 py-3 text-right text-[var(--color-ink-muted)]">{v.correct}/{v.total}</td>
                             <td className="px-4 py-3 text-right">
-                              <span className={`font-bold ${p >= HP_AVERAGES[type] ? 'text-emerald-400' : 'text-amber-400'}`}>
+                              <span className={`font-bold ${p >= HP_AVERAGES[type] ? 'text-emerald-600' : 'text-amber-600'}`}>
                                 {p}%
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right text-slate-500 hidden sm:table-cell">
+                            <td className="px-4 py-3 text-right text-[var(--color-ink-faint)] hidden sm:table-cell">
                               ~{meta?.recommendedMin}m
                             </td>
-                            <td className="px-4 py-3 text-right text-slate-400 hidden sm:table-cell">
+                            <td className="px-4 py-3 text-right text-[var(--color-ink-muted)] hidden sm:table-cell">
                               {hasTime ? fmtMin(actualMs) : '—'}
                             </td>
                           </tr>
@@ -734,8 +734,8 @@ export default function Results() {
               </div>
 
               {/* HP average comparison */}
-              <div className="glass border border-white/[0.06] rounded-2xl p-5 mb-8">
-                <h3 className="font-bold mb-3 text-sm uppercase tracking-widest text-slate-400">Jämförelse med medel</h3>
+              <div className="card border border-[var(--color-card-border)] rounded-2xl p-5 mb-8">
+                <h3 className="font-bold mb-3 text-sm uppercase tracking-widest text-[var(--color-ink-faint)]">Jämförelse med medel</h3>
                 <div className="space-y-3">
                   {SECTION_ORDER.filter(type => byType[type].total > 0).map(type => {
                     const v = byType[type]
@@ -744,10 +744,10 @@ export default function Results() {
                     const diff = p - avg
                     return (
                       <div key={type} className="flex items-center gap-3">
-                        <span className="w-10 text-xs font-black text-slate-400">{type}</span>
-                        <div className="flex-1 h-2 bg-white/[0.05] rounded-full overflow-hidden relative">
+                        <span className="w-10 text-xs font-black text-[var(--color-ink-faint)]">{type}</span>
+                        <div className="flex-1 h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden relative">
                           <div
-                            className="absolute h-full bg-white/[0.15] rounded-full"
+                            className="absolute h-full bg-[var(--color-card-border)] rounded-full"
                             style={{ width: `${avg}%` }}
                           />
                           <div
@@ -755,27 +755,27 @@ export default function Results() {
                             style={{ width: `${p}%` }}
                           />
                         </div>
-                        <span className={`text-xs font-bold w-14 text-right ${diff >= 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        <span className={`text-xs font-bold w-14 text-right ${diff >= 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
                           {p}% {diff >= 0 ? `+${diff}` : diff}pp
                         </span>
                       </div>
                     )
                   })}
                 </div>
-                <p className="text-xs text-slate-500 mt-3">pp = procentenheter jämfört med HP-genomsnittet</p>
+                <p className="text-xs text-[var(--color-ink-faint)] mt-3">pp = procentenheter jämfört med HP-genomsnittet</p>
               </div>
 
               {/* Weakest topics */}
               {weakTags.length > 0 && (
-                <div className="bg-amber-900/20 border border-amber-700/40 rounded-2xl p-5 mb-8">
-                  <h3 className="font-bold mb-3 text-amber-400">Vad du bör öva mer på</h3>
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8">
+                  <h3 className="font-bold mb-3 text-amber-700">Vad du bör öva mer på</h3>
                   <ul className="space-y-2">
                     {weakTags.map(([tag, v]) => {
                       const p = Math.round((v.correct / v.total) * 100)
                       return (
                         <li key={tag} className="flex items-center justify-between text-sm">
-                          <span className="text-slate-300 capitalize">{tag}</span>
-                          <span className="text-amber-400 font-bold">{p}% ({v.correct}/{v.total})</span>
+                          <span className="text-[var(--color-ink-muted)] capitalize">{tag}</span>
+                          <span className="text-amber-600 font-bold">{p}% ({v.correct}/{v.total})</span>
                         </li>
                       )
                     })}
@@ -940,15 +940,15 @@ export default function Results() {
 
         {/* Share card */}
         <div className="mb-6">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Dela resultat</div>
-          <div className="glass border border-white/[0.06] rounded-2xl p-5">
+          <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Dela resultat</div>
+          <div className="card border border-[var(--color-card-border)] rounded-2xl p-5">
             {/* Card preview */}
-            <div id="share-card" className="bg-black/20 rounded-xl p-5 border border-white/[0.06] mb-4">
+            <div id="share-card" className="bg-[var(--color-paper-dark)] rounded-xl p-5 border border-[var(--color-card-border)] mb-4">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-5 h-5 bg-violet-600 rounded-md flex items-center justify-center">
                   <span className="text-[9px] font-black text-white">HP</span>
                 </div>
-                <span className="text-xs font-bold text-slate-400">
+                <span className="text-xs font-bold text-[var(--color-ink-faint)]">
                   HP Träning — {sectionedScore.quant !== null && sectionedScore.verbal !== null ? 'Fullständigt prov' : sectionedScore.verbal !== null ? 'Verbal del' : 'Kvantitativ del'}
                 </span>
               </div>
@@ -958,7 +958,7 @@ export default function Results() {
                   <div className={`text-xl font-black ${hpScoreColor(sectionedScore.combined ?? 1.00)}`}>
                     {(sectionedScore.combined ?? 1.00).toFixed(2)}
                   </div>
-                  <div className="text-xs text-slate-500">{hpScoreLabel(sectionedScore.combined ?? 1.00)}</div>
+                  <div className="text-xs text-[var(--color-ink-faint)]">{hpScoreLabel(sectionedScore.combined ?? 1.00)}</div>
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2 mb-3">
@@ -969,14 +969,14 @@ export default function Results() {
                     return (
                       <div key={type} className="text-center">
                         <div className={`text-[10px] font-black ${TYPE_COLORS[type].text}`}>{type}</div>
-                        <div className="text-sm font-bold text-white">{p}%</div>
+                        <div className="text-sm font-bold text-[var(--color-ink)]">{p}%</div>
                       </div>
                     )
                   })}
               </div>
-              <div className="text-[10px] text-slate-600">{new Date().toLocaleDateString('sv-SE')}</div>
+              <div className="text-[10px] text-[var(--color-ink-faint)]">{new Date().toLocaleDateString('sv-SE')}</div>
             </div>
-            <p className="text-xs text-slate-500 text-center">Ta en skärmbild av kortet ovan för att dela ditt resultat</p>
+            <p className="text-xs text-[var(--color-ink-faint)] text-center">Ta en skärmbild av kortet ovan för att dela ditt resultat</p>
           </div>
         </div>
 

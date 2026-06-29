@@ -198,7 +198,7 @@ export default function XyzGuide() {
             {TOPICS.map(topic => {
               const isOpen = expanded === topic.id
               return (
-                <div key={topic.id} className={`rounded-2xl border transition-all ${isOpen ? `${topic.border} ${topic.bg}` : 'glass border-[var(--color-card-border)]'}`}>
+                <div key={topic.id} className={`rounded-2xl border transition-all ${isOpen ? `${topic.border} ${topic.bg}` : 'card border-[var(--color-card-border)]'}`}>
                   <button
                     onClick={() => setExpanded(isOpen ? null : topic.id)}
                     className="w-full flex items-center justify-between px-4 py-3.5 text-left"
