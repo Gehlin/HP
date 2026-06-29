@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import PageHeader from '../components/PageHeader'
 
 type Tab = 'intro' | 'prefix' | 'suffix' | 'strategi'
 
@@ -326,17 +326,12 @@ function StrategiSection() {
 }
 
 export default function OrdGuide() {
-  const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>('intro')
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pb-24">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+      <PageHeader title="ORD – Ordförståelse" />
       <div className="max-w-2xl mx-auto px-4 pt-6">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => navigate(-1)} className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] transition-colors text-sm">
-            ← Tillbaka
-          </button>
-        </div>
 
         <div className="mb-1 text-[10px] font-bold text-rose-400 uppercase tracking-widest">Ordförståelse</div>
         <h1 className="text-3xl font-black mb-1">ORD-guide</h1>

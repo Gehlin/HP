@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { questions } from '../data/questions'
 import { loadHistory } from '../utils/session'
 import MathText from '../components/MathText'
+import PageHeader from '../components/PageHeader'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1458,15 +1459,12 @@ export default function MathGuide() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)]">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+      <PageHeader title="Matematik" />
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <div className="border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-6 transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-            Tillbaka
-          </button>
           <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-200 text-violet-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
             Matematikguide

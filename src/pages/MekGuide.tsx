@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import PageHeader from '../components/PageHeader'
 
 type Tab = 'konjunktioner' | 'strategi' | 'ovning'
 
@@ -375,21 +375,15 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 export default function MekGuide() {
-  const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>('konjunktioner')
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)]">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+      <PageHeader title="MEK – Meningskomplettering" />
 
       {/* Hero */}
       <div className="border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
-          <button
-            onClick={() => navigate('/theory')}
-            className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-xs mb-4 flex items-center gap-1.5 transition-colors"
-          >
-            ← Teori
-          </button>
           <div className="inline-flex items-center gap-2 bg-lime-500/10 border border-lime-500/20 text-lime-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-lime-400" />
             MEK · Meningskomplettering

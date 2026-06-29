@@ -43,7 +43,7 @@ Users navigating deep into the app — opening a subject guide, launching SRS, b
   - Add `<PageHeader title="HP-poängprediktor" onBack={() => navigate('/')} />`
   - Ensure `pt-topnav pb-8` on outer wrapper
 
-- [ ] Apply `PageHeader` to the subject guide pages. These all navigate back to either `/verbalt`, `/kvantitativt`, or `/practice`. Read each file to confirm where they are navigated from, then apply:
+- [x] Apply `PageHeader` to the subject guide pages. These all navigate back to either `/verbalt`, `/kvantitativt`, or `/practice`. Read each file to confirm where they are navigated from, then apply:
   - `src/pages/VerbalHub.tsx` → `<PageHeader title="Verbalt" onBack={() => navigate('/practice')} />`
   - `src/pages/QuantHub.tsx` → `<PageHeader title="Kvantitativt" onBack={() => navigate('/practice')} />`
   - `src/pages/KvaGuide.tsx` → `<PageHeader title="KVA – Kvantitativa jämförelser" />`
@@ -58,4 +58,4 @@ Users navigating deep into the app — opening a subject guide, launching SRS, b
   - `src/pages/LiggandeStolenGuide.tsx` → `<PageHeader title="Liggande stolen" />`
   - For each: ensure the outer wrapper has `pt-topnav pb-8`, import `PageHeader`, and remove any existing manual back navigation already present
 
-- [ ] Run `npm run build` to confirm no import errors or missing props.
+- [x] Run `npm run build` to confirm no import errors or missing props.
