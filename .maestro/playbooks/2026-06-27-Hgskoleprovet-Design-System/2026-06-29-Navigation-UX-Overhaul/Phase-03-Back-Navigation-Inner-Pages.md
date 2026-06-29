@@ -22,7 +22,7 @@ Users navigating deep into the app — opening a subject guide, launching SRS, b
   - Ensure the page wrapper has `pt-topnav` and `pb-8` padding
   - Remove any existing back navigation
 
-- [ ] Apply `PageHeader` to `src/pages/Bookmarks.tsx`:
+- [x] Apply `PageHeader` to `src/pages/Bookmarks.tsx`:
   - Add `<PageHeader title="Bokmärken" />` at the top
   - Ensure `pt-topnav pb-8` on outer wrapper
   - Remove any existing back navigation

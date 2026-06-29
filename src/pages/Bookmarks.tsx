@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import PageHeader from '../components/PageHeader'
 import { questions } from '../data/questions'
 import { getBookmarks, toggleBookmark } from '../utils/bookmarks'
 import { buildSession, saveSession } from '../utils/session'
@@ -68,35 +69,29 @@ export default function Bookmarks() {
 
   if (bookmarkIds.length === 0) {
     return (
-      <div className="min-h-screen bg-app text-[var(--color-ink)] flex items-center justify-center px-4">
-        <div className="text-center">
-          <div className="text-5xl font-black text-[var(--color-ink-faint)] mb-4">—</div>
-          <div className="text-[var(--color-ink-muted)] font-semibold mb-1">Inga bokmärken</div>
-          <p className="text-[var(--color-ink-faint)] text-sm mb-6">Spara frågor under ett träningspass för att se dem här.</p>
-          <button
-            onClick={() => navigate('/practice')}
-            className="btn-primary px-6 py-3 rounded-xl font-bold text-sm"
-          >
-            Börja öva →
-          </button>
+      <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8 flex flex-col">
+        <PageHeader title="Bokmärken" />
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="text-5xl font-black text-[var(--color-ink-faint)] mb-4">—</div>
+            <div className="text-[var(--color-ink-muted)] font-semibold mb-1">Inga bokmärken</div>
+            <p className="text-[var(--color-ink-faint)] text-sm mb-6">Spara frågor under ett träningspass för att se dem här.</p>
+            <button
+              onClick={() => navigate('/practice')}
+              className="btn-primary px-6 py-3 rounded-xl font-bold text-sm"
+            >
+              Börja öva →
+            </button>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)]">
-      <div className="max-w-2xl mx-auto px-4 pt-10 pb-28">
-
-        <button
-          onClick={() => navigate('/practice')}
-          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] text-sm mb-6 transition-colors"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M19 12H5M12 5l-7 7 7 7"/>
-          </svg>
-          Tillbaka
-        </button>
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+      <PageHeader title="Bokmärken" />
+      <div className="max-w-2xl mx-auto px-4 py-6">
 
         <div className="mb-6">
           <h1 className="text-3xl font-black mb-1 tracking-tight">Bokmärken</h1>
