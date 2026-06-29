@@ -25,10 +25,10 @@ const TYPE_META: Record<string, {
   XYZ: {
     label: 'XYZ',
     desc: 'Matematisk problemlösning',
-    color: 'text-violet-400',
-    text: 'text-violet-300',
-    bg: 'bg-violet-500/10',
-    border: 'border-violet-500/20',
+    color: 'text-violet-700',
+    text: 'text-violet-600',
+    bg: 'bg-violet-50',
+    border: 'border-violet-200',
     bar: 'bg-violet-500',
     guideRoute: '/xyz-guide',
     guideLabel: 'XYZ-guide',
@@ -39,10 +39,10 @@ const TYPE_META: Record<string, {
   KVA: {
     label: 'KVA',
     desc: 'Kvantitativa jämförelser',
-    color: 'text-blue-400',
-    text: 'text-blue-300',
-    bg: 'bg-blue-500/10',
-    border: 'border-blue-500/20',
+    color: 'text-blue-700',
+    text: 'text-blue-600',
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
     bar: 'bg-blue-500',
     guideRoute: '/kva-guide',
     guideLabel: 'KVA-guide',
@@ -53,10 +53,10 @@ const TYPE_META: Record<string, {
   NOG: {
     label: 'NOG',
     desc: 'Datainsamling',
-    color: 'text-emerald-400',
-    text: 'text-emerald-300',
-    bg: 'bg-emerald-500/10',
-    border: 'border-emerald-500/20',
+    color: 'text-emerald-700',
+    text: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-200',
     bar: 'bg-emerald-500',
     guideRoute: '/nog-guide',
     guideLabel: 'NOG-guide',
@@ -67,10 +67,10 @@ const TYPE_META: Record<string, {
   DTK: {
     label: 'DTK',
     desc: 'Diagram, tabeller & kartor',
-    color: 'text-amber-400',
-    text: 'text-amber-300',
-    bg: 'bg-amber-500/10',
-    border: 'border-amber-500/20',
+    color: 'text-amber-700',
+    text: 'text-amber-600',
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
     bar: 'bg-amber-500',
     guideRoute: '/dtk-guide',
     guideLabel: 'DTK-guide',
@@ -153,12 +153,12 @@ export default function QuantHub() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-lg mx-auto px-4 py-10 pb-24">
 
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-8 transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-8 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -168,41 +168,41 @@ export default function QuantHub() {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
             Kvantitativt delprov
           </div>
-          <h1 className="text-3xl font-black tracking-tight mb-1">Kvantitativ träning</h1>
-          <p className="text-slate-500 text-sm">XYZ · KVA · NOG · DTK — din kvantitativa del av HP</p>
+          <h1 className="text-3xl font-[var(--font-serif)] tracking-tight text-[var(--color-ink)] mb-1">Kvantitativ träning</h1>
+          <p className="text-[var(--color-ink-faint)] text-sm">XYZ · KVA · NOG · DTK — din kvantitativa del av HP</p>
         </div>
 
         {/* HP Score card */}
-        <div className="glass rounded-2xl p-5 mb-4 border border-blue-500/10">
+        <div className="card rounded-2xl p-5 mb-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Kvantitativt HP-estimat</div>
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Kvantitativt HP-estimat</div>
               {quantScore !== null ? (
                 <>
                   <div className={`text-4xl font-black ${hpScoreColor(quantScore)}`}>{quantScore.toFixed(2)}</div>
-                  <div className="text-xs text-slate-500 mt-1">Baserat på {totalQuantAnswered} besvarade frågor</div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-1">Baserat på {totalQuantAnswered} besvarade frågor</div>
                 </>
               ) : (
                 <>
-                  <div className="text-4xl font-black text-slate-600">—</div>
-                  <div className="text-xs text-slate-500 mt-1">Öva minst 5 kvantitativa frågor för estimat</div>
+                  <div className="text-4xl font-black text-[var(--color-ink-faint)]">—</div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-1">Öva minst 5 kvantitativa frågor för estimat</div>
                 </>
               )}
             </div>
             <div className="text-right">
               {totalQuantDue > 0 && (
                 <div className="flex items-center gap-1.5 justify-end mb-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-xs text-amber-300 font-bold">{totalQuantDue} att repetera</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-xs text-amber-700 font-bold">{totalQuantDue} att repetera</span>
                 </div>
               )}
               <button
                 onClick={() => navigate('/practice?section=quant')}
-                className="bg-blue-700 hover:bg-blue-600 transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
+                className="btn-primary px-5 py-2.5 text-sm"
               >
                 Öva kvantitativt →
               </button>
@@ -220,21 +220,21 @@ export default function QuantHub() {
             const bankSize = questionCounts[type] ?? 0
 
             return (
-              <div key={type} className={`glass rounded-2xl border ${meta.border} overflow-hidden`}>
+              <div key={type} className={`bg-[var(--color-card)] rounded-2xl border ${meta.border} overflow-hidden`}>
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className={`text-lg font-black ${meta.color}`}>{meta.label}</span>
-                        <span className="text-slate-500 text-sm">{meta.desc}</span>
+                        <span className="text-[var(--color-ink-faint)] text-sm">{meta.desc}</span>
                       </div>
-                      <div className="text-xs text-slate-600">{meta.perExam} frågor/prov · {meta.timePerQ}/fråga · {bankSize} i banken</div>
+                      <div className="text-xs text-[var(--color-ink-faint)]">{meta.perExam} frågor/prov · {meta.timePerQ}/fråga · {bankSize} i banken</div>
                     </div>
                     <div className="flex gap-1.5 shrink-0">
                       {due > 0 && (
                         <button
                           onClick={() => startSrs(type)}
-                          className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 transition-colors"
+                          className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 transition-colors"
                         >
                           ↻ {due}
                         </button>
@@ -252,10 +252,10 @@ export default function QuantHub() {
                   {pct !== null ? (
                     <div className="mb-2">
                       <div className="flex justify-between text-[11px] mb-1">
-                        <span className="text-slate-600">{acc.total} svar</span>
-                        <span className={`font-bold ${pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{pct}%</span>
+                        <span className="text-[var(--color-ink-faint)]">{acc.total} svar</span>
+                        <span className={`font-bold ${pct >= 70 ? 'text-emerald-700' : pct >= 50 ? 'text-amber-700' : 'text-red-700'}`}>{pct}%</span>
                       </div>
-                      <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
                           style={{ width: `${pct}%` }}
@@ -263,7 +263,7 @@ export default function QuantHub() {
                       </div>
                     </div>
                   ) : (
-                    <div className="h-1.5 bg-white/[0.04] rounded-full mb-2" />
+                    <div className="h-1.5 bg-[var(--color-paper-dark)] rounded-full mb-2" />
                   )}
 
                   {/* Strategy tip */}
@@ -274,7 +274,7 @@ export default function QuantHub() {
                 {meta.guideRoute && (
                   <button
                     onClick={() => navigate(meta.guideRoute)}
-                    className="w-full flex items-center justify-between px-4 py-2.5 border-t border-white/[0.04] text-xs text-slate-500 hover:text-slate-300 hover:bg-white/[0.03] transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-2.5 border-t border-[var(--color-card-border)] text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-dark)] transition-colors"
                   >
                     <span>Öppna {meta.guideLabel}</span>
                     <span>→</span>
@@ -286,14 +286,14 @@ export default function QuantHub() {
         </div>
 
         {/* Full quant session */}
-        <div className="glass rounded-2xl p-5 border border-white/[0.05]">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Simulera kvantitativt provpass</div>
-          <p className="text-sm text-slate-500 mb-4 leading-relaxed">
+        <div className="card rounded-2xl p-5">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Simulera kvantitativt provpass</div>
+          <p className="text-sm text-[var(--color-ink-muted)] mb-4 leading-relaxed">
             Öva ett komplett kvantitativt provpass — XYZ → KVA → NOG → DTK i ordning, som på det riktiga provet.
           </p>
           <button
             onClick={() => navigate('/exam/quant-random')}
-            className="w-full bg-blue-700 hover:bg-blue-600 transition-colors rounded-xl py-3 font-bold text-sm"
+            className="btn-primary w-full"
           >
             Starta kvantitativt provpass →
           </button>
