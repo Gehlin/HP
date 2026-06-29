@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { exams, SECTION_SIZES, VERBAL_SECTION_SIZES } from '../data/exams'
 
 const TYPE_PILL: Record<string, string> = {
-  XYZ: 'bg-violet-500/10 text-violet-300 border-violet-500/20',
-  KVA: 'bg-blue-500/10 text-blue-300 border-blue-500/20',
-  NOG: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
-  DTK: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
-  ORD: 'bg-rose-500/10 text-rose-300 border-rose-500/20',
-  LAS: 'bg-pink-500/10 text-pink-300 border-pink-500/20',
-  MEK: 'bg-fuchsia-500/10 text-fuchsia-300 border-fuchsia-500/20',
-  ELF: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
+  XYZ: 'bg-violet-50 text-violet-700 border-violet-200',
+  KVA: 'bg-blue-50 text-blue-700 border-blue-200',
+  NOG: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  DTK: 'bg-amber-50 text-amber-700 border-amber-200',
+  ORD: 'bg-rose-50 text-rose-700 border-rose-200',
+  LAS: 'bg-pink-50 text-pink-700 border-pink-200',
+  MEK: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
+  ELF: 'bg-purple-50 text-purple-700 border-purple-200',
 }
 
 export default function ExamSelect() {
@@ -20,63 +20,63 @@ export default function ExamSelect() {
   const totalVerbal = Object.values(VERBAL_SECTION_SIZES).reduce((a, b) => a + b, 0)
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-2xl mx-auto px-4 pt-10 pb-28">
 
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-6 transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-6 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           Tillbaka
         </button>
 
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
             Provsimulering
           </div>
           <h1 className="text-3xl font-black mb-1 tracking-tight">Simulera HP-prov</h1>
-          <p className="text-slate-500 text-sm">Välj delprov att simulera — kvantitativt eller verbalt.</p>
+          <p className="text-[var(--color-ink-faint)] text-sm">Välj delprov att simulera — kvantitativt eller verbalt.</p>
         </div>
 
         {/* Full HP Day hero */}
-        <div className="glass rounded-2xl p-5 mb-6 border border-indigo-500/20">
-          <div className="flex items-start justify-between gap-4">
+        <div className="card rounded-2xl p-5 mb-6">
+          <div className="flex items-start gap-4 mb-3">
             <div className="flex-1 min-w-0">
-              <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1.5">Komplett simulering</div>
-              <div className="font-black text-lg text-white mb-0.5">Full HP-dag</div>
-              <div className="text-slate-500 text-xs mb-3">Verbalt pass + paus + kvantitativt pass · ~110 min</div>
+              <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-1.5">Komplett simulering</div>
+              <div className="font-black text-lg text-[var(--color-ink)] mb-0.5">Full HP-dag</div>
+              <div className="text-[var(--color-ink-faint)] text-xs mb-3">Verbalt pass + paus + kvantitativt pass · ~110 min</div>
               <div className="flex flex-wrap gap-1.5">
                 {(['ORD','LÄS','MEK','ELF'] as const).map(t => (
-                  <span key={t} className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-rose-500/20 bg-rose-500/10 text-rose-300">{t}</span>
+                  <span key={t} className="text-[10px] font-bold px-1.5 py-0.5 rounded border bg-rose-50 border-rose-200 text-rose-700">{t}</span>
                 ))}
-                <span className="text-[10px] text-slate-600 self-center">+</span>
+                <span className="text-[10px] text-[var(--color-ink-faint)] self-center">+</span>
                 {(['XYZ','KVA','NOG','DTK'] as const).map(t => (
-                  <span key={t} className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-500/20 bg-blue-500/10 text-blue-300">{t}</span>
+                  <span key={t} className="text-[10px] font-bold px-1.5 py-0.5 rounded border bg-blue-50 border-blue-200 text-blue-700">{t}</span>
                 ))}
               </div>
             </div>
-            <button
-              onClick={() => navigate('/exam/full-hp')}
-              className="shrink-0 bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-xl px-4 py-2.5 font-bold text-sm"
-            >
-              Starta →
-            </button>
           </div>
+          <button
+            onClick={() => navigate('/exam/full-hp')}
+            className="btn-primary w-full mt-2"
+          >
+            Starta Full HP-dag →
+          </button>
         </div>
 
         {/* Section toggle */}
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setSection('quant')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors ${section === 'quant' ? 'bg-blue-600 border-blue-500 text-white' : 'glass border-white/[0.08] text-slate-400 hover:text-slate-200'}`}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors ${section === 'quant' ? 'bg-[var(--color-green)] border-[var(--color-green)] text-white' : 'card border-[var(--color-card-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]'}`}
           >
             Kvantitativt
           </button>
           <button
             onClick={() => setSection('verbal')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors ${section === 'verbal' ? 'bg-rose-600 border-rose-500 text-white' : 'glass border-white/[0.08] text-slate-400 hover:text-slate-200'}`}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors ${section === 'verbal' ? 'bg-[var(--color-terracotta)] border-[var(--color-terracotta)] text-white' : 'card border-[var(--color-card-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]'}`}
           >
             Verbalt
           </button>
@@ -89,75 +89,65 @@ export default function ExamSelect() {
               const practiceExams = exams.filter(e => e.id.startsWith('ovning-'))
               return (
                 <>
-                  <div className="space-y-2.5 mb-6">
+                  <div className="mb-6">
                     {realExams.map((exam, i) => (
-                      <div key={exam.id} className="glass rounded-2xl p-5 border border-white/[0.06] hover:border-white/[0.1] transition-colors animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-black text-base text-white mb-0.5">{exam.name}</div>
-                            <div className="text-slate-500 text-xs mb-3">{exam.date}</div>
-                            <div className="flex gap-1.5 flex-wrap">
-                              {([
-                                ['XYZ', exam.sections.XYZ.length, SECTION_SIZES.XYZ],
-                                ['KVA', exam.sections.KVA.length, SECTION_SIZES.KVA],
-                                ['NOG', exam.sections.NOG.length, SECTION_SIZES.NOG],
-                                ['DTK', exam.sections.DTK.length, SECTION_SIZES.DTK],
-                              ] as [string, number, number][]).map(([type, real, total]) => (
-                                <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
-                                  {type} {real}+{total - real}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => navigate(`/exam/${exam.id}`)}
-                            className="shrink-0 bg-blue-600 hover:bg-blue-500 transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
-                          >
-                            Starta →
-                          </button>
+                      <div key={exam.id} className="card rounded-2xl p-4 mb-3 animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
+                        <div className="font-black text-base text-[var(--color-ink)] mb-0.5">{exam.name}</div>
+                        <div className="text-[var(--color-ink-faint)] text-xs mb-3">{exam.date}</div>
+                        <div className="flex gap-1.5 flex-wrap">
+                          {([
+                            ['XYZ', exam.sections.XYZ.length, SECTION_SIZES.XYZ],
+                            ['KVA', exam.sections.KVA.length, SECTION_SIZES.KVA],
+                            ['NOG', exam.sections.NOG.length, SECTION_SIZES.NOG],
+                            ['DTK', exam.sections.DTK.length, SECTION_SIZES.DTK],
+                          ] as [string, number, number][]).map(([type, real, total]) => (
+                            <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
+                              {type} {real}+{total - real}
+                            </span>
+                          ))}
                         </div>
+                        <button
+                          onClick={() => navigate(`/exam/${exam.id}`)}
+                          className="btn-primary w-full mt-4"
+                        >
+                          Starta →
+                        </button>
                       </div>
                     ))}
                   </div>
 
-                  <div className="border-t border-white/[0.05] pt-6 space-y-2.5 mb-6">
-                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Övningsprov</div>
+                  <div className="border-t border-[var(--color-card-border)] pt-6 mb-6">
+                    <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Övningsprov</div>
                     {practiceExams.map(exam => (
-                      <div key={exam.id} className="glass rounded-2xl p-5 border border-amber-500/10 hover:border-amber-500/20 transition-colors">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-black text-base text-white mb-0.5">{exam.name}</div>
-                            <div className="text-slate-500 text-xs mb-3">{exam.date}</div>
-                            <div className="flex gap-1.5 flex-wrap">
-                              {([
-                                ['XYZ', exam.sections.XYZ.length, SECTION_SIZES.XYZ],
-                                ['KVA', exam.sections.KVA.length, SECTION_SIZES.KVA],
-                                ['NOG', exam.sections.NOG.length, SECTION_SIZES.NOG],
-                                ['DTK', exam.sections.DTK.length, SECTION_SIZES.DTK],
-                              ] as [string, number, number][]).map(([type, real, total]) => (
-                                <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
-                                  {type} {real}+{total - real}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => navigate(`/exam/${exam.id}`)}
-                            className="shrink-0 bg-amber-600 hover:bg-amber-500 transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
-                          >
-                            Starta →
-                          </button>
+                      <div key={exam.id} className="card rounded-2xl p-4 mb-3">
+                        <div className="font-black text-base text-[var(--color-ink)] mb-0.5">{exam.name}</div>
+                        <div className="text-[var(--color-ink-faint)] text-xs mb-3">{exam.date}</div>
+                        <div className="flex gap-1.5 flex-wrap">
+                          {([
+                            ['XYZ', exam.sections.XYZ.length, SECTION_SIZES.XYZ],
+                            ['KVA', exam.sections.KVA.length, SECTION_SIZES.KVA],
+                            ['NOG', exam.sections.NOG.length, SECTION_SIZES.NOG],
+                            ['DTK', exam.sections.DTK.length, SECTION_SIZES.DTK],
+                          ] as [string, number, number][]).map(([type, real, total]) => (
+                            <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
+                              {type} {real}+{total - real}
+                            </span>
+                          ))}
                         </div>
+                        <button
+                          onClick={() => navigate(`/exam/${exam.id}`)}
+                          className="btn-primary w-full mt-4"
+                        >
+                          Starta →
+                        </button>
                       </div>
                     ))}
-                    <div className="glass rounded-2xl p-5 flex items-center justify-between gap-4">
-                      <div>
-                        <div className="font-black text-base text-white mb-0.5">Slumpmässigt prov</div>
-                        <div className="text-slate-500 text-xs">40 frågor slumpmässigt valda från hela frågebanken</div>
-                      </div>
+                    <div className="card rounded-2xl p-4 mb-3">
+                      <div className="font-black text-base text-[var(--color-ink)] mb-0.5">Slumpmässigt prov</div>
+                      <div className="text-[var(--color-ink-faint)] text-xs mb-1">40 frågor slumpmässigt valda från hela frågebanken</div>
                       <button
                         onClick={() => navigate('/exam/random')}
-                        className="shrink-0 glass hover:bg-white/[0.08] border border-white/[0.1] transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
+                        className="btn-primary w-full mt-4"
                       >
                         Starta →
                       </button>
@@ -170,20 +160,10 @@ export default function ExamSelect() {
         )}
 
         {section === 'verbal' && (
-          <div className="space-y-4">
-            <div className="glass rounded-2xl p-5 border border-white/[0.06]">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div>
-                  <div className="font-black text-base text-white mb-0.5">Verbalt delprov</div>
-                  <div className="text-slate-500 text-xs">{totalVerbal} frågor · slumpmässigt urval · 55 minuter</div>
-                </div>
-                <button
-                  onClick={() => navigate('/exam/verbal-random')}
-                  className="shrink-0 bg-rose-600 hover:bg-rose-500 transition-colors rounded-xl px-5 py-2.5 font-bold text-sm"
-                >
-                  Starta →
-                </button>
-              </div>
+          <div>
+            <div className="card rounded-2xl p-4 mb-3">
+              <div className="font-black text-base text-[var(--color-ink)] mb-0.5">Verbalt delprov</div>
+              <div className="text-[var(--color-ink-faint)] text-xs mb-3">{totalVerbal} frågor · slumpmässigt urval · 55 minuter</div>
               <div className="flex gap-1.5 flex-wrap">
                 {(Object.entries(VERBAL_SECTION_SIZES) as [string, number][]).map(([type, count]) => (
                   <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
@@ -191,10 +171,16 @@ export default function ExamSelect() {
                   </span>
                 ))}
               </div>
+              <button
+                onClick={() => navigate('/exam/verbal-random')}
+                className="btn-primary w-full mt-4"
+              >
+                Starta →
+              </button>
             </div>
 
-            <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3">
-              <p className="text-xs text-slate-500 leading-relaxed">
+            <div className="bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-4 py-3">
+              <p className="text-xs text-[var(--color-ink-faint)] leading-relaxed">
                 Det verbala delprovet består av fyra avsnitt i ordning: ORD → LÄS → MEK → ELF. Frågor väljs slumpmässigt från frågebanken.
               </p>
             </div>
