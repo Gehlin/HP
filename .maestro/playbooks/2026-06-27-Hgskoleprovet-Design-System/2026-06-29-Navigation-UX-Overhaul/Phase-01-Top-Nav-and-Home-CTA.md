@@ -53,8 +53,9 @@ This phase delivers the biggest visible transformation: ripping out the bottom t
   - Update the `<h1>` text from "Öva" → "Träna"
   - Also removed stale `inSession`/`useLocation` from `App.tsx` (left over from BottomNav→TopNav swap, caused TS6133 build error)
 
-- [ ] Update `src/pages/Progress.tsx` layout:
+- [x] Update `src/pages/Progress.tsx` layout:
   - Find the outermost page div and replace `pb-28` with `pb-8`, and the top padding (usually `pt-12` or `py-8`) with `pt-topnav` on the outermost wrapper. Read the file first to identify the exact class string.
+  <!-- Done: outer div `min-h-screen bg-app pb-28` → `min-h-screen bg-app pb-8 pt-topnav`; inner header div `px-4 pt-12 pb-4 max-w-2xl mx-auto` → `px-4 pb-4 max-w-2xl mx-auto` (pt-12 removed, topnav offset now on outermost wrapper). -->
 
 - [ ] Update `src/pages/Profil.tsx` layout:
   - Same pattern — replace bottom nav clearance `pb-28` with `pb-8`, and add `pt-topnav` to the outermost div. Read the file to identify exact class strings.

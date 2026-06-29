@@ -240,8 +240,8 @@ export default function Progress() {
   }))
 
   return (
-    <div className="min-h-screen bg-app pb-28">
-      <div className="px-4 pt-12 pb-4 max-w-2xl mx-auto">
+    <div className="min-h-screen bg-app pb-8 pt-topnav">
+      <div className="px-4 pb-4 max-w-2xl mx-auto">
         <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)]">Statistik</h1>
         <div className="flex rounded-xl p-1 bg-[var(--color-paper-dark)] w-fit mt-3">
           {(['week', 'month', 'all'] as const).map((range, i) => (
