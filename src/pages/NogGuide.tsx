@@ -11,18 +11,18 @@ function StepReveal({ steps, color = 'emerald' }: { steps: { label: string; cont
   return (
     <div className="space-y-2">
       {steps.map((step, i) => (
-        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-white/[0.08] bg-white/[0.03]' : 'border-white/[0.04] bg-white/[0.01]'} p-3.5`}>
+        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? `${activeColor} text-white` : 'bg-white/[0.07] text-slate-600'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? `${activeColor} text-white` : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-400 mb-0.5">{step.label}</div>
+              <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
-                  <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{step.content}</div>
+                  <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed whitespace-pre-line">{step.content}</div>
                   {step.result && <div className={`mt-1.5 text-xs font-bold ${resultColor}`}>{step.result}</div>}
                 </>
               ) : (
-                <div className="text-xs text-slate-700">Klicka för att avslöja</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
@@ -32,7 +32,7 @@ function StepReveal({ steps, color = 'emerald' }: { steps: { label: string; cont
         </div>
       ))}
       {revealed === steps.length && (
-        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-slate-600 hover:text-slate-400 py-1.5 transition-colors">Återställ ↺</button>
+        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] py-1.5 transition-colors">Återställ ↺</button>
       )}
     </div>
   )
@@ -145,12 +145,12 @@ export default function NogGuide() {
   ]
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-lg mx-auto px-4 py-10 pb-24">
 
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-8 transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-8 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -165,24 +165,24 @@ export default function NogGuide() {
             NOG · Datainsamling
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">NOG-guide</h1>
-          <p className="text-slate-500 text-sm">6 frågor/prov · ~100s/fråga · 5 svarsalternativ A–E</p>
+          <p className="text-[var(--color-ink-faint)] text-sm">6 frågor/prov · ~100s/fråga · 5 svarsalternativ A–E</p>
         </div>
 
         {/* Core insight */}
-        <div className="glass rounded-2xl p-4 mb-6 border border-emerald-500/15">
+        <div className="card rounded-2xl p-4 mb-6 border border-emerald-500/15">
           <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-2">Den enda regeln du behöver</div>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
             NOG testar aldrig din förmåga att <span className="text-emerald-300 font-semibold">lösa</span> uppgiften — bara att avgöra om det <span className="text-emerald-300 font-semibold">går att lösa</span> den entydigt med den givna informationen. Svar med säkerhet "ja, det räcker" eller "nej, det räcker inte" — du behöver aldrig beräkna det faktiska svaret.
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 p-1 glass rounded-xl">
+        <div className="flex gap-1 mb-6 p-1 card rounded-xl">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-emerald-700 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-emerald-700 text-white' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
             </button>
@@ -192,27 +192,27 @@ export default function NogGuide() {
         {/* Schema tab */}
         {tab === 'schema' && (
           <div className="space-y-3">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">De fem svarsalternativen</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">De fem svarsalternativen</div>
             {ANSWER_SCHEME.map(opt => (
               <div key={opt.key} className={`rounded-2xl border ${opt.border} ${opt.bg} p-4`}>
                 <div className="flex items-center gap-3 mb-2">
                   <span className={`text-2xl font-black ${opt.color}`}>{opt.key}</span>
-                  <span className="text-sm font-bold text-slate-200">{opt.label}</span>
+                  <span className="text-sm font-bold text-[var(--color-ink)]">{opt.label}</span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed mb-3">{opt.desc}</p>
-                <div className="bg-black/25 rounded-xl p-3 mb-2">
-                  <div className="text-[10px] font-bold text-slate-600 mb-1">Exempel</div>
-                  <pre className="text-[11px] text-slate-300 whitespace-pre-wrap leading-relaxed">{opt.example}</pre>
+                <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed mb-3">{opt.desc}</p>
+                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 mb-2">
+                  <div className="text-[10px] font-bold text-[var(--color-ink-faint)] mb-1">Exempel</div>
+                  <pre className="text-[11px] text-[var(--color-ink-muted)] whitespace-pre-wrap leading-relaxed">{opt.example}</pre>
                 </div>
                 <div className="flex items-start gap-2 bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-2.5">
                   <span className="text-emerald-400 text-xs shrink-0 mt-0.5">✓</span>
-                  <span className="text-[11px] text-slate-400">{opt.verify}</span>
+                  <span className="text-[11px] text-[var(--color-ink-muted)]">{opt.verify}</span>
                 </div>
               </div>
             ))}
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Beslutsträd</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Beslutsträd</div>
               <div className="space-y-2">
                 {[
                   { cond: 'Räcker (1) ensamt?', yes: '→ A eller D', no: null },
@@ -221,7 +221,7 @@ export default function NogGuide() {
                   { cond: 'Räcker BÅDA var för sig?', yes: '→ D', no: null },
                 ].map(({ cond, yes, no }) => (
                   <div key={cond} className="flex items-center justify-between gap-4 text-xs">
-                    <span className="text-slate-400">{cond}</span>
+                    <span className="text-[var(--color-ink-muted)]">{cond}</span>
                     <div className="flex gap-2 shrink-0">
                       <span className="text-emerald-400 font-bold">{yes}</span>
                       {no && <span className="text-rose-400 font-bold">{no}</span>}
@@ -236,11 +236,11 @@ export default function NogGuide() {
         {/* Tillräcklighet tab */}
         {tab === 'tillracklighet' && (
           <div className="space-y-4">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Vad är tillräcklighet?</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Vad är tillräcklighet?</div>
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-sm font-bold text-slate-200 mb-2">Entydighet är nyckeln</div>
-              <p className="text-xs text-slate-400 leading-relaxed">
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-sm font-bold text-[var(--color-ink)] mb-2">Entydighet är nyckeln</div>
+              <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
                 Ett påstående räcker om det — i kombination med frågeuppgiftens information — ger exakt ett möjligt svar. Om det finns två eller fler möjliga svar räcker inte påståendet, oavsett hur rimligt ett svar verkar.
               </p>
             </div>
@@ -268,7 +268,7 @@ export default function NogGuide() {
               },
             ]} />
 
-            <div className="glass rounded-2xl p-4 border border-amber-500/15">
+            <div className="card rounded-2xl p-4 border border-amber-500/15">
               <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-3">Vanligaste misstagen</div>
               <ul className="space-y-2">
                 {[
@@ -278,7 +278,7 @@ export default function NogGuide() {
                   'Blandar ihop "påståendet är sant" med "påståendet räcker". Ett sant påstående kan fortfarande ge otillräcklig info.',
                   'Kontrollerar inte motexempel: testar ett värde som funkar, men missar ett annat som inte gör det.',
                 ].map(m => (
-                  <li key={m} className="flex gap-2 text-xs text-slate-400">
+                  <li key={m} className="flex gap-2 text-xs text-[var(--color-ink-muted)]">
                     <span className="text-amber-400 shrink-0">·</span>
                     {m}
                   </li>
@@ -286,8 +286,8 @@ export default function NogGuide() {
               </ul>
             </div>
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Tidsstrategi</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Tidsstrategi</div>
               <div className="space-y-2">
                 {[
                   { time: '0–20s', action: 'Läs frågan. Identifiera exakt vad som söks.' },
@@ -298,15 +298,15 @@ export default function NogGuide() {
                 ].map(({ time, action }) => (
                   <div key={time} className="flex gap-3 text-xs">
                     <span className="text-emerald-400 font-black shrink-0 w-14">{time}</span>
-                    <span className="text-slate-400">{action}</span>
+                    <span className="text-[var(--color-ink-muted)]">{action}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Snabbgenomgång av räknetrick</div>
-              <p className="text-xs text-slate-500 mb-2">Behöver du mentala beräkningstrick för NOG? Se den separata guiden.</p>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Snabbgenomgång av räknetrick</div>
+              <p className="text-xs text-[var(--color-ink-faint)] mb-2">Behöver du mentala beräkningstrick för NOG? Se den separata guiden.</p>
               <button
                 onClick={() => navigate('/liggande-stolen')}
                 className="text-xs font-bold text-emerald-400 border border-emerald-500/25 px-3 py-2 rounded-xl hover:bg-emerald-500/10 transition-colors"
@@ -320,33 +320,33 @@ export default function NogGuide() {
         {/* Mönster tab */}
         {tab === 'monster' && (
           <div className="space-y-3">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Vanliga NOG-mönster</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Vanliga NOG-mönster</div>
             {PATTERNS.map(p => (
               <div key={p.name} className={`rounded-2xl border ${p.border} ${p.bg} p-4`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`text-base font-mono ${p.color}`}>{p.icon}</span>
                   <span className={`text-sm font-bold ${p.color}`}>{p.name}</span>
                 </div>
-                <p className="text-xs text-slate-400 mb-2 leading-relaxed">{p.desc}</p>
-                <div className="flex items-start gap-2 bg-black/20 rounded-xl p-2.5 mb-2">
+                <p className="text-xs text-[var(--color-ink-muted)] mb-2 leading-relaxed">{p.desc}</p>
+                <div className="flex items-start gap-2 bg-[var(--color-paper-dark)] rounded-xl p-2.5 mb-2">
                   <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚠</span>
-                  <span className="text-[11px] text-slate-400">{p.trap}</span>
+                  <span className="text-[11px] text-[var(--color-ink-muted)]">{p.trap}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className={`text-xs shrink-0 ${p.color}`}>→</span>
-                  <span className="text-[11px] text-slate-400">{p.tip}</span>
+                  <span className="text-[11px] text-[var(--color-ink-muted)]">{p.tip}</span>
                 </div>
               </div>
             ))}
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Motexempel — ditt bästa vapen</div>
-              <p className="text-xs text-slate-400 leading-relaxed mb-3">
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Motexempel — ditt bästa vapen</div>
+              <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed mb-3">
                 Om du misstänker att ett påstående INTE räcker: hitta två konkreta exempel som uppfyller påståendet men ger olika svar på frågan. Det bevisar otillräcklighet.
               </p>
-              <div className="bg-black/25 rounded-xl p-3">
-                <div className="text-[10px] font-bold text-slate-600 mb-1">Exempel på motexempel</div>
-                <pre className="text-[11px] text-slate-300 whitespace-pre-wrap leading-relaxed">{`Fråga: Är x² > x?
+              <div className="bg-[var(--color-paper-dark)] rounded-xl p-3">
+                <div className="text-[10px] font-bold text-[var(--color-ink-faint)] mb-1">Exempel på motexempel</div>
+                <pre className="text-[11px] text-[var(--color-ink-muted)] whitespace-pre-wrap leading-relaxed">{`Fråga: Är x² > x?
 Påstående (1): x > 0
 
 Testa x=2: 4 > 2 ✓
@@ -359,7 +359,7 @@ Två olika svar → (1) räcker inte → inte A/D`}</pre>
         )}
 
         {/* Drill CTA */}
-        <div className="mt-8 pt-6 border-t border-white/[0.06]">
+        <div className="mt-8 pt-6 border-t border-[var(--color-card-border)]">
           <button
             onClick={() => navigate('/practice?type=NOG')}
             className="w-full bg-emerald-800 hover:bg-emerald-700 transition-colors rounded-xl py-3 font-bold text-sm"

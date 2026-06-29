@@ -8,18 +8,18 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
   return (
     <div className="space-y-2">
       {steps.map((step, i) => (
-        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-white/[0.08] bg-white/[0.03]' : 'border-white/[0.04] bg-white/[0.01]'} p-3.5`}>
+        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-amber-600 text-white' : 'bg-white/[0.07] text-slate-600'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-amber-600 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-400 mb-0.5">{step.label}</div>
+              <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
-                  <div className="text-sm text-slate-300 leading-relaxed">{step.content}</div>
+                  <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{step.content}</div>
                   {step.result && <div className="mt-1.5 text-xs font-bold text-amber-400">{step.result}</div>}
                 </>
               ) : (
-                <div className="text-xs text-slate-700">Klicka för att avslöja</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
@@ -29,7 +29,7 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
         </div>
       ))}
       {revealed === steps.length && (
-        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-slate-600 hover:text-slate-400 py-1.5 transition-colors">Återställ ↺</button>
+        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] py-1.5 transition-colors">Återställ ↺</button>
       )}
     </div>
   )
@@ -132,12 +132,12 @@ export default function DtkGuide() {
   ]
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-lg mx-auto px-4 py-10 pb-24">
 
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-8 transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-8 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -152,24 +152,24 @@ export default function DtkGuide() {
             DTK · Diagram, tabeller &amp; kartor
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">DTK-guide</h1>
-          <p className="text-slate-500 text-sm">12 frågor/prov · ~115s/fråga · mest tid per fråga</p>
+          <p className="text-[var(--color-ink-faint)] text-sm">12 frågor/prov · ~115s/fråga · mest tid per fråga</p>
         </div>
 
         {/* Core insight */}
-        <div className="glass rounded-2xl p-4 mb-6 border border-amber-500/15">
+        <div className="card rounded-2xl p-4 mb-6 border border-amber-500/15">
           <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-2">Kärninsikt</div>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
             DTK är <span className="text-amber-300 font-semibold">ett precisionsprov, inte ett matematikprov</span>. Svaret finns i diagrammet — uppgiften är att läsa av det korrekt. De flesta fel beror inte på felräkning utan på att man läser av fel enhet, fel axel, eller jämför procent med absoluta tal. Läs alltid rubrik, enheter och axlar INNAN du svarar.
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 p-1 glass rounded-xl">
+        <div className="flex gap-1 mb-6 p-1 card rounded-xl">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-amber-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-amber-600 text-white' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
             </button>
@@ -179,7 +179,7 @@ export default function DtkGuide() {
         {/* Teknik tab */}
         {tab === 'teknik' && (
           <div className="space-y-4">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Läsordning för DTK-frågor</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Läsordning för DTK-frågor</div>
             <StepReveal steps={[
               {
                 label: 'Läs diagrammets rubrik',
@@ -208,8 +208,8 @@ export default function DtkGuide() {
               },
             ]} />
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Nyckelformler</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Nyckelformler</div>
               <div className="space-y-3">
                 {[
                   { name: 'Procentuell förändring', formula: '(Nytt − Gammalt) / Gammalt × 100' },
@@ -219,15 +219,15 @@ export default function DtkGuide() {
                   { name: 'Indexberäkning', formula: 'Värde / Basvärde × 100' },
                 ].map(({ name, formula }) => (
                   <div key={name} className="flex items-start justify-between gap-4">
-                    <span className="text-xs text-slate-500">{name}</span>
+                    <span className="text-xs text-[var(--color-ink-faint)]">{name}</span>
                     <span className="text-xs font-mono text-amber-300 text-right">{formula}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Tidsstrategi</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Tidsstrategi</div>
               <div className="space-y-2">
                 {[
                   { time: '0–20s', action: 'Läs rubrik, enheter, axlar. Bygg kontext.' },
@@ -237,7 +237,7 @@ export default function DtkGuide() {
                 ].map(({ time, action }) => (
                   <div key={time} className="flex gap-3 text-xs">
                     <span className="text-amber-400 font-black shrink-0 w-14">{time}</span>
-                    <span className="text-slate-400">{action}</span>
+                    <span className="text-[var(--color-ink-muted)]">{action}</span>
                   </div>
                 ))}
               </div>
@@ -248,7 +248,7 @@ export default function DtkGuide() {
         {/* Diagramtyper tab */}
         {tab === 'diagramtyper' && (
           <div className="space-y-3">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Fem diagramtyper på HP</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fem diagramtyper på HP</div>
             {CHART_TYPES.map(c => (
               <div key={c.name} className={`rounded-2xl border ${c.border} ${c.bg} p-4`}>
                 <div className="flex items-center gap-2 mb-2">
@@ -256,17 +256,17 @@ export default function DtkGuide() {
                   <span className={`text-sm font-bold ${c.color}`}>{c.name}</span>
                 </div>
                 <div className="mb-2">
-                  <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1.5">Vanliga frågetyper</div>
+                  <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1.5">Vanliga frågetyper</div>
                   <div className="flex flex-wrap gap-1.5">
                     {c.questions.map(q => (
-                      <span key={q} className="text-[10px] text-slate-400 bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-md">{q}</span>
+                      <span key={q} className="text-[10px] text-[var(--color-ink-muted)] bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] px-2 py-0.5 rounded-md">{q}</span>
                     ))}
                   </div>
                 </div>
-                <div className="text-[11px] text-slate-400 mb-2 leading-relaxed">{c.strategy}</div>
-                <div className="flex items-start gap-2 bg-black/20 rounded-xl p-2.5">
+                <div className="text-[11px] text-[var(--color-ink-muted)] mb-2 leading-relaxed">{c.strategy}</div>
+                <div className="flex items-start gap-2 bg-[var(--color-paper-dark)] rounded-xl p-2.5">
                   <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚠</span>
-                  <span className="text-[11px] text-slate-400">{c.trap}</span>
+                  <span className="text-[11px] text-[var(--color-ink-muted)]">{c.trap}</span>
                 </div>
               </div>
             ))}
@@ -276,27 +276,27 @@ export default function DtkGuide() {
         {/* Fällor tab */}
         {tab === 'fallor' && (
           <div className="space-y-3">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Vanliga fallgropar</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Vanliga fallgropar</div>
             {TRAPS.map(trap => (
-              <div key={trap.name} className={`glass rounded-2xl p-4 border ${
-                trap.severity === 'hög' ? 'border-red-500/20' : trap.severity === 'medel' ? 'border-amber-500/20' : 'border-white/[0.06]'
+              <div key={trap.name} className={`card rounded-2xl p-4 border ${
+                trap.severity === 'hög' ? 'border-red-500/20' : trap.severity === 'medel' ? 'border-amber-500/20' : 'border-[var(--color-card-border)]'
               }`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                    trap.severity === 'hög' ? 'bg-red-500/15 text-red-400' : trap.severity === 'medel' ? 'bg-amber-500/15 text-amber-400' : 'bg-slate-700/50 text-slate-500'
+                    trap.severity === 'hög' ? 'bg-red-500/15 text-red-400' : trap.severity === 'medel' ? 'bg-amber-500/15 text-amber-400' : 'bg-slate-700/50 text-[var(--color-ink-faint)]'
                   }`}>{trap.severity}</span>
-                  <span className="text-sm font-bold text-slate-200">{trap.name}</span>
+                  <span className="text-sm font-bold text-[var(--color-ink)]">{trap.name}</span>
                 </div>
-                <p className="text-xs text-slate-400 mb-3 leading-relaxed">{trap.desc}</p>
+                <p className="text-xs text-[var(--color-ink-muted)] mb-3 leading-relaxed">{trap.desc}</p>
                 <div className="flex items-start gap-2 bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-2.5">
                   <span className="text-emerald-400 text-xs shrink-0 mt-0.5">✓</span>
-                  <span className="text-[11px] text-slate-400">{trap.fix}</span>
+                  <span className="text-[11px] text-[var(--color-ink-muted)]">{trap.fix}</span>
                 </div>
               </div>
             ))}
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Checklista innan du svarar</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Checklista innan du svarar</div>
               <ul className="space-y-2">
                 {[
                   'Läste jag diagrammets rubrik och enhet?',
@@ -305,8 +305,8 @@ export default function DtkGuide() {
                   'Pratar frågan om förändring (ökade) eller nivå (var störst)?',
                   'Stämmer mitt svar i storleksordning med alternativen?',
                 ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2.5 text-xs text-slate-400">
-                    <span className="w-4 h-4 rounded border border-slate-700 shrink-0 flex items-center justify-center text-[8px] text-slate-600">{i + 1}</span>
+                  <li key={i} className="flex items-center gap-2.5 text-xs text-[var(--color-ink-muted)]">
+                    <span className="w-4 h-4 rounded border border-[var(--color-card-border)] shrink-0 flex items-center justify-center text-[8px] text-[var(--color-ink-faint)]">{i + 1}</span>
                     {item}
                   </li>
                 ))}
@@ -316,7 +316,7 @@ export default function DtkGuide() {
         )}
 
         {/* Drill CTA */}
-        <div className="mt-8 pt-6 border-t border-white/[0.06]">
+        <div className="mt-8 pt-6 border-t border-[var(--color-card-border)]">
           <button
             onClick={() => navigate('/practice?type=DTK')}
             className="w-full bg-amber-700 hover:bg-amber-600 transition-colors rounded-xl py-3 font-bold text-sm"

@@ -147,12 +147,12 @@ export default function XyzGuide() {
   ]
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-lg mx-auto px-4 py-10 pb-24">
 
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-8 transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-8 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -167,24 +167,24 @@ export default function XyzGuide() {
             XYZ · Matematisk problemlösning
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">XYZ-guide</h1>
-          <p className="text-slate-500 text-sm">12 frågor/prov · ~60s/fråga · 4 svarsalternativ</p>
+          <p className="text-[var(--color-ink-faint)] text-sm">12 frågor/prov · ~60s/fråga · 4 svarsalternativ</p>
         </div>
 
         {/* Core insight */}
-        <div className="glass rounded-2xl p-4 mb-6 border border-violet-500/15">
+        <div className="card rounded-2xl p-4 mb-6 border border-violet-500/15">
           <div className="text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-2">Examtaktik i ett nötskal</div>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
             XYZ belönar <span className="text-violet-300 font-semibold">smart uppskattning</span> lika ofta som exakt beräkning. Många frågor kan lösas på 20 sekunder genom att eliminera uppenbart felaktiga alternativ och testa ett rimligt värde. Fastnar du efter 60s — gissa och gå vidare, ingen minuspoäng.
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 p-1 glass rounded-xl">
+        <div className="flex gap-1 mb-6 p-1 card rounded-xl">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-violet-700 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-violet-700 text-white' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
             </button>
@@ -194,11 +194,11 @@ export default function XyzGuide() {
         {/* Ämnen tab */}
         {tab === 'amnen' && (
           <div className="space-y-2.5">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Sex ämnesområden på HP</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Sex ämnesområden på HP</div>
             {TOPICS.map(topic => {
               const isOpen = expanded === topic.id
               return (
-                <div key={topic.id} className={`rounded-2xl border transition-all ${isOpen ? `${topic.border} ${topic.bg}` : 'glass border-white/[0.05]'}`}>
+                <div key={topic.id} className={`rounded-2xl border transition-all ${isOpen ? `${topic.border} ${topic.bg}` : 'glass border-[var(--color-card-border)]'}`}>
                   <button
                     onClick={() => setExpanded(isOpen ? null : topic.id)}
                     className="w-full flex items-center justify-between px-4 py-3.5 text-left"
@@ -209,21 +209,21 @@ export default function XyzGuide() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className={`text-[10px] font-bold uppercase ${topic.freqColor}`}>{topic.freq}</span>
-                      <span className={`text-slate-500 text-xs transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+                      <span className={`text-[var(--color-ink-faint)] text-xs transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>▾</span>
                     </div>
                   </button>
 
                   {isOpen && (
                     <div className="px-4 pb-4 space-y-3 animate-fade-in">
                       <div>
-                        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1.5">Approach</div>
-                        <p className="text-xs text-slate-300 leading-relaxed">{topic.approach}</p>
+                        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1.5">Approach</div>
+                        <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">{topic.approach}</p>
                       </div>
                       <div>
-                        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1.5">Vanliga mönster</div>
+                        <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1.5">Vanliga mönster</div>
                         <ul className="space-y-1">
                           {topic.patterns.map(p => (
-                            <li key={p} className="flex gap-2 text-xs text-slate-400">
+                            <li key={p} className="flex gap-2 text-xs text-[var(--color-ink-muted)]">
                               <span className={`shrink-0 ${topic.color}`}>·</span>
                               {p}
                             </li>
@@ -232,7 +232,7 @@ export default function XyzGuide() {
                       </div>
                       <div className="flex items-start gap-2 bg-amber-500/5 border border-amber-500/15 rounded-xl p-2.5">
                         <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚠</span>
-                        <span className="text-[11px] text-slate-400">{topic.trap}</span>
+                        <span className="text-[11px] text-[var(--color-ink-muted)]">{topic.trap}</span>
                       </div>
                     </div>
                   )}
@@ -243,13 +243,13 @@ export default function XyzGuide() {
             <div className="mt-2">
               <button
                 onClick={() => navigate('/matematik')}
-                className="w-full glass rounded-2xl p-4 text-left hover:bg-white/[0.05] transition-colors flex items-center justify-between"
+                className="w-full card rounded-2xl p-4 text-left hover:bg-[var(--color-paper-dark)] transition-colors flex items-center justify-between"
               >
                 <div>
                   <div className="text-sm font-bold text-violet-300">Fördjupa dig i matematiken</div>
-                  <div className="text-xs text-slate-500 mt-0.5">10 ämnen med fullständiga förklaringar och begrepp</div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">10 ämnen med fullständiga förklaringar och begrepp</div>
                 </div>
-                <span className="text-slate-600">→</span>
+                <span className="text-[var(--color-ink-faint)]">→</span>
               </button>
             </div>
           </div>
@@ -258,7 +258,7 @@ export default function XyzGuide() {
         {/* Strategi tab */}
         {tab === 'strategi' && (
           <div className="space-y-4">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">XYZ-strategier</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">XYZ-strategier</div>
 
             {[
               {
@@ -299,12 +299,12 @@ export default function XyzGuide() {
             ].map(s => (
               <div key={s.title} className={`rounded-2xl border ${s.border} ${s.bg} p-4`}>
                 <div className={`text-sm font-bold ${s.color} mb-2`}>{s.title}</div>
-                <p className="text-xs text-slate-400 leading-relaxed">{s.body}</p>
+                <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">{s.body}</p>
               </div>
             ))}
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Ämnesvis tidsbudget</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Ämnesvis tidsbudget</div>
               <div className="space-y-2">
                 {[
                   { ämne: 'Algebra', tips: '40–60s. Plug-in spar tid.' },
@@ -316,7 +316,7 @@ export default function XyzGuide() {
                 ].map(({ ämne, tips }) => (
                   <div key={ämne} className="flex gap-3 text-xs">
                     <span className="text-violet-400 font-bold shrink-0 w-20">{ämne}</span>
-                    <span className="text-slate-400">{tips}</span>
+                    <span className="text-[var(--color-ink-muted)]">{tips}</span>
                   </div>
                 ))}
               </div>
@@ -327,16 +327,16 @@ export default function XyzGuide() {
         {/* Formler tab */}
         {tab === 'formler' && (
           <div className="space-y-4">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Formelreferens</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Formelreferens</div>
             {FORMULAS.map(cat => (
-              <div key={cat.category} className="glass rounded-2xl overflow-hidden">
-                <div className={`px-4 py-2.5 border-b border-white/[0.04] text-[11px] font-black uppercase tracking-widest ${cat.color}`}>
+              <div key={cat.category} className="card rounded-2xl overflow-hidden">
+                <div className={`px-4 py-2.5 border-b border-[var(--color-card-border)] text-[11px] font-black uppercase tracking-widest ${cat.color}`}>
                   {cat.category}
                 </div>
-                <div className="divide-y divide-white/[0.03]">
+                <div className="divide-y divide-[var(--color-card-border)]">
                   {cat.items.map(item => (
                     <div key={item.name} className="px-4 py-3">
-                      <div className="text-[10px] font-bold text-slate-500 mb-1">{item.name}</div>
+                      <div className="text-[10px] font-bold text-[var(--color-ink-faint)] mb-1">{item.name}</div>
                       <pre className={`text-xs font-mono ${cat.color} opacity-90 whitespace-pre-wrap leading-relaxed`}>{item.formula}</pre>
                     </div>
                   ))}
@@ -344,8 +344,8 @@ export default function XyzGuide() {
               </div>
             ))}
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Praktiska approximationer</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Praktiska approximationer</div>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { val: 'π ≈ 3,14', note: 'Cirklar' },
@@ -355,9 +355,9 @@ export default function XyzGuide() {
                   { val: '1/3 ≈ 0,333', note: 'Bråkkonvertering' },
                   { val: '2/3 ≈ 0,667', note: 'Bråkkonvertering' },
                 ].map(({ val, note }) => (
-                  <div key={val} className="bg-white/[0.03] rounded-xl p-2.5">
+                  <div key={val} className="bg-[var(--color-paper-dark)] rounded-xl p-2.5">
                     <div className="text-violet-400 font-black text-xs mb-0.5 font-mono">{val}</div>
-                    <div className="text-[10px] text-slate-500">{note}</div>
+                    <div className="text-[10px] text-[var(--color-ink-faint)]">{note}</div>
                   </div>
                 ))}
               </div>
@@ -366,7 +366,7 @@ export default function XyzGuide() {
         )}
 
         {/* Drill CTA */}
-        <div className="mt-8 pt-6 border-t border-white/[0.06]">
+        <div className="mt-8 pt-6 border-t border-[var(--color-card-border)]">
           <button
             onClick={() => navigate('/practice?type=XYZ')}
             className="w-full bg-violet-800 hover:bg-violet-700 transition-colors rounded-xl py-3 font-bold text-sm"

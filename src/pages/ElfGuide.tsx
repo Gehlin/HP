@@ -8,18 +8,18 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
   return (
     <div className="space-y-2">
       {steps.map((step, i) => (
-        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-white/[0.08] bg-white/[0.03]' : 'border-white/[0.04] bg-white/[0.01]'} p-3.5`}>
+        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-purple-700 text-white' : 'bg-white/[0.07] text-slate-600'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-purple-700 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-400 mb-0.5">{step.label}</div>
+              <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
-                  <div className="text-sm text-slate-300 leading-relaxed">{step.content}</div>
+                  <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{step.content}</div>
                   {step.result && <div className="mt-1.5 text-xs font-bold text-purple-400">{step.result}</div>}
                 </>
               ) : (
-                <div className="text-xs text-slate-700">Klicka för att avslöja</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
@@ -29,7 +29,7 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
         </div>
       ))}
       {revealed === steps.length && (
-        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-slate-600 hover:text-slate-400 py-1.5 transition-colors">Återställ ↺</button>
+        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] py-1.5 transition-colors">Återställ ↺</button>
       )}
     </div>
   )
@@ -73,7 +73,7 @@ function FalseFriends() {
 
   return (
     <div className="space-y-5">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         False friends är engelska ord som liknar svenska ord men har annan innebörd.
         De är en av de vanligaste felkällorna på ELF.
       </p>
@@ -83,12 +83,12 @@ function FalseFriends() {
         placeholder="Sök ord..."
         value={filter}
         onChange={e => setFilter(e.target.value)}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-purple-500/40"
+        className="w-full bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-ink)] placeholder-[var(--color-ink-faint)] focus:outline-none focus:border-purple-500/40"
       />
 
       <div className="space-y-2">
         {filtered.map(ff => (
-          <div key={ff.eng} className="glass rounded-xl p-4">
+          <div key={ff.eng} className="card rounded-xl p-4">
             <div className="flex items-start justify-between gap-4 mb-2">
               <span className="font-black text-purple-300 text-base">{ff.eng}</span>
               <div className="text-right text-xs">
@@ -96,15 +96,15 @@ function FalseFriends() {
                 <div className="text-red-400/70 line-through mt-0.5">✗ {ff.sv_wrong}</div>
               </div>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed">{ff.note}</p>
+            <p className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{ff.note}</p>
           </div>
         ))}
         {filtered.length === 0 && (
-          <div className="text-center text-xs text-slate-600 py-4">Inga träffar för "{filter}"</div>
+          <div className="text-center text-xs text-[var(--color-ink-faint)] py-4">Inga träffar för "{filter}"</div>
         )}
       </div>
 
-      <div className="glass rounded-2xl p-4">
+      <div className="card rounded-2xl p-4">
         <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Diskursmarkörer — textens logik</div>
         <div className="space-y-1.5">
           {DISCOURSE_MARKERS.map(dm => (
@@ -116,9 +116,9 @@ function FalseFriends() {
                 dm.logic === 'Tillägg' ? 'text-sky-400' :
                 dm.logic === 'Koncessiv' ? 'text-red-400' :
                 dm.logic === 'Sammanfattning' ? 'text-pink-400' :
-                'text-slate-400'
+                'text-[var(--color-ink-muted)]'
               }`}>{dm.logic}</span>
-              <span className="text-slate-500">{dm.sv}</span>
+              <span className="text-[var(--color-ink-faint)]">{dm.sv}</span>
             </div>
           ))}
         </div>
@@ -130,7 +130,7 @@ function FalseFriends() {
 function Strategi() {
   return (
     <div className="space-y-5">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         ELF är strukturellt identisk med LÄS — samma frågetyper, samma tidsbudget, samma metod.
         Den enda skillnaden: texten är på engelska. Frågorna är alltid på svenska.
       </p>
@@ -168,11 +168,11 @@ function Strategi() {
             body: '"Always", "never", "all", "none" i svarsalternativ — extrema formuleringar är nästan alltid fel. Texten nyanserar sig.',
           },
         ].map(item => (
-          <div key={item.n} className="glass rounded-xl p-4 flex gap-3">
+          <div key={item.n} className="card rounded-xl p-4 flex gap-3">
             <span className="text-purple-400 font-black text-sm shrink-0 w-4">{item.n}</span>
             <div>
-              <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-              <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+              <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+              <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
             </div>
           </div>
         ))}
@@ -190,13 +190,13 @@ function Strategi() {
           ].map(([mönster, förklaring]) => (
             <div key={mönster} className="flex flex-col gap-0.5">
               <span className="font-mono text-purple-300 text-[11px]">{mönster}</span>
-              <span className="text-slate-500 text-[11px]">{förklaring}</span>
+              <span className="text-[var(--color-ink-faint)] text-[11px]">{förklaring}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-5 border border-purple-500/10">
+      <div className="card rounded-2xl p-5 border border-purple-500/10">
         <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Textstruktur i akademisk engelska</div>
         <div className="space-y-2">
           {[
@@ -207,7 +207,7 @@ function Strategi() {
           ].map(({ del, funktion }) => (
             <div key={del} className="flex gap-3 text-xs">
               <span className="font-bold text-purple-300 w-24 shrink-0">{del}</span>
-              <span className="text-slate-500 leading-relaxed">{funktion}</span>
+              <span className="text-[var(--color-ink-faint)] leading-relaxed">{funktion}</span>
             </div>
           ))}
         </div>
@@ -219,18 +219,18 @@ function Strategi() {
 function Ovning() {
   return (
     <div className="space-y-6">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         Öva på att navigera engelska texter med svenska frågor — identifiera diskursmarkörer och undvik false friends.
       </p>
 
       {/* Exercise 1 */}
-      <div className="glass rounded-2xl p-5 border border-purple-500/10">
+      <div className="card rounded-2xl p-5 border border-purple-500/10">
         <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Övning 1 — Diskursmarkör</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (excerpt)</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (excerpt)</div>
           <p>The industrial revolution brought unprecedented economic growth. <strong>However</strong>, the rapid urbanization that followed created significant social inequalities and public health challenges that would persist for decades.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: Vad antyder texten om industrialiseringen?</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fråga: Vad antyder texten om industrialiseringen?</div>
         <StepReveal steps={[
           { label: 'Identifiera diskursmarkören', content: '"However" = kontrast/men. Texten ger en positiv aspekt (ekonomisk tillväxt) och kontrasterar med negativa konsekvenser.' },
           { label: 'Läs helheten', content: 'Texten säger: stor ekonomisk tillväxt DOCK sociala ojämlikheter och hälsoproblem som varade länge. Det är en nyanserad bild — inte enbart positiv.' },
@@ -239,13 +239,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 2 */}
-      <div className="glass rounded-2xl p-5 border border-purple-500/10">
+      <div className="card rounded-2xl p-5 border border-purple-500/10">
         <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Övning 2 — False friend i kontext</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (excerpt)</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (excerpt)</div>
           <p>The researchers were <strong>confident</strong> in their methodology and <strong>eventually</strong> published their findings after three years of peer review.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: Vad kan man säga om forskarnas inställning och publiceringstidpunkt?</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fråga: Vad kan man säga om forskarnas inställning och publiceringstidpunkt?</div>
         <StepReveal steps={[
           { label: 'Identifiera false friends', content: '"Confident" ≠ "konfidentiell". "Confident" = säker/övertygad. "Eventually" ≠ "eventuellt". "Eventually" = till slut/slutligen.' },
           { label: 'Applicera rätt betydelse', content: 'Rätt läsning: forskarna var ÖVERTYGADE om sin metod och publicerade TILL SLUT (efter 3 år av peer review).' },
@@ -254,13 +254,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 3 */}
-      <div className="glass rounded-2xl p-5 border border-purple-500/10">
+      <div className="card rounded-2xl p-5 border border-purple-500/10">
         <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Övning 3 — Försiktig slutsats ("suggests")</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (excerpt)</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (excerpt)</div>
           <p>The data <strong>suggests</strong> a correlation between screen time and reduced sleep quality among adolescents. This does <strong>not</strong> imply a direct causal relationship, as other lifestyle factors may contribute.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: Vad kan man dra för slutsats om sambandet mellan skärmtid och sömn?</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fråga: Vad kan man dra för slutsats om sambandet mellan skärmtid och sömn?</div>
         <StepReveal steps={[
           { label: 'Läs "suggests" och "not imply"', content: '"Suggests" = antyder/tyder på — en försiktig, inte definitiv slutsats. "Does not imply causal relationship" = texten nekar till orsakssamband.' },
           { label: 'Identifiera vad texten faktiskt påstår', content: 'Det finns en korrelation (samband). Men orsakssamband är inte etablerat. Andra faktorer kan spela in.' },
@@ -269,13 +269,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 4 */}
-      <div className="glass rounded-2xl p-5 border border-purple-500/10">
+      <div className="card rounded-2xl p-5 border border-purple-500/10">
         <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Övning 4 — Identifiera textens ton</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (excerpt)</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (excerpt)</div>
           <p>While proponents argue that artificial intelligence will create new employment opportunities, critics <strong>rightly</strong> point out that the transition period will inevitably displace millions of workers with insufficient support systems in place.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: Hur ställer sig författaren till kritikernas syn?</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fråga: Hur ställer sig författaren till kritikernas syn?</div>
         <StepReveal steps={[
           { label: 'Hitta attitydsignalen', content: '"Critics rightly point out" — ordet "rightly" (rättmätigt/med rätta) är en tydlig attitydsignal. Författaren instämmer med kritikerna.' },
           { label: 'Läs hela meningens struktur', content: '"While proponents argue... critics rightly point out..." = koncessiv struktur. Förespråkarnas argument presenteras men kritikernas ges mer tyngd via "rightly".' },
@@ -297,14 +297,14 @@ export default function ElfGuide() {
   const [tab, setTab] = useState<Tab>('falsefriends')
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
 
       {/* Hero */}
-      <div className="border-b border-white/[0.06]">
+      <div className="border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
           <button
             onClick={() => navigate('/theory')}
-            className="text-slate-500 hover:text-slate-300 text-xs mb-4 flex items-center gap-1.5 transition-colors"
+            className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-xs mb-4 flex items-center gap-1.5 transition-colors"
           >
             ← Teori
           </button>
@@ -313,7 +313,7 @@ export default function ElfGuide() {
             ELF · Engelsk läsförståelse
           </div>
           <h1 className="text-4xl font-black mb-2 tracking-tight">ELF-guiden</h1>
-          <p className="text-slate-400 text-sm leading-relaxed">
+          <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
             False friends, akademisk engelska och textstruktur för HP-ELF.
             Frågorna är på svenska — texten på engelska.
           </p>
@@ -321,13 +321,13 @@ export default function ElfGuide() {
       </div>
 
       {/* Tab bar */}
-      <div className="sticky top-0 z-20 bg-[#080C14]/95 backdrop-blur-xl border-b border-white/[0.05]">
+      <div className="sticky top-0 z-20 bg-[var(--color-paper)]/95 backdrop-blur-xl border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 flex">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-purple-400' : 'text-slate-600 hover:text-slate-400'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-purple-400' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
               {tab === t.id && (

@@ -7,11 +7,12 @@ This phase applies the warm design system to every remaining screen that still u
 - [x] Read `src/pages/Theory.tsx` and update it: replace `bg-[#080C14]`/`bg-hero`/`.glass` with `bg-app`/`.card` equivalents. Section links should be `.card p-4 mb-3` rows with type accent color dot, section name in `text-[var(--color-ink)]`, description in `text-[var(--color-ink-faint)]`, chevron on right. Page title "Teori" in `text-2xl font-[var(--font-serif)] text-[var(--color-ink)] px-4 pt-12 pb-4`. Remove any dark gradient backgrounds.
   <!-- Done: Replaced all dark theme classes (text-white, text-slate-*, border-white/*, bg-[#080C14], .glass, bg-white/*) with warm palette equivalents. Banner components converted to .card rounded-2xl rows with accent-color dot + ChevronRight. TYPE_COLOR/TAB_UNDERLINE updated to warm hex values. Build passes. -->
 
-- [ ] Update all 9 topic guide pages: read each file and replace dark-theme classes with warm ones. The files are:
+- [x] Update all 9 topic guide pages: read each file and replace dark-theme classes with warm ones. The files are:
   - `src/pages/MathGuide.tsx`, `src/pages/KvaGuide.tsx`, `src/pages/XyzGuide.tsx`, `src/pages/DtkGuide.tsx`, `src/pages/NogGuide.tsx`
   - `src/pages/LasGuide.tsx`, `src/pages/OrdGuide.tsx`, `src/pages/MekGuide.tsx`, `src/pages/ElfGuide.tsx`
   - `src/pages/LiggandeStolenGuide.tsx`
   - For each: replace `bg-slate-900`/`bg-[#080C14]`/`.glass` with `bg-[var(--color-paper)]`/`.card`. Replace `text-slate-100`/`text-slate-300` with `text-[var(--color-ink)]`/`text-[var(--color-ink-muted)]`. Replace `border-white/[0.06]`/`border-slate-700` with `border-[var(--color-card-border)]`. Replace colored accents (`text-violet-400` etc.) with the warm hex equivalents from the Phase 3 accent map.
+  <!-- Done: Applied warm theme to all 10 guide files (9 topic guides + LiggandeStolenGuide). Root containers changed to bg-app text-[var(--color-ink)]. .glass→.card, text-slate-* → ink tokens, border-white/* → color-card-border. MathGuide: TYPE_PILL/TIER_META constants updated to light-mode pill colors (bg-violet-50 text-violet-700), quiz feedback updated to emerald-50/red-50, bg-white/* alpha → paper tokens, all -400 accent text → -600/-700 for contrast on paper. LiggandeStolenGuide active tab: text-white→ink, border-white/[0.15]→color-card-border. OrdGuide emphasis text and hover fixed. Build passes. -->
 
 - [ ] Update `src/pages/VerbalHub.tsx` and `src/pages/QuantHub.tsx`: read both and apply the same warm-theme class replacements as the guides above. These are hub/overview pages — ensure section cards use `.card`, headings use `font-[var(--font-serif)]`, and any hero header areas use a subtle `bg-[var(--color-green-muted)]` tint instead of dark gradients.
 

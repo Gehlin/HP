@@ -8,18 +8,18 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
   return (
     <div className="space-y-2">
       {steps.map((step, i) => (
-        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-white/[0.08] bg-white/[0.03]' : 'border-white/[0.04] bg-white/[0.01]'} p-3.5`}>
+        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-lime-600 text-white' : 'bg-white/[0.07] text-slate-600'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-lime-600 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-400 mb-0.5">{step.label}</div>
+              <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
-                  <div className="text-sm text-slate-300 leading-relaxed">{step.content}</div>
+                  <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{step.content}</div>
                   {step.result && <div className="mt-1.5 text-xs font-bold text-lime-400">{step.result}</div>}
                 </>
               ) : (
-                <div className="text-xs text-slate-700">Klicka för att avslöja</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
@@ -29,7 +29,7 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
         </div>
       ))}
       {revealed === steps.length && (
-        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-slate-600 hover:text-slate-400 py-1.5 transition-colors">Återställ ↺</button>
+        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] py-1.5 transition-colors">Återställ ↺</button>
       )}
     </div>
   )
@@ -101,7 +101,7 @@ const CONJUNCTION_TYPES = [
     name: 'Temporala',
     signal: 'när · medan · innan · sedan · efter att · så fort',
     logic: 'Tidsrelation',
-    logicColor: 'text-slate-300',
+    logicColor: 'text-[var(--color-ink-muted)]',
     desc: 'Beskriver när händelser inträffar i förhållande till varandra: samtidigt (medan), efter (sedan/efter att), före (innan).',
     ex: 'Medan hon presenterade rapportens slutsatser antecknade kollegorna intensivt.',
     trap: '"Medan" = simultant. "Sedan" = efter. Blanda dem inte i MEK-frågor om temporalt samband.',
@@ -142,31 +142,31 @@ function Konjunktioner() {
   const [open, setOpen] = useState<string | null>(null)
   return (
     <div className="space-y-5">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         MEK testar om du förstår den logiska relationen i en mening. Alla meningar bygger på ett av nedanstående mönster.
         Identifiera mönstret — välj rätt par.
       </p>
 
       <div className="space-y-2">
         {CONJUNCTION_TYPES.map(ct => (
-          <div key={ct.id} className="glass rounded-xl overflow-hidden">
+          <div key={ct.id} className="card rounded-xl overflow-hidden">
             <button
               onClick={() => setOpen(open === ct.id ? null : ct.id)}
               className="w-full flex items-center gap-3 px-4 py-3 text-left"
             >
               <span className={`text-[10px] font-black uppercase tracking-widest w-24 shrink-0 ${ct.logicColor}`}>{ct.name}</span>
-              <span className="text-xs text-slate-500 flex-1 truncate">{ct.signal}</span>
-              <span className={`text-slate-600 text-sm transition-transform duration-200 ${open === ct.id ? 'rotate-180' : ''}`}>▾</span>
+              <span className="text-xs text-[var(--color-ink-faint)] flex-1 truncate">{ct.signal}</span>
+              <span className={`text-[var(--color-ink-faint)] text-sm transition-transform duration-200 ${open === ct.id ? 'rotate-180' : ''}`}>▾</span>
             </button>
             {open === ct.id && (
-              <div className="px-4 pb-4 space-y-3 border-t border-white/[0.05]">
+              <div className="px-4 pb-4 space-y-3 border-t border-[var(--color-card-border)]">
                 <div className="flex items-center gap-2 mt-3">
                   <span className={`text-[10px] font-bold uppercase tracking-widest ${ct.logicColor}`}>{ct.logic}</span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed">{ct.desc}</p>
-                <div className="bg-white/[0.04] rounded-lg px-3 py-2.5">
-                  <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">Exempelmening</div>
-                  <p className="text-sm text-slate-200 italic">"{ct.ex}"</p>
+                <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">{ct.desc}</p>
+                <div className="bg-[var(--color-paper-dark)] rounded-lg px-3 py-2.5">
+                  <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Exempelmening</div>
+                  <p className="text-sm text-[var(--color-ink)] italic">"{ct.ex}"</p>
                 </div>
                 <div className="bg-amber-500/8 border border-amber-500/20 rounded-lg px-3 py-2.5">
                   <div className="text-[9px] font-bold text-amber-400 uppercase tracking-widest mb-1">Vanlig fälla</div>
@@ -178,7 +178,7 @@ function Konjunktioner() {
         ))}
       </div>
 
-      <div className="glass rounded-2xl p-4">
+      <div className="card rounded-2xl p-4">
         <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Snabbreferens</div>
         <div className="space-y-1.5">
           {[
@@ -192,8 +192,8 @@ function Konjunktioner() {
             ['Hypotetisk',  'som om...vore'],
           ].map(([typ, signal]) => (
             <div key={typ} className="flex items-baseline gap-2 text-xs">
-              <span className="text-slate-500 w-32 shrink-0">{typ}</span>
-              <span className="text-slate-300 font-mono">{signal}</span>
+              <span className="text-[var(--color-ink-faint)] w-32 shrink-0">{typ}</span>
+              <span className="text-[var(--color-ink-muted)] font-mono">{signal}</span>
             </div>
           ))}
         </div>
@@ -205,7 +205,7 @@ function Konjunktioner() {
 function Strategi() {
   return (
     <div className="space-y-5">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         MEK handlar inte om att gissa — det handlar om att läsa meningens logiska struktur.
         Följ den här processen på varje fråga.
       </p>
@@ -238,17 +238,17 @@ function Strategi() {
             body: 'Klistra in alternativet och lyssna: låter det naturligt och grammatiskt rätt? Fel svar gnisslar ofta vid uppläsning.',
           },
         ].map(item => (
-          <div key={item.n} className="glass rounded-xl p-4 flex gap-3">
+          <div key={item.n} className="card rounded-xl p-4 flex gap-3">
             <span className="text-lime-400 font-black text-sm shrink-0 w-4">{item.n}</span>
             <div>
-              <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-              <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+              <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+              <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="glass rounded-2xl p-5 border border-lime-500/10">
+      <div className="card rounded-2xl p-5 border border-lime-500/10">
         <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Signalord → Relation (snabbkort)</div>
         <div className="grid grid-cols-1 gap-1.5">
           {[
@@ -264,7 +264,7 @@ function Strategi() {
           ].map(({ signal, rel }) => (
             <div key={signal} className="text-xs flex gap-2">
               <span className="font-mono text-lime-300 shrink-0 min-w-[180px]">{signal}</span>
-              <span className="text-slate-500">{rel}</span>
+              <span className="text-[var(--color-ink-faint)]">{rel}</span>
             </div>
           ))}
         </div>
@@ -276,18 +276,18 @@ function Strategi() {
 function Ovning() {
   return (
     <div className="space-y-6">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         Följ analysen steg för steg. Identifiera signalord, bestäm relationen och välj rätt par.
       </p>
 
       {/* Exercise 1 */}
-      <div className="glass rounded-2xl p-5 border border-lime-500/10">
+      <div className="card rounded-2xl p-5 border border-lime-500/10">
         <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Övning 1 — Koncessiv</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4">
-          <p className="text-sm text-slate-200 mb-3">
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
+          <p className="text-sm text-[var(--color-ink)] mb-3">
             "Trots att rapporten var _______ i sin analys, fick den ett _______ mottagande av forskarvärlden."
           </p>
-          <div className="space-y-1 text-xs text-slate-500">
+          <div className="space-y-1 text-xs text-[var(--color-ink-faint)]">
             <div>A — ytlig...negativt</div>
             <div>B — noggrann...kyligt</div>
             <div>C — välskriven...entusiastiskt</div>
@@ -303,13 +303,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 2 */}
-      <div className="glass rounded-2xl p-5 border border-lime-500/10">
+      <div className="card rounded-2xl p-5 border border-lime-500/10">
         <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Övning 2 — Kausal + intern logik</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4">
-          <p className="text-sm text-slate-200 mb-3">
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
+          <p className="text-sm text-[var(--color-ink)] mb-3">
             "Eftersom boken var _______ i sin presentation av källorna, fick den _______ kritik från forskarvärlden."
           </p>
-          <div className="space-y-1 text-xs text-slate-500">
+          <div className="space-y-1 text-xs text-[var(--color-ink-faint)]">
             <div>A — noggrann...lite</div>
             <div>B — bristfällig...skarp</div>
             <div>C — utmärkt...välförtjänt</div>
@@ -324,13 +324,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 3 */}
-      <div className="glass rounded-2xl p-5 border border-lime-500/10">
+      <div className="card rounded-2xl p-5 border border-lime-500/10">
         <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Övning 3 — Proportionell (ju...desto)</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4">
-          <p className="text-sm text-slate-200 mb-3">
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
+          <p className="text-sm text-[var(--color-ink)] mb-3">
             "Ju mer komplex en organisation är, desto _______ är det att _______ snabba beslut."
           </p>
-          <div className="space-y-1 text-xs text-slate-500">
+          <div className="space-y-1 text-xs text-[var(--color-ink-faint)]">
             <div>A — svårare...fatta</div>
             <div>B — viktigare...undvika</div>
             <div>C — lättare...motivera</div>
@@ -345,13 +345,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 4 */}
-      <div className="glass rounded-2xl p-5 border border-lime-500/10">
+      <div className="card rounded-2xl p-5 border border-lime-500/10">
         <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Övning 4 — Additiv vs Alternativ</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4">
-          <p className="text-sm text-slate-200 mb-3">
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
+          <p className="text-sm text-[var(--color-ink)] mb-3">
             "Reformerna genomfördes _______ på ekonomiska grunder _______ av ideologiska skäl."
           </p>
-          <div className="space-y-1 text-xs text-slate-500">
+          <div className="space-y-1 text-xs text-[var(--color-ink-faint)]">
             <div>A — dels...dels</div>
             <div>B — antingen...eller</div>
             <div>C — varken...eller</div>
@@ -379,14 +379,14 @@ export default function MekGuide() {
   const [tab, setTab] = useState<Tab>('konjunktioner')
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
 
       {/* Hero */}
-      <div className="border-b border-white/[0.06]">
+      <div className="border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
           <button
             onClick={() => navigate('/theory')}
-            className="text-slate-500 hover:text-slate-300 text-xs mb-4 flex items-center gap-1.5 transition-colors"
+            className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-xs mb-4 flex items-center gap-1.5 transition-colors"
           >
             ← Teori
           </button>
@@ -395,7 +395,7 @@ export default function MekGuide() {
             MEK · Meningskomplettering
           </div>
           <h1 className="text-4xl font-black mb-2 tracking-tight">MEK-guiden</h1>
-          <p className="text-slate-400 text-sm leading-relaxed">
+          <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
             Alla konjunktionstyper som förekommer på HP, med signalord, logik och
             interaktiva övningar. Identifiera mönstret — välj rätt par.
           </p>
@@ -403,13 +403,13 @@ export default function MekGuide() {
       </div>
 
       {/* Tab bar */}
-      <div className="sticky top-0 z-20 bg-[#080C14]/95 backdrop-blur-xl border-b border-white/[0.05]">
+      <div className="sticky top-0 z-20 bg-[var(--color-paper)]/95 backdrop-blur-xl border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 flex">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-lime-400' : 'text-slate-600 hover:text-slate-400'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-lime-400' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
               {tab === t.id && (

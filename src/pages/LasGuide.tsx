@@ -8,18 +8,18 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
   return (
     <div className="space-y-2">
       {steps.map((step, i) => (
-        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-white/[0.08] bg-white/[0.03]' : 'border-white/[0.04] bg-white/[0.01]'} p-3.5`}>
+        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-pink-700 text-white' : 'bg-white/[0.07] text-slate-600'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-pink-700 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-400 mb-0.5">{step.label}</div>
+              <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
-                  <div className="text-sm text-slate-300 leading-relaxed">{step.content}</div>
+                  <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{step.content}</div>
                   {step.result && <div className="mt-1.5 text-xs font-bold text-pink-400">{step.result}</div>}
                 </>
               ) : (
-                <div className="text-xs text-slate-700">Klicka för att avslöja</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
@@ -29,7 +29,7 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
         </div>
       ))}
       {revealed === steps.length && (
-        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-slate-600 hover:text-slate-400 py-1.5 transition-colors">Återställ ↺</button>
+        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] py-1.5 transition-colors">Återställ ↺</button>
       )}
     </div>
   )
@@ -96,27 +96,27 @@ function Fragor() {
   const [open, setOpen] = useState<string | null>(null)
   return (
     <div className="space-y-5">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         LÄS-frågor återkommer i ett begränsat antal typer. Identifiera frågetypen — du vet genast var i texten du ska leta.
       </p>
 
       <div className="space-y-2">
         {QUESTION_TYPES.map(qt => (
-          <div key={qt.id} className="glass rounded-xl overflow-hidden">
+          <div key={qt.id} className="card rounded-xl overflow-hidden">
             <button
               onClick={() => setOpen(open === qt.id ? null : qt.id)}
               className="w-full flex items-center gap-3 px-4 py-3 text-left"
             >
               <span className={`text-[10px] font-black uppercase tracking-widest w-28 shrink-0 leading-tight ${qt.tagColor}`}>{qt.name}</span>
-              <span className="text-xs text-slate-500 flex-1 truncate">{qt.tag}</span>
-              <span className={`text-slate-600 text-sm transition-transform duration-200 ${open === qt.id ? 'rotate-180' : ''}`}>▾</span>
+              <span className="text-xs text-[var(--color-ink-faint)] flex-1 truncate">{qt.tag}</span>
+              <span className={`text-[var(--color-ink-faint)] text-sm transition-transform duration-200 ${open === qt.id ? 'rotate-180' : ''}`}>▾</span>
             </button>
             {open === qt.id && (
-              <div className="px-4 pb-4 space-y-3 border-t border-white/[0.05]">
-                <p className="text-xs text-slate-400 leading-relaxed mt-3">{qt.desc}</p>
-                <div className="bg-white/[0.04] rounded-lg px-3 py-2.5">
-                  <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">Signalfrågor</div>
-                  <p className="text-xs text-slate-300 italic">{qt.signal}</p>
+              <div className="px-4 pb-4 space-y-3 border-t border-[var(--color-card-border)]">
+                <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed mt-3">{qt.desc}</p>
+                <div className="bg-[var(--color-paper-dark)] rounded-lg px-3 py-2.5">
+                  <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Signalfrågor</div>
+                  <p className="text-xs text-[var(--color-ink-muted)] italic">{qt.signal}</p>
                 </div>
                 <div className="bg-amber-500/8 border border-amber-500/20 rounded-lg px-3 py-2.5">
                   <div className="text-[9px] font-bold text-amber-400 uppercase tracking-widest mb-1">Vanlig fälla</div>
@@ -128,7 +128,7 @@ function Fragor() {
         ))}
       </div>
 
-      <div className="glass rounded-2xl p-4">
+      <div className="card rounded-2xl p-4">
         <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Snabbreferens — frågetyp → sökstrategi</div>
         <div className="space-y-1.5">
           {[
@@ -140,8 +140,8 @@ function Fragor() {
             ['Textstruktur', 'Inledning, avslutning, styckesfunktioner'],
           ].map(([typ, taktik]) => (
             <div key={typ} className="flex items-baseline gap-2 text-xs">
-              <span className="text-slate-500 w-32 shrink-0">{typ}</span>
-              <span className="text-slate-300">{taktik}</span>
+              <span className="text-[var(--color-ink-faint)] w-32 shrink-0">{typ}</span>
+              <span className="text-[var(--color-ink-muted)]">{taktik}</span>
             </div>
           ))}
         </div>
@@ -153,7 +153,7 @@ function Fragor() {
 function Strategi() {
   return (
     <div className="space-y-5">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         LÄS ger ~120 s per fråga — gott om tid om du läser rätt. Följ den här processen för varje text.
       </p>
 
@@ -190,11 +190,11 @@ function Strategi() {
             body: 'Rätt svar omformulerar ofta textens innehåll med andra ord. Alternativ som citerar texten ordagrant kan sakna rätt kontext.',
           },
         ].map(item => (
-          <div key={item.n} className="glass rounded-xl p-4 flex gap-3">
+          <div key={item.n} className="card rounded-xl p-4 flex gap-3">
             <span className="text-pink-400 font-black text-sm shrink-0 w-4">{item.n}</span>
             <div>
-              <div className="text-sm font-semibold text-slate-200 mb-0.5">{item.title}</div>
-              <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+              <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
+              <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
             </div>
           </div>
         ))}
@@ -210,14 +210,14 @@ function Strategi() {
             ['Totalt per text', '~7–8 min'],
           ].map(([steg, tid]) => (
             <div key={steg} className="flex justify-between">
-              <span className="text-slate-400">{steg}</span>
+              <span className="text-[var(--color-ink-muted)]">{steg}</span>
               <span className="text-pink-300 font-mono">{tid}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-5 border border-pink-500/10">
+      <div className="card rounded-2xl p-5 border border-pink-500/10">
         <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Signalord i svenska texter</div>
         <div className="grid grid-cols-1 gap-1.5">
           {[
@@ -230,7 +230,7 @@ function Strategi() {
           ].map(({ signal, rel }) => (
             <div key={signal} className="text-xs flex gap-2">
               <span className="font-mono text-pink-300 shrink-0 min-w-[180px]">{signal}</span>
-              <span className="text-slate-500">{rel}</span>
+              <span className="text-[var(--color-ink-faint)]">{rel}</span>
             </div>
           ))}
         </div>
@@ -242,18 +242,18 @@ function Strategi() {
 function Ovning() {
   return (
     <div className="space-y-6">
-      <p className="text-slate-400 text-sm leading-relaxed">
+      <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
         Öva på att identifiera frågetyp, hitta textbevis och eliminera fel alternativ.
       </p>
 
       {/* Exercise 1 */}
-      <div className="glass rounded-2xl p-5 border border-pink-500/10">
+      <div className="card rounded-2xl p-5 border border-pink-500/10">
         <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Övning 1 — Faktafråga</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (utdrag)</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (utdrag)</div>
           <p>Forskning visar att regelbunden sömn om 7–9 timmar per natt förbättrar kognitiv prestanda markant. Studier på universitetsstudenter visade att de som sov under 6 timmar fick 30% sämre resultat på minnestester, medan de som sov mer än 9 timmar inte visade ytterligare förbättring jämfört med 7–9-gruppen.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: Vad visade studierna om studenter som sov under 6 timmar?</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fråga: Vad visade studierna om studenter som sov under 6 timmar?</div>
         <StepReveal steps={[
           { label: 'Steg 1 — Identifiera frågetypen', content: 'Detta är en faktafråga: "vad visade studierna" — svaret finns ordagrant i texten. Inget tolkningsutrymme behövs.' },
           { label: 'Steg 2 — Hitta textbevis', content: 'Meningen "de som sov under 6 timmar fick 30% sämre resultat på minnestester" är det direkta textbeviset.', result: '→ Textbevis: 30% sämre minnesresultat' },
@@ -262,13 +262,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 2 */}
-      <div className="glass rounded-2xl p-5 border border-pink-500/10">
+      <div className="card rounded-2xl p-5 border border-pink-500/10">
         <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Övning 2 — Slutledning</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (utdrag)</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (utdrag)</div>
           <p>Det biologiska arvet spelar en avgörande roll för individens intelligens, men miljön — uppväxt, utbildning och sociala faktorer — kan modifiera dess uttryck i hög grad. Tvillingstudier visar att identiska tvillingar uppvuxna i skilda miljöer har mätbart olika kognitiva profiler.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: Vad kan man dra för slutsats om förhållandet mellan arv och miljö?</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fråga: Vad kan man dra för slutsats om förhållandet mellan arv och miljö?</div>
         <StepReveal steps={[
           { label: 'Steg 1 — Identifiera frågetypen', content: '"Vad kan man dra för slutsats" = slutledningsfråga. Svaret är inte ordagrant i texten — du ska dra en logisk slutsats.' },
           { label: 'Steg 2 — Identifiera textens kärna', content: 'Texten säger: arv är avgörande MEN miljö kan modifiera. Tvillingar i skilda miljöer skiljer sig. Slutsatsen: BÅDE arv och miljö påverkar.' },
@@ -277,13 +277,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 3 */}
-      <div className="glass rounded-2xl p-5 border border-pink-500/10">
+      <div className="card rounded-2xl p-5 border border-pink-500/10">
         <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Övning 3 — Ordbetydelse i kontext</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (utdrag)</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (utdrag)</div>
           <p>Projektets framgång berodde på teamets förmåga att navigera de <strong>labyrintiska</strong> byråkratiska processerna utan att tappa fart.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fråga: I texten syftar "labyrintiska" närmast på att processerna var:</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Fråga: I texten syftar "labyrintiska" närmast på att processerna var:</div>
         <StepReveal steps={[
           { label: 'Steg 1 — Läs kontexten', content: '"Navigera ... processerna utan att tappa fart" — det krävdes navigationsförmåga för att inte sakta ner. Labyrint = komplex, svår att hitta igenom.' },
           { label: 'Steg 2 — Ordbok vs kontext', content: 'Ordbok: labyrintisk = liknar en labyrint. Men i kontexten: processerna var svårnavigerade och komplexa. Det är kontextbetydelsen som testas.' },
@@ -292,13 +292,13 @@ function Ovning() {
       </div>
 
       {/* Exercise 4 */}
-      <div className="glass rounded-2xl p-5 border border-pink-500/10">
+      <div className="card rounded-2xl p-5 border border-pink-500/10">
         <div className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Övning 4 — Undvika extrema formuleringar</div>
-        <div className="bg-white/[0.04] rounded-xl p-4 mb-4 text-xs text-slate-300 leading-relaxed">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Text (utdrag)</div>
+        <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (utdrag)</div>
           <p>De flesta klimatforskare är överens om att mänsklig aktivitet bidrar till den globala uppvärmningen. Enstaka röster inom forskarvärlden ifrågasätter dock konsensus, och debatten om metodologiska frågor fortsätter.</p>
         </div>
-        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Välj det alternativ som bäst stämmer med textens innehåll:</div>
+        <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Välj det alternativ som bäst stämmer med textens innehåll:</div>
         <StepReveal steps={[
           { label: 'Identifiera extrema formuleringar i alternativen', content: '"Alla klimatforskare är eniga" — texten säger "de flesta" och nämner enstaka ifrågasättanden → fel. "Ingen forskar ifrågasätter" → fel. "Det råder debatt om metodologi" → textbevis finns direkt.' },
           { label: 'Matcha mot texten', content: 'Texten säger: (1) de flesta är överens om mänsklig påverkan, (2) enstaka ifrågasätter, (3) metodologisk debatt pågår. Rätt svar ska fånga nyansen — konsensus finns men debatt pågår.' },
@@ -320,14 +320,14 @@ export default function LasGuide() {
   const [tab, setTab] = useState<Tab>('fragor')
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
 
       {/* Hero */}
-      <div className="border-b border-white/[0.06]">
+      <div className="border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
           <button
             onClick={() => navigate('/theory')}
-            className="text-slate-500 hover:text-slate-300 text-xs mb-4 flex items-center gap-1.5 transition-colors"
+            className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-xs mb-4 flex items-center gap-1.5 transition-colors"
           >
             ← Teori
           </button>
@@ -336,7 +336,7 @@ export default function LasGuide() {
             LÄS · Läsförståelse
           </div>
           <h1 className="text-4xl font-black mb-2 tracking-tight">LÄS-guiden</h1>
-          <p className="text-slate-400 text-sm leading-relaxed">
+          <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
             Alla frågetyper på HP-LÄS, med sökstrategi, signalord och interaktiva övningar.
             Hitta textbeviset — välj rätt alternativ.
           </p>
@@ -344,13 +344,13 @@ export default function LasGuide() {
       </div>
 
       {/* Tab bar */}
-      <div className="sticky top-0 z-20 bg-[#080C14]/95 backdrop-blur-xl border-b border-white/[0.05]">
+      <div className="sticky top-0 z-20 bg-[var(--color-paper)]/95 backdrop-blur-xl border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 flex">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-pink-400' : 'text-slate-600 hover:text-slate-400'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-pink-400' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
               {tab === t.id && (

@@ -8,18 +8,18 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
   return (
     <div className="space-y-2">
       {steps.map((step, i) => (
-        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-white/[0.08] bg-white/[0.03]' : 'border-white/[0.04] bg-white/[0.01]'} p-3.5`}>
+        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-blue-600 text-white' : 'bg-white/[0.07] text-slate-600'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-blue-600 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-400 mb-0.5">{step.label}</div>
+              <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
-                  <div className="text-sm text-slate-300 leading-relaxed">{step.content}</div>
+                  <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{step.content}</div>
                   {step.result && <div className="mt-1.5 text-xs font-bold text-blue-400">{step.result}</div>}
                 </>
               ) : (
-                <div className="text-xs text-slate-700">Klicka för att avslöja</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
@@ -29,7 +29,7 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
         </div>
       ))}
       {revealed === steps.length && (
-        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-slate-600 hover:text-slate-400 py-1.5 transition-colors">Återställ ↺</button>
+        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] py-1.5 transition-colors">Återställ ↺</button>
       )}
     </div>
   )
@@ -138,12 +138,12 @@ export default function KvaGuide() {
   ]
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-lg mx-auto px-4 py-10 pb-24">
 
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-8 transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-8 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -158,24 +158,24 @@ export default function KvaGuide() {
             KVA · Kvantitativa jämförelser
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">KVA-guide</h1>
-          <p className="text-slate-500 text-sm">10 frågor/prov · ~60s/fråga · 4 svarsalternativ</p>
+          <p className="text-[var(--color-ink-faint)] text-sm">10 frågor/prov · ~60s/fråga · 4 svarsalternativ</p>
         </div>
 
         {/* Core insight */}
-        <div className="glass rounded-2xl p-4 mb-6 border border-blue-500/15">
+        <div className="card rounded-2xl p-4 mb-6 border border-blue-500/15">
           <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">Kärninsikt</div>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
             KVA handlar aldrig om att beräkna exakta svar — bara att avgöra <span className="text-blue-300 font-semibold">vilken av två kvantiteter som är större</span>. Det räcker att bevisa att en är större, eller hitta ett motexempel för att välja D. Precision dödar tid; uppskattning vinner poäng.
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 p-1 glass rounded-xl">
+        <div className="flex gap-1 mb-6 p-1 card rounded-xl">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-blue-600 text-white' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
             </button>
@@ -185,23 +185,23 @@ export default function KvaGuide() {
         {/* Schema tab */}
         {tab === 'schema' && (
           <div className="space-y-3">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">De fyra svarsalternativen</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">De fyra svarsalternativen</div>
             {ANSWER_SCHEME.map(opt => (
               <div key={opt.key} className={`rounded-2xl border ${opt.border} ${opt.bg} p-4`}>
                 <div className="flex items-center gap-3 mb-2">
                   <span className={`text-2xl font-black ${opt.color}`}>{opt.key}</span>
-                  <span className="text-sm font-bold text-slate-200">{opt.label}</span>
+                  <span className="text-sm font-bold text-[var(--color-ink)]">{opt.label}</span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed mb-2">{opt.desc}</p>
-                <div className="flex items-start gap-2 bg-black/20 rounded-xl p-2.5">
+                <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed mb-2">{opt.desc}</p>
+                <div className="flex items-start gap-2 bg-[var(--color-paper-dark)] rounded-xl p-2.5">
                   <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚠</span>
-                  <span className="text-[11px] text-slate-400">{opt.trap}</span>
+                  <span className="text-[11px] text-[var(--color-ink-muted)]">{opt.trap}</span>
                 </div>
               </div>
             ))}
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06] mt-4">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Beslutsträd</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)] mt-4">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Beslutsträd</div>
               <div className="space-y-2 text-sm">
                 {[
                   { q: 'Är KVI alltid > KVII?', a: '→ A' },
@@ -210,7 +210,7 @@ export default function KvaGuide() {
                   { q: 'Beror det på värdet av variabeln?', a: '→ D' },
                 ].map(({ q, a }) => (
                   <div key={q} className="flex items-center justify-between gap-4">
-                    <span className="text-slate-400 text-xs">{q}</span>
+                    <span className="text-[var(--color-ink-muted)] text-xs">{q}</span>
                     <span className="text-blue-400 font-black text-sm shrink-0">{a}</span>
                   </div>
                 ))}
@@ -222,7 +222,7 @@ export default function KvaGuide() {
         {/* Strategi tab */}
         {tab === 'strategi' && (
           <div className="space-y-4">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Steg-för-steg-metod</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Steg-för-steg-metod</div>
             <StepReveal steps={[
               {
                 label: 'Läs uppgiften — identifiera eventuella begränsningar',
@@ -251,8 +251,8 @@ export default function KvaGuide() {
               },
             ]} />
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Tidsstrategi</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Tidsstrategi</div>
               <div className="space-y-2">
                 {[
                   { time: '0–20s', action: 'Läs och förstå vad som jämförs. Notera begränsningar.' },
@@ -262,13 +262,13 @@ export default function KvaGuide() {
                 ].map(({ time, action }) => (
                   <div key={time} className="flex gap-3 text-xs">
                     <span className="text-blue-400 font-black shrink-0 w-12">{time}</span>
-                    <span className="text-slate-400">{action}</span>
+                    <span className="text-[var(--color-ink-muted)]">{action}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-4 border border-amber-500/15">
+            <div className="card rounded-2xl p-4 border border-amber-500/15">
               <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-3">De vanligaste fällorna</div>
               <ul className="space-y-2">
                 {[
@@ -278,7 +278,7 @@ export default function KvaGuide() {
                   'Missar att x² ≥ 0 alltid — även om x är negativt. Kvadrater och absoluta värden har alltid definita tecken.',
                   'Förväxlar "kan vara lika" med "är alltid lika". C kräver alltid-likhet.',
                 ].map(trap => (
-                  <li key={trap} className="flex gap-2 text-xs text-slate-400">
+                  <li key={trap} className="flex gap-2 text-xs text-[var(--color-ink-muted)]">
                     <span className="text-amber-400 shrink-0">·</span>
                     {trap}
                   </li>
@@ -291,27 +291,27 @@ export default function KvaGuide() {
         {/* Mönster tab */}
         {tab === 'monster' && (
           <div className="space-y-3">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Vanliga uppgiftsmönster</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Vanliga uppgiftsmönster</div>
             {PATTERNS.map(p => (
               <div key={p.name} className={`rounded-2xl border ${p.border} ${p.bg} p-4`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`text-base font-mono ${p.color}`}>{p.icon}</span>
                   <span className={`text-sm font-bold ${p.color}`}>{p.name}</span>
                 </div>
-                <p className="text-xs text-slate-400 mb-3 leading-relaxed">{p.desc}</p>
-                <div className="bg-black/30 rounded-xl p-3 mb-2">
-                  <div className="text-[10px] font-bold text-slate-600 mb-1">Exempel</div>
-                  <pre className="text-[11px] text-slate-300 whitespace-pre-wrap leading-relaxed font-mono">{p.example}</pre>
+                <p className="text-xs text-[var(--color-ink-muted)] mb-3 leading-relaxed">{p.desc}</p>
+                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 mb-2">
+                  <div className="text-[10px] font-bold text-[var(--color-ink-faint)] mb-1">Exempel</div>
+                  <pre className="text-[11px] text-[var(--color-ink-muted)] whitespace-pre-wrap leading-relaxed font-mono">{p.example}</pre>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-blue-400 text-[11px] shrink-0">→</span>
-                  <span className="text-[11px] text-slate-400">{p.tip}</span>
+                  <span className="text-[11px] text-[var(--color-ink-muted)]">{p.tip}</span>
                 </div>
               </div>
             ))}
 
-            <div className="glass rounded-2xl p-4 border border-white/[0.06]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Snabbreferens — magiska tal</div>
+            <div className="card rounded-2xl p-4 border border-[var(--color-card-border)]">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Snabbreferens — magiska tal</div>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { val: 'x = 0', effect: 'Tar bort termer multiplicerade med x' },
@@ -321,9 +321,9 @@ export default function KvaGuide() {
                   { val: 'x = −0,5', effect: 'Kombinerar negativ + decimal' },
                   { val: 'x = 100', effect: 'Avslöjar dominerande termer' },
                 ].map(({ val, effect }) => (
-                  <div key={val} className="bg-white/[0.03] rounded-xl p-2.5">
+                  <div key={val} className="bg-[var(--color-paper-dark)] rounded-xl p-2.5">
                     <div className="text-blue-400 font-black text-xs mb-0.5 font-mono">{val}</div>
-                    <div className="text-[10px] text-slate-500">{effect}</div>
+                    <div className="text-[10px] text-[var(--color-ink-faint)]">{effect}</div>
                   </div>
                 ))}
               </div>
@@ -332,7 +332,7 @@ export default function KvaGuide() {
         )}
 
         {/* Drill CTA */}
-        <div className="mt-8 pt-6 border-t border-white/[0.06]">
+        <div className="mt-8 pt-6 border-t border-[var(--color-card-border)]">
           <button
             onClick={() => navigate('/practice?type=KVA')}
             className="w-full bg-blue-700 hover:bg-blue-600 transition-colors rounded-xl py-3 font-bold text-sm"

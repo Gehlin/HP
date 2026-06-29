@@ -17,18 +17,18 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
   return (
     <div className="space-y-2">
       {steps.map((step, i) => (
-        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-white/[0.08] bg-white/[0.03]' : 'border-white/[0.04] bg-white/[0.01]'} p-3.5`}>
+        <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-blue-600 text-white' : 'bg-white/[0.07] text-slate-600'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-blue-600 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-400 mb-0.5">{step.label}</div>
+              <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
-                  <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{step.content}</div>
+                  <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed whitespace-pre-line">{step.content}</div>
                   {step.result && <div className="mt-1.5 text-xs font-bold text-blue-400">{step.result}</div>}
                 </>
               ) : (
-                <div className="text-xs text-slate-700">Klicka för att avslöja</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
@@ -38,7 +38,7 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
         </div>
       ))}
       {revealed === steps.length && (
-        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-slate-600 hover:text-slate-400 py-1.5 transition-colors">Återställ ↺</button>
+        <button onClick={() => setRevealed(0)} className="w-full text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] py-1.5 transition-colors">Återställ ↺</button>
       )}
     </div>
   )
@@ -46,14 +46,14 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
 
 function CodeBlock({ children }: { children: string }) {
   return (
-    <pre className="bg-[#0a0f1a] border border-white/[0.06] rounded-xl p-4 text-sm font-mono text-slate-300 overflow-x-auto leading-relaxed">
+    <pre className="bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl p-4 text-sm font-mono text-[var(--color-ink-muted)] overflow-x-auto leading-relaxed">
       {children}
     </pre>
   )
 }
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-sm font-black text-slate-200 mb-3 mt-6 first:mt-0">{children}</h3>
+  return <h3 className="text-sm font-black text-[var(--color-ink)] mb-3 mt-6 first:mt-0">{children}</h3>
 }
 
 function Callout({ title, children, color = 'blue' }: { title: string; children: React.ReactNode; color?: 'blue' | 'amber' | 'emerald' | 'violet' }) {
@@ -66,7 +66,7 @@ function Callout({ title, children, color = 'blue' }: { title: string; children:
   return (
     <div className={`rounded-xl border p-4 mb-4 ${styles[color]}`}>
       <div className="text-[10px] font-black uppercase tracking-widest mb-1.5">{title}</div>
-      <div className="text-sm text-slate-300 leading-relaxed">{children}</div>
+      <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{children}</div>
     </div>
   )
 }
@@ -81,8 +81,8 @@ function IntroSection() {
       </Callout>
 
       <SectionHeading>Varför lära sig det här?</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-4">
-        HP-provet tillåter <span className="text-white font-semibold">inga miniräknare</span>. Alla 40 kvantitativa frågor — XYZ, KVA, NOG och DTK — måste lösas med hjärnan och eventuellt ett utkast på kladdpapper. Liggande Stolen ger dig:
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-4">
+        HP-provet tillåter <span className="text-[var(--color-ink)] font-semibold">inga miniräknare</span>. Alla 40 kvantitativa frågor — XYZ, KVA, NOG och DTK — måste lösas med hjärnan och eventuellt ett utkast på kladdpapper. Liggande Stolen ger dig:
       </p>
       <ul className="space-y-2 mb-6">
         {[
@@ -91,7 +91,7 @@ function IntroSection() {
           'Snabba uppskattningstekniker för att eliminera felaktiga alternativ',
           'Självförtroende — du vet exakt hur du angriper varje beräkning',
         ].map(item => (
-          <li key={item} className="flex items-start gap-2.5 text-sm text-slate-400">
+          <li key={item} className="flex items-start gap-2.5 text-sm text-[var(--color-ink-muted)]">
             <span className="text-blue-400 mt-0.5 shrink-0">·</span>
             {item}
           </li>
@@ -106,10 +106,10 @@ function IntroSection() {
           { label: 'Kvadratrötter',  desc: 'Parvis algoritm',  icon: '√' },
           { label: 'Estimering',     desc: 'Snabb uppskattning', icon: '≈' },
         ].map(p => (
-          <div key={p.label} className="glass rounded-xl p-3.5 border border-white/[0.05]">
+          <div key={p.label} className="card rounded-xl p-3.5 border border-[var(--color-card-border)]">
             <div className="text-2xl font-black text-blue-400 mb-1">{p.icon}</div>
-            <div className="text-sm font-bold text-slate-200">{p.label}</div>
-            <div className="text-xs text-slate-600 mt-0.5">{p.desc}</div>
+            <div className="text-sm font-bold text-[var(--color-ink)]">{p.label}</div>
+            <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">{p.desc}</div>
           </div>
         ))}
       </div>
@@ -166,7 +166,7 @@ function MultiplikationSection() {
       </Callout>
 
       <SectionHeading>Kontrollera med uppskattning</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
         Uppskatta alltid först: 47 × 23 ≈ 50 × 20 = 1 000. Ditt exakta svar 1 081 är rimligt. Om du räknar ut 10 810 har du ett decimalfel.
       </p>
     </div>
@@ -225,8 +225,8 @@ function DivisionSection() {
          4 ...
 
   Svar: 14.28...  ≈ 14.3`}</CodeBlock>
-      <p className="text-sm text-slate-400 leading-relaxed mt-3">
-        När täljaren tar slut — lägg till decimalpunkten och fortsätt med <span className="text-white">nollor</span> tills önskad precision nås. På HP räcker 2–3 decimaler för att eliminera felaktiga alternativ.
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mt-3">
+        När täljaren tar slut — lägg till decimalpunkten och fortsätt med <span className="text-[var(--color-ink)]">nollor</span> tills önskad precision nås. På HP räcker 2–3 decimaler för att eliminera felaktiga alternativ.
       </p>
 
       <SectionHeading>Snabbkoll av nämnaren</SectionHeading>
@@ -241,7 +241,7 @@ function DivisionSection() {
         ].map(r => (
           <div key={r.n} className="flex items-start gap-3 text-sm">
             <span className="font-black text-blue-400 w-7 shrink-0">÷{r.n}</span>
-            <span className="text-slate-400">{r.rule}</span>
+            <span className="text-[var(--color-ink-muted)]">{r.rule}</span>
           </div>
         ))}
       </div>
@@ -257,7 +257,7 @@ function KvadratrotSection() {
       </Callout>
 
       <SectionHeading>Metod 1 — Babyloniska metoden (rekommenderad för HP)</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-3">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">
         Börja med en gissning x₀ nära √N. Iterera: <span className="font-mono text-blue-400">xₙ₊₁ = (xₙ + N/xₙ) / 2</span>. Metoden halverar felet vid varje steg.
       </p>
       <StepReveal steps={[
@@ -268,7 +268,7 @@ function KvadratrotSection() {
       ]} />
 
       <SectionHeading>Metod 2 — Parvisa algoritmen (exakt)</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-3">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">
         Dela upp talet i sifferpar från höger (och från decimalpunkten åt båda hållen). Hitta roten siffra för siffra.
       </p>
       <CodeBlock>{`  √1369 = ?
@@ -296,9 +296,9 @@ function KvadratrotSection() {
           ['√7',  '≈ 2.646'], ['√8',  '≈ 2.828'],
           ['√10', '≈ 3.162'], ['√0.5', '≈ 0.707'],
         ].map(([root, val]) => (
-          <div key={root} className="glass rounded-xl p-3 border border-white/[0.05] flex items-center justify-between">
+          <div key={root} className="card rounded-xl p-3 border border-[var(--color-card-border)] flex items-center justify-between">
             <span className="font-mono text-blue-400 text-sm font-bold">{root}</span>
-            <span className="font-mono text-slate-400 text-sm">{val}</span>
+            <span className="font-mono text-[var(--color-ink-muted)] text-sm">{val}</span>
           </div>
         ))}
       </div>
@@ -314,7 +314,7 @@ function EsteringSection() {
       </Callout>
 
       <SectionHeading>Avrundning till signifikanta siffror</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-3">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">
         Avrunda varje faktor till 1–2 signifikanta siffror. Räkna. Jämför med alternativen.
       </p>
       <StepReveal steps={[
@@ -332,18 +332,18 @@ function EsteringSection() {
           { pct: '33 %', how: 'Dela med 3 (1/3 ≈ 0.333)', ex: '33% av 306 = 102' },
           { pct: '75 %', how: '3/4 = 3 × (25%)', ex: '75% av 348 = 261' },
         ].map(r => (
-          <div key={r.pct} className="glass rounded-xl p-3 border border-white/[0.05]">
+          <div key={r.pct} className="card rounded-xl p-3 border border-[var(--color-card-border)]">
             <div className="flex items-center gap-3 mb-1">
               <span className="font-black text-emerald-400 w-12 shrink-0">{r.pct}</span>
-              <span className="text-sm text-slate-400">{r.how}</span>
+              <span className="text-sm text-[var(--color-ink-muted)]">{r.how}</span>
             </div>
-            <div className="ml-12 text-xs font-mono text-slate-500">{r.ex}</div>
+            <div className="ml-12 text-xs font-mono text-[var(--color-ink-faint)]">{r.ex}</div>
           </div>
         ))}
       </div>
 
       <SectionHeading>Frontaritmetik — räkna framifrån</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-3">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">
         Börja med de mest signifikanta siffrorna. Du får snabbt en approximation som är tillräcklig för att välja rätt alternativ.
       </p>
       <CodeBlock>{`  349 + 278 + 461
@@ -355,7 +355,7 @@ function EsteringSection() {
   Exakt: 1 088  — tillräckligt nära! ✓`}</CodeBlock>
 
       <SectionHeading>Kompatibla tal</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
         Välj tal nära det givna som är lätta att räkna med. Exempel: 483 ÷ 24 ≈ 480 ÷ 24 = 20. (480 = 24 × 20.)
       </p>
     </div>
@@ -370,7 +370,7 @@ function HpTricksSection() {
       </Callout>
 
       <SectionHeading>Trick 1 — Kolla sista siffran (eliminera alternativ)</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-3">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">
         I multiplikation bestäms sista siffran bara av sista siffrorna i faktorerna. Använd detta för att snabbt döda felaktiga alternativ.
       </p>
       <CodeBlock>{`  Fråga: Vad är 47 × 23?
@@ -385,7 +385,7 @@ function HpTricksSection() {
   B och D elimineras direkt. Välj mellan A och C.`}</CodeBlock>
 
       <SectionHeading>Trick 2 — Konjugatregeln för snabb multiplikation</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-3">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">
         <span className="font-mono text-blue-400">(a + b)(a − b) = a² − b²</span>. Används när faktorerna är nära varandra eller nära ett runt tal.
       </p>
       <StepReveal steps={[
@@ -395,7 +395,7 @@ function HpTricksSection() {
       ]} />
 
       <SectionHeading>Trick 3 — Kvadrering nära 100</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-3">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">
         <span className="font-mono text-blue-400">n² = (100 + d)² = 10 000 + 200d + d²</span>, där d = n − 100.
       </p>
       <StepReveal steps={[
@@ -404,7 +404,7 @@ function HpTricksSection() {
       ]} />
 
       <SectionHeading>Trick 4 — Dela och multiplicera med 5</SectionHeading>
-      <p className="text-sm text-slate-400 leading-relaxed mb-3">
+      <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">
         Multiplicera med 5: multiplicera med 10, dividera med 2. Dividera med 5: multiplicera med 2, dividera med 10.
       </p>
       <CodeBlock>{`  348 × 5 = 348 × 10 / 2 = 3480 / 2 = 1740
@@ -421,9 +421,9 @@ function HpTricksSection() {
           ['1/8',  '12.5%'], ['3/8',  '37.5%'],
           ['1/9',  '≈11.1%'],['1/11', '≈9.1%'],
         ].map(([frac, pct]) => (
-          <div key={frac} className="glass rounded-xl p-2.5 border border-white/[0.05] flex items-center justify-between">
+          <div key={frac} className="card rounded-xl p-2.5 border border-[var(--color-card-border)] flex items-center justify-between">
             <span className="font-mono text-amber-400 text-sm font-bold">{frac}</span>
-            <span className="font-mono text-slate-400 text-sm">{pct}</span>
+            <span className="font-mono text-[var(--color-ink-muted)] text-sm">{pct}</span>
           </div>
         ))}
       </div>
@@ -440,7 +440,7 @@ function HpTricksSection() {
         ].map(([sym, val]) => (
           <div key={sym} className="flex items-center gap-3 text-sm">
             <span className="font-mono text-violet-400 w-10 shrink-0">{sym}</span>
-            <span className="text-slate-400">{val}</span>
+            <span className="text-[var(--color-ink-muted)]">{val}</span>
           </div>
         ))}
       </div>
@@ -467,14 +467,14 @@ export default function LiggandeStolenGuide() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-2xl mx-auto px-4 pt-8 pb-28">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <button
             onClick={() => navigate(-1)}
-            className="text-slate-600 hover:text-slate-300 transition-colors p-1 -ml-1"
+            className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors p-1 -ml-1"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -482,7 +482,7 @@ export default function LiggandeStolenGuide() {
           </button>
           <div>
             <h1 className="text-2xl font-black">Liggande Stolen</h1>
-            <p className="text-xs text-slate-500 mt-0.5">Räkna utan miniräknare</p>
+            <p className="text-xs text-[var(--color-ink-faint)] mt-0.5">Räkna utan miniräknare</p>
           </div>
         </div>
 
@@ -496,8 +496,8 @@ export default function LiggandeStolenGuide() {
                 onClick={() => setTab(t.id)}
                 className={`relative flex-shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${
                   isActive
-                    ? 'text-white bg-white/[0.1] border border-white/[0.15]'
-                    : 'text-slate-500 hover:text-slate-300 border border-transparent'
+                    ? 'text-[var(--color-ink)] bg-[var(--color-paper-dark)] border border-[var(--color-card-border)]'
+                    : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] border border-transparent'
                 }`}
               >
                 {isActive && (
@@ -520,14 +520,14 @@ export default function LiggandeStolenGuide() {
         </div>
 
         {/* Nav between tabs */}
-        <div className="flex justify-between mt-8 pt-6 border-t border-white/[0.05]">
+        <div className="flex justify-between mt-8 pt-6 border-t border-[var(--color-card-border)]">
           <button
             onClick={() => {
               const idx = TABS.findIndex(t => t.id === tab)
               if (idx > 0) setTab(TABS[idx - 1].id)
             }}
             disabled={tab === TABS[0].id}
-            className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 disabled:opacity-30 transition-colors"
+            className="flex items-center gap-2 text-sm text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] disabled:opacity-30 transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             Föregående
@@ -538,7 +538,7 @@ export default function LiggandeStolenGuide() {
               if (idx < TABS.length - 1) setTab(TABS[idx + 1].id)
             }}
             disabled={tab === TABS[TABS.length - 1].id}
-            className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 disabled:opacity-30 transition-colors"
+            className="flex items-center gap-2 text-sm text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] disabled:opacity-30 transition-colors"
           >
             Nästa
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>

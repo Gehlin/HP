@@ -1235,7 +1235,7 @@ const GLOSSARY: GlossaryEntry[] = [
 const FORMULA_SECTIONS = [
   {
     title: 'Algebra',
-    color: 'text-violet-400',
+    color: 'text-violet-600',
     formulas: [
       { label: 'Distributiv lag', tex: 'a(b+c) = ab + ac' },
       { label: 'FOIL', tex: '(a+b)(c+d) = ac+ad+bc+bd' },
@@ -1248,7 +1248,7 @@ const FORMULA_SECTIONS = [
   },
   {
     title: 'Procent',
-    color: 'text-blue-400',
+    color: 'text-blue-600',
     formulas: [
       { label: 'Procentdel', tex: '\\tfrac{p}{100} \\times N' },
       { label: 'Procentuell förändring', tex: '\\dfrac{\\text{ny} - \\text{gammal}}{\\text{gammal}} \\times 100' },
@@ -1260,7 +1260,7 @@ const FORMULA_SECTIONS = [
   },
   {
     title: 'Geometri 2D',
-    color: 'text-emerald-400',
+    color: 'text-emerald-600',
     formulas: [
       { label: 'Pythagoras', tex: 'a^2 + b^2 = c^2' },
       { label: 'Triangelarea', tex: 'A = \\tfrac{bh}{2}' },
@@ -1275,7 +1275,7 @@ const FORMULA_SECTIONS = [
   },
   {
     title: 'Geometri 3D',
-    color: 'text-amber-400',
+    color: 'text-amber-600',
     formulas: [
       { label: 'Kub', tex: 'V = s^3,\\; A = 6s^2' },
       { label: 'Rätblock', tex: 'V = l \\cdot b \\cdot h' },
@@ -1287,7 +1287,7 @@ const FORMULA_SECTIONS = [
   },
   {
     title: 'Sannolikhet',
-    color: 'text-red-400',
+    color: 'text-red-600',
     formulas: [
       { label: 'Klassisk', tex: 'P(A) = \\dfrac{\\text{gynnsamma}}{\\text{möjliga}}' },
       { label: 'Komplement', tex: 'P(A^c) = 1 - P(A)' },
@@ -1348,16 +1348,16 @@ const FORMULA_SECTIONS = [
 // ─── Tier metadata ────────────────────────────────────────────────────────────
 
 const TIER_META = {
-  1: { label: 'Kritisk', desc: 'Förekommer i varje prov, spänner över flera delsektioner. Börja här.', color: 'text-red-400', badgeColor: 'bg-red-500/10 text-red-300 border-red-500/20', borderColor: 'border-red-500/20' },
-  2: { label: 'Viktig', desc: 'Regelbundna inslag med tydliga mönster. Hög avkastning per studietimme.', color: 'text-amber-400', badgeColor: 'bg-amber-500/10 text-amber-300 border-amber-500/20', borderColor: 'border-amber-500/20' },
-  3: { label: 'Kompletterande', desc: 'Sällsynta men lättlösta om du kan formlerna. Lär dig dem sist.', color: 'text-emerald-400', badgeColor: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20', borderColor: 'border-emerald-500/20' },
+  1: { label: 'Kritisk', desc: 'Förekommer i varje prov, spänner över flera delsektioner. Börja här.', color: 'text-red-600', badgeColor: 'bg-red-50 text-red-700 border-red-200', borderColor: 'border-red-200' },
+  2: { label: 'Viktig', desc: 'Regelbundna inslag med tydliga mönster. Hög avkastning per studietimme.', color: 'text-amber-600', badgeColor: 'bg-amber-50 text-amber-700 border-amber-200', borderColor: 'border-amber-200' },
+  3: { label: 'Kompletterande', desc: 'Sällsynta men lättlösta om du kan formlerna. Lär dig dem sist.', color: 'text-emerald-600', badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200', borderColor: 'border-emerald-200' },
 } as const
 
 const TYPE_PILL: Record<string, string> = {
-  XYZ: 'bg-violet-500/10 text-violet-300 border-violet-500/20',
-  KVA: 'bg-blue-500/10 text-blue-300 border-blue-500/20',
-  NOG: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
-  DTK: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
+  XYZ: 'bg-violet-50 text-violet-700 border-violet-200',
+  KVA: 'bg-blue-50 text-blue-700 border-blue-200',
+  NOG: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  DTK: 'bg-amber-50 text-amber-700 border-amber-200',
 }
 
 type TopTab = 'topics' | 'path' | 'formulas' | 'glossary'
@@ -1458,22 +1458,22 @@ export default function MathGuide() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
-      <div className="border-b border-white/[0.06]">
+      <div className="border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-6 transition-colors">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-6 transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             Tillbaka
           </button>
-          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-200 text-violet-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
             Matematikguide
           </div>
           <h1 className="text-4xl font-black mb-2 tracking-tight">Matematik på HP</h1>
-          <p className="text-slate-400 text-base leading-relaxed mb-5">
-            Av provets 40 frågor är <strong className="text-white">{totalMathQs} rent matematiska</strong>. Det är matematik — inte läsförståelse — som skiljer 1,4 från 2,0.
+          <p className="text-[var(--color-ink-muted)] text-base leading-relaxed mb-5">
+            Av provets 40 frågor är <strong className="text-[var(--color-ink)]">{totalMathQs} rent matematiska</strong>. Det är matematik — inte läsförståelse — som skiljer 1,4 från 2,0.
           </p>
           <div className="grid grid-cols-4 gap-2">
             {[
@@ -1482,9 +1482,9 @@ export default function MathGuide() {
               { v: '3 mån', l: 'för stor förbättring' },
               { v: '10', l: 'ämnesområden' },
             ].map(s => (
-              <div key={s.l} className="glass rounded-xl p-3 text-center">
-                <div className="text-lg font-black text-white">{s.v}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">{s.l}</div>
+              <div key={s.l} className="card rounded-xl p-3 text-center">
+                <div className="text-lg font-black text-[var(--color-ink)]">{s.v}</div>
+                <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5 leading-tight">{s.l}</div>
               </div>
             ))}
           </div>
@@ -1492,7 +1492,7 @@ export default function MathGuide() {
       </div>
 
       {/* ── Top tabs ──────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 bg-[#080C14]/95 backdrop-blur-xl border-b border-white/[0.05]">
+      <div className="sticky top-0 z-20 bg-[var(--color-paper)]/95 backdrop-blur-xl border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 flex gap-0">
           {([
             ['topics',   'Ämnen'],
@@ -1503,7 +1503,7 @@ export default function MathGuide() {
             <button
               key={tab}
               onClick={() => setTopTab(tab)}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${topTab === tab ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${topTab === tab ? 'text-[var(--color-ink)]' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {label}
               {topTab === tab && <span className="absolute bottom-0 inset-x-4 h-[2px] bg-blue-400 rounded-full" />}
@@ -1521,7 +1521,7 @@ export default function MathGuide() {
           <>
             {/* HP reality section */}
             <section className="mb-8">
-              <h2 className="text-base font-black text-slate-300 mb-3">Vad HP-matematik verkligen är</h2>
+              <h2 className="text-base font-black text-[var(--color-ink-muted)] mb-3">Vad HP-matematik verkligen är</h2>
               <div className="space-y-2">
                 {[
                   { title: 'Ingen miniräknare — och det behövs inte', body: 'HP är konstruerat för att lösas med huvudräkning. Talen är skapade för att gå upp jämnt eller kunna uppskattas. Du ska inte räkna exakt — du ska räkna smart.' },
@@ -1529,9 +1529,9 @@ export default function MathGuide() {
                   { title: 'Grundnivå — men under tidspress', body: 'Inget om derivator, integraler eller komplexa tal. Grundläggande algebra, procent, geometri och sannolikhet — men med välkonstruerade fällor.' },
                   { title: 'Matematik är den mest förbättringsbara delen', body: 'Verbal förmåga förbättras långsamt. Rätt formler + mönsterigenkänning kan ge märkbar förbättring på 2–3 månader.' },
                 ].map(item => (
-                  <div key={item.title} className="glass rounded-xl p-4">
-                    <div className="font-semibold text-slate-200 text-sm mb-1">{item.title}</div>
-                    <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                  <div key={item.title} className="card rounded-xl p-4">
+                    <div className="font-semibold text-[var(--color-ink)] text-sm mb-1">{item.title}</div>
+                    <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
                   </div>
                 ))}
               </div>
@@ -1546,44 +1546,44 @@ export default function MathGuide() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border ${meta.badgeColor}`}>{meta.label}</span>
                   </div>
-                  <p className="text-xs text-slate-600 mb-4">{meta.desc}</p>
+                  <p className="text-xs text-[var(--color-ink-faint)] mb-4">{meta.desc}</p>
 
                   <div className="space-y-2.5">
                     {tierTopics.map(topic => {
                       const isOpen = expanded === topic.id
                       const acc = topicAccuracy[topic.id]
                       const count = topicCounts[topic.id]
-                      const accColor = acc ? (acc.pct >= 70 ? 'text-emerald-400' : acc.pct >= 50 ? 'text-amber-400' : 'text-red-400') : ''
+                      const accColor = acc ? (acc.pct >= 70 ? 'text-emerald-600' : acc.pct >= 50 ? 'text-amber-600' : 'text-red-600') : ''
                       const tab = getInnerTab(topic.id)
 
                       return (
-                        <div key={topic.id} id={`topic-${topic.id}`} className={`rounded-2xl border overflow-hidden transition-colors ${isOpen ? meta.borderColor : 'glass border-white/[0.05]'}`}>
+                        <div key={topic.id} id={`topic-${topic.id}`} className={`rounded-2xl border overflow-hidden transition-colors ${isOpen ? meta.borderColor : 'card border-[var(--color-card-border)]'}`}>
 
                           {/* Card header */}
                           <button
                             onClick={() => setExpanded(isOpen ? null : topic.id)}
-                            className="w-full text-left px-5 py-4 flex items-center gap-3 hover:bg-white/[0.02] transition-colors"
+                            className="w-full text-left px-5 py-4 flex items-center gap-3 hover:bg-[var(--color-paper)] transition-colors"
                           >
-                            <span className="font-mono text-sm font-black text-slate-500 shrink-0 w-10">{topic.icon}</span>
+                            <span className="font-mono text-sm font-black text-[var(--color-ink-faint)] shrink-0 w-10">{topic.icon}</span>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                                <span className="font-black text-white text-sm">{topic.name}</span>
+                                <span className="font-black text-[var(--color-ink)] text-sm">{topic.name}</span>
                                 {topic.sections.map(s => (
                                   <span key={s} className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${TYPE_PILL[s]}`}>{s}</span>
                                 ))}
                                 {acc && <span className={`text-[10px] font-bold ml-auto shrink-0 ${accColor}`}>{acc.pct}%</span>}
                               </div>
-                              <div className="text-xs text-slate-500">{topic.subtitle}</div>
+                              <div className="text-xs text-[var(--color-ink-faint)]">{topic.subtitle}</div>
                             </div>
-                            <span className={`text-slate-600 shrink-0 text-xs transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+                            <span className={`text-[var(--color-ink-faint)] shrink-0 text-xs transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>▾</span>
                           </button>
 
                           {/* Expanded content */}
                           {isOpen && (
-                            <div className="border-t border-white/[0.05] animate-fade-in">
+                            <div className="border-t border-[var(--color-card-border)] animate-fade-in">
 
                               {/* Inner tab bar */}
-                              <div className="flex border-b border-white/[0.04]">
+                              <div className="flex border-b border-[var(--color-card-border)]">
                                 {([
                                   ['lesson',   'Lektion'],
                                   ['theory',   'Begrepp'],
@@ -1592,7 +1592,7 @@ export default function MathGuide() {
                                   <button
                                     key={t}
                                     onClick={() => setTopicInnerTab(topic.id, t)}
-                                    className={`flex-1 py-2.5 text-[11px] font-semibold transition-colors ${tab === t ? 'text-white border-b-2 border-blue-400' : 'text-slate-600 hover:text-slate-400'}`}
+                                    className={`flex-1 py-2.5 text-[11px] font-semibold transition-colors ${tab === t ? 'text-[var(--color-ink)] border-b-2 border-[var(--color-green)]' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
                                   >
                                     {l}
                                   </button>
@@ -1605,8 +1605,8 @@ export default function MathGuide() {
                                 {tab === 'lesson' && (
                                   <>
                                     {/* Hook */}
-                                    <div className="bg-violet-500/8 border border-violet-500/15 rounded-xl p-4">
-                                      <div className="text-[9px] font-bold text-violet-400 uppercase tracking-widest mb-2">Varför lära sig detta</div>
+                                    <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
+                                      <div className="text-[9px] font-bold text-violet-600 uppercase tracking-widest mb-2">Varför lära sig detta</div>
                                       <p className="text-sm text-violet-100 leading-relaxed">
                                         <MathText text={topic.lesson.hook} />
                                       </p>
@@ -1614,8 +1614,8 @@ export default function MathGuide() {
 
                                     {/* Core concept */}
                                     <div>
-                                      <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-2">Grundkonceptet — från grunden</div>
-                                      <div className="text-sm text-slate-300 leading-relaxed space-y-2">
+                                      <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Grundkonceptet — från grunden</div>
+                                      <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed space-y-2">
                                         {topic.lesson.core.split('\n\n').map((para, i) => (
                                           <p key={i}><MathText text={para} /></p>
                                         ))}
@@ -1623,31 +1623,31 @@ export default function MathGuide() {
                                     </div>
 
                                     {/* Key insight */}
-                                    <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl p-3.5">
-                                      <div className="text-[9px] font-bold text-amber-400 uppercase tracking-widest mb-1.5">Nyckelinsikt</div>
+                                    <div className="bg-amber-50 border border-amber-500/20 rounded-xl p-3.5">
+                                      <div className="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-1.5">Nyckelinsikt</div>
                                       <p className="text-sm text-amber-100 leading-relaxed font-medium">
                                         <MathText text={topic.lesson.keyInsight} />
                                       </p>
                                     </div>
 
                                     {/* HP Pattern */}
-                                    <div className="glass rounded-xl overflow-hidden">
-                                      <div className="bg-emerald-500/8 border-b border-emerald-500/15 px-4 py-2.5">
-                                        <div className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">HP-mönster: {topic.lesson.hpPattern}</div>
+                                    <div className="card rounded-xl overflow-hidden">
+                                      <div className="bg-emerald-50 border-b border-emerald-200 px-4 py-2.5">
+                                        <div className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">HP-mönster: {topic.lesson.hpPattern}</div>
                                       </div>
                                       <div className="px-4 py-3">
-                                        <p className="text-sm text-slate-300 leading-relaxed">
+                                        <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
                                           <MathText text={topic.lesson.pattern} />
                                         </p>
                                       </div>
                                     </div>
 
                                     {/* Rule to remember */}
-                                    <div className="flex gap-3 bg-white/[0.03] rounded-xl p-3.5">
-                                      <span className="text-blue-400 font-black text-lg shrink-0 leading-tight">→</span>
+                                    <div className="flex gap-3 bg-[var(--color-paper)] rounded-xl p-3.5">
+                                      <span className="text-blue-600 font-black text-lg shrink-0 leading-tight">→</span>
                                       <div>
-                                        <div className="text-[9px] font-bold text-blue-400 uppercase tracking-widest mb-1">Regeln att minnas</div>
-                                        <p className="text-sm text-slate-200 leading-relaxed">
+                                        <div className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-1">Regeln att minnas</div>
+                                        <p className="text-sm text-[var(--color-ink)] leading-relaxed">
                                           <MathText text={topic.lesson.rule} />
                                         </p>
                                       </div>
@@ -1655,12 +1655,12 @@ export default function MathGuide() {
 
                                     {/* Formulas (compact) */}
                                     <div>
-                                      <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-2">Formler</div>
+                                      <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Formler</div>
                                       <div className="space-y-1.5">
                                         {topic.formulas.map(f => (
-                                          <div key={f.label} className="bg-white/[0.03] rounded-xl px-4 py-2.5 flex items-center gap-3 flex-wrap">
-                                            <span className="text-[11px] text-slate-500 w-32 shrink-0">{f.label}</span>
-                                            <span className="text-slate-200 text-sm flex-1 overflow-x-auto">
+                                          <div key={f.label} className="bg-[var(--color-paper)] rounded-xl px-4 py-2.5 flex items-center gap-3 flex-wrap">
+                                            <span className="text-[11px] text-[var(--color-ink-faint)] w-32 shrink-0">{f.label}</span>
+                                            <span className="text-[var(--color-ink)] text-sm flex-1 overflow-x-auto">
                                               <MathText text={`$${f.tex}$`} />
                                             </span>
                                           </div>
@@ -1670,11 +1670,11 @@ export default function MathGuide() {
 
                                     {/* Traps */}
                                     <div>
-                                      <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-2">Vanliga misstag</div>
+                                      <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Vanliga misstag</div>
                                       <ul className="space-y-2">
                                         {topic.traps.map((trap, i) => (
-                                          <li key={i} className="flex gap-2 text-sm text-slate-400">
-                                            <span className="text-red-400 shrink-0 mt-0.5">!</span>
+                                          <li key={i} className="flex gap-2 text-sm text-[var(--color-ink-muted)]">
+                                            <span className="text-red-600 shrink-0 mt-0.5">!</span>
                                             <MathText text={trap} />
                                           </li>
                                         ))}
@@ -1682,18 +1682,18 @@ export default function MathGuide() {
                                     </div>
 
                                     {/* Self-check mini-quiz */}
-                                    <div className="border-t border-white/[0.06] pt-4">
-                                      <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-3">Snabbkoll — testa dig själv</div>
+                                    <div className="border-t border-[var(--color-card-border)] pt-4">
+                                      <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Snabbkoll — testa dig själv</div>
                                       <div className="space-y-4">
                                         {topic.selfCheck.map((q, qi) => {
                                           const scKey = topic.id
                                           const current = selfCheckState[scKey]?.[qi] ?? { chosen: null, revealed: false }
                                           const isRight = current.chosen === q.correct
                                           return (
-                                            <div key={qi} className="glass rounded-xl overflow-hidden">
-                                              <div className="px-4 py-3 border-b border-white/[0.04]">
-                                                <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">Fråga {qi + 1}</div>
-                                                <div className="text-sm text-slate-200 leading-relaxed">
+                                            <div key={qi} className="card rounded-xl overflow-hidden">
+                                              <div className="px-4 py-3 border-b border-[var(--color-card-border)]">
+                                                <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Fråga {qi + 1}</div>
+                                                <div className="text-sm text-[var(--color-ink)] leading-relaxed">
                                                   <MathText text={q.question} />
                                                 </div>
                                               </div>
@@ -1701,10 +1701,10 @@ export default function MathGuide() {
                                                 {q.options.map((opt, oi) => {
                                                   const isChosen = current.chosen === oi
                                                   const showResult = current.revealed
-                                                  let cls = 'border-white/[0.06] bg-white/[0.02] text-slate-300 hover:border-white/20 hover:bg-white/[0.04]'
-                                                  if (showResult && oi === q.correct) cls = 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-                                                  else if (showResult && isChosen && oi !== q.correct) cls = 'border-red-500/40 bg-red-500/10 text-red-200'
-                                                  else if (isChosen && !showResult) cls = 'border-blue-500/40 bg-blue-500/10 text-blue-200'
+                                                  let cls = 'border-[var(--color-card-border)] bg-[var(--color-paper)] text-[var(--color-ink-muted)] hover:border-[var(--color-card-border)] hover:bg-[var(--color-paper-dark)]'
+                                                  if (showResult && oi === q.correct) cls = 'border-emerald-300 bg-emerald-50 text-emerald-700'
+                                                  else if (showResult && isChosen && oi !== q.correct) cls = 'border-red-300 bg-red-50 text-red-700'
+                                                  else if (isChosen && !showResult) cls = 'border-blue-300 bg-blue-50 text-blue-700'
                                                   return (
                                                     <button
                                                       key={oi}
@@ -1727,13 +1727,13 @@ export default function MathGuide() {
                                                       arr[qi] = { ...arr[qi], revealed: true }
                                                       return { ...prev, [scKey]: arr }
                                                     })}
-                                                    className="w-full py-2 text-xs font-bold text-blue-400 border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 rounded-xl transition-colors"
+                                                    className="w-full py-2 text-xs font-bold text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors"
                                                   >
                                                     Kontrollera svar →
                                                   </button>
                                                 )}
                                                 {current.revealed && (
-                                                  <div className={`rounded-xl px-4 py-3 border text-sm leading-relaxed animate-fade-in ${isRight ? 'bg-emerald-500/8 border-emerald-500/20 text-emerald-200' : 'bg-red-500/8 border-red-500/20 text-red-200'}`}>
+                                                  <div className={`rounded-xl px-4 py-3 border text-sm leading-relaxed animate-fade-in ${isRight ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
                                                     <span className="font-black mr-2">{isRight ? '✓ Rätt!' : '✗ Fel.'}</span>
                                                     <MathText text={q.explanation} />
                                                   </div>
@@ -1751,8 +1751,8 @@ export default function MathGuide() {
                                 {tab === 'theory' && (
                                   <>
                                     <div className="flex items-center justify-between mb-1">
-                                      <p className="text-xs text-slate-600">Formella definitioner — markera vad du behärskar.</p>
-                                      <span className="text-[10px] text-slate-600">
+                                      <p className="text-xs text-[var(--color-ink-faint)]">Formella definitioner — markera vad du behärskar.</p>
+                                      <span className="text-[10px] text-[var(--color-ink-faint)]">
                                         {topic.concepts.filter((_, i) => conceptMastery[`${topic.id}-${i}`] === 'known').length}/{topic.concepts.length} bekanta
                                       </span>
                                     </div>
@@ -1760,41 +1760,41 @@ export default function MathGuide() {
                                       {topic.concepts.map((c, i) => {
                                         const mKey = `${topic.id}-${i}`
                                         const mastery = conceptMastery[mKey]
-                                        const borderClass = mastery === 'known' ? 'border-emerald-500/30' : mastery === 'review' ? 'border-red-500/30' : mastery === 'unsure' ? 'border-amber-500/30' : 'border-white/[0.06]'
+                                        const borderClass = mastery === 'known' ? 'border-emerald-500/30' : mastery === 'review' ? 'border-red-500/30' : mastery === 'unsure' ? 'border-amber-500/30' : 'border-[var(--color-card-border)]'
                                         return (
-                                          <div key={i} className={`glass rounded-xl p-4 border ${borderClass} transition-colors`}>
+                                          <div key={i} className={`card rounded-xl p-4 border ${borderClass} transition-colors`}>
                                             <div className="flex items-start justify-between gap-2 mb-2">
                                               <div className="flex items-baseline gap-2 flex-wrap">
-                                                <span className="font-black text-white text-sm">{c.term}</span>
-                                                <span className="text-[10px] text-slate-600 font-mono">{c.en}</span>
+                                                <span className="font-black text-[var(--color-ink)] text-sm">{c.term}</span>
+                                                <span className="text-[10px] text-[var(--color-ink-faint)] font-mono">{c.en}</span>
                                               </div>
                                               <div className="flex gap-1 shrink-0">
                                                 {([
-                                                  ['known',  '✓', 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'],
-                                                  ['unsure', '~', 'text-amber-400 bg-amber-500/10 border-amber-500/20'],
-                                                  ['review', '↩', 'text-red-400 bg-red-500/10 border-red-500/20'],
+                                                  ['known',  '✓', 'text-emerald-700 bg-emerald-50 border-emerald-200'],
+                                                  ['unsure', '~', 'text-amber-700 bg-amber-50 border-amber-200'],
+                                                  ['review', '↩', 'text-red-700 bg-red-50 border-red-200'],
                                                 ] as [string, string, string][]).map(([val, icon, cls]) => (
                                                   <button
                                                     key={val}
                                                     onClick={() => setMastery(mKey, val as 'known' | 'unsure' | 'review')}
                                                     title={val === 'known' ? 'Kan detta' : val === 'unsure' ? 'Osäker' : 'Behöver repetera'}
-                                                    className={`w-6 h-6 rounded text-[11px] font-bold border transition-all ${mastery === val ? cls : 'text-slate-700 bg-transparent border-white/[0.06] hover:border-white/20'}`}
+                                                    className={`w-6 h-6 rounded text-[11px] font-bold border transition-all ${mastery === val ? cls : 'text-[var(--color-ink-faint)] bg-transparent border-[var(--color-card-border)] hover:border-[var(--color-card-border)]'}`}
                                                   >
                                                     {icon}
                                                   </button>
                                                 ))}
                                               </div>
                                             </div>
-                                            <p className="text-sm text-slate-300 leading-relaxed mb-2">
+                                            <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-2">
                                               <MathText text={c.definition} />
                                             </p>
                                             {c.tex && (
-                                              <div className="bg-white/[0.04] rounded-lg px-3 py-2 text-sm text-slate-200 overflow-x-auto mb-2">
+                                              <div className="bg-[var(--color-paper-dark)] rounded-lg px-3 py-2 text-sm text-[var(--color-ink)] overflow-x-auto mb-2">
                                                 <MathText text={`$$${c.tex}$$`} />
                                               </div>
                                             )}
                                             {c.note && (
-                                              <p className="text-xs text-amber-400/80 leading-relaxed">
+                                              <p className="text-xs text-amber-600/80 leading-relaxed">
                                                 <MathText text={c.note} />
                                               </p>
                                             )}
@@ -1808,7 +1808,7 @@ export default function MathGuide() {
                                 {/* ── EXAMPLES TAB ── */}
                                 {tab === 'examples' && (
                                   <>
-                                    <p className="text-xs text-slate-600">Försök lösa uppgiften själv — avslöja sedan ett steg i taget.</p>
+                                    <p className="text-xs text-[var(--color-ink-faint)]">Försök lösa uppgiften själv — avslöja sedan ett steg i taget.</p>
                                     <div className="space-y-5">
                                       {topic.examples.map((ex, i) => {
                                         const key = `${topic.id}-${i}`
@@ -1816,18 +1816,18 @@ export default function MathGuide() {
                                         const totalSteps = ex.steps.length
                                         const allRevealed = revealed >= totalSteps
                                         return (
-                                          <div key={i} className="glass rounded-xl overflow-hidden">
-                                            <div className="bg-white/[0.03] px-4 py-3 border-b border-white/[0.05]">
-                                              <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">Uppgift {i + 1}</div>
-                                              <div className="text-sm text-slate-200 leading-relaxed">
+                                          <div key={i} className="card rounded-xl overflow-hidden">
+                                            <div className="bg-[var(--color-paper)] px-4 py-3 border-b border-[var(--color-card-border)]">
+                                              <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Uppgift {i + 1}</div>
+                                              <div className="text-sm text-[var(--color-ink)] leading-relaxed">
                                                 <MathText text={ex.problem} />
                                               </div>
                                             </div>
                                             <div className="px-4 py-3 space-y-2.5">
                                               {ex.steps.slice(0, revealed).map((step, j) => (
                                                 <div key={j} className="flex gap-3 animate-fade-in">
-                                                  <span className="text-[10px] font-black text-slate-600 bg-white/[0.04] w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">{j + 1}</span>
-                                                  <div className="text-sm text-slate-300 leading-relaxed">
+                                                  <span className="text-[10px] font-black text-[var(--color-ink-faint)] bg-[var(--color-paper-dark)] w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">{j + 1}</span>
+                                                  <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
                                                     <MathText text={step} />
                                                   </div>
                                                 </div>
@@ -1835,16 +1835,16 @@ export default function MathGuide() {
                                               {!allRevealed && (
                                                 <button
                                                   onClick={() => setRevealedSteps(prev => ({ ...prev, [key]: revealed + 1 }))}
-                                                  className="w-full py-2 text-xs font-semibold text-blue-400 border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                                  className="w-full py-2 text-xs font-semibold text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                                                 >
                                                   {revealed === 0 ? 'Visa steg 1' : `Visa steg ${revealed + 1} av ${totalSteps}`} →
                                                 </button>
                                               )}
                                             </div>
                                             {allRevealed && (
-                                              <div className="bg-emerald-500/8 border-t border-emerald-500/15 px-4 py-2.5 flex items-center gap-2 animate-fade-in">
-                                                <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest shrink-0">Svar</span>
-                                                <div className="text-sm text-emerald-300 font-semibold">
+                                              <div className="bg-emerald-50 border-t border-emerald-200 px-4 py-2.5 flex items-center gap-2 animate-fade-in">
+                                                <span className="text-emerald-600 text-xs font-bold uppercase tracking-widest shrink-0">Svar</span>
+                                                <div className="text-sm text-emerald-700 font-semibold">
                                                   <MathText text={ex.answer} />
                                                 </div>
                                               </div>
@@ -1853,7 +1853,7 @@ export default function MathGuide() {
                                               <div className="px-4 pb-3">
                                                 <button
                                                   onClick={() => setRevealedSteps(prev => ({ ...prev, [key]: 0 }))}
-                                                  className="text-[10px] text-slate-700 hover:text-slate-500 transition-colors"
+                                                  className="text-[10px] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-faint)] transition-colors"
                                                 >
                                                   Återställ ↺
                                                 </button>
@@ -1870,22 +1870,22 @@ export default function MathGuide() {
                                 <div className="pt-1 space-y-3">
                                   {acc && (
                                     <div>
-                                      <div className="flex justify-between text-[10px] text-slate-600 mb-1">
+                                      <div className="flex justify-between text-[10px] text-[var(--color-ink-faint)] mb-1">
                                         <span>Din träffsäkerhet ({acc.total} frågor)</span>
                                         <span className={accColor}>{acc.pct}%</span>
                                       </div>
-                                      <div className="h-1 bg-white/[0.05] rounded-full overflow-hidden">
+                                      <div className="h-1 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                                         <div className={`h-full rounded-full transition-all duration-700 ${acc.pct >= 70 ? 'bg-emerald-500' : acc.pct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${acc.pct}%` }} />
                                       </div>
                                     </div>
                                   )}
                                   <button
                                     onClick={() => navigate(`/practice?tag=${encodeURIComponent(topic.drillTag)}`)}
-                                    className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl py-3 font-bold text-sm transition-colors"
+                                    className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl py-3 font-bold text-sm text-white transition-colors"
                                   >
                                     Öva på {topic.name} →
                                   </button>
-                                  <div className="text-[10px] text-slate-700 text-center">{count} frågor i träningsbanken</div>
+                                  <div className="text-[10px] text-[var(--color-ink-faint)] text-center">{count} frågor i träningsbanken</div>
                                 </div>
                               </div>
                             </div>
@@ -1900,8 +1900,8 @@ export default function MathGuide() {
 
             {/* Mental math strategies */}
             <section className="mb-8">
-              <h2 className="text-base font-black text-slate-300 mb-1">Tänk som HP — 5 mentala verktyg</h2>
-              <p className="text-xs text-slate-600 mb-4">Dessa strategier sparar sekunder per uppgift. Under 55 minuter räknas varje sekund.</p>
+              <h2 className="text-base font-black text-[var(--color-ink-muted)] mb-1">Tänk som HP — 5 mentala verktyg</h2>
+              <p className="text-xs text-[var(--color-ink-faint)] mb-4">Dessa strategier sparar sekunder per uppgift. Under 55 minuter räknas varje sekund.</p>
               <div className="space-y-2.5">
                 {[
                   { n: '01', title: '60-sekundersregeln', body: 'Fastnar du på en XYZ-uppgift efter 60 sekunder? Gör din bästa gissning och gå vidare. Ingen minuspoäng. En halvdan gissning + tid kvar är bättre än ett perfekt svar + en obesvarad.' },
@@ -1910,11 +1910,11 @@ export default function MathGuide() {
                   { n: '04', title: 'Rita alltid en figur', body: 'I geometriuppgifter: rita figuren, märk ut känd information. Rätt figur avslöjar lösningsvägen. Fel figur kostar 10 sekunder; ingen figur kostar hela uppgiften.' },
                   { n: '05', title: 'NOG är logik, inte matematik', body: 'I NOG frågar man om informationen RÄCKER — inte om du kan lösa problemet. Du behöver ofta inte räkna alls, bara avgöra om det KAN lösas med given data.' },
                 ].map(item => (
-                  <div key={item.n} className="glass rounded-xl p-4 flex gap-4">
-                    <div className="text-xl font-black text-slate-700 shrink-0 w-7 tabular-nums">{item.n}</div>
+                  <div key={item.n} className="card rounded-xl p-4 flex gap-4">
+                    <div className="text-xl font-black text-[var(--color-ink-faint)] shrink-0 w-7 tabular-nums">{item.n}</div>
                     <div>
-                      <div className="font-semibold text-slate-200 text-sm mb-1">{item.title}</div>
-                      <div className="text-xs text-slate-500 leading-relaxed">{item.body}</div>
+                      <div className="font-semibold text-[var(--color-ink)] text-sm mb-1">{item.title}</div>
+                      <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
                     </div>
                   </div>
                 ))}
@@ -1931,23 +1931,23 @@ export default function MathGuide() {
               if (!weak.length) return null
               return (
                 <section className="mb-8">
-                  <h2 className="text-base font-black text-slate-300 mb-1">Dina svaga punkter</h2>
-                  <p className="text-xs text-slate-600 mb-3">Baserat på din träningshistorik — prioritera dessa ämnen.</p>
+                  <h2 className="text-base font-black text-[var(--color-ink-muted)] mb-1">Dina svaga punkter</h2>
+                  <p className="text-xs text-[var(--color-ink-faint)] mb-3">Baserat på din träningshistorik — prioritera dessa ämnen.</p>
                   <div className="space-y-2">
                     {weak.map(({ topic, acc }) => (
                       <button
                         key={topic.id}
                         onClick={() => navigate(`/practice?tag=${encodeURIComponent(topic.drillTag)}`)}
-                        className="w-full text-left bg-red-500/8 border border-red-500/15 hover:bg-red-500/12 rounded-xl px-4 py-3.5 transition-colors"
+                        className="w-full text-left bg-red-50 border border-red-200 hover:bg-red-100 rounded-xl px-4 py-3.5 transition-colors"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-bold text-slate-200 text-sm">{topic.name}</span>
-                          <span className="text-red-400 font-black text-sm">{acc!.pct}%</span>
+                          <span className="font-bold text-[var(--color-ink)] text-sm">{topic.name}</span>
+                          <span className="text-red-600 font-black text-sm">{acc!.pct}%</span>
                         </div>
-                        <div className="h-1 bg-white/[0.05] rounded-full overflow-hidden">
+                        <div className="h-1 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                           <div className="h-full bg-red-500 rounded-full" style={{ width: `${acc!.pct}%` }} />
                         </div>
-                        <div className="text-xs text-red-400/50 mt-1.5">Öva nu →</div>
+                        <div className="text-xs text-red-600/50 mt-1.5">Öva nu →</div>
                       </button>
                     ))}
                   </div>
@@ -1969,20 +1969,20 @@ export default function MathGuide() {
               if (!needsReview.length) return null
               return (
                 <section className="mb-8">
-                  <h2 className="text-base font-black text-slate-300 mb-1">Behöver mer övning</h2>
-                  <p className="text-xs text-slate-600 mb-3">Begrepp du markerat som osäkra eller behöver repetera.</p>
+                  <h2 className="text-base font-black text-[var(--color-ink-muted)] mb-1">Behöver mer övning</h2>
+                  <p className="text-xs text-[var(--color-ink-faint)] mb-3">Begrepp du markerat som osäkra eller behöver repetera.</p>
                   <div className="space-y-2">
                     {needsReview.map(({ topic, reviewCount }) => (
                       <button
                         key={topic.id}
                         onClick={() => navigate(`/practice?tag=${encodeURIComponent(topic.drillTag)}`)}
-                        className="w-full text-left bg-violet-500/8 border border-violet-500/15 hover:bg-violet-500/12 rounded-xl px-4 py-3.5 transition-colors"
+                        className="w-full text-left bg-violet-50 border border-violet-200 hover:bg-violet-100 rounded-xl px-4 py-3.5 transition-colors"
                       >
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="font-bold text-slate-200 text-sm">{topic.name}</span>
-                          <span className="text-violet-400 font-black text-xs">{reviewCount} begrepp</span>
+                          <span className="font-bold text-[var(--color-ink)] text-sm">{topic.name}</span>
+                          <span className="text-violet-600 font-black text-xs">{reviewCount} begrepp</span>
                         </div>
-                        <div className="text-xs text-violet-400/50">Öva nu →</div>
+                        <div className="text-xs text-violet-600/50">Öva nu →</div>
                       </button>
                     ))}
                   </div>
@@ -2009,34 +2009,34 @@ export default function MathGuide() {
           return (
             <div className="space-y-6">
               {/* Progress header */}
-              <div className="glass rounded-2xl p-5">
-                <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-3">Din framsteg</div>
+              <div className="card rounded-2xl p-5">
+                <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Din framsteg</div>
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div className="text-center">
-                    <div className="text-2xl font-black text-white">{topicStatus.filter(s => s.isDone).length}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">av 10 ämnen klara</div>
+                    <div className="text-2xl font-black text-[var(--color-ink)]">{topicStatus.filter(s => s.isDone).length}</div>
+                    <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">av 10 ämnen klara</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-black text-emerald-400">{knownConcepts}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">av {totalConcepts} begrepp</div>
+                    <div className="text-2xl font-black text-emerald-600">{knownConcepts}</div>
+                    <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">av {totalConcepts} begrepp</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-black text-blue-400">{topicStatus.filter(s => s.hasStarted && !s.isDone).length}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">pågående ämnen</div>
+                    <div className="text-2xl font-black text-blue-600">{topicStatus.filter(s => s.hasStarted && !s.isDone).length}</div>
+                    <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">pågående ämnen</div>
                   </div>
                 </div>
-                <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden">
+                <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full transition-all duration-700"
                     style={{ width: `${Math.round((knownConcepts / totalConcepts) * 100)}%` }}
                   />
                 </div>
-                <div className="text-[10px] text-slate-600 mt-1.5 text-right">{Math.round((knownConcepts / totalConcepts) * 100)}% begrepp behärskade</div>
+                <div className="text-[10px] text-[var(--color-ink-faint)] mt-1.5 text-right">{Math.round((knownConcepts / totalConcepts) * 100)}% begrepp behärskade</div>
               </div>
 
               {/* How to use */}
               <div className="bg-blue-500/8 border border-blue-500/15 rounded-xl p-4">
-                <div className="text-[9px] font-bold text-blue-400 uppercase tracking-widest mb-2">Så här gör du</div>
+                <div className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-2">Så här gör du</div>
                 <ol className="space-y-1.5 text-sm text-blue-200">
                   <li className="flex gap-2"><span className="font-black shrink-0">1.</span>Öppna ett ämne och läs lektionen (Lektion-fliken)</li>
                   <li className="flex gap-2"><span className="font-black shrink-0">2.</span>Gå igenom begreppen och markera vad du behärskar</li>
@@ -2055,43 +2055,43 @@ export default function MathGuide() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border ${meta.badgeColor}`}>{phaseNames[tier]}</span>
                     </div>
-                    <p className="text-xs text-slate-600 mb-3">{meta.desc}</p>
+                    <p className="text-xs text-[var(--color-ink-faint)] mb-3">{meta.desc}</p>
                     <div className="space-y-2">
                       {phaseTopics.map(({ topic, acc, known, total, hasStarted, isDone }) => {
-                        const accColor = acc ? (acc.pct >= 70 ? 'text-emerald-400' : acc.pct >= 50 ? 'text-amber-400' : 'text-red-400') : 'text-slate-600'
+                        const accColor = acc ? (acc.pct >= 70 ? 'text-emerald-600' : acc.pct >= 50 ? 'text-amber-600' : 'text-red-600') : 'text-[var(--color-ink-faint)]'
                         const statusIcon = isDone ? '✓' : hasStarted ? '◑' : '○'
-                        const statusColor = isDone ? 'text-emerald-400' : hasStarted ? 'text-amber-400' : 'text-slate-600'
+                        const statusColor = isDone ? 'text-emerald-600' : hasStarted ? 'text-amber-600' : 'text-[var(--color-ink-faint)]'
                         return (
-                          <div key={topic.id} className={`glass rounded-xl border overflow-hidden ${isDone ? 'border-emerald-500/20' : hasStarted ? 'border-amber-500/15' : 'border-white/[0.05]'}`}>
+                          <div key={topic.id} className={`card rounded-xl border overflow-hidden ${isDone ? 'border-emerald-200' : hasStarted ? 'border-amber-500/15' : 'border-[var(--color-card-border)]'}`}>
                             <div className="px-4 py-3.5 flex items-center gap-3">
                               <span className={`text-lg font-black shrink-0 ${statusColor}`}>{statusIcon}</span>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                                  <span className="font-bold text-white text-sm">{topic.name}</span>
+                                  <span className="font-bold text-[var(--color-ink)] text-sm">{topic.name}</span>
                                   {acc && <span className={`text-[10px] font-bold ${accColor}`}>{acc.pct}%</span>}
-                                  {!acc && <span className="text-[10px] text-slate-600">Ej övat</span>}
+                                  {!acc && <span className="text-[10px] text-[var(--color-ink-faint)]">Ej övat</span>}
                                 </div>
                                 <div className="flex items-center gap-3">
-                                  <div className="flex-1 h-1 bg-white/[0.05] rounded-full overflow-hidden">
+                                  <div className="flex-1 h-1 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                                     <div
                                       className={`h-full rounded-full transition-all duration-500 ${known / total >= 0.5 ? 'bg-emerald-500' : 'bg-blue-500'}`}
                                       style={{ width: `${Math.round((known / total) * 100)}%` }}
                                     />
                                   </div>
-                                  <span className="text-[10px] text-slate-600 shrink-0">{known}/{total} begrepp</span>
+                                  <span className="text-[10px] text-[var(--color-ink-faint)] shrink-0">{known}/{total} begrepp</span>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex border-t border-white/[0.04]">
+                            <div className="flex border-t border-[var(--color-card-border)]">
                               <button
                                 onClick={() => { setTopTab('topics'); setExpanded(topic.id); setTopicInnerTab(topic.id, 'lesson') }}
-                                className="flex-1 py-2 text-[11px] font-semibold text-violet-400 hover:bg-violet-500/5 transition-colors border-r border-white/[0.04]"
+                                className="flex-1 py-2 text-[11px] font-semibold text-violet-600 hover:bg-violet-50 transition-colors border-r border-[var(--color-card-border)]"
                               >
                                 Läs lektion →
                               </button>
                               <button
                                 onClick={() => navigate(`/practice?tag=${encodeURIComponent(topic.drillTag)}`)}
-                                className="flex-1 py-2 text-[11px] font-semibold text-blue-400 hover:bg-blue-500/5 transition-colors"
+                                className="flex-1 py-2 text-[11px] font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
                               >
                                 Öva frågor →
                               </button>
@@ -2108,32 +2108,32 @@ export default function MathGuide() {
               {(() => {
                 const next = topicStatus.find(s => !s.isDone)
                 if (!next) return (
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5 text-center">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-center">
                     <div className="text-3xl mb-2">🎯</div>
                     <div className="font-black text-emerald-300 mb-1">Alla ämnen klara!</div>
-                    <div className="text-xs text-emerald-400/70">Exceptionell prestation. Fortsätt underhålla med daglig träning.</div>
+                    <div className="text-xs text-emerald-600/70">Exceptionell prestation. Fortsätt underhålla med daglig träning.</div>
                   </div>
                 )
                 return (
-                  <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
-                    <div className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-2">Nästa steg rekommenderat</div>
+                  <div className="bg-[var(--color-paper)] border border-[var(--color-card-border)] rounded-xl p-4">
+                    <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Nästa steg rekommenderat</div>
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-2xl font-mono">{next.topic.icon}</span>
                       <div>
-                        <div className="font-bold text-white text-sm">{next.topic.name}</div>
-                        <div className="text-xs text-slate-500">{next.topic.subtitle}</div>
+                        <div className="font-bold text-[var(--color-ink)] text-sm">{next.topic.name}</div>
+                        <div className="text-xs text-[var(--color-ink-faint)]">{next.topic.subtitle}</div>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => { setTopTab('topics'); setExpanded(next.topic.id); setTopicInnerTab(next.topic.id, 'lesson') }}
-                        className="flex-1 bg-violet-600 hover:bg-violet-500 rounded-xl py-2.5 font-bold text-sm transition-colors"
+                        className="flex-1 bg-violet-600 hover:bg-violet-500 rounded-xl py-2.5 font-bold text-sm text-white transition-colors"
                       >
                         Starta lektion →
                       </button>
                       <button
                         onClick={() => navigate(`/practice?tag=${encodeURIComponent(next.topic.drillTag)}`)}
-                        className="flex-1 bg-blue-600/20 border border-blue-500/30 hover:bg-blue-600/30 rounded-xl py-2.5 font-bold text-sm text-blue-400 transition-colors"
+                        className="flex-1 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-xl py-2.5 font-bold text-sm text-blue-600 transition-colors"
                       >
                         Öva direkt →
                       </button>
@@ -2150,26 +2150,26 @@ export default function MathGuide() {
         ════════════════════════════════════════════ */}
         {topTab === 'formulas' && (
           <div className="space-y-7">
-            <p className="text-sm text-slate-500">Klicka på en formel för att kopiera den.</p>
+            <p className="text-sm text-[var(--color-ink-faint)]">Klicka på en formel för att kopiera den.</p>
             {FORMULA_SECTIONS.map(section => (
               <div key={section.title}>
                 <div className="flex items-center gap-3 mb-3">
                   <h3 className={`text-[11px] font-black uppercase tracking-widest shrink-0 ${section.color}`}>{section.title}</h3>
-                  <div className="flex-1 h-px bg-white/[0.04]" />
+                  <div className="flex-1 h-px bg-[var(--color-paper-dark)]" />
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {section.formulas.map(f => (
                     <button
                       key={f.label}
                       onClick={() => copyFormula(f.tex)}
-                      className={`text-left glass rounded-xl px-3.5 py-3 flex flex-col gap-1.5 hover:bg-white/[0.06] transition-all active:scale-[0.98] ${copiedFormula === f.tex ? 'border-emerald-500/40 bg-emerald-500/5' : ''}`}
+                      className={`text-left card rounded-xl px-3.5 py-3 flex flex-col gap-1.5 hover:bg-[var(--color-paper-dark)] transition-all active:scale-[0.98] ${copiedFormula === f.tex ? 'border-emerald-500/40 bg-emerald-500/5' : ''}`}
                     >
-                      <span className="text-[10px] text-slate-600 leading-tight">{f.label}</span>
-                      <span className="text-slate-200 text-sm overflow-x-auto">
+                      <span className="text-[10px] text-[var(--color-ink-faint)] leading-tight">{f.label}</span>
+                      <span className="text-[var(--color-ink)] text-sm overflow-x-auto">
                         <MathText text={`$${f.tex}$`} />
                       </span>
                       {copiedFormula === f.tex && (
-                        <span className="text-[9px] text-emerald-400 font-bold">Kopierad ✓</span>
+                        <span className="text-[9px] text-emerald-600 font-bold">Kopierad ✓</span>
                       )}
                     </button>
                   ))}
@@ -2184,33 +2184,33 @@ export default function MathGuide() {
         ════════════════════════════════════════════ */}
         {topTab === 'glossary' && (
           <div>
-            <p className="text-sm text-slate-500 mb-4">{GLOSSARY.length} matematiska begrepp med definition, svenska och engelska.</p>
+            <p className="text-sm text-[var(--color-ink-faint)] mb-4">{GLOSSARY.length} matematiska begrepp med definition, svenska och engelska.</p>
             <input
               type="text"
               placeholder="Sök begrepp..."
               value={glossarySearch}
               onChange={e => setGlossarySearch(e.target.value)}
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 mb-5 transition-colors"
+              className="w-full bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-green)] mb-5 transition-colors"
             />
             <div className="space-y-2">
               {filteredGlossary.map(entry => (
-                <div key={entry.term} className="glass rounded-xl px-4 py-3.5">
+                <div key={entry.term} className="card rounded-xl px-4 py-3.5">
                   <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-                    <span className="font-black text-white text-sm">{entry.term}</span>
-                    <span className="text-[10px] font-mono text-slate-600">{entry.en}</span>
+                    <span className="font-black text-[var(--color-ink)] text-sm">{entry.term}</span>
+                    <span className="text-[10px] font-mono text-[var(--color-ink-faint)]">{entry.en}</span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
                     <MathText text={entry.definition} />
                   </p>
                   {entry.tex && (
-                    <div className="mt-2 text-sm text-slate-300 overflow-x-auto">
+                    <div className="mt-2 text-sm text-[var(--color-ink-muted)] overflow-x-auto">
                       <MathText text={`$${entry.tex}$`} />
                     </div>
                   )}
                 </div>
               ))}
               {filteredGlossary.length === 0 && (
-                <p className="text-slate-600 text-center py-8 text-sm">Inget begrepp hittades.</p>
+                <p className="text-[var(--color-ink-faint)] text-center py-8 text-sm">Inget begrepp hittades.</p>
               )}
             </div>
           </div>
