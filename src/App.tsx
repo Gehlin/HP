@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ErrorBoundary from './components/ErrorBoundary'
 import InstallBanner from './components/InstallBanner'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
@@ -51,7 +51,6 @@ function PageLoader() {
 }
 
 function AppInner() {
-  const location = useLocation()
   const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone())
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   const [showKeyGuide, setShowKeyGuide] = useState(false)
@@ -87,8 +86,6 @@ function AppInner() {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [showKeyGuide])
-
-  const inSession = location.pathname.startsWith('/session')
 
   return (
     <>

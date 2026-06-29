@@ -48,9 +48,10 @@ This phase delivers the biggest visible transformation: ripping out the bottom t
     ```
   - Keep all existing content (score card, resume card, section grid) as-is
 
-- [ ] Update `src/pages/Practice.tsx` layout:
+- [x] Update `src/pages/Practice.tsx` layout:
   - Change outer div class from `min-h-screen bg-app pb-28 px-4 pt-12 max-w-2xl mx-auto` → `min-h-screen bg-app pb-8 px-4 pt-6 max-w-2xl mx-auto pt-topnav` — but note `pt-topnav` and `pt-6` conflict. Use a wrapper pattern: outer div `min-h-screen bg-app pt-topnav`, inner div `max-w-2xl mx-auto px-4 pb-8`
   - Update the `<h1>` text from "Öva" → "Träna"
+  - Also removed stale `inSession`/`useLocation` from `App.tsx` (left over from BottomNav→TopNav swap, caused TS6133 build error)
 
 - [ ] Update `src/pages/Progress.tsx` layout:
   - Find the outermost page div and replace `pb-28` with `pb-8`, and the top padding (usually `pt-12` or `py-8`) with `pt-topnav` on the outermost wrapper. Read the file first to identify the exact class string.

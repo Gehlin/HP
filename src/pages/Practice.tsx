@@ -224,10 +224,11 @@ export default function Practice() {
   const canStart = mode === 'repetition' ? dueIds.length > 0 : (selectedTypes.length > 0 && available > 0)
 
   return (
-    <div className="min-h-screen bg-app pb-28 px-4 pt-12 max-w-2xl mx-auto">
+    <div className="min-h-screen bg-app pt-topnav">
+      <div className="max-w-2xl mx-auto px-4 pb-8">
 
         {/* Page title */}
-        <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)] mb-4">Öva</h1>
+        <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)] mb-4">Träna</h1>
 
         {/* Mode selector cards */}
         <div className="mb-6">
@@ -468,7 +469,7 @@ export default function Practice() {
             <div className="mb-6">
               <button
                 onClick={() => setTagsOpen(prev => !prev)}
-                className="w-full flex items-center justify-between text-[10px] font-bold tracking-widest text-slate-600 uppercase mb-2.5"
+                className="w-full flex items-center justify-between text-[10px] font-bold tracking-widest text-[var(--color-ink-faint)] uppercase mb-2.5"
               >
                 <span>
                   Ämnesfilter
@@ -478,7 +479,7 @@ export default function Practice() {
                     </span>
                   )}
                 </span>
-                <span className="text-slate-700">{tagsOpen ? '▲' : '▼'}</span>
+                <span className="text-[var(--color-ink-muted)]">{tagsOpen ? '▲' : '▼'}</span>
               </button>
               {tagsOpen && (
                 <div className="flex flex-wrap gap-1.5">
@@ -488,8 +489,8 @@ export default function Practice() {
                       onClick={() => toggleTag(tag)}
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all duration-150 ${
                         selectedTags.includes(tag)
-                          ? 'border-blue-500/40 bg-blue-500/10 text-blue-300'
-                          : 'glass border-white/[0.05] text-slate-500 hover:border-white/[0.1]'
+                          ? 'border-blue-400 bg-blue-50 text-blue-700'
+                          : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'
                       }`}
                     >
                       {tag}
@@ -529,13 +530,13 @@ export default function Practice() {
                     className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
                       timed === t
                         ? 'border-blue-500/50 bg-blue-500/10'
-                        : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                        : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] hover:border-[var(--color-ink-muted)]'
                     }`}
                   >
-                    <div className={`font-bold text-sm ${timed === t ? 'text-blue-300' : 'text-slate-300'}`}>
+                    <div className={`font-bold text-sm ${timed === t ? 'text-blue-700' : 'text-[var(--color-ink-muted)]'}`}>
                       {t ? 'Med tid' : 'Utan tid'}
                     </div>
-                    <div className="text-[11px] text-slate-600 mt-0.5">
+                    <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">
                       {t
                         ? `${Math.round(computeTimeLimit(filteredPool.slice(0, Math.min(count, filteredPool.length)).map(q => q.id)) / 60)} min`
                         : 'Ta den tid du behöver'}
@@ -554,22 +555,22 @@ export default function Practice() {
                   className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
                     instantFeedback && !studyMode
                       ? 'border-blue-500/50 bg-blue-500/10'
-                      : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                      : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] hover:border-[var(--color-ink-muted)]'
                   }`}
                 >
-                  <div className={`font-bold text-sm ${instantFeedback && !studyMode ? 'text-blue-300' : 'text-slate-300'}`}>Direkt</div>
-                  <div className="text-[11px] text-slate-600 mt-0.5">Rätt/fel efter varje svar</div>
+                  <div className={`font-bold text-sm ${instantFeedback && !studyMode ? 'text-blue-700' : 'text-[var(--color-ink-muted)]'}`}>Direkt</div>
+                  <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">Rätt/fel efter varje svar</div>
                 </button>
                 <button
                   onClick={() => { setInstantFeedback(false); setStudyMode(false) }}
                   className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
                     !instantFeedback && !studyMode
                       ? 'border-blue-500/50 bg-blue-500/10'
-                      : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                      : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] hover:border-[var(--color-ink-muted)]'
                   }`}
                 >
-                  <div className={`font-bold text-sm ${!instantFeedback && !studyMode ? 'text-blue-300' : 'text-slate-300'}`}>I efterhand</div>
-                  <div className="text-[11px] text-slate-600 mt-0.5">Genomgång efter passet</div>
+                  <div className={`font-bold text-sm ${!instantFeedback && !studyMode ? 'text-blue-700' : 'text-[var(--color-ink-muted)]'}`}>I efterhand</div>
+                  <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">Genomgång efter passet</div>
                 </button>
               </div>
             </div>
@@ -581,17 +582,17 @@ export default function Practice() {
                 className={`w-full rounded-xl p-4 border text-left transition-all duration-150 ${
                   studyMode
                     ? 'border-violet-500/40 bg-violet-500/10'
-                    : 'glass border-white/[0.05] hover:border-white/[0.1]'
+                    : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] hover:border-[var(--color-ink-muted)]'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className={`font-bold text-sm ${studyMode ? 'text-violet-300' : 'text-slate-300'}`}>Studieläge</div>
-                    <div className="text-[11px] text-slate-600 mt-0.5">
+                    <div className={`font-bold text-sm ${studyMode ? 'text-violet-700' : 'text-[var(--color-ink-muted)]'}`}>Studieläge</div>
+                    <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">
                       Förklaringar alltid synliga · betygsätt svårigheten för SRS
                     </div>
                   </div>
-                  <div className={`ml-4 w-9 h-5 rounded-full transition-colors flex items-center shrink-0 ${studyMode ? 'bg-violet-600' : 'bg-white/[0.08]'}`}>
+                  <div className={`ml-4 w-9 h-5 rounded-full transition-colors flex items-center shrink-0 ${studyMode ? 'bg-violet-600' : 'bg-[var(--color-paper-dark)]'}`}>
                     <div className={`w-3.5 h-3.5 rounded-full bg-white mx-0.5 transition-transform ${studyMode ? 'translate-x-4' : 'translate-x-0'}`} />
                   </div>
                 </div>
@@ -614,6 +615,7 @@ export default function Practice() {
         >
           {canStart ? 'Starta träning →' : 'Inga frågor tillgängliga'}
         </button>
+      </div>
     </div>
   )
 }
