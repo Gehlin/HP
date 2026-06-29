@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { loadStats } from '../utils/gamification'
 import { loadHistory } from '../utils/session'
 import {
@@ -8,6 +9,9 @@ import {
   daysUntilExam,
   KNOWN_HP_DATES,
 } from '../utils/examDate'
+import { getDueQuestions } from '../utils/srs'
+import { getBookmarks } from '../utils/bookmarks'
+import { questions } from '../data/questions'
 
 interface ProfileStats {
   totalQuestions: number
@@ -61,12 +65,109 @@ function StatItem({ value, label }: { value: number; label: string }) {
   )
 }
 
+const allQuestionIds = questions.map(q => q.id)
+
+function ChevronIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-faint)] shrink-0">
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  )
+}
+
+function BookIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+    </svg>
+  )
+}
+
+function BookmarkIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </svg>
+  )
+}
+
+function ClockIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  )
+}
+
+function TimerIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l3 3" />
+      <path d="M9.5 3h5" />
+      <path d="M12 3v2" />
+    </svg>
+  )
+}
+
+function TypeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <polyline points="4 7 4 4 20 4 20 7" />
+      <line x1="9" y1="20" x2="15" y2="20" />
+      <line x1="12" y1="4" x2="12" y2="20" />
+    </svg>
+  )
+}
+
+function ChartIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <line x1="18" y1="20" x2="18" y2="10" />
+      <line x1="12" y1="20" x2="12" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  )
+}
+
+interface SettingsRowProps {
+  icon: React.ReactNode
+  label: string
+  badge?: number
+  onClick: () => void
+  last?: boolean
+}
+
+function SettingsRow({ icon, label, badge, onClick, last }: SettingsRowProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full px-4 py-3.5 flex items-center gap-3 text-left active:bg-[var(--color-paper-darker)] transition-colors ${!last ? 'border-b border-[var(--color-card-border)]' : ''}`}
+    >
+      {icon}
+      <span className="flex-1 text-sm text-[var(--color-ink)]">{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span className="text-xs font-medium bg-[var(--color-green)] text-white rounded-full px-1.5 py-0.5 leading-none">
+          {badge}
+        </span>
+      )}
+      <ChevronIcon />
+    </button>
+  )
+}
+
 export default function Profil() {
+  const navigate = useNavigate()
   const [stats, setStats] = useState<ProfileStats>({ totalQuestions: 0, streak: 0, sessions: 0 })
   const [examDate, setExamDateState] = useState<Date | null>(null)
   const [daysLeft, setDaysLeft] = useState<number | null>(null)
   const [showDateModal, setShowDateModal] = useState(false)
   const [pendingDate, setPendingDate] = useState<string | null>(null)
+
+  const dueCount = useMemo(() => getDueQuestions(allQuestionIds).length, [])
+  const bookmarkCount = useMemo(() => getBookmarks().length, [])
 
   useEffect(() => {
     setStats(computeStats())
@@ -145,6 +246,17 @@ export default function Profil() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Studieverktyg */}
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)] mb-2 px-1">Studieverktyg</p>
+        <div className="card mb-4 overflow-hidden">
+          <SettingsRow icon={<BookIcon />} label="Teori & guider" onClick={() => navigate('/theory')} />
+          <SettingsRow icon={<BookmarkIcon />} label="Bokmärken" badge={bookmarkCount} onClick={() => navigate('/bookmarks')} />
+          <SettingsRow icon={<ClockIcon />} label="Repetitionskö" badge={dueCount} onClick={() => navigate('/srs')} />
+          <SettingsRow icon={<TimerIcon />} label="Provsimulatorn" onClick={() => navigate('/exam-select')} />
+          <SettingsRow icon={<TypeIcon />} label="Ordbyggaren" onClick={() => navigate('/ord-builder')} />
+          <SettingsRow icon={<ChartIcon />} label="HP-poängprediktor" onClick={() => navigate('/score')} last />
         </div>
       </div>
 
