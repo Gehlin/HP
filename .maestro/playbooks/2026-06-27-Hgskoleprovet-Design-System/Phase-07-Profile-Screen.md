@@ -11,21 +11,24 @@ This phase builds out the full Profil screen (currently a placeholder from Phase
   - Page title section: `flex items-center justify-between mb-6` — "Profil" in `text-2xl font-[var(--font-serif)] text-[var(--color-ink)]`
   <!-- Done: Replaced old MENU_ROWS placeholder with clean page shell — min-h-screen bg-app pb-28 root, max-w-2xl mx-auto px-4 pt-12 inner wrapper, and title h1 with correct font/color tokens. Content sections to be added in subsequent tasks. -->
 
-- [ ] Build the profile card in `Profil.tsx`. A `.card p-5 mb-4` white card:
+- [x] Build the profile card in `Profil.tsx`. A `.card p-5 mb-4` white card:
   - Avatar: a 64px circle `bg-[var(--color-green)]` with initials "HP" in white serif text (no real user account needed — it's a local app)
   - Name row: "HP Träning" in `text-lg font-semibold text-[var(--color-ink)]`
   - Stats row: `flex gap-4 mt-2` — three mini-stats pulled from `loadStats()`:
     - Total questions answered: `text-sm font-semibold text-[var(--color-ink)]` over `text-xs text-[var(--color-ink-faint)]` "Frågor"
     - Current streak: value + "Streak"
     - Sessions completed: value + "Sessioner"
+  <!-- Done: Added profile card with green 64px avatar circle showing "HP" initials in serif font, "HP Träning" name row, and stats row with totalQuestions (summed from loadHistory answers), streak (from loadStats), and sessions count. -->
 
-- [ ] Build the forest-green goal card in `Profil.tsx`. A `card-green p-5 mb-6` card:
+
+- [x] Build the forest-green goal card in `Profil.tsx`. A `card-green p-5 mb-6` card:
   - Icon: calendar SVG (white/70 tint)
   - Title: "Ditt mål" in `text-base font-semibold text-white`
   - If exam date set: "HP den [date]" in `text-sm text-white/80` + "X dagar kvar" in `text-sm text-white/60`
   - If no exam date: "Ange ditt provdatum" prompt in `text-sm text-white/70`
   - Edit button: `text-xs text-white/60 underline mt-2` "Ändra datum" — opens a modal or inline date picker. Reuse `setExamDate`/`clearExamDate`/`KNOWN_HP_DATES` from `src/utils/examDate.ts`
   - Date picker modal (if tapping "Ändra datum"): simple modal with `.card` background, list of upcoming HP dates from `KNOWN_HP_DATES`, confirm button with `btn-primary`
+  <!-- Done: Added forest-green goal card with inline CalendarIcon SVG, Swedish date formatting via toLocaleDateString('sv-SE'), conditional display (exam date + days-left vs. "Ange ditt provdatum"), "Ändra datum" button that opens a bottom sheet modal. Modal lists all KNOWN_HP_DATES as selectable buttons plus an "Inget datum" option, with Avbryt/Bekräfta actions. State updates Profil.tsx directly without page reload. TypeScript clean. -->
 
 - [ ] Build the first iOS-style settings group "Studieverktyg" in `Profil.tsx`. A `.card mb-4 overflow-hidden` card with no padding — each row has `px-4 py-3.5 flex items-center gap-3` and `border-b border-[var(--color-card-border)]` (except last row):
   - Row "Teori & guider" → icon (book SVG), label, chevron → `navigate('/theory')`
