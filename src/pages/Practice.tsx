@@ -361,6 +361,32 @@ export default function Practice() {
           </button>
         )}
 
+        {/* Repetition mode panel — before Sektionsträning so empty-state is visible without scrolling */}
+        {mode === 'repetition' && (
+          <div className="mb-6 bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl p-5">
+            {dueIds.length === 0 ? (
+              <p className="text-center text-[var(--color-ink-faint)] text-sm">Inga frågor att repetera idag — kom tillbaka imorgon!</p>
+            ) : (
+              <>
+                <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">
+                  {dueIds.length} frågor att repetera
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {(Object.entries(dueByType) as [QuestionType, number][])
+                    .filter(([, n]) => n > 0)
+                    .map(([type, n]) => (
+                      <div key={type} className="bg-[var(--color-paper-dark)] rounded-xl p-2.5 text-center">
+                        <div className="text-xs font-black mb-1" style={{ color: TYPE_ACCENTS[type].color }}>{type}</div>
+                        <div className="text-lg font-black text-[var(--color-ink)]">{n}</div>
+                      </div>
+                    ))}
+                </div>
+                <p className="text-[11px] text-[var(--color-ink-faint)] mt-3">Studieläge aktiveras automatiskt.</p>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Section drills */}
         <div className="mb-6">
           <SectionLabel>Sektionsträning</SectionLabel>
@@ -390,31 +416,6 @@ export default function Practice() {
             })}
           </div>
         </div>
-
-{mode === 'repetition' && (
-          <div className="mb-6 bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl p-5">
-            {dueIds.length === 0 ? (
-              <p className="text-center text-[var(--color-ink-faint)] text-sm">Inga frågor att repetera idag — kom tillbaka imorgon!</p>
-            ) : (
-              <>
-                <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">
-                  {dueIds.length} frågor att repetera
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {(Object.entries(dueByType) as [QuestionType, number][])
-                    .filter(([, n]) => n > 0)
-                    .map(([type, n]) => (
-                      <div key={type} className="bg-[var(--color-paper-dark)] rounded-xl p-2.5 text-center">
-                        <div className="text-xs font-black mb-1" style={{ color: TYPE_ACCENTS[type].color }}>{type}</div>
-                        <div className="text-lg font-black text-[var(--color-ink)]">{n}</div>
-                      </div>
-                    ))}
-                </div>
-                <p className="text-[11px] text-[var(--color-ink-faint)] mt-3">Studieläge aktiveras automatiskt.</p>
-              </>
-            )}
-          </div>
-        )}
 
         {mode !== 'repetition' && (
           <>

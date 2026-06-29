@@ -44,6 +44,7 @@ The Practice page currently overwhelms new users with 6+ configuration panels be
 - [x] Move the "Starta träning →" button in `src/pages/Practice.tsx` to appear right after the mode selector cards (and quick-drill shortcuts), BEFORE the Sektionsträning grid. This way users can launch immediately without scrolling. Keep the same button at the bottom of the page too (after advanced options) for users who do configure advanced settings. The top button should only show when `mode !== 'repetition' || dueIds.length > 0` and be disabled when `!canStart`.
   <!-- Done: Added top CTA button between quick-drill shortcuts and Sektionsträning grid. Wraps in `{(mode !== 'repetition' || dueIds.length > 0) && ...}`, disabled when `!canStart`. Bottom button unchanged. Build passes. -->
 
-- [ ] In the Repetition mode panel, if `mode === 'repetition'` and `dueIds.length === 0`, show the empty-state message inline without needing to scroll — the panel is compact. Confirm this still works correctly after the restructure.
+- [x] In the Repetition mode panel, if `mode === 'repetition'` and `dueIds.length === 0`, show the empty-state message inline without needing to scroll — the panel is compact. Confirm this still works correctly after the restructure.
+  <!-- Done: Moved the repetition panel from after Sektionsträning to before it (between Top CTA and Section drills). When mode=repetition and dueIds=0, the compact empty-state message now appears above the fold without scrolling. Build passes. -->
 
 - [ ] Run `npm run build` to verify no errors. Also visually verify the page structure makes sense by reviewing the JSX render order: mode cards → quick CTA → quick drills → section drills → Avancerat toggle → [advanced filters hidden by default] → bottom CTA.
