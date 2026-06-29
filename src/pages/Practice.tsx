@@ -407,6 +407,14 @@ export default function Practice() {
 
         {mode !== 'repetition' && (
           <>
+            <button
+              onClick={() => setAdvancedOpen(prev => !prev)}
+              className="w-full flex items-center justify-between text-[10px] font-bold tracking-widest text-[var(--color-ink-faint)] uppercase mb-4 mt-2"
+            >
+              <span>Avancerat</span>
+              <span className="text-[var(--color-ink-muted)]">{advancedOpen ? '▲' : '▼'}</span>
+            </button>
+
             {advancedOpen && (<>
             {/* Question types */}
             <div className="mb-6">
