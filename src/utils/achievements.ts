@@ -124,8 +124,8 @@ export function getAchievement(id: string): Achievement | undefined {
 }
 
 export const RARITY_STYLES: Record<Achievement['rarity'], { border: string; bg: string; label: string; labelColor: string }> = {
-  bronze:   { border: 'border-amber-700',   bg: 'bg-amber-900/20',   label: 'Brons',    labelColor: 'text-amber-600'   },
-  silver:   { border: 'border-slate-400',   bg: 'bg-slate-700/30',   label: 'Silver',   labelColor: 'text-slate-300'   },
-  gold:     { border: 'border-yellow-500',  bg: 'bg-yellow-900/20',  label: 'Guld',     labelColor: 'text-yellow-400'  },
-  platinum: { border: 'border-violet-400',  bg: 'bg-violet-900/20',  label: 'Platina',  labelColor: 'text-violet-400'  },
+  bronze:   { border: 'border-amber-300',   bg: 'bg-amber-50',                         label: 'Brons',    labelColor: 'text-amber-700'   },
+  silver:   { border: 'border-[var(--color-card-border)]', bg: 'bg-[var(--color-paper-dark)]', label: 'Silver', labelColor: 'text-[var(--color-ink-muted)]' },
+  gold:     { border: 'border-yellow-400',  bg: 'bg-yellow-50',                        label: 'Guld',     labelColor: 'text-yellow-700'  },
+  platinum: { border: 'border-violet-300',  bg: 'bg-violet-50',                        label: 'Platina',  labelColor: 'text-violet-700'  },
 }

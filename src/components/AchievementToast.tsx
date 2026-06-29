@@ -38,12 +38,12 @@ export default function AchievementToast({ newIds, onDone }: Props) {
         <div className="flex items-center gap-3">
           <span className="text-3xl">{achievement.icon}</span>
           <div>
-            <div className="font-black text-white">{achievement.title}</div>
-            <div className="text-xs text-slate-400 mt-0.5">{achievement.description}</div>
+            <div className="font-black text-[var(--color-ink)]">{achievement.title}</div>
+            <div className="text-xs text-[var(--color-ink-muted)] mt-0.5">{achievement.description}</div>
           </div>
         </div>
         {newIds.length > 1 && (
-          <div className="text-[10px] text-slate-500 mt-2 text-right">{idx + 1}/{newIds.length}</div>
+          <div className="text-[10px] text-[var(--color-ink-faint)] mt-2 text-right">{idx + 1}/{newIds.length}</div>
         )}
       </div>
     </div>
