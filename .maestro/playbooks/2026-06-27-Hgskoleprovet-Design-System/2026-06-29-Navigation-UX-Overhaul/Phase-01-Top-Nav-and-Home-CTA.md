@@ -12,7 +12,7 @@ This phase delivers the biggest visible transformation: ripping out the bottom t
   ```
   This will be used by all page wrappers to clear the fixed nav.
 
-- [ ] Create `src/components/TopNav.tsx`. This replaces `BottomNav.tsx` entirely. Requirements:
+- [x] Create `src/components/TopNav.tsx`. This replaces `BottomNav.tsx` entirely. Requirements:
   - `fixed top-0 inset-x-0 z-50` positioning
   - Inner wrapper: `pt-safe` (or inline style `paddingTop: 'env(safe-area-inset-top, 0px)'`) to handle iOS status bar
   - Background `bg-[var(--color-paper)]`, bottom border `border-b border-[var(--color-card-border)]`
