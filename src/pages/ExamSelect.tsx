@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import PageHeader from '../components/PageHeader'
 import { exams, SECTION_SIZES, VERBAL_SECTION_SIZES } from '../data/exams'
 
 const TYPE_PILL: Record<string, string> = {
@@ -20,16 +21,9 @@ export default function ExamSelect() {
   const totalVerbal = Object.values(VERBAL_SECTION_SIZES).reduce((a, b) => a + b, 0)
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)]">
-      <div className="max-w-2xl mx-auto px-4 pt-10 pb-28">
-
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm mb-6 transition-colors"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          Tillbaka
-        </button>
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+      <PageHeader title="Välj prov" />
+      <div className="max-w-2xl mx-auto px-4 py-6">
 
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
