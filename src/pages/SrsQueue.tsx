@@ -6,14 +6,14 @@ import { questions } from '../data/questions'
 import type { QuestionType } from '../types'
 
 const TYPE_COLORS: Record<QuestionType, { text: string; bar: string; bg: string; border: string }> = {
-  XYZ: { text: 'text-violet-400',  bar: 'bg-violet-500',  bg: 'bg-violet-500/10',  border: 'border-violet-500/20'  },
-  KVA: { text: 'text-blue-400',    bar: 'bg-blue-500',    bg: 'bg-blue-500/10',    border: 'border-blue-500/20'    },
-  NOG: { text: 'text-emerald-400', bar: 'bg-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-  DTK: { text: 'text-amber-400',   bar: 'bg-amber-500',   bg: 'bg-amber-500/10',   border: 'border-amber-500/20'   },
-  ORD: { text: 'text-rose-400',    bar: 'bg-rose-500',    bg: 'bg-rose-500/10',    border: 'border-rose-500/20'    },
-  LAS: { text: 'text-pink-400',    bar: 'bg-pink-500',    bg: 'bg-pink-500/10',    border: 'border-pink-500/20'    },
-  MEK: { text: 'text-fuchsia-400', bar: 'bg-fuchsia-500', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20' },
-  ELF: { text: 'text-purple-400',  bar: 'bg-purple-500',  bg: 'bg-purple-500/10',  border: 'border-purple-500/20'  },
+  XYZ: { text: 'text-violet-700',  bar: 'bg-violet-500',  bg: 'bg-violet-50',  border: 'border-violet-200'  },
+  KVA: { text: 'text-blue-700',    bar: 'bg-blue-500',    bg: 'bg-blue-50',    border: 'border-blue-200'    },
+  NOG: { text: 'text-emerald-700', bar: 'bg-emerald-500', bg: 'bg-emerald-50', border: 'border-emerald-200' },
+  DTK: { text: 'text-amber-700',   bar: 'bg-amber-500',   bg: 'bg-amber-50',   border: 'border-amber-200'   },
+  ORD: { text: 'text-rose-700',    bar: 'bg-rose-500',    bg: 'bg-rose-50',    border: 'border-rose-200'    },
+  LAS: { text: 'text-pink-700',    bar: 'bg-pink-500',    bg: 'bg-pink-50',    border: 'border-pink-200'    },
+  MEK: { text: 'text-fuchsia-700', bar: 'bg-fuchsia-500', bg: 'bg-fuchsia-50', border: 'border-fuchsia-200' },
+  ELF: { text: 'text-purple-700',  bar: 'bg-purple-500',  bg: 'bg-purple-50',  border: 'border-purple-200'  },
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -90,12 +90,12 @@ export default function SrsQueue() {
   const upcomingEntries = Object.entries(stats.upcomingByDay).filter(([, n]) => n > 0)
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-lg mx-auto px-5 py-10 pb-24">
 
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-8 transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] text-sm mb-8 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -105,12 +105,12 @@ export default function SrsQueue() {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className={`w-1.5 h-1.5 rounded-full bg-amber-400 ${dueCount > 0 ? 'animate-pulse' : ''}`} />
+          <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className={`w-1.5 h-1.5 rounded-full bg-amber-500 ${dueCount > 0 ? 'animate-pulse' : ''}`} />
             Spaced Repetition
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">Repetitionskö</h1>
-          <p className="text-slate-500 text-sm">
+          <p className="text-[var(--color-ink-faint)] text-sm">
             {dueCount > 0
               ? `${dueCount} frågor väntar på repetition`
               : 'Inga frågor klara för repetition just nu'}
@@ -119,13 +119,13 @@ export default function SrsQueue() {
 
         {/* Due now CTA */}
         {dueCount > 0 ? (
-          <div className="glass rounded-2xl p-6 mb-6 border border-amber-500/15">
+          <div className="card rounded-2xl p-6 mb-6 border border-amber-200">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Klart nu</div>
-                <div className="text-5xl font-black text-white">{dueCount}</div>
+                <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Klart nu</div>
+                <div className="text-5xl font-black text-[var(--color-ink)]">{dueCount}</div>
                 {stats.overdueCount > 0 && (
-                  <div className="text-xs text-red-400 font-bold mt-1">{stats.overdueCount} försenade</div>
+                  <div className="text-xs text-red-600 font-bold mt-1">{stats.overdueCount} försenade</div>
                 )}
               </div>
               <button
@@ -152,18 +152,18 @@ export default function SrsQueue() {
                     <button
                       key={type}
                       onClick={() => setTypeFilter(prev => prev === type ? 'alla' : type)}
-                      className={`rounded-xl p-2.5 text-center transition-all ${tc.bg} border ${isSelected ? tc.bar.replace('bg-', 'border-') : tc.border} ${isSelected ? 'ring-1 ring-inset ring-white/20' : ''}`}
+                      className={`rounded-xl p-2.5 text-center transition-all ${tc.bg} border ${isSelected ? tc.bar.replace('bg-', 'border-') : tc.border}`}
                     >
                       <div className={`text-xs font-black ${tc.text}`}>{type}</div>
-                      <div className="text-lg font-black text-white">{v.due}</div>
+                      <div className="text-lg font-black text-[var(--color-ink)]">{v.due}</div>
                     </button>
                   )
                 })}
             </div>
 
             {typeFilter !== 'alla' && (
-              <div className="mt-4 flex items-center justify-between gap-3 pt-4 border-t border-white/[0.05]">
-                <div className="text-sm text-slate-400">
+              <div className="mt-4 flex items-center justify-between gap-3 pt-4 border-t border-[var(--color-card-border)]">
+                <div className="text-sm text-[var(--color-ink-muted)]">
                   Öva bara <span className={`font-black ${TYPE_COLORS[typeFilter].text}`}>{typeFilter}</span>
                   {' '}({stats.byType[typeFilter]?.due ?? 0} frågor)
                 </div>
@@ -183,40 +183,40 @@ export default function SrsQueue() {
             )}
           </div>
         ) : (
-          <div className="glass rounded-2xl p-8 mb-6 text-center">
+          <div className="card rounded-2xl p-8 mb-6 text-center">
             <div className="text-4xl mb-3">✓</div>
-            <div className="text-lg font-black text-emerald-400 mb-1">Kö klar!</div>
-            <p className="text-sm text-slate-500">Inga frågor klara för repetition just nu. Kom tillbaka senare.</p>
+            <div className="text-lg font-black text-emerald-700 mb-1">Kö klar!</div>
+            <p className="text-sm text-[var(--color-ink-faint)]">Inga frågor klara för repetition just nu. Kom tillbaka senare.</p>
           </div>
         )}
 
         {/* Mastery overview */}
-        <div className="glass rounded-2xl p-5 mb-4">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Frågebank</div>
+        <div className="card rounded-2xl p-5 mb-4">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Frågebank</div>
           <div className="grid grid-cols-3 gap-3 mb-4">
             {[
-              { label: 'Ej sedd', value: stats.unseen, color: 'text-slate-400' },
-              { label: 'Inlärning', value: stats.learning, color: 'text-amber-400' },
-              { label: 'Bemästrad', value: stats.mastered, color: 'text-emerald-400' },
+              { label: 'Ej sedd', value: stats.unseen, color: 'text-[var(--color-ink-muted)]' },
+              { label: 'Inlärning', value: stats.learning, color: 'text-amber-600' },
+              { label: 'Bemästrad', value: stats.mastered, color: 'text-emerald-700' },
             ].map(({ label, value, color }) => (
-              <div key={label} className="text-center bg-white/[0.03] rounded-xl py-3">
+              <div key={label} className="text-center bg-[var(--color-paper-dark)] rounded-xl py-3">
                 <div className={`text-2xl font-black ${color}`}>{value}</div>
-                <div className="text-[10px] text-slate-600 mt-0.5">{label}</div>
+                <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">{label}</div>
               </div>
             ))}
           </div>
           <div className="flex h-2 rounded-full overflow-hidden">
-            <div className="bg-slate-700" style={{ width: `${(stats.unseen / questions.length) * 100}%` }} />
+            <div className="bg-[var(--color-paper-dark)]" style={{ width: `${(stats.unseen / questions.length) * 100}%` }} />
             <div className="bg-amber-500" style={{ width: `${(stats.learning / questions.length) * 100}%` }} />
             <div className="bg-emerald-500" style={{ width: `${(stats.mastered / questions.length) * 100}%` }} />
           </div>
-          <div className="text-xs text-slate-600 mt-1.5 text-right">{questions.length} frågor totalt</div>
+          <div className="text-xs text-[var(--color-ink-faint)] mt-1.5 text-right">{questions.length} frågor totalt</div>
         </div>
 
         {/* Upcoming 7 days */}
         {upcomingEntries.length > 0 && (
-          <div className="glass rounded-2xl p-5 mb-4">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Kommande 7 dagar</div>
+          <div className="card rounded-2xl p-5 mb-4">
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Kommande 7 dagar</div>
             <div className="space-y-2">
               {upcomingEntries.map(([dateStr, count]) => {
                 const d = new Date(dateStr + 'T12:00:00')
@@ -224,11 +224,11 @@ export default function SrsQueue() {
                 const barW = Math.min(100, Math.round((count / Math.max(...upcomingEntries.map(([, n]) => n))) * 100))
                 return (
                   <div key={dateStr} className="flex items-center gap-3">
-                    <span className="text-xs text-slate-500 w-20 shrink-0 capitalize">{label}</span>
-                    <div className="flex-1 h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
-                      <div className="h-full bg-blue-500/60 rounded-full" style={{ width: `${barW}%` }} />
+                    <span className="text-xs text-[var(--color-ink-faint)] w-20 shrink-0 capitalize">{label}</span>
+                    <div className="flex-1 h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500 rounded-full" style={{ width: `${barW}%` }} />
                     </div>
-                    <span className="text-xs text-slate-500 tabular-nums w-6 text-right">{count}</span>
+                    <span className="text-xs text-[var(--color-ink-faint)] tabular-nums w-6 text-right">{count}</span>
                   </div>
                 )
               })}
@@ -237,8 +237,8 @@ export default function SrsQueue() {
         )}
 
         {/* Per-type breakdown */}
-        <div className="glass rounded-2xl p-5">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Fördelning per delprov</div>
+        <div className="card rounded-2xl p-5">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Fördelning per delprov</div>
           <div className="space-y-3">
             {(Object.entries(stats.byType) as [QuestionType, { due: number; total: number }][])
               .filter(([, v]) => v.total > 0)
@@ -249,9 +249,9 @@ export default function SrsQueue() {
                   <div key={type}>
                     <div className="flex justify-between text-xs mb-1">
                       <span className={`font-black ${tc.text}`}>{type}</span>
-                      <span className="text-slate-500">{v.due} / {v.total} klara</span>
+                      <span className="text-[var(--color-ink-faint)]">{v.due} / {v.total} klara</span>
                     </div>
-                    <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                       <div className={`h-full rounded-full ${tc.bar}`} style={{ width: `${pct}%` }} />
                     </div>
                   </div>
