@@ -91,6 +91,7 @@ export default function Practice() {
   )
   const [tagsOpen, setTagsOpen] = useState(!!tagParam)
   const [studyMode, setStudyMode] = useState(false)
+  const [advancedOpen, setAdvancedOpen] = useState(() => !!(typeParam || tagParam))
 
   const toggleType = (t: QuestionType) =>
     setSelectedTypes(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
