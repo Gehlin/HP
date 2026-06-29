@@ -29,7 +29,7 @@ This phase delivers the biggest visible transformation: ripping out the bottom t
   - Return `null` when `location.pathname.startsWith('/session')` (same as BottomNav)
   - Also hide on sub-routes: `/exam/`, `/srs`, `/bookmarks`, `/results` — return null if `inSession || location.pathname.startsWith('/exam/') || ['/srs', '/bookmarks', '/results'].some(p => location.pathname.startsWith(p))`... actually just keep it visible on all non-session routes for now — inner pages have their own back nav. Only hide during `/session`.
 
-- [ ] Update `src/App.tsx`:
+- [x] Update `src/App.tsx`:
   - Replace `import BottomNav from './components/BottomNav'` → `import TopNav from './components/TopNav'`
   - Replace `{!inSession && <BottomNav />}` → `<TopNav />` (TopNav handles its own visibility via the null return)
   - No other changes needed

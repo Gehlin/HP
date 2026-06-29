@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import ErrorBoundary from './components/ErrorBoundary'
 import InstallBanner from './components/InstallBanner'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
-import BottomNav from './components/BottomNav'
+import TopNav from './components/TopNav'
 import { maybeShowDueNotification } from './utils/notifications'
 import { getDueQuestions } from './utils/srs'
 import { questions } from './data/questions'
@@ -165,7 +165,7 @@ function AppInner() {
         </Routes>
       </Suspense>
 
-      {!inSession && <BottomNav />}
+      <TopNav />
       <InstallBanner />
     </>
   )
