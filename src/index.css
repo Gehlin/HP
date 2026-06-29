@@ -152,6 +152,10 @@
   padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
 
+.pt-topnav {
+  padding-top: calc(3.5rem + env(safe-area-inset-top, 0px));
+}
+
 /* ─── Question card slide transitions ───────────────────────── */
 
 @keyframes slideOutLeft {
