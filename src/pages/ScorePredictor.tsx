@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loadHistory } from '../utils/session'
+import PageHeader from '../components/PageHeader'
 import { questions } from '../data/questions'
 import {
   estimateSectionedScore,
@@ -139,12 +140,9 @@ export default function ScorePredictor() {
   const hasData = history.length > 0 && (quant !== null || verbal !== null)
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)]">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+      <PageHeader title="HP-poängprediktor" onBack={() => navigate('/')} />
       <div className="max-w-2xl mx-auto px-4 py-8 pb-28">
-
-        <button onClick={() => navigate('/progress')} className="text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] mb-6 flex items-center gap-2 text-sm transition-colors">
-          ← Statistik
-        </button>
 
         <div className="mb-6">
           <div className="text-[10px] font-bold text-blue-700 uppercase tracking-widest mb-2">HP-analys</div>

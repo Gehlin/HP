@@ -39,7 +39,7 @@ Users navigating deep into the app — opening a subject guide, launching SRS, b
   - Add `<PageHeader title="Ordbyggaren" onBack={() => navigate('/practice')} />`
   - Ensure `pt-topnav pb-8` on outer wrapper
 
-- [ ] Apply `PageHeader` to `src/pages/ScorePredictor.tsx`:
+- [x] Apply `PageHeader` to `src/pages/ScorePredictor.tsx`:
   - Add `<PageHeader title="HP-poängprediktor" onBack={() => navigate('/')} />`
   - Ensure `pt-topnav pb-8` on outer wrapper
 
