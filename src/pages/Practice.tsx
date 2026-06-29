@@ -407,6 +407,7 @@ export default function Practice() {
 
         {mode !== 'repetition' && (
           <>
+            {advancedOpen && (<>
             {/* Question types */}
             <div className="mb-6">
               <SectionLabel>Delprov</SectionLabel>
@@ -599,6 +600,7 @@ export default function Practice() {
                 </div>
               </button>
             </div>
+            </>)}
 
             {available === 0 && (
               <p className="text-amber-400 text-sm mb-4 text-center">
