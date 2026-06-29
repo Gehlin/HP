@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { questions } from '../data/questions'
+import PageHeader from '../components/PageHeader'
 
 const STORAGE_KEY = 'hp_ord_known'
 
@@ -77,18 +78,9 @@ export default function OrdBuilder() {
 
   if (mode === 'menu') {
     return (
-      <div className="min-h-screen bg-app text-[var(--color-ink)]">
-        <div className="max-w-lg mx-auto px-4 py-10 pb-24">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] text-sm mb-8 transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M19 12H5M12 5l-7 7 7 7"/>
-            </svg>
-            Tillbaka
-          </button>
-
+      <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+        <PageHeader title="Ordbyggaren" onBack={() => navigate('/practice')} />
+        <div className="max-w-lg mx-auto px-4 py-6 pb-8">
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse" />

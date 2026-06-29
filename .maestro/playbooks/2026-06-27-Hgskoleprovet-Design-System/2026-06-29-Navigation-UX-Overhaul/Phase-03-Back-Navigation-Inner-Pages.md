@@ -27,15 +27,15 @@ Users navigating deep into the app — opening a subject guide, launching SRS, b
   - Ensure `pt-topnav pb-8` on outer wrapper
   - Remove any existing back navigation
 
-- [ ] Apply `PageHeader` to `src/pages/ExamSelect.tsx`:
+- [x] Apply `PageHeader` to `src/pages/ExamSelect.tsx`:
   - Add `<PageHeader title="Välj prov" />` at the top
   - Ensure `pt-topnav pb-8` on outer wrapper
 
-- [ ] Apply `PageHeader` to `src/pages/ExamStart.tsx`:
+- [x] Apply `PageHeader` to `src/pages/ExamStart.tsx`:
   - Add `<PageHeader title="HP-prov" onBack={() => navigate('/exam-select')} />` — back goes to the exam select page rather than history -1, since the session might auto-start
   - Ensure `pt-topnav pb-8` on outer wrapper
 
-- [ ] Apply `PageHeader` to `src/pages/OrdBuilder.tsx`:
+- [x] Apply `PageHeader` to `src/pages/OrdBuilder.tsx`:
   - Add `<PageHeader title="Ordbyggaren" onBack={() => navigate('/practice')} />`
   - Ensure `pt-topnav pb-8` on outer wrapper
 
