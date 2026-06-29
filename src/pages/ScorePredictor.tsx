@@ -45,10 +45,10 @@ const GOAL_OPTIONS = [
 ]
 
 const TYPE_COLORS: Record<QuestionType, string> = {
-  XYZ: 'text-violet-400', KVA: 'text-blue-400',
-  NOG: 'text-emerald-400', DTK: 'text-amber-400',
-  ORD: 'text-rose-400', LAS: 'text-pink-400',
-  MEK: 'text-fuchsia-400', ELF: 'text-purple-400',
+  XYZ: 'text-violet-700', KVA: 'text-blue-700',
+  NOG: 'text-emerald-700', DTK: 'text-amber-600',
+  ORD: 'text-rose-700', LAS: 'text-pink-700',
+  MEK: 'text-fuchsia-700', ELF: 'text-purple-700',
 }
 
 const TYPE_BARS: Record<QuestionType, string> = {
@@ -62,21 +62,21 @@ function SectionScore({ score, label, pct }: { score: number | null; label: stri
   const barPct = score !== null ? ((score - 1.0) / 1.0) * 100 : 0
   const barColor = score !== null
     ? (score >= 1.80 ? 'bg-emerald-500' : score >= 1.50 ? 'bg-blue-500' : score >= 1.25 ? 'bg-amber-500' : 'bg-red-500')
-    : 'bg-slate-700'
+    : 'bg-[var(--color-paper-dark)]'
   return (
     <div>
-      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{label}</div>
+      <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">{label}</div>
       {score !== null ? (
         <>
           <div className={`text-3xl font-black mb-1 ${hpScoreColor(score)}`}>{score.toFixed(2)}</div>
           {pct !== null && (
-            <div className="text-[10px] text-slate-600 mb-2">{pct}% träffsäkerhet</div>
+            <div className="text-[10px] text-[var(--color-ink-faint)] mb-2">{pct}% träffsäkerhet</div>
           )}
         </>
       ) : (
-        <div className="text-2xl font-black text-slate-600 mb-2">—</div>
+        <div className="text-2xl font-black text-[var(--color-ink-faint)] mb-2">—</div>
       )}
-      <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
+      <div className="h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
         <div className={`h-full ${barColor} rounded-full transition-all duration-700`} style={{ width: `${barPct}%` }} />
       </div>
     </div>
@@ -139,29 +139,29 @@ export default function ScorePredictor() {
   const hasData = history.length > 0 && (quant !== null || verbal !== null)
 
   return (
-    <div className="min-h-screen bg-app text-white">
+    <div className="min-h-screen bg-app text-[var(--color-ink)]">
       <div className="max-w-2xl mx-auto px-4 py-8 pb-28">
 
-        <button onClick={() => navigate('/progress')} className="text-slate-400 hover:text-white mb-6 flex items-center gap-2 text-sm transition-colors">
+        <button onClick={() => navigate('/progress')} className="text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] mb-6 flex items-center gap-2 text-sm transition-colors">
           ← Statistik
         </button>
 
         <div className="mb-6">
-          <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">HP-analys</div>
+          <div className="text-[10px] font-bold text-blue-700 uppercase tracking-widest mb-2">HP-analys</div>
           <h1 className="text-3xl font-black">Din HP-prognos</h1>
-          <p className="text-slate-400 text-sm mt-2 leading-relaxed">
+          <p className="text-[var(--color-ink-muted)] text-sm mt-2 leading-relaxed">
             Estimerat HP-resultat baserat på dina träningspass. Exakt poäng beror på provdagens normering.
           </p>
         </div>
 
         {!hasData ? (
-          <div className="glass rounded-2xl p-10 text-center">
-            <div className="text-4xl font-black text-slate-700 mb-3">—</div>
-            <div className="text-slate-400 font-semibold mb-1">Inga träningsdata ännu</div>
-            <p className="text-slate-600 text-sm mb-6">Genomför träningspass för att se din HP-prognos.</p>
+          <div className="card rounded-2xl p-10 text-center">
+            <div className="text-4xl font-black text-[var(--color-ink-faint)] mb-3">—</div>
+            <div className="text-[var(--color-ink-muted)] font-semibold mb-1">Inga träningsdata ännu</div>
+            <p className="text-[var(--color-ink-faint)] text-sm mb-6">Genomför träningspass för att se din HP-prognos.</p>
             <button
               onClick={() => navigate('/practice')}
-              className="bg-blue-600 hover:bg-blue-500 transition-colors px-6 py-3 rounded-xl font-bold text-sm"
+              className="btn-primary px-6 py-3 rounded-xl font-bold text-sm"
             >
               Starta träning →
             </button>
@@ -169,26 +169,26 @@ export default function ScorePredictor() {
         ) : (
           <>
             {/* ── Main score card ── */}
-            <div className="glass rounded-2xl p-6 mb-4">
+            <div className="card rounded-2xl p-6 mb-4">
               {combined !== null && (
-                <div className="text-center mb-6 pb-6 border-b border-white/[0.06]">
-                  <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Estimerat HP-resultat</div>
+                <div className="text-center mb-6 pb-6 border-b border-[var(--color-card-border)]">
+                  <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Estimerat HP-resultat</div>
                   <div className={`text-7xl font-black mb-1 tabular-nums ${hpScoreColor(combined)}`}>{combined.toFixed(2)}</div>
                   <div className={`text-sm font-bold mb-1 ${hpScoreColor(combined)}`}>{hpScoreLabel(combined)}</div>
                   {percentile !== null && (
-                    <div className="text-xs text-slate-500 mb-3">Bättre än ca {percentile}% av provtagarna</div>
+                    <div className="text-xs text-[var(--color-ink-faint)] mb-3">Bättre än ca {percentile}% av provtagarna</div>
                   )}
                   {hpHistory.length >= 3 && (
                     <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full ${
-                      isImproving ? 'bg-emerald-500/10 text-emerald-400' :
-                      isDeclining ? 'bg-red-500/10 text-red-400' :
-                      'bg-white/[0.05] text-slate-500'
+                      isImproving ? 'bg-emerald-50 text-emerald-700' :
+                      isDeclining ? 'bg-red-50 text-red-700' :
+                      'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'
                     }`}>
                       {isImproving ? '↑' : isDeclining ? '↓' : '→'}
                       {isImproving ? 'Stigande trend' : isDeclining ? 'Sjunkande trend' : 'Stabil trend'}
                     </div>
                   )}
-                  <div className="mt-4 h-2.5 bg-white/[0.05] rounded-full overflow-hidden">
+                  <div className="mt-4 h-2.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-700 ${
                         combined >= 1.80 ? 'bg-emerald-500' :
@@ -198,7 +198,7 @@ export default function ScorePredictor() {
                       style={{ width: `${((combined - 1.0) / 1.0) * 100}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] text-slate-600 mt-1">
+                  <div className="flex justify-between text-[10px] text-[var(--color-ink-faint)] mt-1">
                     <span>1.00</span><span>1.50</span><span>2.00</span>
                   </div>
                 </div>
@@ -210,15 +210,15 @@ export default function ScorePredictor() {
               </div>
 
               {(quant === null || verbal === null) && (
-                <p className="text-[10px] text-slate-600 text-center mt-4">
+                <p className="text-[10px] text-[var(--color-ink-faint)] text-center mt-4">
                   Öva fler {quant === null ? 'kvantitativa' : 'verbala'} frågor för fullständig prognos.
                 </p>
               )}
             </div>
 
             {/* ── Goal setter ── */}
-            <div className="glass rounded-2xl p-6 mb-4">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Sätt ett mål</div>
+            <div className="card rounded-2xl p-6 mb-4">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Sätt ett mål</div>
               <div className="grid grid-cols-7 gap-1 mb-6">
                 {GOAL_OPTIONS.map((opt, i) => (
                   <button
@@ -226,8 +226,8 @@ export default function ScorePredictor() {
                     onClick={() => setGoalIdx(i)}
                     className={`rounded-xl py-2 px-1 border text-center transition-all ${
                       goalIdx === i
-                        ? `border-blue-500/60 bg-blue-500/10 ${hpScoreColor(opt.score)}`
-                        : 'border-white/[0.06] text-slate-500 hover:text-slate-300 hover:border-white/[0.12]'
+                        ? `border-blue-400 bg-blue-50 ${hpScoreColor(opt.score)}`
+                        : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] hover:border-[var(--color-card-border)]'
                     }`}
                   >
                     <div className="text-xs font-black">{opt.score.toFixed(2)}</div>
@@ -237,9 +237,9 @@ export default function ScorePredictor() {
               </div>
 
               <div className="space-y-5">
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-[var(--color-ink-muted)]">
                   För att nå <span className={`font-bold ${hpScoreColor(goal.score)}`}>{goal.score.toFixed(2)}</span>{' '}
-                  ({goal.label}) behöver du <span className="font-bold text-white">≈ {requiredPct}%</span> träffsäkerhet.
+                  ({goal.label}) behöver du <span className="font-bold text-[var(--color-ink)]">≈ {requiredPct}%</span> träffsäkerhet.
                 </div>
 
                 {[
@@ -251,22 +251,22 @@ export default function ScorePredictor() {
                   return (
                     <div key={label}>
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-sm font-semibold text-slate-300">{label}</span>
+                        <span className="text-sm font-semibold text-[var(--color-ink-muted)]">{label}</span>
                         <div className="flex items-center gap-2 text-sm">
                           {current !== null ? (
                             <>
-                              <span className={`font-bold ${achieved ? 'text-emerald-400' : 'text-white'}`}>{current}%</span>
+                              <span className={`font-bold ${achieved ? 'text-emerald-700' : 'text-[var(--color-ink)]'}`}>{current}%</span>
                               {achieved
-                                ? <span className="text-[11px] font-bold text-emerald-400">✓ Uppnått</span>
-                                : <span className="text-[11px] text-red-400">+{gap}pp saknas</span>
+                                ? <span className="text-[11px] font-bold text-emerald-700">✓ Uppnått</span>
+                                : <span className="text-[11px] text-red-700">+{gap}pp saknas</span>
                               }
                             </>
                           ) : (
-                            <span className="text-slate-600 text-xs">Inga data</span>
+                            <span className="text-[var(--color-ink-faint)] text-xs">Inga data</span>
                           )}
                         </div>
                       </div>
-                      <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden relative">
+                      <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden relative">
                         {current !== null && (
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${achieved ? 'bg-emerald-500' : 'bg-blue-500'}`}
@@ -274,14 +274,14 @@ export default function ScorePredictor() {
                           />
                         )}
                         <div
-                          className="absolute top-0 h-full w-0.5 bg-white/30 z-10"
+                          className="absolute top-0 h-full w-0.5 bg-[var(--color-ink)] opacity-30 z-10"
                           style={{ left: `${Math.min(100, requiredPct)}%` }}
                           title={`Mål: ${requiredPct}%`}
                         />
                       </div>
-                      <div className="flex justify-between text-[9px] text-slate-700 mt-1">
+                      <div className="flex justify-between text-[9px] text-[var(--color-ink-faint)] mt-1">
                         <span>0%</span>
-                        <span className="text-slate-600">↑ Mål: {requiredPct}%</span>
+                        <span>↑ Mål: {requiredPct}%</span>
                         <span>100%</span>
                       </div>
                     </div>
@@ -292,8 +292,8 @@ export default function ScorePredictor() {
 
             {/* ── Per-type breakdown ── */}
             {typeBreakdown.length > 0 && (
-              <div className="glass rounded-2xl p-6 mb-4">
-                <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Delprov — träffsäkerhet</div>
+              <div className="card rounded-2xl p-6 mb-4">
+                <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Delprov — träffsäkerhet</div>
                 <div className="space-y-3">
                   {typeBreakdown.map(({ type, pct, total }) => {
                     const isWeak = pct < 60
@@ -302,7 +302,7 @@ export default function ScorePredictor() {
                       <div key={type} className="flex items-center gap-3">
                         <span className={`w-9 text-xs font-black shrink-0 ${TYPE_COLORS[type]}`}>{type}</span>
                         <div className="flex-1 relative">
-                          <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden">
+                          <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                             <div
                               className={`h-full ${TYPE_BARS[type]} rounded-full opacity-60`}
                               style={{ width: `${pct}%` }}
@@ -310,14 +310,14 @@ export default function ScorePredictor() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0 w-28 justify-end">
-                          <span className={`text-xs font-bold ${isWeak ? 'text-red-400' : isMedium ? 'text-amber-400' : 'text-emerald-400'}`}>
+                          <span className={`text-xs font-bold ${isWeak ? 'text-red-700' : isMedium ? 'text-amber-600' : 'text-emerald-700'}`}>
                             {pct}%
                           </span>
-                          <span className="text-[10px] text-slate-600">({total})</span>
+                          <span className="text-[10px] text-[var(--color-ink-faint)]">({total})</span>
                           {isWeak && (
                             <button
                               onClick={() => navigate(`/practice?type=${type}`)}
-                              className="text-[9px] font-bold text-red-400 bg-red-500/10 border border-red-500/25 rounded px-1.5 py-0.5 hover:bg-red-500/20 transition-colors"
+                              className="text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 rounded px-1.5 py-0.5 hover:bg-red-100 transition-colors"
                             >
                               Öva
                             </button>
@@ -327,55 +327,55 @@ export default function ScorePredictor() {
                     )
                   })}
                 </div>
-                <p className="text-[10px] text-slate-600 mt-3">(n) = antal besvarade frågor · kräver minst 3 besvarade</p>
+                <p className="text-[10px] text-[var(--color-ink-faint)] mt-3">(n) = antal besvarade frågor · kräver minst 3 besvarade</p>
               </div>
             )}
 
             {/* ── HP score context ── */}
-            <div className="glass rounded-2xl p-5 mb-4 border border-white/[0.04]">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">HP-skalan i kontext</div>
+            <div className="card rounded-2xl p-5 mb-4">
+              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">HP-skalan i kontext</div>
               <div className="space-y-1.5">
                 {[
-                  { range: '1.90–2.00', label: 'Topp 7%', color: 'text-emerald-400', bar: 'bg-emerald-500' },
-                  { range: '1.80–1.89', label: 'Topp 17%', color: 'text-emerald-400', bar: 'bg-emerald-500' },
-                  { range: '1.70–1.79', label: 'Topp 28%', color: 'text-blue-400', bar: 'bg-blue-500' },
-                  { range: '1.60–1.69', label: 'Topp 40%', color: 'text-blue-400', bar: 'bg-blue-500' },
-                  { range: '1.50–1.59', label: 'Topp 53%', color: 'text-amber-400', bar: 'bg-amber-500' },
-                  { range: '1.40–1.49', label: 'Topp 65%', color: 'text-amber-400', bar: 'bg-amber-500' },
-                  { range: '1.00–1.39', label: 'Under medel', color: 'text-red-400', bar: 'bg-red-500' },
+                  { range: '1.90–2.00', label: 'Topp 7%', color: 'text-emerald-700', bar: 'bg-emerald-500' },
+                  { range: '1.80–1.89', label: 'Topp 17%', color: 'text-emerald-700', bar: 'bg-emerald-500' },
+                  { range: '1.70–1.79', label: 'Topp 28%', color: 'text-blue-700', bar: 'bg-blue-500' },
+                  { range: '1.60–1.69', label: 'Topp 40%', color: 'text-blue-700', bar: 'bg-blue-500' },
+                  { range: '1.50–1.59', label: 'Topp 53%', color: 'text-amber-600', bar: 'bg-amber-500' },
+                  { range: '1.40–1.49', label: 'Topp 65%', color: 'text-amber-600', bar: 'bg-amber-500' },
+                  { range: '1.00–1.39', label: 'Under medel', color: 'text-red-700', bar: 'bg-red-500' },
                 ].map(row => {
                   const lo = parseFloat(row.range.split('–')[0])
                   const isCurrent = combined !== null && combined >= lo && (row.range === '1.00–1.39' ? true : combined < parseFloat(row.range.split('–')[1]) + 0.01)
                   return (
                     <div
                       key={row.range}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isCurrent ? 'bg-white/[0.07] ring-1 ring-white/[0.1]' : ''}`}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isCurrent ? 'bg-[var(--color-paper-dark)] ring-1 ring-[var(--color-card-border)]' : ''}`}
                     >
                       <span className={`text-xs font-black w-20 shrink-0 ${row.color}`}>{row.range}</span>
-                      <div className="flex-1 h-1 bg-white/[0.05] rounded-full overflow-hidden">
+                      <div className="flex-1 h-1 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                         <div className={`h-full ${row.bar} rounded-full opacity-50`} style={{ width: '100%' }} />
                       </div>
-                      <span className={`text-[11px] font-bold w-20 text-right shrink-0 ${isCurrent ? row.color : 'text-slate-600'}`}>
+                      <span className={`text-[11px] font-bold w-20 text-right shrink-0 ${isCurrent ? row.color : 'text-[var(--color-ink-faint)]'}`}>
                         {row.label}{isCurrent ? ' ← du' : ''}
                       </span>
                     </div>
                   )
                 })}
               </div>
-              <p className="text-[10px] text-slate-600 mt-3">Uppskattade percentiler baserade på historisk HP-normering.</p>
+              <p className="text-[10px] text-[var(--color-ink-faint)] mt-3">Uppskattade percentiler baserade på historisk HP-normering.</p>
             </div>
 
             {/* ── CTA ── */}
             <button
               onClick={() => navigate('/practice')}
-              className="w-full glass border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/8 rounded-2xl p-4 text-left transition-colors"
+              className="w-full card border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-2xl p-4 text-left transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm font-bold text-white">Fortsätt träna →</div>
-                  <div className="text-xs text-slate-500 mt-0.5">Adaptiv drill fokuserar automatiskt dina svagaste ämnen</div>
+                  <div className="text-sm font-bold text-[var(--color-ink)]">Fortsätt träna →</div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Adaptiv drill fokuserar automatiskt dina svagaste ämnen</div>
                 </div>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-blue-400 shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-blue-700 shrink-0">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
               </div>
