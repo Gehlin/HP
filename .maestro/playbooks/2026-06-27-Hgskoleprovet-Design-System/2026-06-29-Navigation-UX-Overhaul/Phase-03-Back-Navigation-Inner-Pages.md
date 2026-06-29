@@ -17,7 +17,7 @@ Users navigating deep into the app — opening a subject guide, launching SRS, b
   - Replace with `<PageHeader title="Teori" />` inside a `pt-topnav` wrapper div
   - Remove any existing manual back button
 
-- [ ] Apply `PageHeader` to `src/pages/SrsQueue.tsx`:
+- [x] Apply `PageHeader` to `src/pages/SrsQueue.tsx`:
   - Add `<PageHeader title="Spaced Repetition" />` at the top of the page content
   - Ensure the page wrapper has `pt-topnav` and `pb-8` padding
   - Remove any existing back navigation
