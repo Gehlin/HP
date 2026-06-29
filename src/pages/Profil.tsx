@@ -12,6 +12,8 @@ import {
 import { getDueQuestions } from '../utils/srs'
 import { getBookmarks } from '../utils/bookmarks'
 import { questions } from '../data/questions'
+import { requestNotificationPermission, disableNotifications } from '../utils/notifications'
+import { getFocusPreference, setFocusPreference, FocusPreference } from '../utils/focusPreference'
 
 interface ProfileStats {
   totalQuestions: number
@@ -66,6 +68,12 @@ function StatItem({ value, label }: { value: number; label: string }) {
 }
 
 const allQuestionIds = questions.map(q => q.id)
+
+const FOCUS_LABELS: Record<FocusPreference, string> = {
+  quant: 'Kvantitativ',
+  verbal: 'Verbal',
+  both: 'Båda',
+}
 
 function ChevronIcon() {
   return (
@@ -132,15 +140,62 @@ function ChartIcon() {
   )
 }
 
+function BellIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  )
+}
+
+function SlidersIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <line x1="4" y1="21" x2="4" y2="14" />
+      <line x1="4" y1="10" x2="4" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12" y2="3" />
+      <line x1="20" y1="21" x2="20" y2="16" />
+      <line x1="20" y1="12" x2="20" y2="3" />
+      <line x1="1" y1="14" x2="7" y2="14" />
+      <line x1="9" y1="8" x2="15" y2="8" />
+      <line x1="17" y1="16" x2="23" y2="16" />
+    </svg>
+  )
+}
+
+function IOSToggle({ on }: { on: boolean }) {
+  return (
+    <div
+      className={`relative rounded-full transition-colors shrink-0 ${on ? 'bg-[var(--color-green)]' : 'bg-[var(--color-paper-darker)]'}`}
+      style={{ width: 50, height: 28 }}
+    >
+      <div
+        className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-transform ${on ? 'translate-x-6' : 'translate-x-0.5'}`}
+      />
+    </div>
+  )
+}
+
+function FocusChip({ pref }: { pref: FocusPreference }) {
+  return (
+    <span className="text-xs font-medium bg-[var(--color-green)]/10 text-[var(--color-green)] rounded-full px-2 py-0.5 shrink-0">
+      {FOCUS_LABELS[pref]}
+    </span>
+  )
+}
+
 interface SettingsRowProps {
   icon: React.ReactNode
   label: string
   badge?: number
   onClick: () => void
   last?: boolean
+  right?: React.ReactNode
 }
 
-function SettingsRow({ icon, label, badge, onClick, last }: SettingsRowProps) {
+function SettingsRow({ icon, label, badge, onClick, last, right }: SettingsRowProps) {
   return (
     <button
       onClick={onClick}
@@ -148,12 +203,16 @@ function SettingsRow({ icon, label, badge, onClick, last }: SettingsRowProps) {
     >
       {icon}
       <span className="flex-1 text-sm text-[var(--color-ink)]">{label}</span>
-      {badge !== undefined && badge > 0 && (
-        <span className="text-xs font-medium bg-[var(--color-green)] text-white rounded-full px-1.5 py-0.5 leading-none">
-          {badge}
-        </span>
+      {right !== undefined ? right : (
+        <>
+          {badge !== undefined && badge > 0 && (
+            <span className="text-xs font-medium bg-[var(--color-green)] text-white rounded-full px-1.5 py-0.5 leading-none">
+              {badge}
+            </span>
+          )}
+          <ChevronIcon />
+        </>
       )}
-      <ChevronIcon />
     </button>
   )
 }
@@ -165,6 +224,9 @@ export default function Profil() {
   const [daysLeft, setDaysLeft] = useState<number | null>(null)
   const [showDateModal, setShowDateModal] = useState(false)
   const [pendingDate, setPendingDate] = useState<string | null>(null)
+  const [notifEnabled, setNotifEnabled] = useState(() => localStorage.getItem('hp_notif_enabled') === '1')
+  const [focusPref, setFocusPrefState] = useState<FocusPreference | null>(() => getFocusPreference())
+  const [showFocusModal, setShowFocusModal] = useState(false)
 
   const dueCount = useMemo(() => getDueQuestions(allQuestionIds).length, [])
   const bookmarkCount = useMemo(() => getBookmarks().length, [])
@@ -174,6 +236,22 @@ export default function Profil() {
     setExamDateState(getExamDate())
     setDaysLeft(daysUntilExam())
   }, [])
+
+  async function handleNotifToggle() {
+    if (notifEnabled) {
+      disableNotifications()
+      setNotifEnabled(false)
+    } else {
+      const granted = await requestNotificationPermission()
+      setNotifEnabled(granted)
+    }
+  }
+
+  function handleFocusSelect(pref: FocusPreference) {
+    setFocusPreference(pref)
+    setFocusPrefState(pref)
+    setShowFocusModal(false)
+  }
 
   function handleConfirmDate() {
     if (pendingDate) {
@@ -258,7 +336,61 @@ export default function Profil() {
           <SettingsRow icon={<TypeIcon />} label="Ordbyggaren" onClick={() => navigate('/ord-builder')} />
           <SettingsRow icon={<ChartIcon />} label="HP-poängprediktor" onClick={() => navigate('/score')} last />
         </div>
+
+        {/* Inställningar */}
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)] mb-2 px-1">Inställningar</p>
+        <div className="card mb-4 overflow-hidden">
+          <SettingsRow
+            icon={<BellIcon />}
+            label="Aviseringar"
+            onClick={handleNotifToggle}
+            right={<IOSToggle on={notifEnabled} />}
+          />
+          <SettingsRow
+            icon={<SlidersIcon />}
+            label="Fokusprioritet"
+            onClick={() => setShowFocusModal(true)}
+            right={<>{focusPref && <FocusChip pref={focusPref} />}<ChevronIcon /></>}
+            last
+          />
+        </div>
       </div>
+
+      {/* Focus preference modal */}
+      {showFocusModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pb-8"
+          onClick={() => setShowFocusModal(false)}
+        >
+          <div
+            className="card w-full max-w-md p-5"
+            onClick={e => e.stopPropagation()}
+          >
+            <h2 className="text-base font-semibold text-[var(--color-ink)] mb-4">Fokusprioritet</h2>
+            <div className="flex flex-col gap-2">
+              {(['quant', 'verbal', 'both'] as FocusPreference[]).map(pref => (
+                <button
+                  key={pref}
+                  onClick={() => handleFocusSelect(pref)}
+                  className={`px-4 py-3 rounded-xl text-left text-sm font-medium border transition-colors ${
+                    focusPref === pref
+                      ? 'bg-[var(--color-green)] text-white border-[var(--color-green)]'
+                      : 'border-[var(--color-card-border)] text-[var(--color-ink)] bg-[var(--color-paper)]'
+                  }`}
+                >
+                  {FOCUS_LABELS[pref]}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowFocusModal(false)}
+              className="mt-4 w-full py-2.5 rounded-xl border border-[var(--color-card-border)] text-sm text-[var(--color-ink)]"
+            >
+              Avbryt
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Date picker modal */}
       {showDateModal && (

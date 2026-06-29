@@ -30,7 +30,7 @@ This phase builds out the full Profil screen (currently a placeholder from Phase
   - Date picker modal (if tapping "Ändra datum"): simple modal with `.card` background, list of upcoming HP dates from `KNOWN_HP_DATES`, confirm button with `btn-primary`
   <!-- Done: Added forest-green goal card with inline CalendarIcon SVG, Swedish date formatting via toLocaleDateString('sv-SE'), conditional display (exam date + days-left vs. "Ange ditt provdatum"), "Ändra datum" button that opens a bottom sheet modal. Modal lists all KNOWN_HP_DATES as selectable buttons plus an "Inget datum" option, with Avbryt/Bekräfta actions. State updates Profil.tsx directly without page reload. TypeScript clean. -->
 
-- [ ] Build the first iOS-style settings group "Studieverktyg" in `Profil.tsx`. A `.card mb-4 overflow-hidden` card with no padding — each row has `px-4 py-3.5 flex items-center gap-3` and `border-b border-[var(--color-card-border)]` (except last row):
+- [x] Build the first iOS-style settings group "Studieverktyg" in `Profil.tsx`. A `.card mb-4 overflow-hidden` card with no padding — each row has `px-4 py-3.5 flex items-center gap-3` and `border-b border-[var(--color-card-border)]` (except last row):
   - Row "Teori & guider" → icon (book SVG), label, chevron → `navigate('/theory')`
   - Row "Bokmärken" → icon (bookmark SVG), label + count badge if bookmarks exist, chevron → `navigate('/bookmarks')`
   - Row "Repetitionskö" → icon (clock/refresh SVG), label + count badge if due questions exist, chevron → `navigate('/srs')`
@@ -38,10 +38,12 @@ This phase builds out the full Profil screen (currently a placeholder from Phase
   - Row "Ordbyggaren" → icon (type SVG), label, chevron → `navigate('/ord-builder')`
   - Row "HP-poängprediktor" → icon (chart SVG), label, chevron → `navigate('/score')`
   - Import `getDueQuestions` and `getBookmarks` for badge counts
+  <!-- Done: Added reusable SettingsRow component with icon/label/badge/chevron. Six inline SVG icons (Book, Bookmark, Clock, Timer, Type, Chart). dueCount via getDueQuestions(allQuestionIds) and bookmarkCount via getBookmarks() computed with useMemo. Section header label "STUDIEVERKTYG" above the card. TypeScript clean, committed and pushed. -->
 
-- [ ] Build the second iOS-style settings group "Inställningar" in `Profil.tsx`. Same `.card mb-4 overflow-hidden` structure:
+- [x] Build the second iOS-style settings group "Inställningar" in `Profil.tsx`. Same `.card mb-4 overflow-hidden` structure:
   - Row "Aviseringar": label + iOS toggle switch (a `button` that visually switches between on/off, using `bg-[var(--color-green)]` when on and `bg-[var(--color-paper-darker)]` when off). Toggle state from `localStorage` key `'hp_notif_enabled'`. On toggle: call `requestNotificationPermission()` from `src/utils/notifications.ts` if enabling, update `localStorage`.
   - Row "Fokusprioritet": label + current focus value shown as a chip, tapping opens a small action sheet (bottom modal) with the 3 focus options from `src/utils/focusPreference.ts`. Update via `setFocusPreference()`.
+  <!-- Done: Added BellIcon, SlidersIcon, IOSToggle (50×28px pill with animated white circle), FocusChip (green tinted pill). Extended SettingsRowProps with optional `right` override that replaces badge+chevron when provided. "Aviseringar" row uses IOSToggle as right; toggle calls requestNotificationPermission()/disableNotifications() and updates notifEnabled state. "Fokusprioritet" row shows FocusChip (when set) + ChevronIcon; tapping opens a bottom-sheet modal with Kvantitativ/Verbal/Båda options (selected highlights in green), persisted via setFocusPreference(). TypeScript clean. -->
 
 - [ ] Build the data-management section at the bottom of `Profil.tsx`. A `.card mb-4 overflow-hidden` card:
   - Row "Exportera data" → triggers `JSON.stringify(allLocalStorageData)` download (reuse logic from `Settings.tsx`)
