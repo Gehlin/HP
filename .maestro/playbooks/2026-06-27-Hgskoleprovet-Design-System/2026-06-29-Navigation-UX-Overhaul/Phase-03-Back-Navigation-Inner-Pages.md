@@ -12,7 +12,7 @@ Users navigating deep into the app — opening a subject guide, launching SRS, b
   - Action slot rendered on the right if provided
   - The component itself is NOT fixed/sticky — pages that need it will place it after their own `pt-topnav` offset. Since inner pages don't show in the main TopNav (they navigate away from tabs), just render it inline at the top of the page content.
 
-- [ ] Apply `PageHeader` to `src/pages/Theory.tsx`:
+- [x] Apply `PageHeader` to `src/pages/Theory.tsx`:
   - Read the file to find the current header/back button pattern
   - Replace with `<PageHeader title="Teori" />` inside a `pt-topnav` wrapper div
   - Remove any existing manual back button

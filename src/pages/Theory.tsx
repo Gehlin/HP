@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import PageHeader from '../components/PageHeader'
 
 function ChevronRight() {
   return (
@@ -749,18 +750,9 @@ export default function Theory() {
   const [tab, setTab] = useState<Tab>('overview')
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen bg-app pt-topnav">
 
-      {/* ── Hero ────────────────────────────────────────────────── */}
-      <div className="border-b border-[var(--color-card-border)]">
-        <div className="max-w-2xl mx-auto px-4 pt-12 pb-6">
-          <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)] mb-2">Teori</h1>
-          <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
-            Struktur, svarsscheman och strategi för alla åtta avsnitt. Matematik och formler hittar du i{' '}
-            <button onClick={() => navigate('/matematik')} className="text-[#7C3AED] hover:text-[#6d28d9] underline underline-offset-2 transition-colors">Matematikguiden</button>.
-          </p>
-        </div>
-      </div>
+      <PageHeader title="Teori" />
 
       {/* ── Top tabs ────────────────────────────────────────────── */}
       <div className="sticky top-0 z-20 bg-[var(--color-paper)]/95 backdrop-blur-sm border-b border-[var(--color-card-border)]">
