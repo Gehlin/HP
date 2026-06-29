@@ -350,6 +350,17 @@ export default function Practice() {
           </div>
         )}
 
+        {/* Top CTA — quick launch before section drills */}
+        {(mode !== 'repetition' || dueIds.length > 0) && (
+          <button
+            onClick={start}
+            disabled={!canStart}
+            className="btn-primary w-full mb-6 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {canStart ? 'Starta träning →' : 'Inga frågor tillgängliga'}
+          </button>
+        )}
+
         {/* Section drills */}
         <div className="mb-6">
           <SectionLabel>Sektionsträning</SectionLabel>

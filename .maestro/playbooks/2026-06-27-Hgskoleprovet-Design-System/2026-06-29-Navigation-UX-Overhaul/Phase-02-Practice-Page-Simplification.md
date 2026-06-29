@@ -29,7 +29,7 @@ The Practice page currently overwhelms new users with 6+ configuration panels be
   Keep always visible: the mode selector cards (Övning / Provläge / Spaced Repetition), the quick-drill shortcut cards (Fokusträning, Öva på dina fel, Bokmärkta frågor), and the Sektionsträning grid.
   <!-- Done: Wrapped all 7 advanced sections in `{advancedOpen && (<>...</>)}` on lines 410–603 of Practice.tsx. The `{available === 0}` warning remains always visible. Build has one TS6133 warning (`setAdvancedOpen` unused) — expected intermediate state, will be resolved when task 4 adds the toggle button that calls it. -->
 
-- [ ] Add an "Avancerat" toggle button in `src/pages/Practice.tsx` between the Sektionsträning grid and the conditionally-shown advanced section. This button expands/collapses the advanced section:
+- [x] Add an "Avancerat" toggle button in `src/pages/Practice.tsx` between the Sektionsträning grid and the conditionally-shown advanced section. This button expands/collapses the advanced section:
   ```tsx
   <button
     onClick={() => setAdvancedOpen(prev => !prev)}
@@ -39,8 +39,10 @@ The Practice page currently overwhelms new users with 6+ configuration panels be
     <span className="text-[var(--color-ink-muted)]">{advancedOpen ? '▲' : '▼'}</span>
   </button>
   ```
+  <!-- Done: Added inside the `{mode !== 'repetition'}` block at Practice.tsx, just before the `{advancedOpen && ...}` conditional. Shows ▼ when collapsed, ▲ when expanded. Build passes. -->
 
-- [ ] Move the "Starta träning →" button in `src/pages/Practice.tsx` to appear right after the mode selector cards (and quick-drill shortcuts), BEFORE the Sektionsträning grid. This way users can launch immediately without scrolling. Keep the same button at the bottom of the page too (after advanced options) for users who do configure advanced settings. The top button should only show when `mode !== 'repetition' || dueIds.length > 0` and be disabled when `!canStart`.
+- [x] Move the "Starta träning →" button in `src/pages/Practice.tsx` to appear right after the mode selector cards (and quick-drill shortcuts), BEFORE the Sektionsträning grid. This way users can launch immediately without scrolling. Keep the same button at the bottom of the page too (after advanced options) for users who do configure advanced settings. The top button should only show when `mode !== 'repetition' || dueIds.length > 0` and be disabled when `!canStart`.
+  <!-- Done: Added top CTA button between quick-drill shortcuts and Sektionsträning grid. Wraps in `{(mode !== 'repetition' || dueIds.length > 0) && ...}`, disabled when `!canStart`. Bottom button unchanged. Build passes. -->
 
 - [ ] In the Repetition mode panel, if `mode === 'repetition'` and `dueIds.length === 0`, show the empty-state message inline without needing to scroll — the panel is compact. Confirm this still works correctly after the restructure.
 
