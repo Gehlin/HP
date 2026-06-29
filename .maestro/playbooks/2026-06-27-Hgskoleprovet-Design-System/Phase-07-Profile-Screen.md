@@ -45,11 +45,12 @@ This phase builds out the full Profil screen (currently a placeholder from Phase
   - Row "Fokusprioritet": label + current focus value shown as a chip, tapping opens a small action sheet (bottom modal) with the 3 focus options from `src/utils/focusPreference.ts`. Update via `setFocusPreference()`.
   <!-- Done: Added BellIcon, SlidersIcon, IOSToggle (50×28px pill with animated white circle), FocusChip (green tinted pill). Extended SettingsRowProps with optional `right` override that replaces badge+chevron when provided. "Aviseringar" row uses IOSToggle as right; toggle calls requestNotificationPermission()/disableNotifications() and updates notifEnabled state. "Fokusprioritet" row shows FocusChip (when set) + ChevronIcon; tapping opens a bottom-sheet modal with Kvantitativ/Verbal/Båda options (selected highlights in green), persisted via setFocusPreference(). TypeScript clean. -->
 
-- [ ] Build the data-management section at the bottom of `Profil.tsx`. A `.card mb-4 overflow-hidden` card:
+- [x] Build the data-management section at the bottom of `Profil.tsx`. A `.card mb-4 overflow-hidden` card:
   - Row "Exportera data" → triggers `JSON.stringify(allLocalStorageData)` download (reuse logic from `Settings.tsx`)
   - Row "Importera data" → hidden file input `<input type="file" accept=".json">`, triggers parse & restore (reuse logic from `Settings.tsx`)
   - Row "Återställ all data" → shows a confirmation modal before calling `localStorage.clear()` and reloading. Modal: `.card-green` or `bg-[var(--color-terracotta)]` warning styling, "Säker?" title, confirm + cancel buttons.
   - Import all relevant utility functions already used in `Settings.tsx`
+  <!-- Done: Added "HANTERA DATA" section with DownloadIcon/UploadIcon/TrashIcon inline SVGs. exportData() and handleImport() copied verbatim from Settings.tsx using the same DATA_KEYS list. Hidden file input wired via importRef. "Återställ all data" row opens a bottom-sheet modal with TrashIcon, "Säker?" heading, warning copy, and red "Återställ" + "Avbryt" buttons. handleResetAll() calls localStorage.clear() and window.location.reload(). toast state for import success/error feedback. TypeScript clean. -->
 
 - [ ] Update the `THEORY_PREFIXES` active-detection in `src/components/BottomNav.tsx`: since Teori tab is gone, these paths no longer need to highlight a nav tab. The active check for each tab should be clean: `/` (exact), `/practice` (starts-with), `/progress` (starts-with), `/profil` (starts-with). Remove the `THEORY_PREFIXES` constant from BottomNav if it's still there from Phase 2.
 

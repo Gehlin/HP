@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loadStats } from '../utils/gamification'
 import { loadHistory } from '../utils/session'
@@ -149,6 +149,64 @@ function BellIcon() {
   )
 }
 
+const DATA_KEYS = [
+  'hp_srs', 'hp_current_session', 'hp_session_history', 'hp_gamification',
+  'hp_bookmarks', 'hp_achievements', 'hp_onboarding_done', 'hp_daily_done',
+  'hp_exam_date', 'hp_notif_enabled', 'hp_notif_last_shown',
+]
+
+function exportData(): void {
+  const data: Record<string, unknown> = {}
+  DATA_KEYS.forEach(k => {
+    const v = localStorage.getItem(k)
+    if (v !== null) {
+      try { data[k] = JSON.parse(v) } catch { data[k] = v }
+    }
+  })
+  const payload = JSON.stringify({ version: 1, exported: new Date().toISOString(), data }, null, 2)
+  const blob = new Blob([payload], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `hp-backup-${new Date().toISOString().slice(0, 10)}.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  )
+}
+
+function UploadIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  )
+}
+
+function TrashIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-terracotta,#c0392b)] shrink-0">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  )
+}
+
 function SlidersIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
@@ -227,6 +285,9 @@ export default function Profil() {
   const [notifEnabled, setNotifEnabled] = useState(() => localStorage.getItem('hp_notif_enabled') === '1')
   const [focusPref, setFocusPrefState] = useState<FocusPreference | null>(() => getFocusPreference())
   const [showFocusModal, setShowFocusModal] = useState(false)
+  const [showResetModal, setShowResetModal] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+  const importRef = useRef<HTMLInputElement>(null)
 
   const dueCount = useMemo(() => getDueQuestions(allQuestionIds).length, [])
   const bookmarkCount = useMemo(() => getBookmarks().length, [])
@@ -251,6 +312,35 @@ export default function Profil() {
     setFocusPreference(pref)
     setFocusPrefState(pref)
     setShowFocusModal(false)
+  }
+
+  function flash(msg: string) {
+    setToast(msg)
+    setTimeout(() => setToast(null), 2500)
+  }
+
+  function handleImport(file: File) {
+    const reader = new FileReader()
+    reader.onload = e => {
+      try {
+        const json = JSON.parse(e.target?.result as string)
+        if (!json.data || typeof json.data !== 'object') throw new Error()
+        Object.entries(json.data).forEach(([k, v]) => {
+          if (DATA_KEYS.includes(k)) localStorage.setItem(k, JSON.stringify(v))
+        })
+        flash('Data importerad!')
+        setTimeout(() => window.location.reload(), 1200)
+      } catch {
+        flash('Fel: ogiltig backupfil')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  function handleResetAll() {
+    localStorage.clear()
+    setShowResetModal(false)
+    window.location.reload()
   }
 
   function handleConfirmDate() {
@@ -354,6 +444,35 @@ export default function Profil() {
             last
           />
         </div>
+
+        {/* Hantera data */}
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)] mb-2 px-1">Hantera data</p>
+        <div className="card mb-4 overflow-hidden">
+          <SettingsRow
+            icon={<DownloadIcon />}
+            label="Exportera data"
+            onClick={exportData}
+          />
+          <SettingsRow
+            icon={<UploadIcon />}
+            label="Importera data"
+            onClick={() => importRef.current?.click()}
+          />
+          <SettingsRow
+            icon={<TrashIcon />}
+            label="Återställ all data"
+            onClick={() => setShowResetModal(true)}
+            right={<ChevronIcon />}
+            last
+          />
+        </div>
+        <input
+          ref={importRef}
+          type="file"
+          accept=".json,application/json"
+          className="hidden"
+          onChange={e => { const f = e.target.files?.[0]; if (f) handleImport(f) }}
+        />
       </div>
 
       {/* Focus preference modal */}
@@ -388,6 +507,48 @@ export default function Profil() {
             >
               Avbryt
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[400] bg-[var(--color-green)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg">
+          {toast}
+        </div>
+      )}
+
+      {/* Reset confirmation modal */}
+      {showResetModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pb-8"
+          onClick={() => setShowResetModal(false)}
+        >
+          <div
+            className="card w-full max-w-md p-5"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <TrashIcon />
+              <h2 className="text-base font-semibold text-[var(--color-ink)]">Säker?</h2>
+            </div>
+            <p className="text-sm text-[var(--color-ink-muted)] mb-5">
+              All data raderas permanent — XP, historik, SRS, bokmärken och inställningar. Det går inte att ångra.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="flex-1 py-2.5 rounded-xl border border-[var(--color-card-border)] text-sm text-[var(--color-ink)]"
+              >
+                Avbryt
+              </button>
+              <button
+                onClick={handleResetAll}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold"
+              >
+                Återställ
+              </button>
+            </div>
           </div>
         </div>
       )}
