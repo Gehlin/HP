@@ -52,10 +52,11 @@ With the structural overhaul complete, this phase sweeps through the remaining r
     - Grepped both files for `pb-28` / `pt-12` — zero matches in either, confirming no stale bottom-nav or safe-area offsets remain.
     - `npx tsc --noEmit` passes with zero errors. No code changes were necessary.
 
-- [ ] Improve the Settings page navigation in `src/pages/Settings.tsx`:
+- [x] Improve the Settings page navigation in `src/pages/Settings.tsx`:
   - The current "← Tillbaka" button at the top uses `navigate('/')` hardcoded to home. Change to `navigate(-1)` so it goes back to wherever the user came from (likely Profil tab)
   - Apply `PageHeader` component (created in Phase 03) to Settings: `<PageHeader title="Inställningar" />` — this replaces the existing manual back button and `<h1>` title at the top. Import `PageHeader` and remove the old manual button and `h1`
   - The page wrapper should also get `pt-topnav` if it doesn't have it already
+  - **Done:** Imported `PageHeader` from `../components/PageHeader` (`src/pages/Settings.tsx:3`) and replaced the manual "← Tillbaka" `<button>` + `<h1>Inställningar</h1>` block with `<PageHeader title="Inställningar" />` (`src/pages/Settings.tsx:127`). `PageHeader`'s `onBack` prop was left unset, so it falls back to its default `navigate(-1)` behavior — satisfying the back-navigation requirement without extra code. Added `pt-topnav` to the outer wrapper (`src/pages/Settings.tsx:126`), matching the established pattern from `ExamSelect.tsx`/`SrsQueue.tsx` (wrapper has `pt-topnav`, `PageHeader` sits directly inside it, then a separate `max-w-2xl mx-auto` content div follows). Also tightened the content div's vertical padding from `py-10` to `py-6` to match that same convention now that `PageHeader` supplies its own top spacing — `py-10` would have produced an oversized gap below the header bar. `npx tsc --noEmit` passes with zero errors; no lint script is configured in this project.
 
 - [ ] Do a final scan of all pages in `src/pages/` using Glob, then Read any page not yet touched in this playbook to confirm it has `pt-topnav` on its outermost wrapper and no remaining `pb-28` from the old bottom nav. Fix any stragglers.
 
