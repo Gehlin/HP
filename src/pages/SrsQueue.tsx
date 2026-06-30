@@ -89,6 +89,9 @@ export default function SrsQueue() {
 
   const dueCount = dueIds.length
   const upcomingEntries = Object.entries(stats.upcomingByDay).filter(([, n]) => n > 0)
+  const nextDueLabel = upcomingEntries.length > 0
+    ? new Date(upcomingEntries[0][0] + 'T12:00:00').toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' })
+    : null
 
   return (
     <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
@@ -176,9 +179,12 @@ export default function SrsQueue() {
           </div>
         ) : (
           <div className="card rounded-2xl p-8 mb-6 text-center">
-            <div className="text-4xl mb-3">✓</div>
-            <div className="text-lg font-black text-emerald-700 mb-1">Kö klar!</div>
-            <p className="text-sm text-[var(--color-ink-faint)]">Inga frågor klara för repetition just nu. Kom tillbaka senare.</p>
+            <div className="text-4xl mb-3">↻</div>
+            <div className="text-lg font-black text-emerald-700 mb-1">Inget att repetera idag!</div>
+            <p className="text-sm text-[var(--color-ink-faint)]">Du är à jour. Kom tillbaka imorgon för fler repetitioner.</p>
+            {nextDueLabel && (
+              <p className="text-xs text-[var(--color-ink-faint)] mt-2">Nästa repetition: {nextDueLabel}</p>
+            )}
           </div>
         )}
 
