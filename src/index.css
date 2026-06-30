@@ -12,11 +12,12 @@
   --color-terracotta-muted: rgba(191, 90, 51, 0.1);
   --color-gold: #E4C66A;
   --color-gold-muted: rgba(228, 198, 106, 0.15);
-  --color-ink: #1A1A18;
-  --color-ink-muted: #4A4A45;
-  --color-ink-faint: #9A9A92;
-  --color-card: #FDFAF6;
-  --color-card-border: rgba(34, 74, 58, 0.10);
+  --color-ink: #23201A;
+  /* maps to spec --color-muted (#8B8478): sampled usages are secondary labels/captions, not body text */
+  --color-ink-muted: #8B8478;
+  --color-ink-faint: #A89F90;
+  --color-card: #FFFFFF;
+  --color-card-border: #EAE3D6;
   --color-success: #2D6150;
   --color-success-bg: rgba(45, 97, 80, 0.10);
   --color-error: #BF5A33;
