@@ -35,14 +35,14 @@ function computeTimeLimit(ids: string[]): number {
 }
 
 const TYPE_ACCENTS: Record<QuestionType, { color: string; ring: string; bg: string }> = {
-  XYZ: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
-  KVA: { color: '#2563EB', ring: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
-  NOG: { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.08)' },
-  DTK: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.08)' },
-  ORD: { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.08)' },
-  LAS: { color: '#DB2777', ring: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
-  MEK: { color: '#9333EA', ring: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
-  ELF: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+  XYZ: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  KVA: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  NOG: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  DTK: { color: 'var(--color-gold-deep)',  ring: 'var(--color-gold-deep)',  bg: 'var(--color-gold-muted)'       },
+  ORD: { color: 'var(--color-green)',       ring: 'var(--color-green)',       bg: 'var(--color-green-muted)'      },
+  LAS: { color: 'var(--color-green)',       ring: 'var(--color-green)',       bg: 'var(--color-green-muted)'      },
+  MEK: { color: 'var(--color-green)',       ring: 'var(--color-green)',       bg: 'var(--color-green-muted)'      },
+  ELF: { color: 'var(--color-green)',       ring: 'var(--color-green)',       bg: 'var(--color-green-muted)'      },
 }
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -50,9 +50,9 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
 }
 
 const DIFFICULTY_ACCENTS: Record<Difficulty, { color: string; ring: string; bg: string }> = {
-  easy:   { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.10)' },
-  medium: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.10)' },
-  hard:   { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.10)' },
+  easy:   { color: 'var(--color-green)',      ring: 'var(--color-green)',      bg: 'var(--color-green-muted)'  },
+  medium: { color: 'var(--color-gold-deep)',  ring: 'var(--color-gold-deep)',  bg: 'var(--color-gold-muted)'   },
+  hard:   { color: 'var(--color-error)',      ring: 'var(--color-error)',      bg: 'var(--color-error-bg)'     },
 }
 
 const ALL_DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard']
@@ -297,49 +297,49 @@ export default function Practice() {
                   saveSession(session)
                   navigate('/session')
                 }}
-                className="w-full rounded-2xl p-4 border border-violet-500/25 bg-violet-500/8 hover:bg-violet-500/12 text-left transition-colors"
+                className="w-full rounded-2xl p-4 border border-[var(--color-green)] bg-[var(--color-green-muted)] hover:bg-[var(--color-paper-dark)] text-left transition-colors"
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <div className="font-bold text-violet-400 text-sm">Fokusträning</div>
+                  <div className="font-bold text-[var(--color-green)] text-sm">Fokusträning</div>
                   {weakTypes.length > 0 && (
                     <div className="flex gap-1 flex-wrap justify-end">
                       {weakTypes.map(({ type, pct }) => (
-                        <span key={type} className="text-[10px] font-bold bg-violet-500/15 text-violet-300 border border-violet-500/20 px-1.5 py-0.5 rounded-md">
+                        <span key={type} className="text-[10px] font-bold bg-[var(--color-green-muted)] text-[var(--color-green)] border border-[var(--color-green)] px-1.5 py-0.5 rounded-md">
                           {type} {pct}%
                         </span>
                       ))}
                     </div>
                   )}
                 </div>
-                <div className="text-xs text-violet-400/50">{adaptiveIds.length} frågor · svagaste ämnen · studieläge</div>
+                <div className="text-xs text-[var(--color-ink-faint)]">{adaptiveIds.length} frågor · svagaste ämnen · studieläge</div>
               </button>
             )}
             {wrongQuestionIds.length > 0 && (
               <button
                 onClick={startWrongDrill}
-                className="w-full rounded-2xl p-4 border border-amber-500/25 bg-amber-500/8 hover:bg-amber-500/12 text-left transition-colors"
+                className="w-full rounded-2xl p-4 border border-[var(--color-gold-deep)] bg-[var(--color-gold-muted)] hover:bg-[var(--color-paper-dark)] text-left transition-colors"
               >
-                <div className="font-bold text-amber-400 text-sm">Öva på dina fel</div>
-                <div className="text-xs text-amber-400/50 mt-0.5">{wrongQuestionIds.length} frågor du svarat fel på · studieläge</div>
+                <div className="font-bold text-[var(--color-gold-deep)] text-sm">Öva på dina fel</div>
+                <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">{wrongQuestionIds.length} frågor du svarat fel på · studieläge</div>
               </button>
             )}
             {bookmarkedIds.length > 0 && (
-              <div className="rounded-2xl border border-blue-500/25 bg-blue-500/8 overflow-hidden">
+              <div className="rounded-2xl border border-[var(--color-green)] bg-[var(--color-green-muted)] overflow-hidden">
                 <div className="flex items-center justify-between p-4">
                   <div>
-                    <div className="font-bold text-blue-400 text-sm">Bokmärkta frågor</div>
-                    <div className="text-xs text-blue-400/50 mt-0.5">{bookmarkedIds.length} sparade frågor</div>
+                    <div className="font-bold text-[var(--color-green)] text-sm">Bokmärkta frågor</div>
+                    <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">{bookmarkedIds.length} sparade frågor</div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => navigate('/bookmarks')}
-                      className="text-xs text-blue-400/70 hover:text-blue-300 border border-blue-500/25 rounded-lg px-2.5 py-1.5 transition-colors"
+                      className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] border border-[var(--color-card-border)] rounded-lg px-2.5 py-1.5 transition-colors"
                     >
                       Bläddra
                     </button>
                     <button
                       onClick={startBookmarkDrill}
-                      className="text-xs text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg px-2.5 py-1.5 font-bold transition-colors"
+                      className="text-xs text-[var(--color-green)] bg-[var(--color-paper-dark)] hover:bg-[var(--color-paper-darker)] rounded-lg px-2.5 py-1.5 font-bold transition-colors"
                     >
                       Drill →
                     </button>
@@ -496,7 +496,7 @@ export default function Practice() {
                 <span>
                   Ämnesfilter
                   {!allTagsSelected && (
-                    <span className="ml-2 text-blue-400 normal-case font-normal tracking-normal">
+                    <span className="ml-2 text-[var(--color-green)] normal-case font-normal tracking-normal">
                       ({selectedTags.length}/{ALL_TAGS.length})
                     </span>
                   )}
@@ -511,7 +511,7 @@ export default function Practice() {
                       onClick={() => toggleTag(tag)}
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all duration-150 ${
                         selectedTags.includes(tag)
-                          ? 'border-blue-400 bg-blue-50 text-blue-700'
+                          ? 'border-[var(--color-green)] bg-[var(--color-green-muted)] text-[var(--color-green)]'
                           : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'
                       }`}
                     >
@@ -551,11 +551,11 @@ export default function Practice() {
                     onClick={() => setTimed(t)}
                     className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
                       timed === t
-                        ? 'border-blue-500/50 bg-blue-500/10'
+                        ? 'border-[var(--color-green)] bg-[var(--color-green-muted)]'
                         : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] hover:border-[var(--color-ink-muted)]'
                     }`}
                   >
-                    <div className={`font-bold text-sm ${timed === t ? 'text-blue-700' : 'text-[var(--color-ink-muted)]'}`}>
+                    <div className={`font-bold text-sm ${timed === t ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-muted)]'}`}>
                       {t ? 'Med tid' : 'Utan tid'}
                     </div>
                     <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">
@@ -576,22 +576,22 @@ export default function Practice() {
                   onClick={() => { setInstantFeedback(true); setStudyMode(false) }}
                   className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
                     instantFeedback && !studyMode
-                      ? 'border-blue-500/50 bg-blue-500/10'
+                      ? 'border-[var(--color-green)] bg-[var(--color-green-muted)]'
                       : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] hover:border-[var(--color-ink-muted)]'
                   }`}
                 >
-                  <div className={`font-bold text-sm ${instantFeedback && !studyMode ? 'text-blue-700' : 'text-[var(--color-ink-muted)]'}`}>Direkt</div>
+                  <div className={`font-bold text-sm ${instantFeedback && !studyMode ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-muted)]'}`}>Direkt</div>
                   <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">Rätt/fel efter varje svar</div>
                 </button>
                 <button
                   onClick={() => { setInstantFeedback(false); setStudyMode(false) }}
                   className={`rounded-xl p-3.5 border text-left transition-all duration-150 ${
                     !instantFeedback && !studyMode
-                      ? 'border-blue-500/50 bg-blue-500/10'
+                      ? 'border-[var(--color-green)] bg-[var(--color-green-muted)]'
                       : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] hover:border-[var(--color-ink-muted)]'
                   }`}
                 >
-                  <div className={`font-bold text-sm ${!instantFeedback && !studyMode ? 'text-blue-700' : 'text-[var(--color-ink-muted)]'}`}>I efterhand</div>
+                  <div className={`font-bold text-sm ${!instantFeedback && !studyMode ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-muted)]'}`}>I efterhand</div>
                   <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">Genomgång efter passet</div>
                 </button>
               </div>
@@ -603,19 +603,19 @@ export default function Practice() {
                 onClick={() => setStudyMode(prev => !prev)}
                 className={`w-full rounded-xl p-4 border text-left transition-all duration-150 ${
                   studyMode
-                    ? 'border-violet-500/40 bg-violet-500/10'
+                    ? 'border-[var(--color-green)] bg-[var(--color-green-muted)]'
                     : 'bg-[var(--color-paper-dark)] border-[var(--color-card-border)] hover:border-[var(--color-ink-muted)]'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className={`font-bold text-sm ${studyMode ? 'text-violet-700' : 'text-[var(--color-ink-muted)]'}`}>Studieläge</div>
+                    <div className={`font-bold text-sm ${studyMode ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-muted)]'}`}>Studieläge</div>
                     <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">
                       Förklaringar alltid synliga · betygsätt svårigheten för SRS
                     </div>
                   </div>
-                  <div className={`ml-4 w-9 h-5 rounded-full transition-colors flex items-center shrink-0 ${studyMode ? 'bg-violet-600' : 'bg-[var(--color-paper-dark)]'}`}>
-                    <div className={`w-3.5 h-3.5 rounded-full bg-white mx-0.5 transition-transform ${studyMode ? 'translate-x-4' : 'translate-x-0'}`} />
+                  <div className={`ml-4 w-9 h-5 rounded-full transition-colors flex items-center shrink-0 ${studyMode ? 'bg-[var(--color-green)]' : 'bg-[var(--color-paper-dark)]'}`}>
+                    <div className={`w-3.5 h-3.5 rounded-full bg-[var(--color-cream)] mx-0.5 transition-transform ${studyMode ? 'translate-x-4' : 'translate-x-0'}`} />
                   </div>
                 </div>
               </button>
@@ -623,7 +623,7 @@ export default function Practice() {
             </>)}
 
             {available === 0 && (
-              <p className="text-amber-400 text-sm mb-4 text-center">
+              <p className="text-[var(--color-gold-deep)] text-sm mb-4 text-center">
                 Inga frågor matchar filtren — justera svårighetsgrad, ämnen eller delprov.
               </p>
             )}

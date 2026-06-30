@@ -10,25 +10,25 @@ import MathText from '../components/MathText'
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
 const TYPE_PILL: Record<QuestionType, string> = {
-  XYZ: 'border-violet-200  bg-violet-50  text-violet-700',
-  KVA: 'border-blue-200    bg-blue-50    text-blue-700',
-  NOG: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-  DTK: 'border-amber-200   bg-amber-50   text-amber-700',
-  ORD: 'border-rose-200    bg-rose-50    text-rose-700',
-  LAS: 'border-pink-200    bg-pink-50    text-pink-700',
-  MEK: 'border-fuchsia-200 bg-fuchsia-50 text-fuchsia-700',
-  ELF: 'border-purple-200  bg-purple-50  text-purple-700',
+  XYZ: 'border-[var(--color-terracotta)] bg-[var(--color-terracotta-muted)] text-[var(--color-terracotta)]',
+  KVA: 'border-[var(--color-terracotta)] bg-[var(--color-terracotta-muted)] text-[var(--color-terracotta)]',
+  NOG: 'border-[var(--color-terracotta)] bg-[var(--color-terracotta-muted)] text-[var(--color-terracotta)]',
+  DTK: 'border-[var(--color-gold-deep)]  bg-[var(--color-gold-muted)]       text-[var(--color-gold-deep)]',
+  ORD: 'border-[var(--color-green)]      bg-[var(--color-green-muted)]       text-[var(--color-green)]',
+  LAS: 'border-[var(--color-green)]      bg-[var(--color-green-muted)]       text-[var(--color-green)]',
+  MEK: 'border-[var(--color-green)]      bg-[var(--color-green-muted)]       text-[var(--color-green)]',
+  ELF: 'border-[var(--color-green)]      bg-[var(--color-green-muted)]       text-[var(--color-green)]',
 }
 
 const FILTER_ACTIVE: Record<QuestionType, string> = {
-  XYZ: 'border-violet-500  text-violet-700  bg-violet-50',
-  KVA: 'border-blue-500    text-blue-700    bg-blue-50',
-  NOG: 'border-emerald-500 text-emerald-700 bg-emerald-50',
-  DTK: 'border-amber-500   text-amber-700   bg-amber-50',
-  ORD: 'border-rose-500    text-rose-700    bg-rose-50',
-  LAS: 'border-pink-500    text-pink-700    bg-pink-50',
-  MEK: 'border-fuchsia-500 text-fuchsia-700 bg-fuchsia-50',
-  ELF: 'border-purple-500  text-purple-700  bg-purple-50',
+  XYZ: 'border-[var(--color-terracotta)] text-[var(--color-terracotta)] bg-[var(--color-terracotta-muted)]',
+  KVA: 'border-[var(--color-terracotta)] text-[var(--color-terracotta)] bg-[var(--color-terracotta-muted)]',
+  NOG: 'border-[var(--color-terracotta)] text-[var(--color-terracotta)] bg-[var(--color-terracotta-muted)]',
+  DTK: 'border-[var(--color-gold-deep)]  text-[var(--color-gold-deep)]  bg-[var(--color-gold-muted)]',
+  ORD: 'border-[var(--color-green)]      text-[var(--color-green)]      bg-[var(--color-green-muted)]',
+  LAS: 'border-[var(--color-green)]      text-[var(--color-green)]      bg-[var(--color-green-muted)]',
+  MEK: 'border-[var(--color-green)]      text-[var(--color-green)]      bg-[var(--color-green-muted)]',
+  ELF: 'border-[var(--color-green)]      text-[var(--color-green)]      bg-[var(--color-green-muted)]',
 }
 
 export default function Bookmarks() {
@@ -80,7 +80,7 @@ export default function Bookmarks() {
             <p className="text-sm text-[var(--color-ink-faint)] mb-6">Tryck på bokmärkesikonen på en fråga för att spara den här.</p>
             <button
               onClick={() => navigate('/practice')}
-              className="bg-[var(--color-green)] hover:opacity-90 transition-opacity px-6 py-3 rounded-xl font-bold text-sm text-white"
+              className="bg-[var(--color-green)] hover:opacity-90 transition-opacity px-6 py-3 rounded-xl font-bold text-sm text-[var(--color-cream)]"
             >
               Öva nu →
             </button>
@@ -106,7 +106,7 @@ export default function Bookmarks() {
             onClick={() => setFilterType(null)}
             className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${
               !filterType
-                ? 'border-blue-500 text-blue-700 bg-blue-50'
+                ? 'border-[var(--color-green)] text-[var(--color-green)] bg-[var(--color-green-muted)]'
                 : 'border-[var(--color-card-border)] text-[var(--color-ink-muted)] hover:border-[var(--color-card-border)]'
             }`}
           >
@@ -168,12 +168,12 @@ export default function Bookmarks() {
                             key={key}
                             className={`flex items-start gap-2.5 rounded-lg px-3 py-2 text-sm border ${
                               isAnswer
-                                ? 'border-emerald-200 bg-emerald-50 text-[var(--color-ink)]'
+                                ? 'border-[var(--color-feedback-correct-border)] bg-[var(--color-feedback-correct-bg)] text-[var(--color-ink)]'
                                 : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)]'
                             }`}
                           >
                             <span className={`shrink-0 w-5 h-5 rounded-md flex items-center justify-center text-xs font-black mt-0.5 ${
-                              isAnswer ? 'bg-emerald-600 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'
+                              isAnswer ? 'bg-[var(--color-correct-badge)] text-[var(--color-cream)]' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'
                             }`}>
                               {isAnswer ? '✓' : key}
                             </span>
@@ -187,7 +187,7 @@ export default function Bookmarks() {
                     )}
                     <button
                       onClick={() => handleRemove(q.id)}
-                      className="text-xs text-[var(--color-ink-faint)] hover:text-red-600 transition-colors"
+                      className="text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-error)] transition-colors"
                     >
                       Ta bort bokmärke
                     </button>

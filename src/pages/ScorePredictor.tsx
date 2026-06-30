@@ -46,23 +46,23 @@ const GOAL_OPTIONS = [
 ]
 
 const TYPE_COLORS: Record<QuestionType, string> = {
-  XYZ: 'text-violet-700', KVA: 'text-blue-700',
-  NOG: 'text-emerald-700', DTK: 'text-amber-600',
-  ORD: 'text-rose-700', LAS: 'text-pink-700',
-  MEK: 'text-fuchsia-700', ELF: 'text-purple-700',
+  XYZ: 'text-[var(--color-terracotta)]', KVA: 'text-[var(--color-terracotta)]',
+  NOG: 'text-[var(--color-terracotta)]', DTK: 'text-[var(--color-gold-deep)]',
+  ORD: 'text-[var(--color-green)]',      LAS: 'text-[var(--color-green)]',
+  MEK: 'text-[var(--color-green)]',      ELF: 'text-[var(--color-green)]',
 }
 
 const TYPE_BARS: Record<QuestionType, string> = {
-  XYZ: 'bg-violet-500', KVA: 'bg-blue-500',
-  NOG: 'bg-emerald-500', DTK: 'bg-amber-500',
-  ORD: 'bg-rose-500', LAS: 'bg-pink-500',
-  MEK: 'bg-fuchsia-500', ELF: 'bg-purple-500',
+  XYZ: 'bg-[var(--color-terracotta)]', KVA: 'bg-[var(--color-terracotta)]',
+  NOG: 'bg-[var(--color-terracotta)]', DTK: 'bg-[var(--color-gold-deep)]',
+  ORD: 'bg-[var(--color-green)]',      LAS: 'bg-[var(--color-green)]',
+  MEK: 'bg-[var(--color-green)]',      ELF: 'bg-[var(--color-green)]',
 }
 
 function SectionScore({ score, label, pct }: { score: number | null; label: string; pct: number | null }) {
   const barPct = score !== null ? ((score - 1.0) / 1.0) * 100 : 0
   const barColor = score !== null
-    ? (score >= 1.80 ? 'bg-emerald-500' : score >= 1.50 ? 'bg-blue-500' : score >= 1.25 ? 'bg-amber-500' : 'bg-red-500')
+    ? (score >= 1.80 ? 'bg-[var(--color-green)]' : score >= 1.50 ? 'bg-[var(--color-green-light)]' : score >= 1.25 ? 'bg-[var(--color-gold-deep)]' : 'bg-[var(--color-error)]')
     : 'bg-[var(--color-paper-dark)]'
   return (
     <div>
@@ -145,7 +145,7 @@ export default function ScorePredictor() {
       <div className="max-w-2xl mx-auto px-4 py-8">
 
         <div className="mb-6">
-          <div className="text-[10px] font-bold text-blue-700 uppercase tracking-widest mb-2">HP-analys</div>
+          <div className="text-[10px] font-bold text-[var(--color-ink-muted)] uppercase tracking-widest mb-2">HP-analys</div>
           <h1 className="text-3xl font-black">Din HP-prognos</h1>
           <p className="text-[var(--color-ink-muted)] text-sm mt-2 leading-relaxed">
             Estimerat HP-resultat baserat på dina träningspass. Exakt poäng beror på provdagens normering.
@@ -178,8 +178,8 @@ export default function ScorePredictor() {
                   )}
                   {hpHistory.length >= 3 && (
                     <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full ${
-                      isImproving ? 'bg-emerald-50 text-emerald-700' :
-                      isDeclining ? 'bg-red-50 text-red-700' :
+                      isImproving ? 'bg-[var(--color-green-muted)] text-[var(--color-green)]' :
+                      isDeclining ? 'bg-[var(--color-error-bg)] text-[var(--color-error)]' :
                       'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'
                     }`}>
                       {isImproving ? '↑' : isDeclining ? '↓' : '→'}
@@ -189,9 +189,9 @@ export default function ScorePredictor() {
                   <div className="mt-4 h-2.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-700 ${
-                        combined >= 1.80 ? 'bg-emerald-500' :
-                        combined >= 1.50 ? 'bg-blue-500' :
-                        combined >= 1.25 ? 'bg-amber-500' : 'bg-red-500'
+                        combined >= 1.80 ? 'bg-[var(--color-green)]' :
+                        combined >= 1.50 ? 'bg-[var(--color-green-light)]' :
+                        combined >= 1.25 ? 'bg-[var(--color-gold-deep)]' : 'bg-[var(--color-error)]'
                       }`}
                       style={{ width: `${((combined - 1.0) / 1.0) * 100}%` }}
                     />
@@ -224,7 +224,7 @@ export default function ScorePredictor() {
                     onClick={() => setGoalIdx(i)}
                     className={`rounded-xl py-2 px-1 border text-center transition-all ${
                       goalIdx === i
-                        ? `border-blue-400 bg-blue-50 ${hpScoreColor(opt.score)}`
+                        ? `border-[var(--color-green)] bg-[var(--color-green-muted)] ${hpScoreColor(opt.score)}`
                         : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] hover:border-[var(--color-card-border)]'
                     }`}
                   >
@@ -253,10 +253,10 @@ export default function ScorePredictor() {
                         <div className="flex items-center gap-2 text-sm">
                           {current !== null ? (
                             <>
-                              <span className={`font-bold ${achieved ? 'text-emerald-700' : 'text-[var(--color-ink)]'}`}>{current}%</span>
+                              <span className={`font-bold ${achieved ? 'text-[var(--color-green)]' : 'text-[var(--color-ink)]'}`}>{current}%</span>
                               {achieved
-                                ? <span className="text-[11px] font-bold text-emerald-700">✓ Uppnått</span>
-                                : <span className="text-[11px] text-red-700">+{gap}pp saknas</span>
+                                ? <span className="text-[11px] font-bold text-[var(--color-green)]">✓ Uppnått</span>
+                                : <span className="text-[11px] text-[var(--color-error)]">+{gap}pp saknas</span>
                               }
                             </>
                           ) : (
@@ -267,7 +267,7 @@ export default function ScorePredictor() {
                       <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden relative">
                         {current !== null && (
                           <div
-                            className={`h-full rounded-full transition-all duration-500 ${achieved ? 'bg-emerald-500' : 'bg-blue-500'}`}
+                            className={`h-full rounded-full transition-all duration-500 ${achieved ? 'bg-[var(--color-green)]' : 'bg-[var(--color-gold-deep)]'}`}
                             style={{ width: `${Math.min(100, current)}%` }}
                           />
                         )}
@@ -308,14 +308,14 @@ export default function ScorePredictor() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0 w-28 justify-end">
-                          <span className={`text-xs font-bold ${isWeak ? 'text-red-700' : isMedium ? 'text-amber-600' : 'text-emerald-700'}`}>
+                          <span className={`text-xs font-bold ${isWeak ? 'text-[var(--color-error)]' : isMedium ? 'text-[var(--color-gold-deep)]' : 'text-[var(--color-green)]'}`}>
                             {pct}%
                           </span>
                           <span className="text-[10px] text-[var(--color-ink-faint)]">({total})</span>
                           {isWeak && (
                             <button
                               onClick={() => navigate(`/practice?type=${type}`)}
-                              className="text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 rounded px-1.5 py-0.5 hover:bg-red-100 transition-colors"
+                              className="text-[9px] font-bold text-[var(--color-feedback-wrong-title)] bg-[var(--color-feedback-wrong-bg)] border border-[var(--color-feedback-wrong-border)] rounded px-1.5 py-0.5 hover:opacity-80 transition-opacity"
                             >
                               Öva
                             </button>
@@ -334,13 +334,13 @@ export default function ScorePredictor() {
               <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">HP-skalan i kontext</div>
               <div className="space-y-1.5">
                 {[
-                  { range: '1.90–2.00', label: 'Topp 7%', color: 'text-emerald-700', bar: 'bg-emerald-500' },
-                  { range: '1.80–1.89', label: 'Topp 17%', color: 'text-emerald-700', bar: 'bg-emerald-500' },
-                  { range: '1.70–1.79', label: 'Topp 28%', color: 'text-blue-700', bar: 'bg-blue-500' },
-                  { range: '1.60–1.69', label: 'Topp 40%', color: 'text-blue-700', bar: 'bg-blue-500' },
-                  { range: '1.50–1.59', label: 'Topp 53%', color: 'text-amber-600', bar: 'bg-amber-500' },
-                  { range: '1.40–1.49', label: 'Topp 65%', color: 'text-amber-600', bar: 'bg-amber-500' },
-                  { range: '1.00–1.39', label: 'Under medel', color: 'text-red-700', bar: 'bg-red-500' },
+                  { range: '1.90–2.00', label: 'Topp 7%',     color: 'text-[var(--color-green)]',      bar: 'bg-[var(--color-green)]'      },
+                  { range: '1.80–1.89', label: 'Topp 17%',    color: 'text-[var(--color-green)]',      bar: 'bg-[var(--color-green)]'      },
+                  { range: '1.70–1.79', label: 'Topp 28%',    color: 'text-[var(--color-green-light)]',bar: 'bg-[var(--color-green-light)]'},
+                  { range: '1.60–1.69', label: 'Topp 40%',    color: 'text-[var(--color-green-light)]',bar: 'bg-[var(--color-green-light)]'},
+                  { range: '1.50–1.59', label: 'Topp 53%',    color: 'text-[var(--color-gold-deep)]',  bar: 'bg-[var(--color-gold-deep)]'  },
+                  { range: '1.40–1.49', label: 'Topp 65%',    color: 'text-[var(--color-gold-deep)]',  bar: 'bg-[var(--color-gold-deep)]'  },
+                  { range: '1.00–1.39', label: 'Under medel', color: 'text-[var(--color-error)]',      bar: 'bg-[var(--color-error)]'      },
                 ].map(row => {
                   const lo = parseFloat(row.range.split('–')[0])
                   const isCurrent = combined !== null && combined >= lo && (row.range === '1.00–1.39' ? true : combined < parseFloat(row.range.split('–')[1]) + 0.01)
@@ -366,14 +366,14 @@ export default function ScorePredictor() {
             {/* ── CTA ── */}
             <button
               onClick={() => navigate('/practice')}
-              className="w-full card border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-2xl p-4 text-left transition-colors"
+              className="w-full card border border-[var(--color-card-border)] bg-[var(--color-paper-dark)] hover:bg-[var(--color-paper-darker)] rounded-2xl p-4 text-left transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-bold text-[var(--color-ink)]">Fortsätt träna →</div>
                   <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Adaptiv drill fokuserar automatiskt dina svagaste ämnen</div>
                 </div>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-blue-700 shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--color-green)] shrink-0">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
               </div>

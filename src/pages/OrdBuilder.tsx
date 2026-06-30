@@ -82,8 +82,8 @@ export default function OrdBuilder() {
         <PageHeader title="Ordbyggaren" onBack={() => navigate('/practice')} />
         <div className="max-w-lg mx-auto px-4 py-6 pb-8">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse" />
+            <div className="inline-flex items-center gap-2 bg-[var(--color-green-muted)] border border-[var(--color-green)] text-[var(--color-green)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-green)] animate-pulse" />
               ORD · Ordförståelse
             </div>
             <h1 className="text-3xl font-black tracking-tight mb-1">Ordbyggaren</h1>
@@ -91,14 +91,14 @@ export default function OrdBuilder() {
           </div>
 
           {/* Progress */}
-          <div className="card rounded-2xl p-5 mb-6 border border-rose-200">
+          <div className="card rounded-2xl p-5 mb-6 border border-[var(--color-green)]">
             <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Din ordbank</div>
             <div className="flex items-end gap-3 mb-3">
-              <div className="text-4xl font-black text-rose-700">{knownCount}</div>
+              <div className="text-4xl font-black text-[var(--color-green)]">{knownCount}</div>
               <div className="text-[var(--color-ink-faint)] text-sm pb-1">av {ordQuestions.length} ord inlärda</div>
             </div>
             <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden mb-1">
-              <div className="h-full bg-rose-500 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+              <div className="h-full bg-[var(--color-green)] rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
             </div>
             <div className="text-[11px] text-[var(--color-ink-faint)]">{pct}% klart</div>
           </div>
@@ -116,7 +116,7 @@ export default function OrdBuilder() {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-colors ${filter === f ? 'bg-rose-600 border-rose-500 text-white' : 'card border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:text-[var(--color-ink)]'}`}
+                  className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-colors ${filter === f ? 'bg-[var(--color-green)] border-[var(--color-green)] text-[var(--color-cream)]' : 'card border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:text-[var(--color-ink)]'}`}
                 >
                   {labels[f]} ({counts[f]})
                 </button>
@@ -127,7 +127,7 @@ export default function OrdBuilder() {
           <button
             onClick={handleStart}
             disabled={deck.length === 0}
-            className="w-full disabled:opacity-40 bg-rose-700 hover:bg-rose-600 transition-colors rounded-2xl py-4 font-black text-base text-white"
+            className="btn-primary w-full disabled:opacity-40 rounded-2xl py-4 font-black text-base"
           >
             {deck.length === 0 ? 'Inga ord att öva' : `Starta — ${deck.length} ord →`}
           </button>
@@ -142,7 +142,7 @@ export default function OrdBuilder() {
                 return (
                   <span
                     key={q.id}
-                    className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border ${isKnown ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-[var(--color-paper)] border-[var(--color-card-border)] text-[var(--color-ink-faint)]'}`}
+                    className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border ${isKnown ? 'bg-[var(--color-green-muted)] border-[var(--color-green)] text-[var(--color-green)]' : 'bg-[var(--color-paper)] border-[var(--color-card-border)] text-[var(--color-ink-faint)]'}`}
                   >
                     {word}
                   </span>
@@ -159,13 +159,13 @@ export default function OrdBuilder() {
     return (
       <div className="min-h-screen bg-app text-[var(--color-ink)] flex items-center justify-center px-4">
         <div className="max-w-sm w-full text-center">
-          <div className="text-6xl font-black text-rose-700 mb-2">{sessionResults.known}</div>
+          <div className="text-6xl font-black text-[var(--color-green)] mb-2">{sessionResults.known}</div>
           <div className="text-[var(--color-ink-muted)] mb-1">ord kände du till</div>
           <div className="text-[var(--color-ink-faint)] text-sm mb-8">{sessionResults.unknown} ord att fortsätta öva</div>
           <div className="space-y-3">
             <button
               onClick={() => { setMode('menu') }}
-              className="w-full bg-rose-700 hover:bg-rose-600 transition-colors rounded-xl py-3 font-bold text-sm text-white"
+              className="btn-primary w-full rounded-xl py-3 font-bold text-sm"
             >
               Tillbaka till menyn
             </button>
@@ -201,7 +201,7 @@ export default function OrdBuilder() {
           </button>
           <div className="flex-1 h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-rose-500 rounded-full transition-all duration-300"
+              className="h-full bg-[var(--color-green)] rounded-full transition-all duration-300"
               style={{ width: `${((cardIndex) / deck.length) * 100}%` }}
             />
           </div>
@@ -209,7 +209,7 @@ export default function OrdBuilder() {
         </div>
 
         {/* Card */}
-        <div className="card rounded-2xl p-8 mb-6 border border-rose-200 text-center min-h-[220px] flex flex-col items-center justify-center">
+        <div className="card rounded-2xl p-8 mb-6 border border-[var(--color-green)] text-center min-h-[220px] flex flex-col items-center justify-center">
           <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Vad betyder</div>
           <div className="text-4xl font-black tracking-widest text-[var(--color-ink)] mb-2">{word}</div>
           <div className="text-xs text-[var(--color-ink-faint)]">?</div>
@@ -217,8 +217,8 @@ export default function OrdBuilder() {
           {revealed && (
             <div className="mt-6 animate-fade-in w-full">
               <div className="h-px bg-[var(--color-card-border)] mb-5" />
-              <div className="text-[10px] font-bold text-rose-700 uppercase tracking-widest mb-2">Synonym</div>
-              <div className="text-2xl font-black text-rose-700 mb-3">{correctOption}</div>
+              <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-2">Synonym</div>
+              <div className="text-2xl font-black text-[var(--color-green)] mb-3">{correctOption}</div>
               <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">{currentCard.explanation}</p>
             </div>
           )}
@@ -235,13 +235,13 @@ export default function OrdBuilder() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => handleMark(false)}
-              className="card border border-red-200 hover:bg-red-50 transition-colors rounded-2xl py-4 font-bold text-sm text-red-700"
+              className="card border border-[var(--color-feedback-wrong-border)] hover:bg-[var(--color-feedback-wrong-bg)] transition-colors rounded-2xl py-4 font-bold text-sm text-[var(--color-feedback-wrong-title)]"
             >
               Kände ej till
             </button>
             <button
               onClick={() => handleMark(true)}
-              className="card border border-emerald-200 hover:bg-emerald-50 transition-colors rounded-2xl py-4 font-bold text-sm text-emerald-700"
+              className="card border border-[var(--color-feedback-correct-border)] hover:bg-[var(--color-feedback-correct-bg)] transition-colors rounded-2xl py-4 font-bold text-sm text-[var(--color-feedback-correct-title)]"
             >
               Kände till ✓
             </button>
@@ -250,7 +250,7 @@ export default function OrdBuilder() {
 
         {/* Difficulty indicator */}
         <div className="mt-4 text-center">
-          <span className={`text-[10px] font-bold uppercase tracking-widest ${currentCard.difficulty === 'easy' ? 'text-emerald-600' : currentCard.difficulty === 'medium' ? 'text-amber-600' : 'text-red-600'}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-widest ${currentCard.difficulty === 'easy' ? 'text-[var(--color-green)]' : currentCard.difficulty === 'medium' ? 'text-[var(--color-gold-deep)]' : 'text-[var(--color-error)]'}`}>
             {currentCard.difficulty === 'easy' ? 'Lätt' : currentCard.difficulty === 'medium' ? 'Medel' : 'Svår'}
           </span>
         </div>

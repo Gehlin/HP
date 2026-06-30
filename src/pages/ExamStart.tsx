@@ -5,14 +5,14 @@ import { buildSession, saveSession } from '../utils/session'
 import PageHeader from '../components/PageHeader'
 
 const TYPE_COLORS: Record<string, { text: string; border: string; bg: string }> = {
-  XYZ: { text: 'text-violet-700',  border: 'border-violet-200',  bg: 'bg-violet-50'  },
-  KVA: { text: 'text-blue-700',    border: 'border-blue-200',    bg: 'bg-blue-50'    },
-  NOG: { text: 'text-emerald-700', border: 'border-emerald-200', bg: 'bg-emerald-50' },
-  DTK: { text: 'text-amber-700',   border: 'border-amber-200',   bg: 'bg-amber-50'   },
-  ORD: { text: 'text-rose-700',    border: 'border-rose-200',    bg: 'bg-rose-50'    },
-  LAS: { text: 'text-pink-700',    border: 'border-pink-200',    bg: 'bg-pink-50'    },
-  MEK: { text: 'text-fuchsia-700', border: 'border-fuchsia-200', bg: 'bg-fuchsia-50' },
-  ELF: { text: 'text-purple-700',  border: 'border-purple-200',  bg: 'bg-purple-50'  },
+  XYZ: { text: 'text-[var(--color-terracotta)]', border: 'border-[var(--color-terracotta)]', bg: 'bg-[var(--color-terracotta-muted)]' },
+  KVA: { text: 'text-[var(--color-terracotta)]', border: 'border-[var(--color-terracotta)]', bg: 'bg-[var(--color-terracotta-muted)]' },
+  NOG: { text: 'text-[var(--color-terracotta)]', border: 'border-[var(--color-terracotta)]', bg: 'bg-[var(--color-terracotta-muted)]' },
+  DTK: { text: 'text-[var(--color-gold-deep)]',  border: 'border-[var(--color-gold-deep)]',  bg: 'bg-[var(--color-gold-muted)]'       },
+  ORD: { text: 'text-[var(--color-green)]',       border: 'border-[var(--color-green)]',       bg: 'bg-[var(--color-green-muted)]'      },
+  LAS: { text: 'text-[var(--color-green)]',       border: 'border-[var(--color-green)]',       bg: 'bg-[var(--color-green-muted)]'      },
+  MEK: { text: 'text-[var(--color-green)]',       border: 'border-[var(--color-green)]',       bg: 'bg-[var(--color-green-muted)]'      },
+  ELF: { text: 'text-[var(--color-green)]',       border: 'border-[var(--color-green)]',       bg: 'bg-[var(--color-green-muted)]'      },
 }
 
 const QUANT_RULES = [
@@ -76,8 +76,8 @@ export default function ExamStart() {
         <PageHeader title="HP-prov" onBack={() => navigate('/exam-select')} />
         <div className="max-w-lg mx-auto px-5 py-6">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+            <div className="inline-flex items-center gap-2 bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] text-[var(--color-ink-muted)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-ink-muted)] animate-pulse" />
               Full HP-simulering
             </div>
             <h1 className="text-3xl font-black tracking-tight mb-1">Full HP-dag</h1>
@@ -87,10 +87,10 @@ export default function ExamStart() {
           {/* Two-pass layout */}
           <div className="space-y-3 mb-8">
             {/* Pass 1 */}
-            <div className="card rounded-2xl border border-rose-200 overflow-hidden">
+            <div className="card rounded-2xl border border-[var(--color-green)] overflow-hidden">
               <div className="px-4 py-3 border-b border-[var(--color-card-border)] flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-rose-600 flex items-center justify-center text-[11px] font-black text-white">1</span>
-                <span className="font-bold text-rose-700">Verbalt provpass</span>
+                <span className="w-6 h-6 rounded-full bg-[var(--color-green)] flex items-center justify-center text-[11px] font-black text-[var(--color-cream)]">1</span>
+                <span className="font-bold text-[var(--color-green)]">Verbalt provpass</span>
                 <span className="ml-auto text-xs text-[var(--color-ink-faint)]">55 min</span>
               </div>
               <div className="grid grid-cols-4 divide-x divide-[var(--color-card-border)]">
@@ -121,10 +121,10 @@ export default function ExamStart() {
             </div>
 
             {/* Pass 2 */}
-            <div className="card rounded-2xl border border-blue-200 overflow-hidden">
+            <div className="card rounded-2xl border border-[var(--color-terracotta)] overflow-hidden">
               <div className="px-4 py-3 border-b border-[var(--color-card-border)] flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[11px] font-black text-white">2</span>
-                <span className="font-bold text-blue-700">Kvantitativt provpass</span>
+                <span className="w-6 h-6 rounded-full bg-[var(--color-terracotta)] flex items-center justify-center text-[11px] font-black text-[var(--color-cream)]">2</span>
+                <span className="font-bold text-[var(--color-terracotta)]">Kvantitativt provpass</span>
                 <span className="ml-auto text-xs text-[var(--color-ink-faint)]">55 min</span>
               </div>
               <div className="grid grid-cols-4 divide-x divide-[var(--color-card-border)]">
@@ -182,8 +182,8 @@ export default function ExamStart() {
 
         {/* Header */}
         <div className="mb-8">
-          <div className={`inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4 ${isVerbal ? 'bg-rose-50 border border-rose-200 text-rose-700' : 'bg-blue-50 border border-blue-200 text-blue-700'}`}>
-            <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isVerbal ? 'bg-rose-500' : 'bg-blue-500'}`} />
+          <div className={`inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4 ${isVerbal ? 'bg-[var(--color-green-muted)] border border-[var(--color-green)] text-[var(--color-green)]' : 'bg-[var(--color-terracotta-muted)] border border-[var(--color-terracotta)] text-[var(--color-terracotta)]'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isVerbal ? 'bg-[var(--color-green)]' : 'bg-[var(--color-terracotta)]'}`} />
             {isVerbal ? 'Verbalt delprov' : isQuant ? 'Kvantitativt delprov' : 'HP-Provsimulering'}
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">
