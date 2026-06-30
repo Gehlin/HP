@@ -32,10 +32,15 @@ With the structural overhaul complete, this phase sweeps through the remaining r
     - The streak pill (`src/pages/Home.tsx:95`) already sits on the right side of the greeting row via `flex items-center justify-between` (`src/pages/Home.tsx:93`) — confirmed correct, no change needed.
     - Searched for `pt-12` in the file — zero matches, no stale safe-area offset remains.
 
-- [ ] Audit `src/pages/Practice.tsx` for spacing consistency:
+- [x] Audit `src/pages/Practice.tsx` for spacing consistency:
   - Confirm the mode selector cards have correct `mb-6` spacing
   - The Sektionsträning section grid should have consistent gap with the new "Avancerat" toggle below it
   - Ensure the "Starta träning →" button at top and bottom are both clearly tappable (min `py-4`)
+  - **Done:** Audited all three checks:
+    - Mode selector cards container (`src/pages/Practice.tsx:235`) already has `mb-6` — correct, no change.
+    - The Sektionsträning grid (`src/pages/Practice.tsx:391`, `mb-6`) was followed by the "Avancerat" toggle button with both `mb-4` *and* `mt-2` (`src/pages/Practice.tsx:424`), producing a 32px gap there vs. the consistent 24px (`mb-6`-only) gap used between every other section on the page. Removed the redundant `mt-2` so the gap now matches the rest of the page's section rhythm.
+    - Both "Starta träning →" buttons (top CTA `src/pages/Practice.tsx:358` and bottom CTA `src/pages/Practice.tsx:637`) already use `py-4` — confirmed tappable, no change needed.
+    - `npx tsc --noEmit` passes with zero errors.
 
 - [ ] Audit `src/pages/Progress.tsx` and `src/pages/Profil.tsx` for padding consistency:
   - Both should use `pt-topnav` on their outermost wrapper (added in Phase 01, but verify)
