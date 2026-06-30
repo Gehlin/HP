@@ -23,10 +23,14 @@ With the structural overhaul complete, this phase sweeps through the remaining r
   Apply `due-pulse` class to the icon wrapper `<span>` on the Träna tab when `dueCount > 0`.
   - **Done:** Added the `pulse-ring` keyframes and `.due-pulse` class to `src/index.css` (placed alongside the other nav-related animations, right after `.nav-pill`). Conditionally applied `due-pulse` to the icon wrapper `<span>` in `src/components/TopNav.tsx:65` via a template-literal class for `tab.path === '/practice' && dueCount > 0`, alongside the existing numeric badge. `npx tsc --noEmit` passes with zero errors.
 
-- [ ] Audit `src/pages/Home.tsx` for visual consistency with the new top nav:
+- [x] Audit `src/pages/Home.tsx` for visual consistency with the new top nav:
   - The greeting header (`God morgon`, date) should sit well below the nav — confirm `pt-6` gives enough breathing room or increase to `pt-8`
   - The streak pill (`🔥 {stats.streak}`) can be repositioned to the right side of the greeting row — confirm it still looks right
   - Remove `pt-12` if it still appears anywhere (it was the old manual safe-area offset)
+  - **Done:** Audited `src/pages/Home.tsx` against sibling pages — no code changes were needed, all three checks already pass:
+    - The outer wrapper has `pt-topnav` (`calc(3.5rem + safe-area-inset-top)`, defined in `src/index.css:155-157`) plus the header div adds its own `pt-6` (`src/pages/Home.tsx:92`), giving more clearance than `Practice.tsx` and `Progress.tsx`, both of which rely on `pt-topnav` alone with no extra top padding on their `<h1>` wrapper. `pt-6` is therefore already generous; bumping to `pt-8` would make Home an outlier vs. the rest of the app, so left as-is.
+    - The streak pill (`src/pages/Home.tsx:95`) already sits on the right side of the greeting row via `flex items-center justify-between` (`src/pages/Home.tsx:93`) — confirmed correct, no change needed.
+    - Searched for `pt-12` in the file — zero matches, no stale safe-area offset remains.
 
 - [ ] Audit `src/pages/Practice.tsx` for spacing consistency:
   - Confirm the mode selector cards have correct `mb-6` spacing
