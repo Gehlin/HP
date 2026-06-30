@@ -109,6 +109,20 @@ export default function Home() {
           Starta träning →
         </button>
 
+        {/* ── Exam date prompt ──────────────────────────────── */}
+        {hasHistory && !examDate && (
+          <button
+            onClick={() => navigate('/profil')}
+            className="w-full card p-4 mb-4 text-left flex items-center justify-between gap-3 border border-amber-500/30 bg-amber-500/5"
+          >
+            <div>
+              <div className="text-sm font-semibold text-[var(--color-ink)]">Ange ditt provdatum</div>
+              <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Se nedräkning och anpassa träningsplanen</div>
+            </div>
+            <span className="text-amber-600 text-lg shrink-0">→</span>
+          </button>
+        )}
+
         {/* ── Welcome / first-use empty state ──────────────── */}
         {!hasHistory && (
           <div className="card p-5 mb-4 border-l-4 border-l-[var(--color-green)]">

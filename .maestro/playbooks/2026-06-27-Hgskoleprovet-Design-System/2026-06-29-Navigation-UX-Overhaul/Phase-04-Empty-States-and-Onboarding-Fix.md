@@ -45,7 +45,7 @@ Two problems make the app feel broken for new users: the Home page shows a score
   - Keep the existing logic for when due questions exist
   **Done:** `src/pages/SrsQueue.tsx` already had a `dueCount === 0` branch (`card rounded-2xl p-8 mb-6 text-center`), so the existing layout/structure and "when due questions exist" logic were left untouched — only its contents were updated. Replaced the "✓" / "Kö klar!" copy with a "↻" icon, heading "Inget att repetera idag!", and body "Du är à jour. Kom tillbaka imorgon för fler repetitioner." Added a `nextDueLabel` derived from the existing `stats.upcomingByDay` data (already computed for the "Kommande 7 dagar" card further down) — it picks the first upcoming day with a nonzero count and formats it via `toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' })`, rendered as a smaller "Nästa repetition: {date}" note below the body copy, only when at least one question has a future `nextReview`. Verified with `npx tsc --noEmit` (no errors) and `npm test -- --run` (14/14 passing, no dedicated SrsQueue test file existed).
 
-- [ ] Add an exam date prompt to `src/pages/Home.tsx`. This shows only when no exam date is set AND the user has some history (showing it on first use would be overwhelming). After the "Starta träning" hero button, conditionally render:
+- [x] Add an exam date prompt to `src/pages/Home.tsx`. This shows only when no exam date is set AND the user has some history (showing it on first use would be overwhelming). After the "Starta träning" hero button, conditionally render:
   ```tsx
   {hasHistory && !examDate && (
     <button
@@ -60,5 +60,6 @@ Two problems make the app feel broken for new users: the Home page shows a score
     </button>
   )}
   ```
+  **Done:** Inserted the prompt verbatim in `src/pages/Home.tsx` directly after the "Starta träning →" hero CTA button and before the first-use welcome empty state block. `examDate` (`Date | null`, populated from `getExamDate()` in the existing `useEffect`) and `hasHistory` (set in the same effect) were already present as component state, so no new state was needed — the condition `hasHistory && !examDate` naturally never overlaps with the `!hasHistory` welcome card. `/profil` route confirmed to exist in `src/App.tsx:161`. Verified with `npx tsc --noEmit` — no errors.
 
 - [ ] Run `npm run build` to verify no TypeScript errors.
