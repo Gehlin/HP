@@ -25,26 +25,12 @@ function formatSwedishDate(date: Date): string {
   return date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-function CalendarIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-white/70 shrink-0"
-    >
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  )
+const SHORT_MONTHS_SV = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
+
+function memberSinceLabel(history: ReturnType<typeof loadHistory>): string {
+  const earliest = history.length > 0 ? Math.min(...history.map(s => s.startTime)) : Date.now()
+  const d = new Date(earliest)
+  return `Medlem sedan ${SHORT_MONTHS_SV[d.getMonth()]} ${d.getFullYear()}`
 }
 
 function computeStats(): ProfileStats {
@@ -226,11 +212,12 @@ function SlidersIcon() {
 function IOSToggle({ on }: { on: boolean }) {
   return (
     <div
-      className={`relative rounded-full transition-colors shrink-0 ${on ? 'bg-[var(--color-green)]' : 'bg-[var(--color-paper-darker)]'}`}
-      style={{ width: 50, height: 28 }}
+      className="relative rounded-full shrink-0"
+      style={{ width: 44, height: 26, background: on ? 'var(--color-green)' : 'var(--color-track)', transition: 'background 0.2s' }}
     >
       <div
-        className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-transform ${on ? 'translate-x-6' : 'translate-x-0.5'}`}
+        className="absolute rounded-full bg-white shadow-sm"
+        style={{ width: 22, height: 22, top: 2, left: on ? 20 : 2, transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }}
       />
     </div>
   )
@@ -260,7 +247,7 @@ function SettingsRow({ icon, label, badge, onClick, last, right }: SettingsRowPr
       className={`w-full px-4 py-3.5 flex items-center gap-3 text-left active:bg-[var(--color-paper-darker)] transition-colors ${!last ? 'border-b border-[var(--color-card-border)]' : ''}`}
     >
       {icon}
-      <span className="flex-1 text-sm text-[var(--color-ink)]">{label}</span>
+      <span className="flex-1 text-[15px] font-medium text-[var(--color-ink)]">{label}</span>
       {right !== undefined ? right : (
         <>
           {badge !== undefined && badge > 0 && (
@@ -364,23 +351,22 @@ export default function Profil() {
   return (
     <div className="min-h-screen bg-app pb-8 pt-topnav">
       <div className="max-w-2xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)]">
-            Profil
-          </h1>
-        </div>
+        <h1 className="text-[26px] font-[var(--font-serif)] text-[var(--color-ink)] mb-5">
+          Profil
+        </h1>
 
         {/* Profile card */}
-        <div className="card p-5 mb-4">
+        <div className="card mb-4" style={{ borderRadius: 18, padding: '16px 18px' }}>
           <div className="flex items-center gap-4">
             <div
               className="flex items-center justify-center rounded-full bg-[var(--color-green)] shrink-0"
-              style={{ width: 64, height: 64 }}
+              style={{ width: 48, height: 48 }}
             >
-              <span className="text-white text-xl font-[var(--font-serif)] select-none">HP</span>
+              <span className="text-[var(--color-cream)] text-xl font-[var(--font-serif)] select-none">HP</span>
             </div>
             <div>
-              <p className="text-lg font-semibold text-[var(--color-ink)]">HP Träning</p>
+              <p className="text-[16px] font-bold text-[var(--color-ink)]">HP Träning</p>
+              <p className="text-xs font-medium text-[var(--color-muted)] mt-0.5">{memberSinceLabel(loadHistory())}</p>
               <div className="flex gap-4 mt-2">
                 <StatItem value={stats.totalQuestions} label="Frågor" />
                 <StatItem value={stats.streak} label="Streak" />
@@ -391,34 +377,31 @@ export default function Profil() {
         </div>
 
         {/* Goal card */}
-        <div className="card-green p-5 mb-6">
-          <div className="flex items-start gap-3">
-            <CalendarIcon />
-            <div className="flex-1">
-              <p className="text-base font-semibold text-white">Ditt mål</p>
-              {examDate ? (
-                <>
-                  <p className="text-sm text-white/80 mt-0.5">HP den {formatSwedishDate(examDate)}</p>
-                  {daysLeft !== null && (
-                    <p className="text-sm text-white/60">{daysLeft > 0 ? `${daysLeft} dagar kvar` : daysLeft === 0 ? 'Provet är idag!' : 'Provet har passerat'}</p>
-                  )}
-                </>
-              ) : (
-                <p className="text-sm text-white/70 mt-0.5">Ange ditt provdatum</p>
-              )}
-              <button
-                onClick={() => { setPendingDate(null); setShowDateModal(true) }}
-                className="text-xs text-white/60 underline mt-2"
-              >
-                Ändra datum
-              </button>
-            </div>
+        <div className="card-green mb-6" style={{ borderRadius: 18, padding: '16px 18px' }}>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-green-tint)]">
+              PROVDATUM
+            </span>
+            <span className="text-[13px] font-medium text-[var(--color-cream-dim)] text-right">
+              {examDate
+                ? `${formatSwedishDate(examDate)}${daysLeft !== null ? ` (${daysLeft > 0 ? `om ${daysLeft} dagar` : daysLeft === 0 ? 'idag' : 'passerat'})` : ''}`
+                : 'Inget datum valt'}
+            </span>
+          </div>
+          <div className="flex justify-end mt-3">
+            <button
+              onClick={() => { setPendingDate(null); setShowDateModal(true) }}
+              className="text-[13px] font-semibold text-[var(--color-cream)] rounded-full"
+              style={{ background: 'rgba(255,255,255,0.12)', padding: '6px 14px' }}
+            >
+              Ändra
+            </button>
           </div>
         </div>
 
         {/* Studieverktyg */}
-        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)] mb-2 px-1">Studieverktyg</p>
-        <div className="card mb-4 overflow-hidden">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2 px-1">Studieverktyg</p>
+        <div className="card mb-4 overflow-hidden" style={{ borderRadius: 18 }}>
           <SettingsRow icon={<BookIcon />} label="Teori & guider" onClick={() => navigate('/theory')} />
           <SettingsRow icon={<BookmarkIcon />} label="Bokmärken" badge={bookmarkCount} onClick={() => navigate('/bookmarks')} />
           <SettingsRow icon={<ClockIcon />} label="Repetitionskö" badge={dueCount} onClick={() => navigate('/srs')} />
@@ -428,8 +411,8 @@ export default function Profil() {
         </div>
 
         {/* Inställningar */}
-        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)] mb-2 px-1">Inställningar</p>
-        <div className="card mb-4 overflow-hidden">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2 px-1">Inställningar</p>
+        <div className="card mb-4 overflow-hidden" style={{ borderRadius: 18 }}>
           <SettingsRow
             icon={<BellIcon />}
             label="Aviseringar"
@@ -446,8 +429,8 @@ export default function Profil() {
         </div>
 
         {/* Hantera data */}
-        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)] mb-2 px-1">Hantera data</p>
-        <div className="card mb-4 overflow-hidden">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2 px-1">Hantera data</p>
+        <div className="card mb-4 overflow-hidden" style={{ borderRadius: 18 }}>
           <SettingsRow
             icon={<DownloadIcon />}
             label="Exportera data"
