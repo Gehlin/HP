@@ -67,4 +67,5 @@ With the structural overhaul complete, this phase sweeps through the remaining r
     - Re-grepped all of `src/pages/*.tsx` for `pb-28` and `pt-12` after the fixes — zero matches remain.
     - `npx tsc --noEmit` passes with zero errors.
 
-- [ ] Run `npm run build` for a final clean build. Confirm zero TypeScript errors and zero ESLint errors if a lint script exists.
+- [x] Run `npm run build` for a final clean build. Confirm zero TypeScript errors and zero ESLint errors if a lint script exists.
+  - **Done:** Ran `npm run build` (`tsc && vite build`) — completed with exit code 0, zero TypeScript errors. Confirmed `package.json` has no `lint` script configured, so there was no ESLint gate to satisfy. Vite/PWA build emitted all expected chunks and precache assets; the only output was an informational (non-error) warning that one vendor chunk (`index-CVHdEGm-.js`, 1.6MB) exceeds the 500kB chunk-size suggestion — pre-existing and out of scope for this navigation/UX playbook.
