@@ -14,7 +14,7 @@ Two problems make the app feel broken for new users: the Home page shows a score
   ```
   **Done:** Updated `src/pages/Settings.tsx:289` to use `window.location.href = '/'` instead of `navigate('/')`. Verified with `tsc --noEmit` that no type errors were introduced; `navigate` is still used elsewhere in the file so no unused-import issue.
 
-- [ ] Add a first-use empty state to `src/pages/Home.tsx`. Load `loadHistory()` in the existing `useEffect` (it's already called there). Derive `const hasHistory = history.length > 0`. Conditionally render a welcome card ABOVE the hero score card when `!hasHistory`:
+- [x] Add a first-use empty state to `src/pages/Home.tsx`. Load `loadHistory()` in the existing `useEffect` (it's already called there). Derive `const hasHistory = history.length > 0`. Conditionally render a welcome card ABOVE the hero score card when `!hasHistory`:
   ```tsx
   {!hasHistory && (
     <div className="card p-5 mb-4 border-l-4 border-l-[var(--color-green)]">
@@ -29,6 +29,7 @@ Two problems make the app feel broken for new users: the Home page shows a score
   )}
   ```
   Store `hasHistory` in state (derive from the history loaded in `useEffect`) and initialize to `false` so the welcome card shows on first render.
+  **Done:** Added `hasHistory` state (initialized `false`) to `src/pages/Home.tsx`, set it from `history.length > 0` inside the existing `useEffect`, and rendered the welcome card directly above the hero score card. Verified with `npx tsc --noEmit` — no type errors.
 
 - [ ] Add an empty state to `src/pages/Progress.tsx`. Read the file to find where the history/stats data is loaded. Add a check: if `history.length === 0`, render a full-page empty state instead of the charts:
   - A simple centered layout with an icon (e.g. chart bars SVG), heading "Inga träningspass än", body "Gör ditt första pass för att se statistik här.", and a button "Starta träning →" that navigates to `/practice`

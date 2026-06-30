@@ -43,6 +43,7 @@ export default function Home() {
   const [readiness, setReadiness] = useState<ReturnType<typeof computeReadiness> | null>(null)
   const [totalCorrect, setTotalCorrect] = useState(0)
   const [typeAccuracy, setTypeAccuracy] = useState<Record<string, { correct: number; total: number }>>({})
+  const [hasHistory, setHasHistory] = useState(false)
 
   useEffect(() => {
     setStats(loadStats())
@@ -54,6 +55,7 @@ export default function Home() {
     setReadiness(computeReadiness())
 
     const history = loadHistory()
+    setHasHistory(history.length > 0)
     const fullTypeAcc: Record<string, { correct: number; total: number }> = {
       XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
       NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
@@ -106,6 +108,19 @@ export default function Home() {
         >
           Starta träning →
         </button>
+
+        {/* ── Welcome / first-use empty state ──────────────── */}
+        {!hasHistory && (
+          <div className="card p-5 mb-4 border-l-4 border-l-[var(--color-green)]">
+            <div className="text-sm font-bold text-[var(--color-ink)] mb-1">Välkommen! Kom igång nu.</div>
+            <p className="text-xs text-[var(--color-ink-faint)] mb-3 leading-relaxed">
+              Du har inte tränat än. Starta ett pass för att se dina framsteg här.
+            </p>
+            <button onClick={() => navigate('/practice')} className="btn-primary text-sm py-2 px-4">
+              Starta ditt första pass →
+            </button>
+          </div>
+        )}
 
         {/* ── Hero score card ───────────────────────────────── */}
         <div className="card-green p-6 mb-4">
