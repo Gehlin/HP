@@ -30,7 +30,7 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
               )}
             </div>
             {i >= revealed && (
-              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-[#2563EB] border border-[rgba(37,99,235,0.30)] rounded-lg px-2 py-1 hover:bg-[rgba(37,99,235,0.08)] transition-colors">Visa</button>
+              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-[var(--color-green-light)] border border-[var(--color-green-muted)] rounded-lg px-2 py-1 hover:bg-[var(--color-green-muted)] transition-colors">Visa</button>
             )}
           </div>
         </div>
@@ -57,26 +57,26 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 const TYPE_COLOR: Record<string, string> = {
-  XYZ: 'text-[#7C3AED]',
-  KVA: 'text-[#2563EB]',
+  XYZ: 'text-[var(--color-terracotta)]',
+  KVA: 'text-[var(--color-terracotta)]',
   NOG: 'text-[var(--color-green)]',
-  DTK: 'text-[#D97706]',
-  ORD: 'text-[#DC2626]',
-  LAS: 'text-[#DB2777]',
-  MEK: 'text-[#9333EA]',
-  ELF: 'text-[#7C3AED]',
+  DTK: 'text-[var(--color-gold-deep)]',
+  ORD: 'text-[var(--color-green)]',
+  LAS: 'text-[var(--color-green)]',
+  MEK: 'text-[var(--color-green)]',
+  ELF: 'text-[var(--color-green)]',
 }
 
 const TAB_UNDERLINE: Record<Tab, string> = {
-  overview: 'bg-[#2563EB]',
-  XYZ: 'bg-[#7C3AED]',
-  KVA: 'bg-[#2563EB]',
+  overview: 'bg-[var(--color-green)]',
+  XYZ: 'bg-[var(--color-terracotta)]',
+  KVA: 'bg-[var(--color-terracotta)]',
   NOG: 'bg-[var(--color-green)]',
-  DTK: 'bg-[#D97706]',
-  ORD: 'bg-[#DC2626]',
-  LAS: 'bg-[#DB2777]',
-  MEK: 'bg-[#9333EA]',
-  ELF: 'bg-[#7C3AED]',
+  DTK: 'bg-[var(--color-gold-deep)]',
+  ORD: 'bg-[var(--color-green)]',
+  LAS: 'bg-[var(--color-green)]',
+  MEK: 'bg-[var(--color-green)]',
+  ELF: 'bg-[var(--color-green)]',
 }
 
 
@@ -86,7 +86,7 @@ function MathGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate
       onClick={() => navigate('/matematik')}
       className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-6"
     >
-      <span className="w-2 h-2 rounded-full bg-[#7C3AED] shrink-0" />
+      <span className="w-2 h-2 rounded-full bg-[var(--color-terracotta)] shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--color-ink)]">Matematikguide</div>
         <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Formler, teori & begrepp — 10 ämnesområden</div>
@@ -102,7 +102,7 @@ function OrdGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
       onClick={() => navigate('/ord-guide')}
       className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
     >
-      <span className="w-2 h-2 rounded-full bg-[#DC2626] shrink-0" />
+      <span className="w-2 h-2 rounded-full bg-[var(--color-green)] shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--color-ink)]">ORD-guide</div>
         <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Prefix, suffix och strategier för okända ord</div>
@@ -118,7 +118,7 @@ function MekGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
       onClick={() => navigate('/mek-guide')}
       className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
     >
-      <span className="w-2 h-2 rounded-full bg-[#9333EA] shrink-0" />
+      <span className="w-2 h-2 rounded-full bg-[var(--color-green)] shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--color-ink)]">MEK-guide</div>
         <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">10 konjunktionstyper, signalord och övningar</div>
@@ -134,7 +134,7 @@ function LasGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
       onClick={() => navigate('/las-guide')}
       className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
     >
-      <span className="w-2 h-2 rounded-full bg-[#DB2777] shrink-0" />
+      <span className="w-2 h-2 rounded-full bg-[var(--color-green)] shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--color-ink)]">LÄS-guide</div>
         <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Texttyper, frågekategorier och läsordningsstrategi</div>
@@ -150,7 +150,7 @@ function ElfGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
       onClick={() => navigate('/elf-guide')}
       className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
     >
-      <span className="w-2 h-2 rounded-full bg-[#7C3AED] shrink-0" />
+      <span className="w-2 h-2 rounded-full bg-[var(--color-green)] shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--color-ink)]">ELF-guide</div>
         <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">False friends, akademisk engelska och textstruktur</div>
@@ -166,7 +166,7 @@ function LiggandeStolenBanner({ navigate }: { navigate: ReturnType<typeof useNav
       onClick={() => navigate('/liggande-stolen')}
       className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-3"
     >
-      <span className="w-2 h-2 rounded-full bg-[#2563EB] shrink-0" />
+      <span className="w-2 h-2 rounded-full bg-[var(--color-terracotta)] shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--color-ink)]">Liggande stolen</div>
         <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Multiplikation, division och estimering för hand</div>
@@ -330,8 +330,8 @@ function KVASection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         </div>
       </div>
 
-      <div className="bg-[rgba(217,119,6,0.08)] border border-[rgba(217,119,6,0.20)] rounded-xl p-4">
-        <div className="text-[10px] font-bold text-[#D97706] uppercase tracking-widest mb-1.5">Vanlig fälla</div>
+      <div className="bg-[var(--color-gold-muted)] border border-[rgba(228,198,106,0.30)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[var(--color-gold-deep)] uppercase tracking-widest mb-1.5">Vanlig fälla</div>
         <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
           Om x² = 4 kan x vara 2 <strong>eller</strong> −2. Testa alltid båda. Detsamma gäller alla jämnpotensuations — glöm inte den negativa roten.
         </p>
@@ -339,7 +339,7 @@ function KVASection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
 
       {/* Interactive worked example */}
       <div className="card rounded-2xl p-5">
-        <div className="text-[10px] font-bold text-[#2563EB] uppercase tracking-widest mb-3">Interaktivt exempel — testa extremvärden</div>
+        <div className="text-[10px] font-bold text-[var(--color-terracotta)] uppercase tracking-widest mb-3">Interaktivt exempel — testa extremvärden</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-sm">
           <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Kvantitativa jämförelser</div>
           <div className="grid grid-cols-2 gap-4 text-center mb-2">
@@ -507,8 +507,8 @@ function DTKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         </div>
       </div>
 
-      <div className="bg-[rgba(37,99,235,0.08)] border border-[rgba(37,99,235,0.15)] rounded-xl p-4">
-        <div className="text-[10px] font-bold text-[#2563EB] uppercase tracking-widest mb-1.5">HP-insikt</div>
+      <div className="bg-[var(--color-gold-muted)] border border-[rgba(228,198,106,0.25)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[var(--color-gold-deep)] uppercase tracking-widest mb-1.5">HP-insikt</div>
         <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
           DTK-frågor letar efter om du kan läsa och beräkna från data — inte om du kan avancerad matematik.
           De flesta fel beror på att man läser diagrammet fel, inte att man räknar fel.
@@ -517,13 +517,13 @@ function DTKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
 
       {/* Interactive worked example */}
       <div className="card rounded-2xl p-5">
-        <div className="text-[10px] font-bold text-[#D97706] uppercase tracking-widest mb-3">Interaktivt exempel — läs diagrammet rätt</div>
+        <div className="text-[10px] font-bold text-[var(--color-gold-deep)] uppercase tracking-widest mb-3">Interaktivt exempel — läs diagrammet rätt</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
           <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Diagram — Försäljning (tusental enheter)</div>
           <div className="flex items-end gap-2 h-20 mb-1">
             {[{ y: 2020, v: 100 }, { y: 2021, v: 145 }, { y: 2022, v: 90 }, { y: 2023, v: 120 }].map(bar => (
               <div key={bar.y} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full bg-[rgba(217,119,6,0.60)] rounded-t" style={{ height: `${(bar.v / 145) * 72}px` }} />
+                <div className="w-full bg-[rgba(201,162,74,0.60)] rounded-t" style={{ height: `${(bar.v / 145) * 72}px` }} />
                 <div className="text-[9px] text-[var(--color-ink-faint)]">{bar.y}</div>
               </div>
             ))}
@@ -546,7 +546,7 @@ function ORDSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold text-[#DC2626] uppercase tracking-widest mb-1">ORD — Ordförståelse · 10 frågor · ~45 s/fråga · svar A–E</div>
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1">ORD — Ordförståelse · 10 frågor · ~45 s/fråga · svar A–E</div>
         <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Ett ord eller uttryck ges — du väljer det alternativ som bäst har samma innebörd. Testet mäter om du kan förstå ords nyanser och synonymer.
         </p>
@@ -579,8 +579,8 @@ function ORDSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
           ))}
         </div>
       </div>
-      <div className="bg-[rgba(220,38,38,0.08)] border border-[rgba(220,38,38,0.15)] rounded-xl p-4">
-        <div className="text-[10px] font-bold text-[#DC2626] uppercase tracking-widest mb-1.5">Vanliga kategorier</div>
+      <div className="bg-[var(--color-green-muted)] border border-[var(--color-card-border)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1.5">Vanliga kategorier</div>
         <div className="grid grid-cols-2 gap-1.5">
           {['Akademiska termer', 'Abstrakta begrepp', 'Litterärt/ålderdomligt språk', 'Fackspråk (juridik, medicin)', 'Idiom & fraser', 'Latinska ord'].map(cat => (
             <div key={cat} className="text-xs text-[var(--color-ink-muted)] bg-[var(--color-paper-dark)] rounded-lg px-3 py-2">{cat}</div>
@@ -596,7 +596,7 @@ function LASSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold text-[#DB2777] uppercase tracking-widest mb-1">LÄS — Läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1">LÄS — Läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
         <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Tre texter (200–500 ord var) följs av 4–6 frågor vardera om textens innehåll, slutsatser och ords innebörd i sammanhang.
         </p>
@@ -621,14 +621,14 @@ function LASSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
           ))}
         </div>
       </div>
-      <div className="bg-[rgba(219,39,119,0.08)] border border-[rgba(219,39,119,0.15)] rounded-xl p-4">
-        <div className="text-[10px] font-bold text-[#DB2777] uppercase tracking-widest mb-1.5">HP-insikt</div>
+      <div className="bg-[var(--color-green-muted)] border border-[var(--color-card-border)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1.5">HP-insikt</div>
         <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
           LÄS är den sektion där läsordning spelar störst roll. Om texten är lång och tät — läs de 5 frågorna på 30 sekunder, markera nyckelord, läs sedan texten. Kom tillbaka till frågorna och hitta textbevis.
         </p>
       </div>
       <div className="card rounded-2xl p-5">
-        <div className="text-[10px] font-bold text-[#DB2777] uppercase tracking-widest mb-3">Interaktivt exempel — hitta textbevis</div>
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Interaktivt exempel — hitta textbevis</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink)] leading-relaxed">
           <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (utdrag)</div>
           <p>Urbaniseringen i Sverige har accelererat under de senaste decennierna. Allt fler väljer att bosätta sig i storstadsregioner, medan landsbygdens befolkning minskar. Forskare pekar på att denna rörelse drivs av tillgång till arbetsmarknaden och utbildning — inte av en vilja att lämna landsbygden.</p>
@@ -650,7 +650,7 @@ function MEKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold text-[#9333EA] uppercase tracking-widest mb-1">MEK — Meningskomplettering · 10 frågor · ~50 s/fråga · svar A–D</div>
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1">MEK — Meningskomplettering · 10 frågor · ~50 s/fråga · svar A–D</div>
         <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           En mening med ett eller två luckor ges. Du väljer det ord eller den fras som bäst kompletterar meningen semantiskt och grammatiskt.
         </p>
@@ -699,7 +699,7 @@ function ELFSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-[10px] font-bold text-[#7C3AED] uppercase tracking-widest mb-1">ELF — Engelsk läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1">ELF — Engelsk läsförståelse · 16 frågor · ~120 s/fråga · svar A–D</div>
         <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
           Identisk struktur som LÄS, men texten är på engelska. Frågorna och svarsalternativen är på svenska. Testas din förmåga att förstå akademisk engelska.
         </p>
@@ -723,8 +723,8 @@ function ELFSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
           ))}
         </div>
       </div>
-      <div className="bg-[rgba(124,58,237,0.08)] border border-[rgba(124,58,237,0.20)] rounded-xl p-4">
-        <div className="text-[10px] font-bold text-[#7C3AED] uppercase tracking-widest mb-1.5">False friends — vanliga misstag</div>
+      <div className="bg-[var(--color-green-muted)] border border-[var(--color-card-border)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1.5">False friends — vanliga misstag</div>
         <div className="space-y-1.5">
           {[
             ['Eventually', 'Till slut', 'Eventuellt (wrong!)'],
@@ -733,7 +733,7 @@ function ELFSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
             ['Sympathetic', 'Förstående/medkännande', 'Sympatisk (wrong!)'],
           ].map(([eng, right, wrong]) => (
             <div key={eng} className="grid grid-cols-3 gap-2 text-xs">
-              <span className="font-bold text-[#7C3AED]">{eng}</span>
+              <span className="font-bold text-[var(--color-green)]">{eng}</span>
               <span className="text-[var(--color-green-light)]">✓ {right}</span>
               <span className="text-[var(--color-error)]">✗ {wrong}</span>
             </div>
