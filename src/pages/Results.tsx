@@ -246,28 +246,25 @@ export default function Results() {
 
         <p className="text-xs uppercase tracking-[0.15em] text-white/60 font-[var(--font-sans)] mb-4">Resultat</p>
 
-        <svg width="120" height="120" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="52" stroke="rgba(255,255,255,0.15)" strokeWidth="8" fill="none" />
-          <circle
-            cx="60" cy="60" r="52"
-            stroke="white" strokeWidth="8" fill="none"
-            strokeLinecap="round"
-            strokeDasharray="326.73"
-            strokeDashoffset={326.73 * (1 - pct / 100)}
-            transform="rotate(-90 60 60)"
-          />
-          <text
-            x="60" y="60"
-            textAnchor="middle"
-            dominantBaseline="central"
-            fill="white"
-            fontSize="22"
-            fontFamily="var(--font-serif)"
-            fontWeight="bold"
+        <div
+          style={{
+            width: 120, height: 120, borderRadius: '50%',
+            background: `conic-gradient(var(--color-gold) ${pct}%, rgba(255,255,255,0.15) 0)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: 88, height: 88, borderRadius: '50%',
+              background: 'var(--color-green)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              font: '700 22px var(--font-serif)',
+              color: 'white',
+            }}
           >
             {pct}%
-          </text>
-        </svg>
+          </div>
+        </div>
 
         <div className="text-4xl font-[var(--font-serif)] text-white mt-4">{pct}%</div>
         <div className="text-base text-white/70">{correct} av {total} rätt</div>
@@ -275,7 +272,7 @@ export default function Results() {
 
       {/* ── Three-stat strip ─────────────────────── */}
       <div className="bg-[var(--color-green-light)] px-4 py-4">
-        <div className="grid grid-cols-3 divide-x divide-white/20 max-w-2xl mx-auto">
+        <div className="grid grid-cols-3 divide-x divide-[rgba(255,255,255,0.12)] max-w-2xl mx-auto">
           <div className="flex flex-col items-center py-1">
             <span className="text-xs text-white/60">Rätt svar</span>
             <span className="text-lg font-semibold text-white">{correct}</span>
@@ -303,7 +300,15 @@ export default function Results() {
 
         {/* ── Streak achievement card ──────────────── */}
         {xpInfo?.streakIncreased && (
-          <div className="card p-4 mb-4" style={{ borderLeft: '4px solid var(--color-terracotta)' }}>
+          <div
+            className="mb-4"
+            style={{
+              background: 'var(--color-green-muted)',
+              border: '1px solid rgba(34, 74, 58, 0.12)',
+              borderRadius: 18,
+              padding: '16px 18px',
+            }}
+          >
             <div className="flex items-center gap-3">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-[var(--color-terracotta)] shrink-0">
                 <path d="M12 23c-4.97 0-9-3.58-9-8 0-2.39 1.05-4.55 2.86-6.12C7.1 7.77 8 6.15 8 4.25c0-.41.34-.75.75-.75.19 0 .37.07.5.2C10.68 5.16 11.5 6.77 11.5 8.5c0 .69-.14 1.35-.39 1.94C11.85 10.17 12.5 9.33 12.5 8c0-.32.2-.61.5-.72.29-.11.62-.03.84.2C15.23 9.18 16.5 11.09 16.5 13c0 .78-.16 1.52-.43 2.2.75-.62 1.2-1.48 1.3-2.4.04-.36.27-.67.61-.79.33-.12.7-.03.93.23C20.22 13.96 21 15.9 21 17.5c0 3.03-4.03 5.5-9 5.5z"/>
