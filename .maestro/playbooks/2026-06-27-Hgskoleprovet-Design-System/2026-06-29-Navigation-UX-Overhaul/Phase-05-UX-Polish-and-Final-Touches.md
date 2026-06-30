@@ -42,10 +42,15 @@ With the structural overhaul complete, this phase sweeps through the remaining r
     - Both "Starta träning →" buttons (top CTA `src/pages/Practice.tsx:358` and bottom CTA `src/pages/Practice.tsx:637`) already use `py-4` — confirmed tappable, no change needed.
     - `npx tsc --noEmit` passes with zero errors.
 
-- [ ] Audit `src/pages/Progress.tsx` and `src/pages/Profil.tsx` for padding consistency:
+- [x] Audit `src/pages/Progress.tsx` and `src/pages/Profil.tsx` for padding consistency:
   - Both should use `pt-topnav` on their outermost wrapper (added in Phase 01, but verify)
   - Content should not feel cramped at the top — add `pt-4` inside the topnav-offset wrapper if needed
   - Confirm `pb-8` is sufficient (no more `pb-28` bottom padding for the old bottom nav)
+  - **Done:** Audited both files:
+    - `Progress.tsx` — outer wrapper has `pt-topnav` on both the empty-state branch (`src/pages/Progress.tsx:72`) and the main return (`src/pages/Progress.tsx:267`); both also already carry `pb-8`. Header (`Statistik`, `src/pages/Progress.tsx:269`) sits directly under the topnav offset with no extra cramping — consistent with the `pt-topnav`-alone pattern already confirmed for `Practice.tsx` in the prior task, so no `pt-4` was added.
+    - `Profil.tsx` — outer wrapper (`src/pages/Profil.tsx:365`) has `pt-topnav pb-8`. Header (`Profil`, `src/pages/Profil.tsx:368`) follows the same pattern, no cramping observed.
+    - Grepped both files for `pb-28` / `pt-12` — zero matches in either, confirming no stale bottom-nav or safe-area offsets remain.
+    - `npx tsc --noEmit` passes with zero errors. No code changes were necessary.
 
 - [ ] Improve the Settings page navigation in `src/pages/Settings.tsx`:
   - The current "← Tillbaka" button at the top uses `navigate('/')` hardcoded to home. Change to `navigate(-1)` so it goes back to wherever the user came from (likely Profil tab)
