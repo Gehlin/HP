@@ -42,16 +42,8 @@ const TYPE_COLORS: Record<QuestionType, { text: string; bar: string }> = {
   ELF: { text: 'text-purple-400',  bar: 'bg-purple-500'  },
 }
 
-const WARM_TYPE_HEX: Record<QuestionType, { color: string; bg: string }> = {
-  XYZ: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
-  KVA: { color: '#2563EB', bg: 'rgba(37,99,235,0.08)'  },
-  NOG: { color: '#224A3A', bg: 'rgba(34,74,58,0.08)'   },
-  DTK: { color: '#D97706', bg: 'rgba(217,119,6,0.08)'  },
-  ORD: { color: '#DC2626', bg: 'rgba(220,38,38,0.08)'  },
-  LAS: { color: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
-  MEK: { color: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
-  ELF: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
-}
+// Verbal sections (ORD/LÄS/MEK/ELF) vs quant sections (XYZ/KVA/NOG/DTK) per DESIGN-SYSTEM-06.md
+const VERBAL_TYPES: QuestionType[] = ['ORD', 'LAS', 'MEK', 'ELF']
 
 export default function Progress() {
   const navigate = useNavigate()
@@ -303,7 +295,7 @@ export default function Progress() {
       {/* Weekly activity bar chart */}
       <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
         <div className="text-sm font-semibold text-[var(--color-ink)] mb-3">Aktivitet</div>
-        <div className="flex items-end justify-between gap-1 h-16">
+        <div className="flex items-end justify-between gap-1 h-[60px]">
           {sevenDayActivity.map(({ dayLabel, count, barHeightPx }) => (
             <div key={dayLabel} className="flex flex-col items-center gap-1 flex-1">
               {count > 0 ? (
@@ -312,9 +304,9 @@ export default function Progress() {
                   style={{ height: `${barHeightPx}px` }}
                 />
               ) : (
-                <div className="w-full h-2 rounded-t-md bg-[var(--color-paper-darker)]" />
+                <div className="w-full h-2 rounded-t-md bg-[var(--color-track)]" />
               )}
-              <span className="text-[10px] text-[var(--color-ink-faint)]">{dayLabel}</span>
+              <span className="text-[10px] text-[var(--color-muted)]">{dayLabel}</span>
             </div>
           ))}
         </div>
@@ -323,24 +315,26 @@ export default function Progress() {
       {/* Per-section accuracy bars */}
       <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
         <div className="text-sm font-semibold text-[var(--color-ink)] mb-3">Per delprovstyp</div>
-        {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][]).map(([type, v]) => {
-          const pct = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0
-          const tc = WARM_TYPE_HEX[type]
-          return (
-            <div key={type} className="flex items-center gap-3 mb-2">
-              <span className="text-xs font-semibold text-[var(--color-ink)] w-8">{type}</span>
-              <div className="flex-1 h-2 rounded-full bg-[var(--color-paper-dark)]">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${pct}%`, backgroundColor: tc.color }}
-                />
+        {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
+          .map(([type, v]) => ({ type, v, pct: v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0 }))
+          .sort((a, b) => b.pct - a.pct)
+          .map(({ type, v, pct }) => {
+            const fillColor = VERBAL_TYPES.includes(type) ? 'var(--color-green)' : 'var(--color-terracotta)'
+            return (
+              <div key={type} className="flex items-center gap-3 mb-2">
+                <span className="text-xs font-bold text-[var(--color-ink)] w-[30px]">{type}</span>
+                <div className="progress-bar-track flex-1">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${pct}%`, backgroundColor: fillColor }}
+                  />
+                </div>
+                <span className="text-xs font-semibold text-[var(--color-ink)] w-[35px] text-right">
+                  {v.total > 0 ? `${pct}%` : '—'}
+                </span>
               </div>
-              <span className="text-xs text-[var(--color-ink-faint)] w-8 text-right">
-                {v.total > 0 ? `${pct}%` : '—'}
-              </span>
-            </div>
-          )
-        })}
+            )
+          })}
       </div>
 
       {/* HP Score card */}
@@ -713,7 +707,7 @@ export default function Progress() {
             <div className="grid grid-cols-2 gap-3 mb-6">
               {/* Rolling HP score + sparkline */}
               <div className="card rounded-2xl p-5">
-                <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-wider mb-3">HP-poäng (trend)</div>
+                <div className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-[0.16em] mb-3">HP-poäng (trend)</div>
                 {rollingHp !== null ? (
                   <>
                     <div className="flex items-baseline gap-2 mb-1">
@@ -728,7 +722,7 @@ export default function Progress() {
                     {hpHistory.length >= 2 && (
                       <Sparkline values={hpHistory} color={`${hpScoreColor(rollingHp)}`} height={32} />
                     )}
-                    <div className="mt-2 h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
+                    <div className="mt-2 h-1.5 bg-[var(--color-track)] rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${rollingHp >= 1.80 ? 'bg-emerald-500' : rollingHp >= 1.50 ? 'bg-[var(--color-green)]' : rollingHp >= 1.25 ? 'bg-amber-500' : 'bg-red-500'}`}
                         style={{ width: `${((rollingHp - 1) / 1) * 100}%` }}
