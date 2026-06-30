@@ -122,9 +122,9 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-white pb-24">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pb-24">
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <button onClick={() => navigate('/')} className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 text-sm mb-6 transition-colors">
+        <button onClick={() => navigate('/')} className="flex items-center gap-1.5 text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] text-sm mb-6 transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           Tillbaka
         </button>
@@ -137,55 +137,55 @@ export default function Settings() {
         )}
 
         {/* Stats summary */}
-        <div className="glass rounded-2xl p-6 mb-6">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Din data</div>
+        <div className="card rounded-2xl p-6 mb-6">
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Din data</div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div className="text-center">
-              <div className="text-2xl font-black text-blue-400">{stats.xp}</div>
-              <div className="text-xs text-slate-400 mt-1">XP</div>
+              <div className="text-2xl font-black text-blue-600">{stats.xp}</div>
+              <div className="text-xs text-[var(--color-ink-muted)] mt-1">XP</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-black text-orange-400">{stats.streak}</div>
-              <div className="text-xs text-slate-400 mt-1">Dagars streak</div>
+              <div className="text-2xl font-black text-orange-600">{stats.streak}</div>
+              <div className="text-xs text-[var(--color-ink-muted)] mt-1">Dagars streak</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-black text-white">{history.length}</div>
-              <div className="text-xs text-slate-400 mt-1">Träningspass</div>
+              <div className="text-2xl font-black text-[var(--color-ink)]">{history.length}</div>
+              <div className="text-xs text-[var(--color-ink-muted)] mt-1">Träningspass</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-black text-amber-400">{earned.length}</div>
-              <div className="text-xs text-slate-400 mt-1">Brickor</div>
+              <div className="text-2xl font-black text-amber-600">{earned.length}</div>
+              <div className="text-xs text-[var(--color-ink-muted)] mt-1">Brickor</div>
             </div>
           </div>
         </div>
 
         {/* Backup & restore */}
         <div className="mb-8">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Säkerhetskopiering</div>
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Säkerhetskopiering</div>
           <div className="space-y-3">
             <button
               onClick={exportData}
-              className="w-full text-left glass hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.12] rounded-xl px-5 py-4 transition-colors"
+              className="w-full text-left card hover:bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-5 py-4 transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-slate-200">Exportera data</div>
-                  <div className="text-xs text-slate-500 mt-1">Laddar ner en JSON-fil med all din data</div>
+                  <div className="font-semibold text-[var(--color-ink)]">Exportera data</div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-1">Laddar ner en JSON-fil med all din data</div>
                 </div>
-                <span className="text-slate-400 text-lg shrink-0">⬇</span>
+                <span className="text-[var(--color-ink-muted)] text-lg shrink-0">⬇</span>
               </div>
             </button>
 
             <button
               onClick={() => fileRef.current?.click()}
-              className="w-full text-left glass hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.12] rounded-xl px-5 py-4 transition-colors"
+              className="w-full text-left card hover:bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-5 py-4 transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-slate-200">Importera data</div>
-                  <div className="text-xs text-slate-500 mt-1">Återställ från en tidigare exporterad fil</div>
+                  <div className="font-semibold text-[var(--color-ink)]">Importera data</div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-1">Återställ från en tidigare exporterad fil</div>
                 </div>
-                <span className="text-slate-400 text-lg shrink-0">⬆</span>
+                <span className="text-[var(--color-ink-muted)] text-lg shrink-0">⬆</span>
               </div>
             </button>
             <input
@@ -201,21 +201,21 @@ export default function Settings() {
         {/* Notifications */}
         {notificationsSupported() && (
           <div className="mb-8">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Notiser</div>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Notiser</div>
             <button
               onClick={toggleNotifications}
-              className="w-full text-left glass hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.12] rounded-xl px-5 py-4 transition-colors"
+              className="w-full text-left card hover:bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-5 py-4 transition-colors"
             >
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <div className="font-semibold text-slate-200">Påminnelser om repetition</div>
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className="font-semibold text-[var(--color-ink)]">Påminnelser om repetition</div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-1">
                     {Notification.permission === 'denied'
                       ? 'Blockerade av webbläsaren — ändra i webbläsarinställningarna'
                       : 'Visa en systemnotis när du har frågor att repetera'}
                   </div>
                 </div>
-                <div className={`w-10 h-6 rounded-full transition-colors flex items-center shrink-0 ${notifOn ? 'bg-blue-600' : 'bg-white/[0.15]'} ${Notification.permission === 'denied' ? 'opacity-40' : ''}`}>
+                <div className={`w-10 h-6 rounded-full transition-colors flex items-center shrink-0 ${notifOn ? 'bg-blue-600' : 'bg-[var(--color-paper-dark)]'} ${Notification.permission === 'denied' ? 'opacity-40' : ''}`}>
                   <div className={`w-4 h-4 rounded-full bg-white mx-1 transition-transform ${notifOn ? 'translate-x-4' : 'translate-x-0'}`} />
                 </div>
               </div>
@@ -225,7 +225,7 @@ export default function Settings() {
 
         {/* Reset options */}
         <div className="space-y-3 mb-8">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Rensa data</div>
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Rensa data</div>
 
           <ResetRow
             label="Nollställ SRS-framsteg"
@@ -259,22 +259,22 @@ export default function Settings() {
 
         {/* Focus preference */}
         <div className="mb-8">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Träningsfokus</div>
-          <div className="glass rounded-xl p-4 border border-white/[0.06]">
-            <div className="text-sm font-semibold text-slate-200 mb-1">Vad vill du fokusera på?</div>
-            <div className="text-xs text-slate-500 mb-3">Styr startsidan och rekommendationer</div>
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Träningsfokus</div>
+          <div className="card rounded-xl p-4 border border-[var(--color-card-border)]">
+            <div className="text-sm font-semibold text-[var(--color-ink)] mb-1">Vad vill du fokusera på?</div>
+            <div className="text-xs text-[var(--color-ink-faint)] mb-3">Styr startsidan och rekommendationer</div>
             <div className="grid grid-cols-3 gap-2">
               {([
-                { value: 'quant' as FocusPreference, label: 'Kvantitativt', sub: 'XYZ·KVA·NOG·DTK', color: 'border-blue-500/50 bg-blue-500/10 text-blue-300' },
-                { value: 'verbal' as FocusPreference, label: 'Verbalt', sub: 'ORD·LÄS·MEK·ELF', color: 'border-rose-500/50 bg-rose-500/10 text-rose-300' },
-                { value: 'both' as FocusPreference, label: 'Hela provet', sub: 'Alla 8 delproven', color: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300' },
+                { value: 'quant' as FocusPreference, label: 'Kvantitativt', sub: 'XYZ·KVA·NOG·DTK', color: 'border-blue-400 bg-blue-50 text-blue-700' },
+                { value: 'verbal' as FocusPreference, label: 'Verbalt', sub: 'ORD·LÄS·MEK·ELF', color: 'border-rose-400 bg-rose-50 text-rose-700' },
+                { value: 'both' as FocusPreference, label: 'Hela provet', sub: 'Alla 8 delproven', color: 'border-emerald-400 bg-emerald-50 text-emerald-700' },
               ] as const).map(opt => (
                 <button
                   key={opt.value}
                   onClick={() => { setFocusPreference(opt.value); setFocus(opt.value); flash('Fokus uppdaterat') }}
-                  className={`rounded-xl px-2 py-3 text-center border transition-all ${focus === opt.value ? opt.color : 'border-white/[0.07] bg-white/[0.02] text-slate-500 hover:text-slate-300 hover:bg-white/[0.05]'}`}
+                  className={`rounded-xl px-2 py-3 text-center border transition-all ${focus === opt.value ? opt.color : 'border-[var(--color-card-border)] bg-[var(--color-paper)] text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-dark)]'}`}
                 >
-                  <div className={`text-xs font-black ${focus === opt.value ? '' : 'text-slate-400'}`}>{opt.label}</div>
+                  <div className={`text-xs font-black ${focus === opt.value ? '' : 'text-[var(--color-ink-muted)]'}`}>{opt.label}</div>
                   <div className="text-[9px] mt-0.5 opacity-70">{opt.sub}</div>
                 </button>
               ))}
@@ -284,20 +284,20 @@ export default function Settings() {
 
         {/* Misc */}
         <div className="mb-8">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Övrigt</div>
+          <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Övrigt</div>
           <button
-            onClick={() => { localStorage.removeItem(KEYS.onboarding); navigate('/') }}
-            className="w-full text-left glass hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.12] rounded-xl px-5 py-4 transition-colors"
+            onClick={() => { localStorage.removeItem(KEYS.onboarding); window.location.href = '/' }}
+            className="w-full text-left card hover:bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-5 py-4 transition-colors"
           >
-            <div className="font-semibold text-slate-200">Visa introduktion igen</div>
-            <div className="text-xs text-slate-500 mt-1">Starta om välkomstguiden</div>
+            <div className="font-semibold text-[var(--color-ink)]">Visa introduktion igen</div>
+            <div className="text-xs text-[var(--color-ink-faint)] mt-1">Starta om välkomstguiden</div>
           </button>
         </div>
 
         {/* Nuclear reset */}
-        <div className="border border-red-900/50 rounded-2xl p-5 bg-red-900/10">
-          <div className="text-xs font-bold text-red-400 uppercase tracking-widest mb-1">Farlig zon</div>
-          <p className="text-sm text-slate-400 mb-4">Tar bort all data permanent — XP, historik, SRS, bokmärken och brickor.</p>
+        <div className="border border-red-200 rounded-2xl p-5 bg-red-50">
+          <div className="text-xs font-bold text-red-600 uppercase tracking-widest mb-1">Farlig zon</div>
+          <p className="text-sm text-[var(--color-ink-muted)] mb-4">Tar bort all data permanent — XP, historik, SRS, bokmärken och brickor.</p>
           <button
             onClick={() => confirm('all', resetAll)}
             className={`w-full rounded-xl py-3 font-bold text-sm transition-colors ${
@@ -311,8 +311,8 @@ export default function Settings() {
         </div>
 
         <div className="mt-8 text-center space-y-1">
-          <p className="text-xs text-slate-600">HP Träning — Kvantitativt &amp; Verbalt</p>
-          <p className="text-xs text-slate-600">{questions.length} frågor · Verkliga HP-prov 2025–2026</p>
+          <p className="text-xs text-[var(--color-ink-faint)]">HP Träning — Kvantitativt &amp; Verbalt</p>
+          <p className="text-xs text-[var(--color-ink-faint)]">{questions.length} frågor · Verkliga HP-prov 2025–2026</p>
         </div>
       </div>
     </div>
@@ -327,17 +327,17 @@ function ResetRow({ label, description, badge, isConfirming, onPress }: {
       onClick={onPress}
       className={`w-full text-left rounded-xl px-5 py-4 border transition-colors ${
         isConfirming
-          ? 'border-amber-500 bg-amber-900/20'
-          : 'border-white/[0.06] glass hover:bg-white/[0.06] hover:border-white/[0.12]'
+          ? 'border-amber-500 bg-amber-50'
+          : 'border-[var(--color-card-border)] card hover:bg-[var(--color-paper-dark)]'
       }`}
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="font-semibold text-slate-200">{label}</div>
-        <span className={`text-xs shrink-0 px-2 py-0.5 rounded-lg font-medium ${isConfirming ? 'text-amber-300 bg-amber-900/40' : 'text-slate-500 bg-white/[0.05]'}`}>
+        <div className="font-semibold text-[var(--color-ink)]">{label}</div>
+        <span className={`text-xs shrink-0 px-2 py-0.5 rounded-lg font-medium ${isConfirming ? 'text-amber-700 bg-amber-100' : 'text-[var(--color-ink-faint)] bg-[var(--color-paper-dark)]'}`}>
           {isConfirming ? 'Tryck igen' : badge}
         </span>
       </div>
-      <div className="text-xs text-slate-500 mt-1">{description}</div>
+      <div className="text-xs text-[var(--color-ink-faint)] mt-1">{description}</div>
     </button>
   )
 }
