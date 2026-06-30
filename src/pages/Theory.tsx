@@ -772,7 +772,7 @@ export default function Theory() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+      <div className="max-w-2xl mx-auto px-4 py-6 pb-8">
         {tab === 'overview' && <Overview navigate={navigate} />}
         {tab === 'XYZ'      && <XYZSection navigate={navigate} />}
         {tab === 'KVA'      && <KVASection navigate={navigate} />}

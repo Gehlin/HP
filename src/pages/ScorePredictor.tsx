@@ -142,7 +142,7 @@ export default function ScorePredictor() {
   return (
     <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
       <PageHeader title="HP-poängprediktor" onBack={() => navigate('/')} />
-      <div className="max-w-2xl mx-auto px-4 py-8 pb-28">
+      <div className="max-w-2xl mx-auto px-4 py-8">
 
         <div className="mb-6">
           <div className="text-[10px] font-bold text-blue-700 uppercase tracking-widest mb-2">HP-analys</div>

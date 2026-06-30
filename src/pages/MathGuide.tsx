@@ -1510,7 +1510,7 @@ export default function MathGuide() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+      <div className="max-w-2xl mx-auto px-4 py-6">
 
         {/* ════════════════════════════════════════════
             TAB 1: Topics

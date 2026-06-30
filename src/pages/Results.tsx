@@ -105,7 +105,7 @@ export default function Results() {
   }, [])
 
   if (!session) return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav flex items-center justify-center px-4">
       <div className="text-center">
         <div className="text-5xl font-black text-[var(--color-ink-faint)] mb-4">—</div>
         <div className="text-[var(--color-ink-muted)] font-semibold mb-1">Ingen session hittades</div>
@@ -213,13 +213,13 @@ export default function Results() {
     : 0
 
   return (
-    <div className="min-h-screen bg-[var(--color-paper)]">
+    <div className="min-h-screen bg-[var(--color-paper)] pt-topnav">
       {newAchievements.length > 0 && (
         <AchievementToast newIds={newAchievements} onDone={() => setNewAchievements([])} />
       )}
 
       {/* ── Hero ─────────────────────────────────── */}
-      <div className="bg-[var(--color-green)] px-4 pt-16 pb-10 flex flex-col items-center relative">
+      <div className="bg-[var(--color-green)] px-4 pt-10 pb-10 flex flex-col items-center relative">
         <button
           onClick={handleShare}
           className="absolute top-4 right-4 flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white/90 transition-colors"
@@ -298,7 +298,7 @@ export default function Results() {
         </div>
       </div>
 
-      <div className="bg-[var(--color-paper)] px-4 pt-6 pb-28">
+      <div className="bg-[var(--color-paper)] px-4 pt-6 pb-8">
         <div className="max-w-2xl mx-auto">
 
         {/* ── Streak achievement card ──────────────── */}

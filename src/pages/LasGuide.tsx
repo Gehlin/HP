@@ -355,7 +355,7 @@ export default function LasGuide() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+      <div className="max-w-2xl mx-auto px-4 py-6">
         {tab === 'fragor'   && <Fragor />}
         {tab === 'strategi' && <Strategi />}
         {tab === 'ovning'   && <Ovning />}

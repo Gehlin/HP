@@ -332,7 +332,7 @@ export default function ElfGuide() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+      <div className="max-w-2xl mx-auto px-4 py-6">
         {tab === 'falsefriends' && <FalseFriends />}
         {tab === 'strategi'     && <Strategi />}
         {tab === 'ovning'       && <Ovning />}

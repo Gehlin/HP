@@ -468,7 +468,7 @@ export default function LiggandeStolenGuide() {
   return (
     <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
       <PageHeader title="Liggande stolen" />
-      <div className="max-w-2xl mx-auto px-4 pt-8 pb-28">
+      <div className="max-w-2xl mx-auto px-4 pt-8">
 
         {/* Header */}
         <div className="mb-8">
