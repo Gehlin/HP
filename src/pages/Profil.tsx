@@ -183,7 +183,7 @@ function UploadIcon() {
 
 function TrashIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-terracotta,#c0392b)] shrink-0">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-terracotta)] shrink-0">
       <polyline points="3 6 5 6 21 6" />
       <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
       <path d="M10 11v6" />
@@ -251,7 +251,7 @@ function SettingsRow({ icon, label, badge, onClick, last, right }: SettingsRowPr
       {right !== undefined ? right : (
         <>
           {badge !== undefined && badge > 0 && (
-            <span className="text-xs font-medium bg-[var(--color-green)] text-white rounded-full px-1.5 py-0.5 leading-none">
+            <span className="text-xs font-medium bg-[var(--color-green)] text-[var(--color-cream)] rounded-full px-1.5 py-0.5 leading-none">
               {badge}
             </span>
           )}
@@ -476,7 +476,7 @@ export default function Profil() {
                   onClick={() => handleFocusSelect(pref)}
                   className={`px-4 py-3 rounded-xl text-left text-sm font-medium border transition-colors ${
                     focusPref === pref
-                      ? 'bg-[var(--color-green)] text-white border-[var(--color-green)]'
+                      ? 'bg-[var(--color-green)] text-[var(--color-cream)] border-[var(--color-green)]'
                       : 'border-[var(--color-card-border)] text-[var(--color-ink)] bg-[var(--color-paper)]'
                   }`}
                 >
@@ -496,7 +496,7 @@ export default function Profil() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[400] bg-[var(--color-green)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[400] bg-[var(--color-green)] text-[var(--color-cream)] text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg">
           {toast}
         </div>
       )}
@@ -554,7 +554,7 @@ export default function Profil() {
                   onClick={() => setPendingDate(date)}
                   className={`px-4 py-3 rounded-xl text-left text-sm font-medium border transition-colors ${
                     pendingDate === date
-                      ? 'bg-[var(--color-green)] text-white border-[var(--color-green)]'
+                      ? 'bg-[var(--color-green)] text-[var(--color-cream)] border-[var(--color-green)]'
                       : 'border-[var(--color-card-border)] text-[var(--color-ink)] bg-[var(--color-paper)]'
                   }`}
                 >
@@ -565,7 +565,7 @@ export default function Profil() {
                 onClick={() => setPendingDate(null)}
                 className={`px-4 py-3 rounded-xl text-left text-sm font-medium border transition-colors ${
                   pendingDate === null
-                    ? 'bg-[var(--color-green)] text-white border-[var(--color-green)]'
+                    ? 'bg-[var(--color-green)] text-[var(--color-cream)] border-[var(--color-green)]'
                     : 'border-[var(--color-card-border)] text-[var(--color-ink)] bg-[var(--color-paper)]'
                 }`}
               >

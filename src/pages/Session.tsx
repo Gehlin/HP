@@ -15,20 +15,20 @@ import { getPassage } from '../data/passages'
 const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
 
 const TYPE_ACCENTS: Record<QuestionType, { color: string; bg: string }> = {
-  XYZ: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
-  KVA: { color: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
-  NOG: { color: '#224A3A', bg: 'rgba(34,74,58,0.08)' },
-  DTK: { color: '#D97706', bg: 'rgba(217,119,6,0.08)' },
-  ORD: { color: '#DC2626', bg: 'rgba(220,38,38,0.08)' },
-  LAS: { color: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
-  MEK: { color: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
-  ELF: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+  XYZ: { color: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  KVA: { color: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  NOG: { color: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  DTK: { color: 'var(--color-gold-deep)', bg: 'var(--color-gold-muted)' },
+  ORD: { color: 'var(--color-green)', bg: 'var(--color-green-muted)' },
+  LAS: { color: 'var(--color-green)', bg: 'var(--color-green-muted)' },
+  MEK: { color: 'var(--color-green)', bg: 'var(--color-green-muted)' },
+  ELF: { color: 'var(--color-green)', bg: 'var(--color-green-muted)' },
 }
 
 const DIFFICULTY_ACCENTS: Record<string, { color: string; bg: string; ring: string }> = {
-  easy:   { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.10)' },
-  medium: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.10)' },
-  hard:   { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.10)' },
+  easy:   { color: 'var(--color-green)',      ring: 'var(--color-green)',      bg: 'var(--color-green-muted)' },
+  medium: { color: 'var(--color-gold-deep)',  ring: 'var(--color-gold-deep)',  bg: 'var(--color-gold-muted)' },
+  hard:   { color: 'var(--color-error)',      ring: 'var(--color-error)',      bg: 'var(--color-error-bg)' },
 }
 
 interface BreakScreenData {
@@ -536,9 +536,9 @@ export default function Session() {
 
               let badgeBg = 'bg-[var(--color-hairline)]'
               let badgeColor = 'text-[var(--color-ink)]'
-              if (!isRevealed && isChosen) { badgeBg = 'bg-[var(--color-terracotta)]'; badgeColor = 'text-white' }
-              if (isRevealed && isAnswer) { badgeBg = 'bg-[var(--color-correct-badge)]'; badgeColor = 'text-white' }
-              if (isRevealed && isChosen && !isAnswer) { badgeBg = 'bg-[var(--color-wrong-badge)]'; badgeColor = 'text-white' }
+              if (!isRevealed && isChosen) { badgeBg = 'bg-[var(--color-terracotta)]'; badgeColor = 'text-[var(--color-cream)]' }
+              if (isRevealed && isAnswer) { badgeBg = 'bg-[var(--color-correct-badge)]'; badgeColor = 'text-[var(--color-cream)]' }
+              if (isRevealed && isChosen && !isAnswer) { badgeBg = 'bg-[var(--color-wrong-badge)]'; badgeColor = 'text-[var(--color-cream)]' }
 
               const badgeLabel = isRevealed && isAnswer ? '✓'
                 : (isRevealed && isChosen && !isAnswer) ? '✗'
@@ -696,7 +696,7 @@ export default function Session() {
                 const isFlagged = flagged.includes(sq.id)
                 const isCurrent = idx === current
                 let cls = 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)] hover:bg-[var(--color-paper-dark)]/80 hover:text-[var(--color-ink-muted)]'
-                if (isCurrent) cls = 'bg-blue-600 text-white'
+                if (isCurrent) cls = 'bg-[var(--color-green)] text-[var(--color-cream)]'
                 else if (isFlagged) cls = 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
                 else if (isAnswered) cls = 'bg-[var(--color-paper-dark)] text-[var(--color-ink)] hover:bg-[var(--color-paper-dark)]/80'
                 return (
@@ -713,7 +713,7 @@ export default function Session() {
             <div className="flex gap-4 mt-4 text-[10px] text-[var(--color-ink-faint)]">
               <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-[var(--color-paper-dark)]" /> Besvarad</span>
               <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-amber-50 border border-amber-200" /> Markerad</span>
-              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-blue-600" /> Aktuell</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-[var(--color-green)]" /> Aktuell</span>
             </div>
           </div>
         </div>
@@ -744,7 +744,7 @@ export default function Session() {
               <>
                 {[
                   { label: 'Svårt',  quality: isCorrect ? 1 : 0, color: 'var(--color-error)',   bg: 'var(--color-error-bg)' },
-                  { label: 'Ok',     quality: isCorrect ? 2 : 0, color: '#D97706',              bg: 'rgba(217,119,6,0.10)' },
+                  { label: 'Ok',     quality: isCorrect ? 2 : 0, color: 'var(--color-gold-deep)', bg: 'var(--color-gold-muted)' },
                   { label: 'Enkelt', quality: isCorrect ? 3 : 0, color: 'var(--color-success)', bg: 'var(--color-success-bg)' },
                 ].map(({ label, quality, color, bg }) => (
                   <button

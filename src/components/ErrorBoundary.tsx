@@ -28,7 +28,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           </p>
           <button
             onClick={() => { this.setState({ error: null }); window.location.href = '/' }}
-            className="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white px-7 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+            className="bg-[var(--color-green)] hover:opacity-90 text-[var(--color-cream)] px-7 py-2.5 rounded-xl text-sm font-semibold transition-colors"
           >
             Gå till startsidan
           </button>

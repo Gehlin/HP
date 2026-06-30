@@ -25,6 +25,34 @@ The app is much bigger than the five core screens — it has subject hub pages (
 
   <!-- COMPLETED 2026-07-01: ExplanationCard was already fully on correct tokens (feedback-correct-*/feedback-wrong-* throughout). AchievementToast itself was clean; its data source (RARITY_STYLES in achievements.ts) was fixed: bronze/gold → gold-deep/gold-muted tokens, platinum → terracotta/terracotta-muted. FormulaDrawer component code was clean; its data source (formulaCards.ts) fixed: XYZ/KVA/NOG → terracotta token family, DTK → gold-deep/gold-muted; border-opacity-* modifiers removed (card-border token already hairline-subtle). Onboarding.tsx: all QUANT_PILLS (violet/blue/emerald) → terracotta (XYZ/KVA/NOG) / gold-deep (DTK); all VERBAL_PILLS (rose/pink/fuchsia/purple) → green; FOCUS_OPTIONS quant → terracotta, verbal/both → green; slide hero icon colors: HP/↻ → green, ∑ → ink, ?/→ → gold-deep; quant/verbal section boxes in slide 1 now terracotta/green. InstallBanner: text-white on green bg → text-[var(--color-cream)]. ChartView: PALETTE hex values replaced with CSS var strings; all SVG fill/stroke attributes converted to inline style={{ fill/stroke }} so CSS variables resolve correctly in SVG context; #9A9A92 axis/label text → var(--color-ink-faint), grid lines → var(--color-card-border); title text → var(--color-ink-faint); off-palette 4th colour (#2563EB blue) → var(--color-green-light). Math.tsx/MathText.tsx: no color references, KaTeX inherits ink from parent context — no changes needed. Build: zero TypeScript errors. -->
 
-- [ ] Run a final consistency sweep across all of `src/`: grep for any remaining raw hex colors in `.tsx` files (pattern like `#[0-9A-Fa-f]{6}` inside `style={{` or `className`) that aren't already routed through a CSS variable, and for any leftover `text-white` Tailwind usages that should instead be `var(--color-cream)` (on green backgrounds) or `var(--color-ink)` (on paper backgrounds). Fix every match found.
+- [x] Run a final consistency sweep across all of `src/`: grep for any remaining raw hex colors in `.tsx` files (pattern like `#[0-9A-Fa-f]{6}` inside `style={{` or `className`) that aren't already routed through a CSS variable, and for any leftover `text-white` Tailwind usages that should instead be `var(--color-cream)` (on green backgrounds) or `var(--color-ink)` (on paper backgrounds). Fix every match found.
+
+  <!-- COMPLETED 2026-07-01: Grepped all .tsx files for raw hex values and text-white usages. Files fixed and changes made:
+
+  **Raw hex → CSS var conversions:**
+  - Home.tsx, Session.tsx, Results.tsx: All three shared the same TYPE_ACCENTS lookup table (used for progress rings and section accent pills) with identical off-palette hex values. Mapped: XYZ/KVA/NOG → terracotta token family; DTK → gold-deep/gold-muted; ORD/LAS/MEK/ELF → green token family.
+  - Session.tsx DIFFICULTY_ACCENTS: easy #224A3A → green, medium #D97706 → gold-deep/gold-muted, hard #DC2626 → error/error-bg.
+  - Session.tsx "Ok" SRS quality button: #D97706 → var(--color-gold-deep), rgba hex bg → var(--color-gold-muted).
+  - Progress.tsx heatmap: bg-[#224A3A]/30 and /60 → bg-[var(--color-green)]/30 and /60 (both in heatColor() function and legend swatches at line 1059-1060).
+  - Math.tsx errorColor: '#cc0000' → '#BF5A33' (hex of --color-error; CSS vars cannot be passed into KaTeX options).
+  - Profil.tsx: Removed fallback hex from var(--color-terracotta,#c0392b) → var(--color-terracotta).
+
+  **text-white → text-[var(--color-cream)] conversions (on green/terracotta backgrounds):**
+  - App.tsx: offline banner on terracotta bg.
+  - TopNav.tsx: SRS due-count badge (also bg-amber-500 → bg-[var(--color-gold-deep)]).
+  - ErrorBoundary.tsx: error CTA button (also bg-blue-600 → bg-[var(--color-green)]).
+  - Settings.tsx: success toast (also bg-emerald-600 → bg-[var(--color-green)]).
+  - Results.tsx: hero section (share button, "Nytt personbästa!" pill, "Resultat" label, score ring inner text, score display, stat strip values/labels); answer review labels (emerald-600 → correct-badge token, red-600 → wrong-badge token); HP logo badge in share card (also violet-600 → green).
+  - Progress.tsx: two empty-state CTA buttons on green bg.
+  - Session.tsx: answer option badges on terracotta/correct-badge/wrong-badge bg; current question jump button (also bg-blue-600 → bg-[var(--color-green)]); jump panel legend swatch updated to match.
+  - Home.tsx: hero score card on card-green bg (score number, all three stat values and labels).
+  - Profil.tsx: nav badge pill, focus preference toggles, toast notification, date picker toggles (all on green bg).
+
+  **Intentionally left unchanged:**
+  - Settings.tsx line 302: bg-red-600 confirm-delete button (danger zone UI pattern, red is appropriate).
+  - Profil.tsx line 530: bg-red-600 delete account button (destructive action).
+
+  Build: zero TypeScript errors. -->
+
 
 - [ ] Run `npm run build` to confirm zero TypeScript errors, then manually click through every remaining page (both hubs, at least 3 theory guides, Bookmarks, SRS queue, Ord builder, Score predictor, Exam select/start) in the dev server to confirm a single coherent warm paper aesthetic with no leftover dark-theme fragments anywhere in the app.

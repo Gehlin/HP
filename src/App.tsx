@@ -90,7 +90,7 @@ function AppInner() {
   return (
     <>
       {!isOnline && (
-        <div className="fixed top-0 inset-x-0 z-[300] bg-[var(--color-terracotta)] text-white text-center text-xs py-1.5 font-semibold">
+        <div className="fixed top-0 inset-x-0 z-[300] bg-[var(--color-terracotta)] text-[var(--color-cream)] text-center text-xs py-1.5 font-semibold">
           Ingen internetanslutning — appen fungerar offline
         </div>
       )}

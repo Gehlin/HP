@@ -156,14 +156,14 @@ export default function Results() {
   }
 
   const WARM_TYPE_COLORS: Record<QuestionType, { color: string; ring: string; bg: string }> = {
-    XYZ: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
-    KVA: { color: '#2563EB', ring: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
-    NOG: { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.08)' },
-    DTK: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.08)' },
-    ORD: { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.08)' },
-    LAS: { color: '#DB2777', ring: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
-    MEK: { color: '#9333EA', ring: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
-    ELF: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+    XYZ: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+    KVA: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+    NOG: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+    DTK: { color: 'var(--color-gold-deep)',  ring: 'var(--color-gold-deep)',  bg: 'var(--color-gold-muted)' },
+    ORD: { color: 'var(--color-green)',      ring: 'var(--color-green)',      bg: 'var(--color-green-muted)' },
+    LAS: { color: 'var(--color-green)',      ring: 'var(--color-green)',      bg: 'var(--color-green-muted)' },
+    MEK: { color: 'var(--color-green)',      ring: 'var(--color-green)',      bg: 'var(--color-green-muted)' },
+    ELF: { color: 'var(--color-green)',      ring: 'var(--color-green)',      bg: 'var(--color-green-muted)' },
   }
 
   const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
@@ -222,7 +222,7 @@ export default function Results() {
       <div className="bg-[var(--color-green)] px-4 pt-10 pb-10 flex flex-col items-center relative">
         <button
           onClick={handleShare}
-          className="absolute top-4 right-4 flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white/90 transition-colors"
+          className="absolute top-4 right-4 flex items-center gap-1.5 text-xs font-semibold text-[var(--color-cream)]/60 hover:text-[var(--color-cream)]/90 transition-colors"
         >
           {shareFeedback === 'copied' ? (
             <>
@@ -238,13 +238,13 @@ export default function Results() {
         </button>
 
         {isNewBest && (
-          <div className="inline-flex items-center gap-1.5 bg-white/10 text-white/80 text-[11px] font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-3">
+          <div className="inline-flex items-center gap-1.5 bg-white/10 text-[var(--color-cream)]/80 text-[11px] font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-3">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
             Nytt personbästa!
           </div>
         )}
 
-        <p className="text-xs uppercase tracking-[0.15em] text-white/60 font-[var(--font-sans)] mb-4">Resultat</p>
+        <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-cream)]/60 font-[var(--font-sans)] mb-4">Resultat</p>
 
         <div
           style={{
@@ -259,33 +259,33 @@ export default function Results() {
               background: 'var(--color-green)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               font: '700 22px var(--font-serif)',
-              color: 'white',
+              color: 'var(--color-cream)',
             }}
           >
             {pct}%
           </div>
         </div>
 
-        <div className="text-4xl font-[var(--font-serif)] text-white mt-4">{pct}%</div>
-        <div className="text-base text-white/70">{correct} av {total} rätt</div>
+        <div className="text-4xl font-[var(--font-serif)] text-[var(--color-cream)] mt-4">{pct}%</div>
+        <div className="text-base text-[var(--color-cream)]/70">{correct} av {total} rätt</div>
       </div>
 
       {/* ── Three-stat strip ─────────────────────── */}
       <div className="bg-[var(--color-green-light)] px-4 py-4">
         <div className="grid grid-cols-3 divide-x divide-[rgba(255,255,255,0.12)] max-w-2xl mx-auto">
           <div className="flex flex-col items-center py-1">
-            <span className="text-xs text-white/60">Rätt svar</span>
-            <span className="text-lg font-semibold text-white">{correct}</span>
+            <span className="text-xs text-[var(--color-cream)]/60">Rätt svar</span>
+            <span className="text-lg font-semibold text-[var(--color-cream)]">{correct}</span>
           </div>
           <div className="flex flex-col items-center py-1">
-            <span className="text-xs text-white/60">Tid</span>
-            <span className="text-lg font-semibold text-white">
+            <span className="text-xs text-[var(--color-cream)]/60">Tid</span>
+            <span className="text-lg font-semibold text-[var(--color-cream)]">
               {String(Math.floor(duration / 60)).padStart(2, '0')}:{String(duration % 60).padStart(2, '0')}
             </span>
           </div>
           <div className="flex flex-col items-center py-1">
-            <span className="text-xs text-white/60">Streak</span>
-            <span className="text-lg font-semibold text-white flex items-center gap-1">
+            <span className="text-xs text-[var(--color-cream)]/60">Streak</span>
+            <span className="text-lg font-semibold text-[var(--color-cream)] flex items-center gap-1">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-orange-400">
                 <path d="M12 23c-4.97 0-9-3.58-9-8 0-2.39 1.05-4.55 2.86-6.12C7.1 7.77 8 6.15 8 4.25c0-.41.34-.75.75-.75.19 0 .37.07.5.2C10.68 5.16 11.5 6.77 11.5 8.5c0 .69-.14 1.35-.39 1.94C11.85 10.17 12.5 9.33 12.5 8c0-.32.2-.61.5-.72.29-.11.62-.03.84.2C15.23 9.18 16.5 11.09 16.5 13c0 .78-.16 1.52-.43 2.2.75-.62 1.2-1.48 1.3-2.4.04-.36.27-.67.61-.79.33-.12.7-.03.93.23C20.22 13.96 21 15.9 21 17.5c0 3.03-4.03 5.5-9 5.5z"/>
               </svg>
@@ -911,8 +911,8 @@ export default function Results() {
                       {answerOptions.map(([key, text]) => {
                         let cls = 'border-[var(--color-card-border)] text-[var(--color-ink-faint)]'
                         let labelCls = 'bg-[var(--color-paper-dark)] text-[var(--color-ink-muted)]'
-                        if (key === q.answer) { cls = 'border-emerald-500/60 text-[var(--color-ink)] bg-emerald-500/10'; labelCls = 'bg-emerald-600 text-white' }
-                        if (key === userAnswer && key !== q.answer) { cls = 'border-red-500/60 text-[var(--color-ink)] bg-red-500/10'; labelCls = 'bg-red-600 text-white' }
+                        if (key === q.answer) { cls = 'border-[var(--color-correct-border)] text-[var(--color-ink)] bg-[var(--color-correct-bg)]'; labelCls = 'bg-[var(--color-correct-badge)] text-[var(--color-cream)]' }
+                        if (key === userAnswer && key !== q.answer) { cls = 'border-[var(--color-wrong-border)] text-[var(--color-ink)] bg-[var(--color-wrong-bg)]'; labelCls = 'bg-[var(--color-wrong-badge)] text-[var(--color-cream)]' }
                         return (
                           <div key={key} className={`border rounded-xl px-3 py-2.5 text-sm flex gap-3 items-start ${cls}`}>
                             <span className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-black ${labelCls}`}>{key}</span>
@@ -950,8 +950,8 @@ export default function Results() {
             {/* Card preview */}
             <div id="share-card" className="bg-[var(--color-paper-dark)] rounded-xl p-5 border border-[var(--color-card-border)] mb-4">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-5 h-5 bg-violet-600 rounded-md flex items-center justify-center">
-                  <span className="text-[9px] font-black text-white">HP</span>
+                <div className="w-5 h-5 bg-[var(--color-green)] rounded-md flex items-center justify-center">
+                  <span className="text-[9px] font-black text-[var(--color-cream)]">HP</span>
                 </div>
                 <span className="text-xs font-bold text-[var(--color-ink-faint)]">
                   HP Träning — {sectionedScore.quant !== null && sectionedScore.verbal !== null ? 'Fullständigt prov' : sectionedScore.verbal !== null ? 'Verbal del' : 'Kvantitativ del'}

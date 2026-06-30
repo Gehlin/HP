@@ -73,7 +73,7 @@ export default function Progress() {
           <p className="text-sm text-[var(--color-ink-faint)] mb-6">Gör ditt första pass för att se statistik här.</p>
           <button
             onClick={() => navigate('/practice')}
-            className="bg-[var(--color-green)] hover:opacity-90 transition-opacity px-6 py-3 rounded-xl font-bold text-sm text-white"
+            className="bg-[var(--color-green)] hover:opacity-90 transition-opacity px-6 py-3 rounded-xl font-bold text-sm text-[var(--color-cream)]"
           >
             Starta träning →
           </button>
@@ -231,8 +231,8 @@ export default function Progress() {
 
   function heatColor(count: number): string {
     if (count === 0) return 'bg-[var(--color-paper-darker)]'
-    if (count <= 10) return 'bg-[#224A3A]/30'
-    if (count <= 30) return 'bg-[#224A3A]/60'
+    if (count <= 10) return 'bg-[var(--color-green)]/30'
+    if (count <= 30) return 'bg-[var(--color-green)]/60'
     return 'bg-[var(--color-green)]'
   }
 
@@ -612,7 +612,7 @@ export default function Progress() {
             <p className="text-[var(--color-ink-faint)] text-sm mb-6">Genomför ditt första pass för att se din detaljerade statistik.</p>
             <button
               onClick={() => navigate('/practice')}
-              className="bg-[var(--color-green)] hover:opacity-90 transition-opacity px-6 py-3 rounded-xl font-bold text-sm text-white"
+              className="bg-[var(--color-green)] hover:opacity-90 transition-opacity px-6 py-3 rounded-xl font-bold text-sm text-[var(--color-cream)]"
             >
               Starta träning →
             </button>
@@ -1056,8 +1056,8 @@ export default function Progress() {
                 <span>Färre</span>
                 <div className="flex gap-1 items-center">
                   <div className="w-3 h-3 rounded-sm bg-[var(--color-paper-darker)]" title="0 frågor" />
-                  <div className="w-3 h-3 rounded-sm bg-[#224A3A]/30" title="1–10 frågor" />
-                  <div className="w-3 h-3 rounded-sm bg-[#224A3A]/60" title="11–30 frågor" />
+                  <div className="w-3 h-3 rounded-sm bg-[var(--color-green)]/30" title="1–10 frågor" />
+                  <div className="w-3 h-3 rounded-sm bg-[var(--color-green)]/60" title="11–30 frågor" />
                   <div className="w-3 h-3 rounded-sm bg-[var(--color-green)]" title="30+ frågor" />
                 </div>
                 <span>Fler</span>

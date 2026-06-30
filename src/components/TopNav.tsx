@@ -65,7 +65,7 @@ export default function TopNav() {
                 <span className={`relative transition-colors duration-150 ${isActive ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-faint)] group-hover:text-[var(--color-ink-muted)]'} ${tab.path === '/practice' && dueCount > 0 ? 'due-pulse' : ''}`}>
                   <tab.Icon active={isActive} />
                   {tab.path === '/practice' && dueCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full bg-amber-500 text-white text-[9px] font-black flex items-center justify-center px-0.5 ring-2 ring-[var(--color-paper)]">{dueCount > 9 ? '9+' : dueCount}</span>
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full bg-[var(--color-gold-deep)] text-[var(--color-cream)] text-[9px] font-black flex items-center justify-center px-0.5 ring-2 ring-[var(--color-paper)]">{dueCount > 9 ? '9+' : dueCount}</span>
                   )}
                 </span>
                 <span className={`text-[10px] font-medium leading-none transition-colors duration-150 ${isActive ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-faint)] group-hover:text-[var(--color-ink-muted)]'}`}>

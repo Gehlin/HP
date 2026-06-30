@@ -128,7 +128,7 @@ export default function Settings() {
       <div className="max-w-2xl mx-auto px-6 py-6">
 
         {done && (
-          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[400] bg-emerald-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-lg animate-fade-in">
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[400] bg-[var(--color-green)] text-[var(--color-cream)] text-sm font-bold px-4 py-2.5 rounded-xl shadow-lg animate-fade-in">
             ✓ {done}
           </div>
         )}

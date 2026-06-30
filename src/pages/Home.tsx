@@ -8,14 +8,14 @@ import { computeReadiness } from '../utils/readiness'
 import type { ExamSession } from '../types'
 
 const TYPE_ACCENTS: Record<string, { color: string; ring: string; bg: string }> = {
-  XYZ: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
-  KVA: { color: '#2563EB', ring: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
-  NOG: { color: '#224A3A', ring: '#224A3A', bg: 'rgba(34,74,58,0.08)' },
-  DTK: { color: '#D97706', ring: '#D97706', bg: 'rgba(217,119,6,0.08)' },
-  ORD: { color: '#DC2626', ring: '#DC2626', bg: 'rgba(220,38,38,0.08)' },
-  LAS: { color: '#DB2777', ring: '#DB2777', bg: 'rgba(219,39,119,0.08)' },
-  MEK: { color: '#9333EA', ring: '#9333EA', bg: 'rgba(147,51,234,0.08)' },
-  ELF: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
+  XYZ: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  KVA: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  NOG: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
+  DTK: { color: 'var(--color-gold-deep)', ring: 'var(--color-gold-deep)', bg: 'var(--color-gold-muted)' },
+  ORD: { color: 'var(--color-green)', ring: 'var(--color-green)', bg: 'var(--color-green-muted)' },
+  LAS: { color: 'var(--color-green)', ring: 'var(--color-green)', bg: 'var(--color-green-muted)' },
+  MEK: { color: 'var(--color-green)', ring: 'var(--color-green)', bg: 'var(--color-green-muted)' },
+  ELF: { color: 'var(--color-green)', ring: 'var(--color-green)', bg: 'var(--color-green-muted)' },
 }
 
 export default function Home() {
@@ -137,7 +137,7 @@ export default function Home() {
           >
             Uppskattat HP-poäng
           </p>
-          <div className="text-5xl font-[var(--font-serif)] text-white leading-none mb-4">
+          <div className="text-5xl font-[var(--font-serif)] text-[var(--color-cream)] leading-none mb-4">
             {readiness?.score ?? 0}
           </div>
           <div className="h-1.5 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.15)' }}>
@@ -148,16 +148,16 @@ export default function Home() {
           </div>
           <div className="flex gap-5">
             <div>
-              <div className="text-base text-white font-semibold">{totalCorrect}</div>
-              <div className="text-xs text-white/60">Rätt totalt</div>
+              <div className="text-base text-[var(--color-cream)] font-semibold">{totalCorrect}</div>
+              <div className="text-xs text-[var(--color-cream)]/60">Rätt totalt</div>
             </div>
             <div>
-              <div className="text-base text-white font-semibold">{stats?.streak ?? '–'}</div>
-              <div className="text-xs text-white/60">Streak</div>
+              <div className="text-base text-[var(--color-cream)] font-semibold">{stats?.streak ?? '–'}</div>
+              <div className="text-xs text-[var(--color-cream)]/60">Streak</div>
             </div>
             <div>
-              <div className="text-base text-white font-semibold">{days ?? '–'}</div>
-              <div className="text-xs text-white/60">Dagar kvar till HP</div>
+              <div className="text-base text-[var(--color-cream)] font-semibold">{days ?? '–'}</div>
+              <div className="text-xs text-[var(--color-cream)]/60">Dagar kvar till HP</div>
             </div>
           </div>
         </div>

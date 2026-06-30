@@ -9,7 +9,7 @@ function render(math: string, displayMode: boolean): string {
   return katex.renderToString(math, {
     throwOnError: false,
     displayMode,
-    errorColor: '#cc0000',
+    errorColor: '#BF5A33',
     output: 'html',
   })
 }
