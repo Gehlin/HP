@@ -66,6 +66,30 @@ export default function Progress() {
   const [tagSort, setTagSort] = useState<'asc' | 'desc' | 'count'>('asc')
   const [tagTypeFilter, setTagTypeFilter] = useState<'alla' | QuestionType>('alla')
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week')
+
+  if (history.length === 0) {
+    return (
+      <div className="min-h-screen bg-app pb-8 pt-topnav flex items-center justify-center px-4">
+        <div className="card rounded-2xl p-10 text-center max-w-sm w-full">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4 text-[var(--color-ink-faint)]">
+            <path d="M3 3v18h18" />
+            <rect x="7" y="13" width="3" height="5" />
+            <rect x="12" y="9" width="3" height="9" />
+            <rect x="17" y="5" width="3" height="13" />
+          </svg>
+          <h1 className="text-lg font-bold text-[var(--color-ink)] mb-2">Inga träningspass än</h1>
+          <p className="text-sm text-[var(--color-ink-faint)] mb-6">Gör ditt första pass för att se statistik här.</p>
+          <button
+            onClick={() => navigate('/practice')}
+            className="bg-[var(--color-green)] hover:opacity-90 transition-opacity px-6 py-3 rounded-xl font-bold text-sm text-white"
+          >
+            Starta träning →
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   const timeAnalytics = timeAnalyticsByType()
   const difficultyAcc = accuracyByDifficulty()
   const rollingHp = rollingHpScore()
