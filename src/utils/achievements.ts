@@ -124,8 +124,8 @@ export function getAchievement(id: string): Achievement | undefined {
 }
 
 export const RARITY_STYLES: Record<Achievement['rarity'], { border: string; bg: string; label: string; labelColor: string }> = {
-  bronze:   { border: 'border-amber-300',   bg: 'bg-amber-50',                         label: 'Brons',    labelColor: 'text-amber-700'   },
-  silver:   { border: 'border-[var(--color-card-border)]', bg: 'bg-[var(--color-paper-dark)]', label: 'Silver', labelColor: 'text-[var(--color-ink-muted)]' },
-  gold:     { border: 'border-yellow-400',  bg: 'bg-yellow-50',                        label: 'Guld',     labelColor: 'text-yellow-700'  },
-  platinum: { border: 'border-violet-300',  bg: 'bg-violet-50',                        label: 'Platina',  labelColor: 'text-violet-700'  },
+  bronze:   { border: 'border-[var(--color-gold-deep)]',      bg: 'bg-[var(--color-gold-muted)]',      label: 'Brons',   labelColor: 'text-[var(--color-gold-deep)]'  },
+  silver:   { border: 'border-[var(--color-card-border)]',    bg: 'bg-[var(--color-paper-dark)]',      label: 'Silver',  labelColor: 'text-[var(--color-ink-muted)]'  },
+  gold:     { border: 'border-[var(--color-gold)]',           bg: 'bg-[var(--color-gold-muted)]',      label: 'Guld',    labelColor: 'text-[var(--color-gold-deep)]'  },
+  platinum: { border: 'border-[var(--color-terracotta)]',     bg: 'bg-[var(--color-terracotta-muted)]', label: 'Platina', labelColor: 'text-[var(--color-terracotta)]' },
 }

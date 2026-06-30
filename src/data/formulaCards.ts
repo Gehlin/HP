@@ -15,9 +15,9 @@ export interface FormulaCard {
 export const FORMULA_CARDS: Record<string, FormulaCard> = {
   XYZ: {
     type: 'XYZ',
-    color: 'text-violet-400',
-    borderColor: 'border-violet-500',
-    bgColor: 'bg-violet-500/10',
+    color: 'text-[var(--color-terracotta)]',
+    borderColor: 'border-[var(--color-card-border)]',
+    bgColor: 'bg-[var(--color-terracotta-muted)]',
     tagline: 'Matematisk problemlösning — nyckelformler',
     sections: [
       {
@@ -62,9 +62,9 @@ export const FORMULA_CARDS: Record<string, FormulaCard> = {
 
   KVA: {
     type: 'KVA',
-    color: 'text-blue-400',
-    borderColor: 'border-blue-500',
-    bgColor: 'bg-blue-500/10',
+    color: 'text-[var(--color-terracotta)]',
+    borderColor: 'border-[var(--color-card-border)]',
+    bgColor: 'bg-[var(--color-terracotta-muted)]',
     tagline: 'Kvantitativa jämförelser — strategier',
     sections: [
       {
@@ -98,9 +98,9 @@ export const FORMULA_CARDS: Record<string, FormulaCard> = {
 
   NOG: {
     type: 'NOG',
-    color: 'text-emerald-400',
-    borderColor: 'border-emerald-500',
-    bgColor: 'bg-emerald-500/10',
+    color: 'text-[var(--color-terracotta)]',
+    borderColor: 'border-[var(--color-card-border)]',
+    bgColor: 'bg-[var(--color-terracotta-muted)]',
     tagline: 'Dataräcklighet — sufficiensregler',
     sections: [
       {
@@ -135,9 +135,9 @@ export const FORMULA_CARDS: Record<string, FormulaCard> = {
 
   DTK: {
     type: 'DTK',
-    color: 'text-amber-400',
-    borderColor: 'border-amber-500',
-    bgColor: 'bg-amber-500/10',
+    color: 'text-[var(--color-gold-deep)]',
+    borderColor: 'border-[var(--color-card-border)]',
+    bgColor: 'bg-[var(--color-gold-muted)]',
     tagline: 'Diagram, tabeller & kartor — lästeknik',
     sections: [
       {

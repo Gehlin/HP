@@ -32,7 +32,7 @@ export default function FormulaDrawer({ questionType, onClose }: Props) {
       <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[80vh] flex flex-col bg-[var(--color-card)] border-t border-[var(--color-card-border)] rounded-t-2xl shadow-2xl overflow-hidden animate-slide-up">
 
         {/* Handle + header */}
-        <div className={`shrink-0 border-b ${card.borderColor} border-opacity-40 px-5 pt-4 pb-3`}>
+        <div className={`shrink-0 border-b ${card.borderColor} px-5 pt-4 pb-3`}>
           <div className="flex justify-center mb-3">
             <div className="w-10 h-1 bg-[var(--color-paper-dark)] rounded-full" />
           </div>
@@ -60,7 +60,7 @@ export default function FormulaDrawer({ questionType, onClose }: Props) {
               </div>
               <div className="space-y-1.5">
                 {section.items.map((item, i) => (
-                  <div key={i} className={`rounded-xl px-4 py-3 ${card.bgColor} border ${card.borderColor} border-opacity-30`}>
+                  <div key={i} className={`rounded-xl px-4 py-3 ${card.bgColor} border ${card.borderColor}`}>
                     <div className="flex items-start gap-3">
                       <span className="text-xs text-[var(--color-ink-faint)] shrink-0 pt-0.5 min-w-[80px]">{item.label}</span>
                       <div className="flex-1 min-w-0">

@@ -41,7 +41,7 @@ export default function InstallBanner() {
     <div className="fixed bottom-20 left-4 right-4 z-[150] max-w-md mx-auto">
       <div className="card border border-[var(--color-card-border)] rounded-2xl p-4 flex items-center gap-4 shadow-2xl animate-slide-up">
         <div className="w-10 h-10 bg-[var(--color-green)] rounded-xl flex items-center justify-center shrink-0">
-          <span className="text-white text-xs font-black">HP</span>
+          <span className="text-[var(--color-cream)] text-xs font-black">HP</span>
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-bold text-[var(--color-ink)]">Lägg till på hemskärmen</div>

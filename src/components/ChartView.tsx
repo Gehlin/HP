@@ -1,6 +1,6 @@
 import type { ChartData } from '../types'
 
-const PALETTE = ['#224A3A', '#E4C66A', '#BF5A33', '#2563EB']
+const PALETTE = ['var(--color-green)', 'var(--color-gold)', 'var(--color-terracotta)', 'var(--color-green-light)']
 const W = 360, H = 220, mL = 50, mR = 10, mT = 28, mB = 32
 const pW = W - mL - mR, pH = H - mT - mB
 
@@ -28,8 +28,8 @@ function Legend({ series }: { series: ChartData['series'] }) {
     <>
       {series.map((s, i) => (
         <g key={i} transform={`translate(${mL + i * 85}, 6)`}>
-          <rect x={0} y={1} width={10} height={10} fill={s.color ?? PALETTE[i % 4]} rx={2} />
-          <text x={14} y={10} fontSize={10} fill="#9A9A92">{s.label}</text>
+          <rect x={0} y={1} width={10} height={10} style={{ fill: s.color ?? PALETTE[i % 4] }} rx={2} />
+          <text x={14} y={10} fontSize={10} style={{ fill: 'var(--color-ink-faint)' }}>{s.label}</text>
         </g>
       ))}
     </>
@@ -45,8 +45,8 @@ function YAxis({ min, max, step, ticks }: { min: number; max: number; step: numb
         const y = mT + pH - ((v - min) / range) * pH
         return (
           <g key={i}>
-            <line x1={mL} x2={W - mR} y1={y} y2={y} stroke="rgba(26,26,24,0.08)" strokeWidth={1} />
-            <text x={mL - 4} y={y + 3.5} textAnchor="end" fontSize={9} fill="#9A9A92">{fmt(v)}</text>
+            <line x1={mL} x2={W - mR} y1={y} y2={y} style={{ stroke: 'var(--color-card-border)' }} strokeWidth={1} />
+            <text x={mL - 4} y={y + 3.5} textAnchor="end" fontSize={9} style={{ fill: 'var(--color-ink-faint)' }}>{fmt(v)}</text>
           </g>
         )
       })}
@@ -74,11 +74,11 @@ function BarChart({ data }: { data: ChartData }) {
           const bH = Math.max(0, ((v - min) / range) * pH)
           const x = mL + gi * groupW + groupOffset + si * barW
           const y = mT + pH - bH
-          return <rect key={`${si}-${gi}`} x={x} y={y} width={barW - 2} height={bH} fill={color} opacity={0.82} rx={1.5} />
+          return <rect key={`${si}-${gi}`} x={x} y={y} width={barW - 2} height={bH} style={{ fill: color }} opacity={0.82} rx={1.5} />
         })
       })}
       {data.xLabels.map((lbl, i) => (
-        <text key={i} x={mL + i * groupW + groupW / 2} y={H - mB + 16} textAnchor="middle" fontSize={9} fill="#9A9A92">{lbl}</text>
+        <text key={i} x={mL + i * groupW + groupW / 2} y={H - mB + 16} textAnchor="middle" fontSize={9} style={{ fill: 'var(--color-ink-faint)' }}>{lbl}</text>
       ))}
     </svg>
   )
@@ -101,16 +101,16 @@ function LineChart({ data }: { data: ChartData }) {
         const pts = s.values.map((v, i) => `${toX(i)},${toY(v)}`).join(' ')
         return (
           <g key={si}>
-            <polyline points={pts} fill="none" stroke={color} strokeWidth={2.5}
+            <polyline points={pts} style={{ fill: 'none', stroke: color }} strokeWidth={2.5}
               strokeLinejoin="round" strokeLinecap="round" opacity={0.9} />
             {s.values.map((v, i) => (
-              <circle key={i} cx={toX(i)} cy={toY(v)} r={3.5} fill={color} />
+              <circle key={i} cx={toX(i)} cy={toY(v)} r={3.5} style={{ fill: color }} />
             ))}
           </g>
         )
       })}
       {data.xLabels.map((lbl, i) => (
-        <text key={i} x={toX(i)} y={H - mB + 16} textAnchor="middle" fontSize={9} fill="#9A9A92">{lbl}</text>
+        <text key={i} x={toX(i)} y={H - mB + 16} textAnchor="middle" fontSize={9} style={{ fill: 'var(--color-ink-faint)' }}>{lbl}</text>
       ))}
     </svg>
   )
@@ -119,7 +119,7 @@ function LineChart({ data }: { data: ChartData }) {
 export default function ChartView({ data }: { data: ChartData }) {
   return (
     <div className="card rounded-2xl p-4 mb-5 overflow-x-auto">
-      {data.title && <p className="text-xs text-[#9A9A92] mb-3">{data.title}</p>}
+      {data.title && <p className="text-xs text-[var(--color-ink-faint)] mb-3">{data.title}</p>}
       {data.type === 'bar' ? <BarChart data={data} /> : <LineChart data={data} />}
     </div>
   )
