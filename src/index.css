@@ -24,6 +24,37 @@
   --color-error-bg: rgba(191, 90, 51, 0.10);
   --font-serif: 'Newsreader', Georgia, serif;
   --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+
+  /* ─── Spec extended palette (additive; see Phase 01 token audit) ─── */
+  --color-hairline: #EAE3D6;
+  --color-ink-soft: #33302A;
+  --color-muted: #8B8478;
+  --color-muted-light: #A89F90;
+  --color-green-deep: #1A3A2D;
+  --color-cream: #FBF7EE;
+  --color-cream-dim: #EFE9DD;
+  --color-green-tint: #9FB7A8;
+  --color-terracotta-deep: #A84A26;
+  --color-terracotta-soft: #F3E0D5;
+  --color-terracotta-soft2: #F4E7DD;
+  --color-gold-deep: #C9A24A;
+  --color-track: #E7E0D3;
+  --color-selected-bg: #F4E7DD;
+  --color-selected-border: #C97A52;
+  --color-correct-bg: #E4EDE6;
+  --color-correct-border: #3E7A5E;
+  --color-correct-badge: #2E6A4C;
+  --color-correct-text: #1E3A2E;
+  --color-wrong-bg: #F6E3DC;
+  --color-wrong-border: #C0573A;
+  --color-wrong-badge: #BF4A2E;
+  --color-wrong-text: #7A3A28;
+  --color-feedback-correct-bg: #EAF1EC;
+  --color-feedback-correct-border: #CFE0D4;
+  --color-feedback-correct-title: #2E6A4C;
+  --color-feedback-wrong-bg: #F8EAE3;
+  --color-feedback-wrong-border: #ECD3C6;
+  --color-feedback-wrong-title: #A84A26;
 }
 
 @layer base {
