@@ -62,4 +62,5 @@ Two problems make the app feel broken for new users: the Home page shows a score
   ```
   **Done:** Inserted the prompt verbatim in `src/pages/Home.tsx` directly after the "Starta träning →" hero CTA button and before the first-use welcome empty state block. `examDate` (`Date | null`, populated from `getExamDate()` in the existing `useEffect`) and `hasHistory` (set in the same effect) were already present as component state, so no new state was needed — the condition `hasHistory && !examDate` naturally never overlaps with the `!hasHistory` welcome card. `/profil` route confirmed to exist in `src/App.tsx:161`. Verified with `npx tsc --noEmit` — no errors.
 
-- [ ] Run `npm run build` to verify no TypeScript errors.
+- [x] Run `npm run build` to verify no TypeScript errors.
+  **Done:** Ran `npm run build`. Build completed successfully (`✓ built in 318ms`) with no TypeScript errors. Only pre-existing warning is about `index-BjcpQR0d.js` exceeding the 500 kB chunk-size guideline, which is unrelated to this phase's changes and not a build failure.
