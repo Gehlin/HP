@@ -72,15 +72,17 @@ export default function Bookmarks() {
       <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8 flex flex-col">
         <PageHeader title="Bokmärken" />
         <div className="flex-1 flex items-center justify-center px-4">
-          <div className="text-center">
-            <div className="text-5xl font-black text-[var(--color-ink-faint)] mb-4">—</div>
-            <div className="text-[var(--color-ink-muted)] font-semibold mb-1">Inga bokmärken</div>
-            <p className="text-[var(--color-ink-faint)] text-sm mb-6">Spara frågor under ett träningspass för att se dem här.</p>
+          <div className="card rounded-2xl p-10 text-center max-w-sm w-full">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4 text-[var(--color-ink-faint)]">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+            <h1 className="text-lg font-bold text-[var(--color-ink)] mb-2">Inga bokmärken än</h1>
+            <p className="text-sm text-[var(--color-ink-faint)] mb-6">Tryck på bokmärkesikonen på en fråga för att spara den här.</p>
             <button
               onClick={() => navigate('/practice')}
-              className="btn-primary px-6 py-3 rounded-xl font-bold text-sm"
+              className="bg-[var(--color-green)] hover:opacity-90 transition-opacity px-6 py-3 rounded-xl font-bold text-sm text-white"
             >
-              Börja öva →
+              Öva nu →
             </button>
           </div>
         </div>
