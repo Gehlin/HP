@@ -82,7 +82,7 @@ const QuestionTimer = memo(function QuestionTimer({ currentIdx }: { currentIdx: 
     return () => clearInterval(t)
   }, [currentIdx])
   return (
-    <span className={`font-mono text-sm tabular-nums shrink-0 ${elapsed >= 120 ? 'text-[var(--color-error)] timer-warning' : 'text-[var(--color-ink-muted)]'}`}>
+    <span className={`font-[var(--font-sans)] font-semibold text-[13px] tabular-nums shrink-0 bg-[var(--color-card)] border border-[var(--color-hairline)] rounded-full px-3 py-[5px] ${elapsed >= 120 ? 'text-[var(--color-error)] timer-warning' : 'text-[var(--color-ink)]'}`}>
       {fmtTime(elapsed)}
     </span>
   )
@@ -349,43 +349,43 @@ export default function Session() {
     const completedMeta = SECTION_META[breakScreen.completedSection]
     const nextAccent = TYPE_ACCENTS[breakScreen.nextSection as QuestionType]
     return (
-      <div className="h-screen bg-app text-white flex flex-col items-center justify-center px-6">
+      <div className="h-screen bg-app text-[var(--color-ink)] flex flex-col items-center justify-center px-6">
         <div className="max-w-md w-full text-center animate-scale-in">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-3.5 py-1.5 mb-4">
-            <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3.5 py-1.5 mb-4">
+            <span className="text-emerald-700 text-xs font-bold uppercase tracking-widest">
               Avsnitt {breakScreen.completedSectionNumber} av 4 klart
             </span>
           </div>
-          <div className="text-5xl font-black mb-2 text-emerald-400">{breakScreen.completedSection}</div>
-          <div className="text-slate-500 text-sm mb-10">{completedMeta?.description}</div>
+          <div className="text-5xl font-black mb-2 text-emerald-700">{breakScreen.completedSection}</div>
+          <div className="text-[var(--color-ink-faint)] text-sm mb-10">{completedMeta?.description}</div>
 
-          <div className="glass rounded-2xl p-6 mb-8 text-left">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Nästa avsnitt</div>
-            <div className="text-3xl font-black mb-1" style={{ color: nextAccent?.color ?? '#fff' }}>
+          <div className="card rounded-2xl p-6 mb-8 text-left">
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Nästa avsnitt</div>
+            <div className="text-3xl font-black mb-1" style={{ color: nextAccent?.color ?? 'var(--color-ink)' }}>
               {breakScreen.nextSection}
             </div>
-            <div className="text-slate-400 text-sm mb-5">{SECTION_META[breakScreen.nextSection]?.description}</div>
+            <div className="text-[var(--color-ink-muted)] text-sm mb-5">{SECTION_META[breakScreen.nextSection]?.description}</div>
             <div className="flex gap-6">
               <div>
-                <div className="text-2xl font-black text-white">{breakScreen.nextCount}</div>
-                <div className="text-xs text-slate-600 mt-0.5">frågor</div>
+                <div className="text-2xl font-black text-[var(--color-ink)]">{breakScreen.nextCount}</div>
+                <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">frågor</div>
               </div>
               <div>
-                <div className="text-2xl font-black text-white">~{breakScreen.recommendedMin} min</div>
-                <div className="text-xs text-slate-600 mt-0.5">rekommenderat</div>
+                <div className="text-2xl font-black text-[var(--color-ink)]">~{breakScreen.recommendedMin} min</div>
+                <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">rekommenderat</div>
               </div>
             </div>
           </div>
 
           <button
             onClick={() => doBreakContinue(breakScreen, sectionTimestamps)}
-            className="bg-blue-600 hover:bg-blue-500 transition-colors rounded-2xl px-10 py-3.5 font-bold text-base"
+            className="btn-primary px-10 py-3.5 rounded-2xl font-bold text-base"
           >
-            Fortsätt{breakCountdown > 0 && <span className="text-blue-300/70 text-sm ml-2">({breakCountdown})</span>}
+            Fortsätt{breakCountdown > 0 && <span className="text-[var(--color-green-light)]/70 text-sm ml-2">({breakCountdown})</span>}
           </button>
 
           {timeLeft !== null && (
-            <div className={`mt-6 font-mono text-sm ${timeLeft < 120 ? 'text-red-400 timer-warning' : 'text-slate-600'}`}>
+            <div className={`mt-6 font-mono text-sm ${timeLeft < 120 ? 'text-[var(--color-error)] timer-warning' : 'text-[var(--color-ink-faint)]'}`}>
               {fmtTime(timeLeft)} kvar av provet
             </div>
           )}
@@ -423,7 +423,7 @@ export default function Session() {
 
           {/* Right: exam timer or per-question elapsed timer */}
           {timeLeft !== null ? (
-            <span className={`font-mono text-sm text-[var(--color-ink-muted)] tabular-nums${timeLeft < 30 ? ' timer-warning' : ''}`}>
+            <span className={`font-[var(--font-sans)] font-semibold text-[13px] text-[var(--color-ink)] tabular-nums shrink-0 bg-[var(--color-card)] border border-[var(--color-hairline)] rounded-full px-3 py-[5px]${timeLeft < 30 ? ' timer-warning' : ''}`}>
               {fmtTime(timeLeft)}
             </span>
           ) : (
@@ -432,7 +432,7 @@ export default function Session() {
         </div>
 
         {/* Linear progress bar */}
-        <div className="h-1 bg-[var(--color-paper-dark)]">
+        <div className="h-[3px] bg-[var(--color-track)]">
           <div
             className="h-full bg-[var(--color-green)] transition-all duration-300"
             style={{ width: `${(current / sessionQuestions.length) * 100}%` }}
@@ -531,13 +531,14 @@ export default function Session() {
                 !isRevealed && isChosen ? 'answer-option-selected' : '',
                 isRevealed && isAnswer ? 'answer-option-correct reveal-correct' : '',
                 isRevealed && isChosen && !isAnswer ? 'answer-option-wrong' : '',
-                isRevealed && !isAnswer && !isChosen ? 'opacity-50' : '',
+                isRevealed && !isAnswer && !isChosen ? 'answer-option-other' : '',
               ].filter(Boolean).join(' ')
 
-              let badgeBg = 'bg-[var(--color-paper-dark)]'
+              let badgeBg = 'bg-[var(--color-hairline)]'
               let badgeColor = 'text-[var(--color-ink)]'
-              if (isRevealed && isAnswer) { badgeBg = 'bg-[var(--color-green)]'; badgeColor = 'text-white' }
-              if (isRevealed && isChosen && !isAnswer) { badgeBg = 'bg-[var(--color-error)]'; badgeColor = 'text-white' }
+              if (!isRevealed && isChosen) { badgeBg = 'bg-[var(--color-terracotta)]'; badgeColor = 'text-white' }
+              if (isRevealed && isAnswer) { badgeBg = 'bg-[var(--color-correct-badge)]'; badgeColor = 'text-white' }
+              if (isRevealed && isChosen && !isAnswer) { badgeBg = 'bg-[var(--color-wrong-badge)]'; badgeColor = 'text-white' }
 
               const badgeLabel = isRevealed && isAnswer ? '✓'
                 : (isRevealed && isChosen && !isAnswer) ? '✗'
@@ -605,8 +606,8 @@ export default function Session() {
       {/* ── Skip undo toast ──────────────────────────────────── */}
       {undoSkip && (
         <div className="fixed bottom-24 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
-          <div className="pointer-events-auto flex items-center gap-3 bg-slate-800 border border-white/[0.1] rounded-xl px-4 py-2.5 shadow-2xl animate-slide-up">
-            <span className="text-sm text-slate-300">Fråga hoppades över</span>
+          <div className="pointer-events-auto flex items-center gap-3 card border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 shadow-2xl animate-slide-up">
+            <span className="text-sm text-[var(--color-ink-muted)]">Fråga hoppades över</span>
             <button
               onClick={handleUndoSkip}
               className="text-sm font-bold text-blue-400 hover:text-blue-300 transition-colors"
@@ -620,8 +621,8 @@ export default function Session() {
       {/* ── Key guide overlay ─────────────────────────────────── */}
       {showKeyGuide && (
         <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowKeyGuide(false)}>
-          <div ref={keyGuideRef} role="dialog" aria-modal="true" aria-label="Tangentbordsgenvägar" className="bg-[#0d1320] border border-white/[0.08] rounded-2xl w-full max-w-xs p-6 animate-scale-in" onClick={e => e.stopPropagation()}>
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Tangentbordsgenvägar</div>
+          <div ref={keyGuideRef} role="dialog" aria-modal="true" aria-label="Tangentbordsgenvägar" className="bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl w-full max-w-xs p-6 animate-scale-in" onClick={e => e.stopPropagation()}>
+            <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Tangentbordsgenvägar</div>
             <div className="space-y-3">
               {[
                 { key: 'A – E', desc: 'Välj svarsalternativ' },
@@ -630,12 +631,12 @@ export default function Session() {
                 { key: '?', desc: 'Visa / dölj denna guide' },
               ].map(s => (
                 <div key={s.key} className="flex items-center justify-between gap-4">
-                  <kbd className="text-xs font-mono bg-white/[0.06] border border-white/[0.1] text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap">{s.key}</kbd>
-                  <span className="text-sm text-slate-400 text-right">{s.desc}</span>
+                  <kbd className="text-xs font-mono bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] text-[var(--color-ink-muted)] px-2.5 py-1 rounded-lg whitespace-nowrap">{s.key}</kbd>
+                  <span className="text-sm text-[var(--color-ink-muted)] text-right">{s.desc}</span>
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowKeyGuide(false)} className="mt-5 w-full text-xs text-slate-600 hover:text-slate-400 transition-colors">Stäng (Esc)</button>
+            <button onClick={() => setShowKeyGuide(false)} className="mt-5 w-full text-xs text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] transition-colors">Stäng (Esc)</button>
           </div>
         </div>
       )}
@@ -643,25 +644,25 @@ export default function Session() {
       {/* ── Finish confirmation modal ──────────────────────────── */}
       {showFinishModal && (
         <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onClick={() => setShowFinishModal(false)}>
-          <div ref={finishModalRef} role="dialog" aria-modal="true" aria-label="Avsluta passet" className="bg-[#0d1320] border border-white/[0.08] rounded-2xl w-full max-w-sm p-6 animate-slide-up sm:animate-scale-in" onClick={e => e.stopPropagation()}>
-            <div className="text-base font-black text-white mb-1">Avsluta passet?</div>
-            <p className="text-sm text-slate-500 mb-5">Du kan inte återgå till frågorna efter att du avslutat.</p>
+          <div ref={finishModalRef} role="dialog" aria-modal="true" aria-label="Avsluta passet" className="bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl w-full max-w-sm p-6 animate-slide-up sm:animate-scale-in" onClick={e => e.stopPropagation()}>
+            <div className="text-base font-black text-[var(--color-ink)] mb-1">Avsluta passet?</div>
+            <p className="text-sm text-[var(--color-ink-faint)] mb-5">Du kan inte återgå till frågorna efter att du avslutat.</p>
             <div className="grid grid-cols-3 gap-3 mb-5 text-center">
-              <div className="bg-white/[0.04] rounded-xl py-2.5">
-                <div className="text-lg font-black text-white">{Object.keys(answers).length}</div>
-                <div className="text-[10px] text-slate-600 mt-0.5">Besvarade</div>
+              <div className="bg-[var(--color-paper-dark)] rounded-xl py-2.5">
+                <div className="text-lg font-black text-[var(--color-ink)]">{Object.keys(answers).length}</div>
+                <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">Besvarade</div>
               </div>
-              <div className="bg-white/[0.04] rounded-xl py-2.5">
-                <div className="text-lg font-black text-amber-400">{flagged.length}</div>
-                <div className="text-[10px] text-slate-600 mt-0.5">Markerade</div>
+              <div className="bg-[var(--color-paper-dark)] rounded-xl py-2.5">
+                <div className="text-lg font-black text-amber-600">{flagged.length}</div>
+                <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">Markerade</div>
               </div>
-              <div className="bg-white/[0.04] rounded-xl py-2.5">
-                <div className="text-lg font-black text-slate-400">{sessionQuestions.length - Object.keys(answers).length}</div>
-                <div className="text-[10px] text-slate-600 mt-0.5">Ej besvarade</div>
+              <div className="bg-[var(--color-paper-dark)] rounded-xl py-2.5">
+                <div className="text-lg font-black text-[var(--color-ink-muted)]">{sessionQuestions.length - Object.keys(answers).length}</div>
+                <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">Ej besvarade</div>
               </div>
             </div>
             <div className="flex gap-2.5">
-              <button onClick={() => setShowFinishModal(false)} className="flex-1 glass border border-white/[0.08] hover:bg-white/[0.07] rounded-xl py-3 font-bold text-sm transition-colors">
+              <button onClick={() => setShowFinishModal(false)} className="flex-1 card border border-[var(--color-card-border)] hover:bg-[var(--color-paper-dark)] rounded-xl py-3 font-bold text-sm transition-colors text-[var(--color-ink)]">
                 Fortsätt
               </button>
               <button onClick={handleFinish} className="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-xl py-3 font-bold text-sm transition-colors">
@@ -682,22 +683,22 @@ export default function Session() {
             role="dialog"
             aria-modal="true"
             aria-label="Hoppa till fråga"
-            className="bg-[#0d1320] border border-white/[0.08] rounded-2xl w-full max-w-sm p-5 animate-slide-up sm:animate-scale-in"
+            className="bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl w-full max-w-sm p-5 animate-slide-up sm:animate-scale-in"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="text-sm font-bold text-slate-300">Hoppa till fråga</div>
-              <button onClick={() => setShowJump(false)} className="text-slate-600 hover:text-slate-400 text-xl leading-none">×</button>
+              <div className="text-sm font-bold text-[var(--color-ink-muted)]">Hoppa till fråga</div>
+              <button onClick={() => setShowJump(false)} className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-xl leading-none">×</button>
             </div>
             <div className="grid grid-cols-8 gap-1.5">
               {sessionQuestions.map((sq, idx) => {
                 const isAnswered = !!answers[sq.id]
                 const isFlagged = flagged.includes(sq.id)
                 const isCurrent = idx === current
-                let cls = 'bg-white/[0.04] text-slate-600 hover:bg-white/[0.08] hover:text-slate-300'
+                let cls = 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)] hover:bg-[var(--color-paper-dark)]/80 hover:text-[var(--color-ink-muted)]'
                 if (isCurrent) cls = 'bg-blue-600 text-white'
-                else if (isFlagged) cls = 'bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30'
-                else if (isAnswered) cls = 'bg-white/[0.1] text-slate-200 hover:bg-white/[0.15]'
+                else if (isFlagged) cls = 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                else if (isAnswered) cls = 'bg-[var(--color-paper-dark)] text-[var(--color-ink)] hover:bg-[var(--color-paper-dark)]/80'
                 return (
                   <button
                     key={sq.id}
@@ -709,9 +710,9 @@ export default function Session() {
                 )
               })}
             </div>
-            <div className="flex gap-4 mt-4 text-[10px] text-slate-600">
-              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-white/[0.1]" /> Besvarad</span>
-              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-amber-500/20 border border-amber-500/30" /> Markerad</span>
+            <div className="flex gap-4 mt-4 text-[10px] text-[var(--color-ink-faint)]">
+              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-[var(--color-paper-dark)]" /> Besvarad</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-amber-50 border border-amber-200" /> Markerad</span>
               <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded bg-blue-600" /> Aktuell</span>
             </div>
           </div>
@@ -768,15 +769,17 @@ export default function Session() {
                 }}
                 className="btn-primary px-8"
               >
-                Visa svar
+                Kontrollera svar
               </button>
             ) : (
               <button
                 onClick={current < sessionQuestions.length - 1 ? handleNextQuestion : requestFinish}
                 disabled={(!chosen && !isRevealed) || isTransitioning}
-                className="btn-primary px-8 disabled:opacity-40"
+                className="btn-primary px-8 disabled:opacity-[0.45]"
               >
-                {current < sessionQuestions.length - 1 ? 'Nästa' : 'Slutför'}
+                {!chosen && !isRevealed
+                  ? 'Välj ett svar'
+                  : current < sessionQuestions.length - 1 ? 'Nästa fråga' : 'Se resultat'}
               </button>
             )}
           </div>

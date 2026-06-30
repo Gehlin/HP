@@ -55,6 +55,7 @@
   --color-feedback-wrong-bg: #F8EAE3;
   --color-feedback-wrong-border: #ECD3C6;
   --color-feedback-wrong-title: #A84A26;
+  --color-surface-warm: #FBF9F4;
 }
 
 @layer base {
@@ -164,18 +165,24 @@
 }
 
 .answer-option-selected {
-  border: 2px solid var(--color-green);
-  background: var(--color-green-muted);
+  border: 2px solid var(--color-selected-border);
+  background: var(--color-selected-bg);
 }
 
 .answer-option-correct {
-  border: 2px solid var(--color-green);
-  background: var(--color-success-bg);
+  border: 2px solid var(--color-correct-border);
+  background: var(--color-correct-bg);
 }
 
 .answer-option-wrong {
-  border: 2px solid var(--color-error);
-  background: var(--color-error-bg);
+  border: 2px solid var(--color-wrong-border);
+  background: var(--color-wrong-bg);
+}
+
+.answer-option-other {
+  background: var(--color-surface-warm);
+  border-color: #EEE8DC;
+  opacity: 0.8;
 }
 
 /* ─── Spacing utility ────────────────────────────────────────── */

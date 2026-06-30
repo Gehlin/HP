@@ -14,18 +14,18 @@ interface Props {
 
 export default function ExplanationCard({ isCorrect, correctAnswer, correctAnswerText, explanation, explanationData, chosenAnswer, onLearnMore, learnMoreLabel }: Props) {
   return (
-    <div className="rounded-2xl overflow-hidden mt-4 border border-[var(--color-card-border)] bg-[var(--color-card)]">
+    <div className={`rounded-2xl overflow-hidden mt-4 border bg-[var(--color-card)] ${isCorrect ? 'border-[var(--color-feedback-correct-border)]' : 'border-[var(--color-feedback-wrong-border)]'}`}>
 
       {/* Header */}
-      <div className={`px-5 py-3 flex items-center gap-3 ${isCorrect ? 'bg-[var(--color-success-bg)]' : 'bg-[var(--color-error-bg)]'}`}>
+      <div className={`px-5 py-3 flex items-center gap-3 ${isCorrect ? 'bg-[var(--color-feedback-correct-bg)]' : 'bg-[var(--color-feedback-wrong-bg)]'}`}>
         {isCorrect ? (
-          <span className="text-lg font-black text-[var(--color-success)]">✓ Rätt!</span>
+          <span className="text-lg font-black text-[var(--color-feedback-correct-title)]">✓ Rätt!</span>
         ) : correctAnswerText ? (
-          <span className="text-lg font-black text-[var(--color-error)]">
+          <span className="text-lg font-black text-[var(--color-feedback-wrong-title)]">
             ✗ Fel — rätt svar {correctAnswer}:&nbsp;<MathText text={correctAnswerText} />
           </span>
         ) : (
-          <span className="text-lg font-black text-[var(--color-error)]">✗ Fel — rätt svar: {correctAnswer}</span>
+          <span className="text-lg font-black text-[var(--color-feedback-wrong-title)]">✗ Fel — rätt svar: {correctAnswer}</span>
         )}
       </div>
 
