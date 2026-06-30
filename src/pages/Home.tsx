@@ -18,12 +18,6 @@ const TYPE_ACCENTS: Record<string, { color: string; ring: string; bg: string }> 
   ELF: { color: '#7C3AED', ring: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
 }
 
-const HERO_R = 36
-const HERO_C = 2 * Math.PI * HERO_R
-
-const SECT_R = 20
-const SECT_C = 2 * Math.PI * SECT_R
-
 export default function Home() {
   const navigate = useNavigate()
   const byType = {
@@ -80,8 +74,7 @@ export default function Home() {
 
   const days = examDate ? daysUntilExam() : null
 
-  const heroScorePct = (readiness?.score ?? 0) / 2.0
-  const heroRingOffset = HERO_C * (1 - heroScorePct / 100)
+  const heroScorePct = Math.min(100, Math.max(0, (readiness?.score ?? 0) / 2.0))
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'God morgon' : hour < 17 ? 'God dag' : 'God kväll'
@@ -137,41 +130,35 @@ export default function Home() {
         )}
 
         {/* ── Hero score card ───────────────────────────────── */}
-        <div className="card-green p-6 mb-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-white/70 font-[var(--font-sans)] mb-1">Uppskattat HP-poäng</p>
-              <div className="text-5xl font-[var(--font-serif)] text-white leading-none mb-4">
-                {readiness?.score ?? 0}
-              </div>
-              <div className="flex gap-5">
-                <div>
-                  <div className="text-base text-white font-semibold">{totalCorrect}</div>
-                  <div className="text-xs text-white/60">Rätt totalt</div>
-                </div>
-                <div>
-                  <div className="text-base text-white font-semibold">{stats?.streak ?? '–'}</div>
-                  <div className="text-xs text-white/60">Streak</div>
-                </div>
-                <div>
-                  <div className="text-base text-white font-semibold">{days ?? '–'}</div>
-                  <div className="text-xs text-white/60">Dagar kvar till HP</div>
-                </div>
-              </div>
+        <div className="card-green mb-4" style={{ borderRadius: 22, padding: 20 }}>
+          <p
+            className="text-[10px] font-bold uppercase tracking-[0.16em] mb-1"
+            style={{ color: 'var(--color-green-tint)' }}
+          >
+            Uppskattat HP-poäng
+          </p>
+          <div className="text-5xl font-[var(--font-serif)] text-white leading-none mb-4">
+            {readiness?.score ?? 0}
+          </div>
+          <div className="h-1.5 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.15)' }}>
+            <div
+              className="h-full rounded-full transition-all duration-300"
+              style={{ width: `${heroScorePct}%`, background: 'var(--color-gold)' }}
+            />
+          </div>
+          <div className="flex gap-5">
+            <div>
+              <div className="text-base text-white font-semibold">{totalCorrect}</div>
+              <div className="text-xs text-white/60">Rätt totalt</div>
             </div>
-            <svg width="80" height="80" viewBox="0 0 80 80" className="shrink-0">
-              <circle cx="40" cy="40" r={HERO_R} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="6" />
-              <circle
-                cx="40" cy="40" r={HERO_R}
-                fill="none"
-                stroke="white"
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeDasharray={HERO_C}
-                strokeDashoffset={heroRingOffset}
-                transform="rotate(-90 40 40)"
-              />
-            </svg>
+            <div>
+              <div className="text-base text-white font-semibold">{stats?.streak ?? '–'}</div>
+              <div className="text-xs text-white/60">Streak</div>
+            </div>
+            <div>
+              <div className="text-base text-white font-semibold">{days ?? '–'}</div>
+              <div className="text-xs text-white/60">Dagar kvar till HP</div>
+            </div>
           </div>
         </div>
 
@@ -182,9 +169,9 @@ export default function Home() {
           const remaining = tot - answered
           const sessionType = resumeSession.type === 'exam' ? 'HP-prov' : resumeSession.studyMode ? 'Studieläge' : 'Övning'
           return (
-            <div className="card p-4 mb-4 flex items-center justify-between gap-4">
+            <div className="card p-4 mb-4 flex items-center justify-between gap-4" style={{ borderRadius: 18 }}>
               <div className="flex-1 min-w-0">
-                <div className="text-xs uppercase tracking-widest text-[var(--color-ink-faint)] font-semibold mb-1">
+                <div className="text-xs uppercase tracking-[0.16em] text-[var(--color-ink-faint)] font-semibold mb-1">
                   Fortsätt där du slutade
                 </div>
                 <div className="text-base font-semibold text-[var(--color-ink)]">
@@ -208,7 +195,6 @@ export default function Home() {
             const acc = typeAccuracy[type]
             const pct = acc && acc.total > 0 ? Math.round((acc.correct / acc.total) * 100) : 0
             const count = byType[type as keyof typeof byType] ?? 0
-            const sectOffset = SECT_C * (1 - pct / 100)
             return (
               <button
                 key={type}
@@ -217,19 +203,26 @@ export default function Home() {
                 style={{ backgroundColor: accent.bg }}
               >
                 <div className="flex items-start gap-3 mb-1">
-                  <svg width="48" height="48" viewBox="0 0 48 48" className="shrink-0">
-                    <circle cx="24" cy="24" r={SECT_R} fill="none" stroke="var(--color-paper-dark)" strokeWidth="4" />
-                    <circle
-                      cx="24" cy="24" r={SECT_R}
-                      fill="none"
-                      stroke={accent.ring}
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeDasharray={SECT_C}
-                      strokeDashoffset={sectOffset}
-                      transform="rotate(-90 24 24)"
-                    />
-                  </svg>
+                  <div
+                    className="shrink-0"
+                    style={{
+                      width: 32, height: 32, borderRadius: '50%',
+                      background: `conic-gradient(${accent.ring} ${pct}%, var(--color-track) 0)`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 23, height: 23, borderRadius: '50%',
+                        background: 'var(--color-card)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        font: '700 9px/1 var(--font-sans)',
+                        color: 'var(--color-ink)',
+                      }}
+                    >
+                      {pct}
+                    </div>
+                  </div>
                   <div className="flex-1 min-w-0 pt-1">
                     <div className="text-sm font-semibold text-[var(--color-ink)]">{type}</div>
                     <div className="text-xs text-[var(--color-ink-faint)]">{pct}% rätt</div>
