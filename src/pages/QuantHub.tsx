@@ -26,11 +26,11 @@ const TYPE_META: Record<string, {
   XYZ: {
     label: 'XYZ',
     desc: 'Matematisk problemlösning',
-    color: 'text-violet-700',
-    text: 'text-violet-600',
-    bg: 'bg-violet-50',
-    border: 'border-violet-200',
-    bar: 'bg-violet-500',
+    color: 'text-[var(--color-terracotta)]',
+    text: 'text-[var(--color-terracotta)]',
+    bg: 'bg-[var(--color-terracotta-muted)]',
+    border: 'border-[var(--color-card-border)]',
+    bar: 'bg-[var(--color-terracotta)]',
     guideRoute: '/xyz-guide',
     guideLabel: 'XYZ-guide',
     strategy: 'Rita alltid en figur vid geometri. Fastnar du efter 60s? Gissa och gå vidare — ingen minuspoäng.',
@@ -40,11 +40,11 @@ const TYPE_META: Record<string, {
   KVA: {
     label: 'KVA',
     desc: 'Kvantitativa jämförelser',
-    color: 'text-blue-700',
-    text: 'text-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    bar: 'bg-blue-500',
+    color: 'text-[var(--color-terracotta)]',
+    text: 'text-[var(--color-terracotta)]',
+    bg: 'bg-[var(--color-terracotta-muted)]',
+    border: 'border-[var(--color-card-border)]',
+    bar: 'bg-[var(--color-terracotta)]',
     guideRoute: '/kva-guide',
     guideLabel: 'KVA-guide',
     strategy: 'Testa extremvärden (x=0, x=1, x=−1) istället för att räkna exakt. Välj D om ett motexempel hittas.',
@@ -54,11 +54,11 @@ const TYPE_META: Record<string, {
   NOG: {
     label: 'NOG',
     desc: 'Datainsamling',
-    color: 'text-emerald-700',
-    text: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    bar: 'bg-emerald-500',
+    color: 'text-[var(--color-terracotta)]',
+    text: 'text-[var(--color-terracotta)]',
+    bg: 'bg-[var(--color-terracotta-muted)]',
+    border: 'border-[var(--color-card-border)]',
+    bar: 'bg-[var(--color-terracotta)]',
     guideRoute: '/nog-guide',
     guideLabel: 'NOG-guide',
     strategy: 'Du behöver INTE lösa — bara avgöra om det GÅR. Testa varje påstående separat innan du kombinerar.',
@@ -68,11 +68,11 @@ const TYPE_META: Record<string, {
   DTK: {
     label: 'DTK',
     desc: 'Diagram, tabeller & kartor',
-    color: 'text-amber-700',
-    text: 'text-amber-600',
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    bar: 'bg-amber-500',
+    color: 'text-[var(--color-terracotta)]',
+    text: 'text-[var(--color-terracotta)]',
+    bg: 'bg-[var(--color-terracotta-muted)]',
+    border: 'border-[var(--color-card-border)]',
+    bar: 'bg-[var(--color-terracotta)]',
     guideRoute: '/dtk-guide',
     guideLabel: 'DTK-guide',
     strategy: 'Läs axlarnas enheter och rubriken FÖRST. Besvara exakt vad som frågas — inte det du tror frågas.',
@@ -160,8 +160,8 @@ export default function QuantHub() {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-[var(--color-terracotta-muted)] border border-[var(--color-terracotta)] text-[var(--color-terracotta)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-terracotta)] animate-pulse" />
             Kvantitativt delprov
           </div>
           <h1 className="text-3xl font-[var(--font-serif)] tracking-tight text-[var(--color-ink)] mb-1">Kvantitativ träning</h1>
@@ -188,8 +188,8 @@ export default function QuantHub() {
             <div className="text-right">
               {totalQuantDue > 0 && (
                 <div className="flex items-center gap-1.5 justify-end mb-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-xs text-amber-700 font-bold">{totalQuantDue} att repetera</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)] animate-pulse" />
+                  <span className="text-xs text-[var(--color-gold-deep)] font-bold">{totalQuantDue} att repetera</span>
                 </div>
               )}
               <button
@@ -226,7 +226,7 @@ export default function QuantHub() {
                       {due > 0 && (
                         <button
                           onClick={() => startSrs(type)}
-                          className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 transition-colors"
+                          className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-[var(--color-gold-muted)] border border-[var(--color-hairline)] text-[var(--color-gold-deep)] hover:opacity-80 transition-opacity"
                         >
                           ↻ {due}
                         </button>
@@ -245,11 +245,11 @@ export default function QuantHub() {
                     <div className="mb-2">
                       <div className="flex justify-between text-[11px] mb-1">
                         <span className="text-[var(--color-ink-faint)]">{acc.total} svar</span>
-                        <span className={`font-bold ${pct >= 70 ? 'text-emerald-700' : pct >= 50 ? 'text-amber-700' : 'text-red-700'}`}>{pct}%</span>
+                        <span className={`font-bold ${pct >= 70 ? 'text-[var(--color-green)]' : pct >= 50 ? 'text-[var(--color-gold-deep)]' : 'text-[var(--color-terracotta)]'}`}>{pct}%</span>
                       </div>
                       <div className="h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                          className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-[var(--color-green-light)]' : pct >= 50 ? 'bg-[var(--color-gold)]' : 'bg-[var(--color-terracotta)]'}`}
                           style={{ width: `${pct}%` }}
                         />
                       </div>

@@ -26,11 +26,11 @@ const TYPE_META: Record<string, {
   ORD: {
     label: 'ORD',
     desc: 'Ordförståelse',
-    color: 'text-rose-700',
-    text: 'text-rose-600',
-    bg: 'bg-rose-50',
-    border: 'border-rose-200',
-    bar: 'bg-rose-500',
+    color: 'text-[var(--color-green)]',
+    text: 'text-[var(--color-green)]',
+    bg: 'bg-[var(--color-green-muted)]',
+    border: 'border-[var(--color-card-border)]',
+    bar: 'bg-[var(--color-green-light)]',
     guideRoute: '/ord-guide',
     guideLabel: 'ORD-guide',
     strategy: 'Bryt ned okända ord: prefix + rot + suffix. Etymologi slår gissning varje gång.',
@@ -40,11 +40,11 @@ const TYPE_META: Record<string, {
   LAS: {
     label: 'LÄS',
     desc: 'Läsförståelse',
-    color: 'text-pink-700',
-    text: 'text-pink-600',
-    bg: 'bg-pink-50',
-    border: 'border-pink-200',
-    bar: 'bg-pink-500',
+    color: 'text-[var(--color-green)]',
+    text: 'text-[var(--color-green)]',
+    bg: 'bg-[var(--color-green-muted)]',
+    border: 'border-[var(--color-card-border)]',
+    bar: 'bg-[var(--color-green-light)]',
     guideRoute: '/las-guide',
     guideLabel: 'LÄS-guide',
     strategy: 'Läs första meningen i varje stycke — bygg en karta innan du går till frågorna.',
@@ -54,11 +54,11 @@ const TYPE_META: Record<string, {
   MEK: {
     label: 'MEK',
     desc: 'Meningskomplettering',
-    color: 'text-fuchsia-700',
-    text: 'text-fuchsia-600',
-    bg: 'bg-fuchsia-50',
-    border: 'border-fuchsia-200',
-    bar: 'bg-fuchsia-500',
+    color: 'text-[var(--color-green)]',
+    text: 'text-[var(--color-green)]',
+    bg: 'bg-[var(--color-green-muted)]',
+    border: 'border-[var(--color-card-border)]',
+    bar: 'bg-[var(--color-green-light)]',
     guideRoute: '/mek-guide',
     guideLabel: 'MEK-guide',
     strategy: 'Identifiera signalordet (trots/eftersom/dels) — det avslöjar relationen.',
@@ -68,11 +68,11 @@ const TYPE_META: Record<string, {
   ELF: {
     label: 'ELF',
     desc: 'Engelsk läsförståelse',
-    color: 'text-purple-700',
-    text: 'text-purple-600',
-    bg: 'bg-purple-50',
-    border: 'border-purple-200',
-    bar: 'bg-purple-500',
+    color: 'text-[var(--color-green)]',
+    text: 'text-[var(--color-green)]',
+    bg: 'bg-[var(--color-green-muted)]',
+    border: 'border-[var(--color-card-border)]',
+    bar: 'bg-[var(--color-green-light)]',
     guideRoute: '/elf-guide',
     guideLabel: 'ELF-guide',
     strategy: 'Läs frågan först, lokalisera sedan rätt stycke — undvik att läsa om hela texten.',
@@ -160,8 +160,8 @@ export default function VerbalHub() {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-[var(--color-green-muted)] border border-[var(--color-green)] text-[var(--color-green)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-green)] animate-pulse" />
             Verbalt delprov
           </div>
           <h1 className="text-3xl font-[var(--font-serif)] tracking-tight text-[var(--color-ink)] mb-1">Verbal träning</h1>
@@ -188,8 +188,8 @@ export default function VerbalHub() {
             <div className="text-right">
               {totalVerbalDue > 0 && (
                 <div className="flex items-center gap-1.5 justify-end mb-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-xs text-amber-700 font-bold">{totalVerbalDue} att repetera</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)] animate-pulse" />
+                  <span className="text-xs text-[var(--color-gold-deep)] font-bold">{totalVerbalDue} att repetera</span>
                 </div>
               )}
               <button
@@ -226,7 +226,7 @@ export default function VerbalHub() {
                       {due > 0 && (
                         <button
                           onClick={() => startSrs(type)}
-                          className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 transition-colors"
+                          className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-[var(--color-gold-muted)] border border-[var(--color-hairline)] text-[var(--color-gold-deep)] hover:opacity-80 transition-opacity"
                         >
                           ↻ {due}
                         </button>
@@ -245,11 +245,11 @@ export default function VerbalHub() {
                     <div className="mb-2">
                       <div className="flex justify-between text-[11px] mb-1">
                         <span className="text-[var(--color-ink-faint)]">{acc.total} svar</span>
-                        <span className={`font-bold ${pct >= 70 ? 'text-emerald-700' : pct >= 50 ? 'text-amber-700' : 'text-red-700'}`}>{pct}%</span>
+                        <span className={`font-bold ${pct >= 70 ? 'text-[var(--color-green)]' : pct >= 50 ? 'text-[var(--color-gold-deep)]' : 'text-[var(--color-terracotta)]'}`}>{pct}%</span>
                       </div>
                       <div className="h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                          className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-[var(--color-green-light)]' : pct >= 50 ? 'bg-[var(--color-gold)]' : 'bg-[var(--color-terracotta)]'}`}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -279,7 +279,7 @@ export default function VerbalHub() {
         <div className="card rounded-2xl p-5 mb-4">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <div className="text-[10px] font-bold text-rose-700 uppercase tracking-widest mb-1">Vokabulärbyggaren</div>
+              <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1">Vokabulärbyggaren</div>
               <div className="font-black text-base text-[var(--color-ink)] mb-0.5">Ordbyggaren</div>
               <div className="text-[var(--color-ink-faint)] text-xs">Lär dig HP:s ordförråd med flashcards och egenbedömning</div>
             </div>
