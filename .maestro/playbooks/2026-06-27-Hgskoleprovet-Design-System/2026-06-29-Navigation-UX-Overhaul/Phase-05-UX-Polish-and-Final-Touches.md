@@ -9,7 +9,7 @@ With the structural overhaul complete, this phase sweeps through the remaining r
   - Position it absolutely on the icon container (the `<span className="relative">` wrapper around the icon)
   - **Done:** Replaced the `w-2 h-2` dot at `src/components/TopNav.tsx:67-69` with the numeric pill exactly as specified, kept on the existing `relative` icon wrapper span. `npx tsc --noEmit` passes with zero errors.
 
-- [ ] Add a contextual sub-label under the "Träna" tab in `src/components/TopNav.tsx` when `dueCount > 0`. Instead of just "Träna", show "Träna" label as normal but the tab icon gets a pulsing amber ring to draw attention. Add a CSS animation in `src/index.css`:
+- [x] Add a contextual sub-label under the "Träna" tab in `src/components/TopNav.tsx` when `dueCount > 0`. Instead of just "Träna", show "Träna" label as normal but the tab icon gets a pulsing amber ring to draw attention. Add a CSS animation in `src/index.css`:
   ```css
   @keyframes pulse-ring {
     0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
@@ -21,6 +21,7 @@ With the structural overhaul complete, this phase sweeps through the remaining r
   }
   ```
   Apply `due-pulse` class to the icon wrapper `<span>` on the Träna tab when `dueCount > 0`.
+  - **Done:** Added the `pulse-ring` keyframes and `.due-pulse` class to `src/index.css` (placed alongside the other nav-related animations, right after `.nav-pill`). Conditionally applied `due-pulse` to the icon wrapper `<span>` in `src/components/TopNav.tsx:65` via a template-literal class for `tab.path === '/practice' && dueCount > 0`, alongside the existing numeric badge. `npx tsc --noEmit` passes with zero errors.
 
 - [ ] Audit `src/pages/Home.tsx` for visual consistency with the new top nav:
   - The greeting header (`God morgon`, date) should sit well below the nav — confirm `pt-6` gives enough breathing room or increase to `pt-8`

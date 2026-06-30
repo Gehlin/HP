@@ -62,7 +62,7 @@ export default function TopNav() {
                 onClick={() => navigate(tab.path)}
                 className="flex flex-col items-center justify-center gap-0.5 px-3 py-2 relative group min-w-[3.5rem]"
               >
-                <span className={`relative transition-colors duration-150 ${isActive ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-faint)] group-hover:text-[var(--color-ink-muted)]'}`}>
+                <span className={`relative transition-colors duration-150 ${isActive ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-faint)] group-hover:text-[var(--color-ink-muted)]'} ${tab.path === '/practice' && dueCount > 0 ? 'due-pulse' : ''}`}>
                   <tab.Icon active={isActive} />
                   {tab.path === '/practice' && dueCount > 0 && (
                     <span className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full bg-amber-500 text-white text-[9px] font-black flex items-center justify-center px-0.5 ring-2 ring-[var(--color-paper)]">{dueCount > 9 ? '9+' : dueCount}</span>

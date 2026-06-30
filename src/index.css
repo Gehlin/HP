@@ -296,6 +296,16 @@
   animation: navPillSlide 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  50% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+}
+
+.due-pulse {
+  animation: pulse-ring 2s ease-in-out infinite;
+  border-radius: 50%;
+}
+
 /* ─── Custom scrollbar ───────────────────────────────────────── */
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
