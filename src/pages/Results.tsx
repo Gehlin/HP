@@ -791,19 +791,19 @@ export default function Results() {
         <div className="flex gap-2 mb-4 flex-wrap">
           <button
             onClick={() => setReviewFilter('all')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-blue-500 text-blue-400 bg-blue-500/10' : 'border-[var(--color-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-[var(--color-selected-border)] text-[var(--color-ink)] bg-[var(--color-selected-bg)]' : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
           >
             Alla ({sessionQuestions.length})
           </button>
           <button
             onClick={() => setReviewFilter('wrong')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'wrong' ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-[var(--color-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'wrong' ? 'border-[var(--color-wrong-border)] text-[var(--color-wrong-badge)] bg-[var(--color-wrong-bg)]' : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
           >
             Fel ({sessionQuestions.filter(q => !skipped.includes(q.id) && session.answers[q.id] !== q.answer).length})
           </button>
           <button
             onClick={() => setReviewFilter('flagged')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'flagged' ? 'border-amber-500 text-amber-400 bg-amber-500/10' : 'border-[var(--color-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
+            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'flagged' ? 'border-[var(--color-gold-deep)] text-[var(--color-gold-deep)] bg-[var(--color-gold-muted)]' : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
           >
             ★ Markerade ({(session.flagged ?? []).length})
           </button>
@@ -884,7 +884,7 @@ export default function Results() {
                     </span>
                   )}
                   {fmtQuestionTime && (
-                    <span className="border border-[var(--color-border)] rounded px-1.5 py-0.5 text-[10px] text-[var(--color-ink-faint)]">
+                    <span className="border border-[var(--color-card-border)] rounded px-1.5 py-0.5 text-[10px] text-[var(--color-ink-faint)]">
                       ⏱ {fmtQuestionTime}
                     </span>
                   )}
@@ -894,7 +894,7 @@ export default function Results() {
                       const next = toggleBookmark(q.id)
                       setBookmarkState(s => ({ ...s, [q.id]: next }))
                     }}
-                    className={`border rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${bookmarkState[q.id] ? 'border-blue-600 text-blue-400 bg-blue-500/10' : 'border-[var(--color-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
+                    className={`border rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${bookmarkState[q.id] ? 'border-[var(--color-gold-deep)] text-[var(--color-gold-deep)] bg-[var(--color-gold-muted)]' : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
                   >
                     🔖 {bookmarkState[q.id] ? 'Sparat' : 'Spara'}
                   </button>
@@ -904,7 +904,7 @@ export default function Results() {
                   <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 mt-2">
                     <div className="grid gap-2">
                       {answerOptions.map(([key, text]) => {
-                        let cls = 'border-[var(--color-border)] text-[var(--color-ink-faint)]'
+                        let cls = 'border-[var(--color-card-border)] text-[var(--color-ink-faint)]'
                         let labelCls = 'bg-[var(--color-paper-dark)] text-[var(--color-ink-muted)]'
                         if (key === q.answer) { cls = 'border-emerald-500/60 text-[var(--color-ink)] bg-emerald-500/10'; labelCls = 'bg-emerald-600 text-white' }
                         if (key === userAnswer && key !== q.answer) { cls = 'border-red-500/60 text-[var(--color-ink)] bg-red-500/10'; labelCls = 'bg-red-600 text-white' }

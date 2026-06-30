@@ -526,7 +526,7 @@ export default function Practice() {
             <div className="mb-6">
               <SectionLabel>
                 Antal frågor — {Math.min(count, available)}{' '}
-                <span className="text-slate-700 normal-case tracking-normal font-normal">av {available} tillgängliga</span>
+                <span className="text-[var(--color-ink-muted)] normal-case tracking-normal font-normal">av {available} tillgängliga</span>
               </SectionLabel>
               <input
                 type="range"
@@ -536,7 +536,7 @@ export default function Practice() {
                 onChange={e => setCount(Number(e.target.value))}
                 className="w-full"
               />
-              <div className="flex justify-between text-[10px] text-slate-700 mt-1">
+              <div className="flex justify-between text-[10px] text-[var(--color-ink-muted)] mt-1">
                 <span>5</span><span>{available}</span>
               </div>
             </div>
