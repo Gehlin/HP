@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { questions } from '../data/questions'
 import { loadStats, type GameStats } from '../utils/gamification'
-import { loadHistory, loadSession, saveSession } from '../utils/session'
+import { loadHistory, loadSession, saveSession, buildSession } from '../utils/session'
 import { getExamDate, daysUntilExam } from '../utils/examDate'
 import { computeReadiness } from '../utils/readiness'
 import { computePacing, type PacingResult } from '../utils/pacing'
+import { weakTypeSummary, buildWeakAreaSession } from '../utils/analytics'
 import type { ExamSession } from '../types'
 
 const TYPE_ACCENTS: Record<string, { color: string; ring: string; bg: string }> = {
@@ -41,6 +42,8 @@ export default function Home() {
   const [hasHistory, setHasHistory] = useState(false)
   const [pacing, setPacing] = useState<PacingResult | null>(null)
   const [pacingDismissed, setPacingDismissed] = useState(false)
+  const [weakTypes, setWeakTypes] = useState<{ type: string; pct: number }[]>([])
+  const [weakAreaIds, setWeakAreaIds] = useState<string[]>([])
 
   useEffect(() => {
     setStats(loadStats())
@@ -60,6 +63,10 @@ export default function Home() {
 
     const history = loadHistory()
     setHasHistory(history.length > 0)
+    if (history.length > 0) {
+      setWeakTypes(weakTypeSummary())
+      setWeakAreaIds(buildWeakAreaSession(20))
+    }
     const fullTypeAcc: Record<string, { correct: number; total: number }> = {
       XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
       NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
@@ -213,6 +220,50 @@ export default function Home() {
               </button>
             </div>
           </div>
+        )}
+
+        {/* ── Weak-area focus card ─────────────────────────── */}
+        {weakTypes.length > 0 && weakAreaIds.length > 0 && (
+          <button
+            onClick={() => {
+              const session = buildSession(weakAreaIds, null, true, 'drill', true)
+              saveSession(session)
+              navigate('/session')
+            }}
+            className="w-full card p-4 mb-4 text-left"
+            style={{ borderLeft: '4px solid var(--color-terracotta)' }}
+          >
+            <div
+              className="text-[10px] font-bold uppercase tracking-[0.16em] mb-1"
+              style={{ color: 'var(--color-terracotta)' }}
+            >
+              Fokusträning
+            </div>
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <p className="text-sm font-semibold text-[var(--color-ink)]">
+                Öva på dina svagaste delmoment
+              </p>
+              <span className="text-[var(--color-ink-faint)] shrink-0">→</span>
+            </div>
+            <div className="flex gap-1.5 flex-wrap items-center">
+              {weakTypes.map(({ type, pct }) => (
+                <span
+                  key={type}
+                  className="text-[10px] font-bold border px-1.5 py-0.5 rounded-md"
+                  style={{
+                    color: 'var(--color-terracotta)',
+                    borderColor: 'var(--color-terracotta)',
+                    background: 'var(--color-terracotta-muted)',
+                  }}
+                >
+                  {type} {pct}%
+                </span>
+              ))}
+              <span className="text-[10px] text-[var(--color-ink-faint)]">
+                · {weakAreaIds.length} frågor · studieläge
+              </span>
+            </div>
+          </button>
         )}
 
         {/* ── Fortsätt card ─────────────────────────────────── */}

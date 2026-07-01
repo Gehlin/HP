@@ -148,6 +148,39 @@ export function weakTypeSummary(): { type: QuestionType; pct: number }[] {
     .slice(0, 3)
 }
 
+// Selects up to `limit` question IDs from the user's weakest tag areas.
+// Mirrors the adaptiveIds logic in Practice.tsx — extract tags with <70% accuracy
+// (min 3 answers), pick the 4 weakest, then sample questions touching those tags.
+export function buildWeakAreaSession(limit = 20): string[] {
+  const history = loadHistory()
+  if (history.length === 0) return []
+  const tagAcc: Record<string, { correct: number; total: number }> = {}
+  history.forEach(s => {
+    s.questionIds.forEach(qid => {
+      const q = questions.find(x => x.id === qid)
+      if (!q || !s.answers[qid]) return
+      for (const tag of q.tags) {
+        if (!tagAcc[tag]) tagAcc[tag] = { correct: 0, total: 0 }
+        tagAcc[tag].total++
+        if (s.answers[qid] === q.answer) tagAcc[tag].correct++
+      }
+    })
+  })
+  const weakTags = new Set(
+    Object.entries(tagAcc)
+      .filter(([, v]) => v.total >= 3 && (v.correct / v.total) < 0.70)
+      .sort(([, a], [, b]) => (a.correct / a.total) - (b.correct / b.total))
+      .slice(0, 4)
+      .map(([tag]) => tag)
+  )
+  if (weakTags.size === 0) return []
+  return questions
+    .filter(q => q.tags.some(t => weakTags.has(t)))
+    .sort(() => Math.random() - 0.5)
+    .slice(0, limit)
+    .map(q => q.id)
+}
+
 // Weighted rolling HP score — more recent sessions weighted higher
 export function rollingHpScore(n = 10): number | null {
   const history = loadHistory().slice(0, n)

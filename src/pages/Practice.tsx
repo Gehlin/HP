@@ -6,7 +6,7 @@ import { buildSession, saveSession, loadHistory } from '../utils/session'
 import { getDueQuestions } from '../utils/srs'
 import { getBookmarks } from '../utils/bookmarks'
 import { getDailyChallengeIds, markDailyChallengeCompleted } from '../utils/dailyChallenge'
-import { weakTypeSummary } from '../utils/analytics'
+import { weakTypeSummary, buildWeakAreaSession } from '../utils/analytics'
 
 type Mode = 'drill' | 'exam' | 'repetition'
 type Difficulty = 'easy' | 'medium' | 'hard'
@@ -157,35 +157,7 @@ export default function Practice() {
     return Array.from(wrongSet)
   }, [])
 
-  const adaptiveIds = useMemo(() => {
-    const history = loadHistory()
-    if (history.length === 0) return []
-    const tagAcc: Record<string, { correct: number; total: number }> = {}
-    history.forEach(s => {
-      s.questionIds.forEach(qid => {
-        const q = questions.find(x => x.id === qid)
-        if (!q || !s.answers[qid]) return
-        for (const tag of q.tags) {
-          if (!tagAcc[tag]) tagAcc[tag] = { correct: 0, total: 0 }
-          tagAcc[tag].total++
-          if (s.answers[qid] === q.answer) tagAcc[tag].correct++
-        }
-      })
-    })
-    const weakTags = new Set(
-      Object.entries(tagAcc)
-        .filter(([, v]) => v.total >= 3 && (v.correct / v.total) < 0.70)
-        .sort(([, a], [, b]) => (a.correct / a.total) - (b.correct / b.total))
-        .slice(0, 4)
-        .map(([tag]) => tag)
-    )
-    if (weakTags.size === 0) return []
-    return questions
-      .filter(q => q.tags.some(t => weakTags.has(t)))
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 20)
-      .map(q => q.id)
-  }, [])
+  const adaptiveIds = useMemo(() => buildWeakAreaSession(20), [])
 
   const weakTypes = useMemo(() => weakTypeSummary(), [])
 
