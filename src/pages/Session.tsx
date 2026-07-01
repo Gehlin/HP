@@ -114,6 +114,8 @@ export default function Session() {
   const [sectionTimestamps, setSectionTimestamps] = useState<Record<string, number>>(
     session?.sectionTimestamps ?? {}
   )
+  const [streak, setStreak] = useState(0)
+  const [orderedIds, setOrderedIds] = useState<string[]>(() => loadSession()?.questionIds ?? [])
 
   const questionStartRef = useRef<number>(Date.now())
   const explanationRef = useRef<HTMLDivElement>(null)
@@ -126,7 +128,7 @@ export default function Session() {
   const isTransitioning = cardAnimClass !== ''
   const isExam = session?.type === 'exam'
 
-  const sessionQuestions = (session?.questionIds ?? [])
+  const sessionQuestions = orderedIds
     .map(id => questions.find(q => q.id === id))
     .filter(Boolean) as typeof questions
 
@@ -196,6 +198,32 @@ export default function Session() {
       return
     }
 
+    // In practice/study mode: after 2+ consecutive correct answers bias toward a
+    // harder same-type question; after 2+ consecutive incorrect, bias toward easier.
+    if (!isExam && q && answers[q.id]) {
+      const isAnswerCorrect = answers[q.id] === q.answer
+      const newStreak = isAnswerCorrect
+        ? (streak > 0 ? streak + 1 : 1)
+        : (streak < 0 ? streak - 1 : -1)
+      setStreak(newStreak)
+
+      if (Math.abs(newStreak) >= 2) {
+        const targetDifficulty = newStreak >= 2 ? 'hard' : 'easy'
+        const remaining = sessionQuestions.slice(nextIdx)
+        const swapOffset = remaining.findIndex(
+          rq => rq.type === q.type && rq.difficulty === targetDifficulty
+        )
+        if (swapOffset > 0) {
+          setOrderedIds(ids => {
+            const next = [...ids]
+            const abs = nextIdx + swapOffset
+            ;[next[nextIdx], next[abs]] = [next[abs], next[nextIdx]]
+            return next
+          })
+        }
+      }
+    }
+
     const currType = sessionQuestions[current]?.type
     const nextType = sessionQuestions[nextIdx]?.type
 
@@ -216,7 +244,7 @@ export default function Session() {
     }
 
     advanceQuestion()
-  }, [current, sessionQuestions, isExam, advanceQuestion, handleFinish])
+  }, [current, sessionQuestions, isExam, advanceQuestion, handleFinish, streak, answers, q])
 
   const pick = useCallback((key: AnswerKey) => {
     if (!q || isRevealed) return
