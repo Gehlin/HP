@@ -55,4 +55,24 @@ The app is much bigger than the five core screens — it has subject hub pages (
   Build: zero TypeScript errors. -->
 
 
-- [ ] Run `npm run build` to confirm zero TypeScript errors, then manually click through every remaining page (both hubs, at least 3 theory guides, Bookmarks, SRS queue, Ord builder, Score predictor, Exam select/start) in the dev server to confirm a single coherent warm paper aesthetic with no leftover dark-theme fragments anywhere in the app.
+- [x] Run `npm run build` to confirm zero TypeScript errors, then manually click through every remaining page (both hubs, at least 3 theory guides, Bookmarks, SRS queue, Ord builder, Score predictor, Exam select/start) in the dev server to confirm a single coherent warm paper aesthetic with no leftover dark-theme fragments anywhere in the app.
+
+  <!-- COMPLETED 2026-07-01: Build passed with zero TypeScript errors (79 modules transformed). Playwright visual QA run across 14 pages at 390×844 viewport — screenshots saved to Working/. Findings:
+
+  ✅ Home: Warm paper background, dark green hero card with cream text, white surface cards with hairline borders, ink headings, section type badges.
+  ✅ VerbalHub (/verbalt): Paper bg, green "VERBALT DELPROV" badge, white section cards, ORD/LÄS/MEK/ELF labels in green accent, dark green CTA button.
+  ✅ QuantHub (/kvantitativt): Paper bg, terracotta "KVANTITATIVT DELPROV" badge, XYZ/KVA/NOG tip text in terracotta, dark green CTA button.
+  ✅ OrdGuide: Paper bg, white content cards, green tab underline for selected tab, feedback-correct-* green highlight on example answer.
+  ✅ DtkGuide: Paper bg, gold "DTK · DIAGRAM..." badge pill, terracotta accent on "Kärninsikt" label, white step-list cards.
+  ✅ ElfGuide: Paper bg, green section badge, green tab underline, semantic red strikethrough / green checkmark for false friends.
+  ✅ Bookmarks: Paper bg, white empty-state card, dark green CTA button.
+  ✅ SRS Queue: Paper bg, gold "SPACED REPETITION" badge, white cards, stats tiles in paper-dark.
+  ✅ OrdBuilder: Paper bg, ORD badge, white progress card, dark green selected tab + CTA button, word grid.
+  ✅ ScorePredictor (/score): Paper bg, white empty-state card, dark green CTA.
+  ✅ ExamSelect: Paper bg, green "PROVSIMULERING" badge, verbal badges (ORD/LÄS/MEK/ELF) in green, quant (XYZ/KVA/NOG) in terracotta, DTK in gold, terracotta active tab for "Kvantitativt".
+  ✅ ExamStart: Paper bg, Pass 1 "Verbalt" circle in green, Pass 2 "Kvantitativt" circle in terracotta, XYZ/KVA/NOG in terracotta, DTK in gold, instructions on paper-dark.
+  ✅ Progress: Paper bg, white empty-state card, dark green CTA.
+  ✅ Profil: Paper bg, dark green avatar/header card, cream text on dark green "Ändra" button, list rows with hairline separators.
+
+  No off-palette colors (blue, violet, rose, raw green hex), no text-white on light surfaces, no dark-theme fragments detected anywhere. Phase 03 complete. -->
+
