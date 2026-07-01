@@ -58,6 +58,7 @@ export default function Progress() {
   const [tagSort, setTagSort] = useState<'asc' | 'desc' | 'count'>('asc')
   const [tagTypeFilter, setTagTypeFilter] = useState<'alla' | QuestionType>('alla')
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week')
+  const [calTip, setCalTip] = useState<{ date: string; count: number } | null>(null)
 
   if (history.length === 0) {
     return (
@@ -229,8 +230,27 @@ export default function Progress() {
     ...heatDays,
   ]
 
+  const cal12Weeks: { date: Date; count: number }[] = []
+  for (let i = 83; i >= 0; i--) {
+    const d = new Date(todayMidnight)
+    d.setDate(d.getDate() - i)
+    cal12Weeks.push({ date: d, count: questionsByDay[d.toISOString().slice(0, 10)] ?? 0 })
+  }
+  const cal12StartDow = cal12Weeks[0].date.getDay()
+  const paddedCal12: ({ date: Date; count: number } | null)[] = [
+    ...Array(cal12StartDow).fill(null),
+    ...cal12Weeks,
+  ]
+
   function heatColor(count: number): string {
     if (count === 0) return 'bg-[var(--color-paper-darker)]'
+    if (count <= 10) return 'bg-[var(--color-green)]/30'
+    if (count <= 30) return 'bg-[var(--color-green)]/60'
+    return 'bg-[var(--color-green)]'
+  }
+
+  function calColor(count: number): string {
+    if (count === 0) return 'bg-[var(--color-track)]'
     if (count <= 10) return 'bg-[var(--color-green)]/30'
     if (count <= 30) return 'bg-[var(--color-green)]/60'
     return 'bg-[var(--color-green)]'
@@ -335,6 +355,45 @@ export default function Progress() {
               </div>
             )
           })}
+      </div>
+
+      {/* Practice consistency calendar — 12 weeks */}
+      <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
+        <div className="text-sm font-semibold text-[var(--color-ink)] mb-3">Träningskonsistens — 12 veckor</div>
+        <div
+          className="grid gap-1 overflow-x-auto"
+          style={{ gridTemplateRows: 'repeat(7, minmax(0,1fr))', gridAutoFlow: 'column', gridAutoColumns: '12px' }}
+        >
+          {paddedCal12.map((day, i) =>
+            day ? (
+              <button
+                key={i}
+                className={`w-3 h-3 rounded-sm ${calColor(day.count)} cursor-pointer`}
+                title={`${day.date.toLocaleDateString('sv-SE')}: ${day.count} frågor`}
+                onClick={() => {
+                  const key = day.date.toISOString().slice(0, 10)
+                  setCalTip(prev => prev?.date === key ? null : { date: key, count: day.count })
+                }}
+              />
+            ) : (
+              <div key={i} className="w-3 h-3" />
+            )
+          )}
+        </div>
+        {calTip && (
+          <div className="mt-2 text-xs text-[var(--color-ink)] bg-[var(--color-paper-dark)] rounded-lg px-3 py-2 inline-block">
+            {calTip.date}: {calTip.count} {calTip.count === 1 ? 'fråga' : 'frågor'}
+          </div>
+        )}
+        <div className="flex items-center gap-2 mt-3 text-[10px] text-[var(--color-ink-faint)]">
+          <div className="flex gap-1 items-center">
+            <div className="w-3 h-3 rounded-sm bg-[var(--color-track)]" />
+            <div className="w-3 h-3 rounded-sm bg-[var(--color-green)]/30" />
+            <div className="w-3 h-3 rounded-sm bg-[var(--color-green)]/60" />
+            <div className="w-3 h-3 rounded-sm bg-[var(--color-green)]" />
+          </div>
+          <span>0 · 1–10 · 11–30 · 30+ frågor</span>
+        </div>
       </div>
 
       {/* HP Score card */}
