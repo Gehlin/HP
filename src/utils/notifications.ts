@@ -1,5 +1,8 @@
+import { computePacing } from './pacing'
+
 const ENABLED_KEY = 'hp_notif_enabled'
 const LAST_SHOWN_KEY = 'hp_notif_last_shown'
+const PACING_LAST_SHOWN_KEY = 'hp_notif_pacing_last_shown'
 
 export function notificationsSupported(): boolean {
   return 'Notification' in window
@@ -46,5 +49,33 @@ export function maybeShowDueNotification(dueCount: number, lastSessionTimestamp:
     body: `${dueCount} frågor att repetera idag — håll streaken vid liv!`,
     icon: '/icon-192.png',
     tag: 'hp-due-review',
+  })
+}
+
+/** Show a pacing reminder if the user is meaningfully behind pace and hasn't practiced today.
+ *  Respects the same enabled/permission/last-shown/active-study guards as maybeShowDueNotification.
+ */
+export function maybeShowPacingNotification(lastSessionTimestamp: number | null): void {
+  if (!notificationsEnabled()) return
+
+  const pacing = computePacing()
+  if (pacing.onTrack) return
+
+  // Don't send if user has already practiced today
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  if (lastSessionTimestamp !== null && lastSessionTimestamp >= todayStart.getTime()) return
+
+  const now = Date.now()
+  const lastShown = parseInt(localStorage.getItem(PACING_LAST_SHOWN_KEY) ?? '0', 10)
+  if (now - lastShown < 20 * 60 * 60 * 1000) return
+  if (lastSessionTimestamp !== null && now - lastSessionTimestamp < 3 * 60 * 60 * 1000) return
+
+  localStorage.setItem(PACING_LAST_SHOWN_KEY, String(now))
+
+  new Notification('HP Träning', {
+    body: pacing.message,
+    icon: '/icon-192.png',
+    tag: 'hp-pacing-reminder',
   })
 }

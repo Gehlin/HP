@@ -4,7 +4,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import InstallBanner from './components/InstallBanner'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
 import TopNav from './components/TopNav'
-import { maybeShowDueNotification } from './utils/notifications'
+import { maybeShowDueNotification, maybeShowPacingNotification } from './utils/notifications'
 import { getDueQuestions } from './utils/srs'
 import { questions } from './data/questions'
 import { loadHistory } from './utils/session'
@@ -71,6 +71,7 @@ function AppInner() {
     const history = loadHistory()
     const lastSession = history.length > 0 ? history[0].startTime : null
     maybeShowDueNotification(dueCount, lastSession)
+    maybeShowPacingNotification(lastSession)
   }, [])
 
   useEffect(() => {
