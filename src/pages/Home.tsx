@@ -5,6 +5,7 @@ import { loadStats, type GameStats } from '../utils/gamification'
 import { loadHistory, loadSession, saveSession } from '../utils/session'
 import { getExamDate, daysUntilExam } from '../utils/examDate'
 import { computeReadiness } from '../utils/readiness'
+import { computePacing, type PacingResult } from '../utils/pacing'
 import type { ExamSession } from '../types'
 
 const TYPE_ACCENTS: Record<string, { color: string; ring: string; bg: string }> = {
@@ -38,6 +39,8 @@ export default function Home() {
   const [totalCorrect, setTotalCorrect] = useState(0)
   const [typeAccuracy, setTypeAccuracy] = useState<Record<string, { correct: number; total: number }>>({})
   const [hasHistory, setHasHistory] = useState(false)
+  const [pacing, setPacing] = useState<PacingResult | null>(null)
+  const [pacingDismissed, setPacingDismissed] = useState(false)
 
   useEffect(() => {
     setStats(loadStats())
@@ -45,8 +48,15 @@ export default function Home() {
     const session = loadSession()
     if (session && !session.endTime) setResumeSession(session)
 
-    setExamDateState(getExamDate())
+    const ed = getExamDate()
+    setExamDateState(ed)
     setReadiness(computeReadiness())
+
+    if (ed) {
+      setPacing(computePacing())
+      const dismissKey = `pacing_dismissed_${new Date().toISOString().slice(0, 10)}`
+      setPacingDismissed(localStorage.getItem(dismissKey) === '1')
+    }
 
     const history = loadHistory()
     setHasHistory(history.length > 0)
@@ -75,6 +85,12 @@ export default function Home() {
   const days = examDate ? daysUntilExam() : null
 
   const heroScorePct = Math.min(100, Math.max(0, (readiness?.score ?? 0) / 2.0))
+
+  function dismissPacingCard() {
+    const key = `pacing_dismissed_${new Date().toISOString().slice(0, 10)}`
+    localStorage.setItem(key, '1')
+    setPacingDismissed(true)
+  }
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'God morgon' : hour < 17 ? 'God dag' : 'God kväll'
@@ -161,6 +177,43 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* ── Pacing nudge card ─────────────────────────────── */}
+        {examDate && pacing && !pacingDismissed && (
+          <div
+            className="card p-4 mb-4 relative"
+            style={{ borderLeft: `4px solid ${pacing.onTrack ? 'var(--color-green)' : 'var(--color-terracotta)'}` }}
+          >
+            <button
+              onClick={dismissPacingCard}
+              aria-label="Stäng"
+              className="absolute top-3 right-3 text-xl leading-none text-[var(--color-ink-faint)] hover:text-[var(--color-ink)]"
+            >
+              ×
+            </button>
+            <div
+              className="text-[10px] font-bold uppercase tracking-[0.16em] mb-1"
+              style={{ color: pacing.onTrack ? 'var(--color-green)' : 'var(--color-terracotta)' }}
+            >
+              {pacing.onTrack ? 'I fas' : 'Halkar efter'}
+            </div>
+            <p className="text-sm text-[var(--color-ink)] mb-3 pr-6 leading-snug">{pacing.message}</p>
+            <div className="flex gap-5 text-xs text-[var(--color-ink-faint)]">
+              <span>
+                <strong className="text-[var(--color-ink)] font-semibold">{pacing.dailyTarget}</strong> frågor/dag
+              </span>
+              <span>
+                <strong className="text-[var(--color-ink)] font-semibold">{pacing.weeklyTarget}</strong> frågor/vecka
+              </span>
+              <button
+                onClick={() => navigate('/profil')}
+                className="ml-auto text-[var(--color-ink-faint)] underline underline-offset-2"
+              >
+                Ändra provdatum
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── Fortsätt card ─────────────────────────────────── */}
         {resumeSession && (() => {
