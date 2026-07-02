@@ -197,11 +197,11 @@ export default function Practice() {
   const canStart = mode === 'repetition' ? dueIds.length > 0 : (selectedTypes.length > 0 && available > 0)
 
   return (
-    <div className="min-h-screen bg-app pt-topnav">
-      <div className="max-w-2xl mx-auto px-4 pb-8">
+    <div className="min-h-screen bg-app pt-topnav pb-bottomnav">
+      <div className="max-w-2xl mx-auto px-4">
 
         {/* Page title */}
-        <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)] mb-4">Träna</h1>
+        <h1 style={{ fontFamily: "'Newsreader', serif", fontWeight: 400, fontSize: 26, lineHeight: 1.05, color: '#23201A', marginBottom: 16, marginTop: 4 }}>Öva</h1>
 
         {/* Mode selector cards */}
         <div className="mb-6">
@@ -381,7 +381,7 @@ export default function Practice() {
                   className="rounded-xl p-3.5 border text-left transition-all duration-150"
                   style={{ borderColor: accent.ring, backgroundColor: accent.bg }}
                 >
-                  <div className="font-black text-sm" style={{ color: accent.color }}>{t}</div>
+                  <div className="font-black text-sm" style={{ color: accent.color }}>{t === 'LAS' ? 'LÄS' : t}</div>
                   <div className="text-[11px] text-[var(--color-ink-faint)] mt-0.5">{sectionCount} frågor · {timeLabel}</div>
                 </button>
               )

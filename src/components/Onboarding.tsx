@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { setFocusPreference, type FocusPreference } from '../utils/focusPreference'
+import { setExamDate, getExamDate, EXAM_OPTIONS } from '../utils/examDate'
 
 const ONBOARDING_KEY = 'hp_onboarding_done'
 
@@ -11,179 +11,192 @@ export function markOnboardingDone(): void {
   localStorage.setItem(ONBOARDING_KEY, '1')
 }
 
-const QUANT_PILLS = [
-  { label: 'XYZ', color: 'bg-[var(--color-terracotta-muted)] text-[var(--color-terracotta)] border-[var(--color-terracotta)]' },
-  { label: 'KVA', color: 'bg-[var(--color-terracotta-muted)] text-[var(--color-terracotta)] border-[var(--color-terracotta)]' },
-  { label: 'NOG', color: 'bg-[var(--color-terracotta-muted)] text-[var(--color-terracotta)] border-[var(--color-terracotta)]' },
-  { label: 'DTK', color: 'bg-[var(--color-gold-muted)] text-[var(--color-gold-deep)] border-[var(--color-gold-deep)]' },
-]
+const GOAL_CHIPS = ['1,20', '1,40', '1,60', '1,80', '2,00']
 
-const VERBAL_PILLS = [
-  { label: 'ORD', color: 'bg-[var(--color-green-muted)] text-[var(--color-green)] border-[var(--color-green)]' },
-  { label: 'LÄS', color: 'bg-[var(--color-green-muted)] text-[var(--color-green)] border-[var(--color-green)]' },
-  { label: 'MEK', color: 'bg-[var(--color-green-muted)] text-[var(--color-green)] border-[var(--color-green)]' },
-  { label: 'ELF', color: 'bg-[var(--color-green-muted)] text-[var(--color-green)] border-[var(--color-green)]' },
-]
+const CTA_LABELS = ['Kom igång', 'Fortsätt', 'Fortsätt', 'Sätt igång']
 
-const FOCUS_OPTIONS: { value: FocusPreference; label: string; sub: string; color: string; border: string; bg: string }[] = [
-  { value: 'quant', label: 'Kvantitativt', sub: 'XYZ · KVA · NOG · DTK', color: 'text-[var(--color-terracotta)]', border: 'border-[var(--color-terracotta)]', bg: 'bg-[var(--color-terracotta-muted)]' },
-  { value: 'verbal', label: 'Verbalt', sub: 'ORD · LÄS · MEK · ELF', color: 'text-[var(--color-green)]', border: 'border-[var(--color-card-border)]', bg: 'bg-[var(--color-green-muted)]' },
-  { value: 'both', label: 'Hela provet', sub: 'Alla 8 delproven', color: 'text-[var(--color-green)]', border: 'border-[var(--color-card-border)]', bg: 'bg-[var(--color-green-muted)]' },
-]
+function daysLeft(iso: string): number {
+  return Math.max(0, Math.ceil((new Date(iso + 'T00:00:00').getTime() - Date.now()) / 86400000))
+}
 
 interface Props {
   onClose: () => void
+  /** Enter the wizard at an arbitrary step (prototype `goalEdit`: Profil "Ändra" → step 2). */
+  initialStep?: number
 }
 
-export default function Onboarding({ onClose }: Props) {
-  const [slide, setSlide] = useState(0)
-  const [selectedFocus, setSelectedFocus] = useState<FocusPreference | null>(null)
-  const TOTAL_SLIDES = 5
+export default function Onboarding({ onClose, initialStep = 0 }: Props) {
+  const [step, setStep] = useState(() => Math.min(3, Math.max(0, initialStep)))
+  const [name, setName] = useState(() => {
+    try { return localStorage.getItem('hp_user_name') ?? '' } catch { return '' }
+  })
+  const [goal, setGoal] = useState(() => {
+    try { return localStorage.getItem('hp_goal') ?? '1,40' } catch { return '1,40' }
+  })
+  const [examISO, setExamISO] = useState(() => {
+    const stored = getExamDate()
+    if (stored) {
+      const iso = stored.toISOString().slice(0, 10)
+      if (EXAM_OPTIONS.some(o => o.iso === iso)) return iso
+    }
+    return EXAM_OPTIONS[0].iso
+  })
 
-  const finish = (focus?: FocusPreference) => {
-    const f = focus ?? selectedFocus
-    if (f) setFocusPreference(f)
+  const finish = () => {
+    try {
+      localStorage.setItem('hp_user_name', name.trim() || 'Elin')
+      localStorage.setItem('hp_goal', goal)
+    } catch { /* ignore */ }
+    setExamDate(examISO)
     markOnboardingDone()
     onClose()
   }
 
   const next = () => {
-    if (slide === 2 && !selectedFocus) return
-    if (slide === TOTAL_SLIDES - 1) { finish(); return }
-    setSlide(s => s + 1)
+    if (step < 3) setStep(s => s + 1)
+    else finish()
   }
 
-  const isLast = slide === TOTAL_SLIDES - 1
-  const isFocusSlide = slide === 2
-  const canAdvance = !isFocusSlide || selectedFocus !== null
+  const back = () => setStep(s => Math.max(0, s - 1))
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-end sm:items-center justify-center p-4">
-      <div className="bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden animate-slide-up sm:animate-scale-in">
+    <div className="fixed inset-0 z-[200] bg-[var(--color-paper)] flex flex-col pt-[62px] px-6 pb-9">
 
-        {/* Progress dots */}
-        <div className="flex justify-center gap-1.5 pt-5 pb-1">
-          {Array.from({ length: TOTAL_SLIDES }).map((_, i) => (
+      {/* Back button + progress dots */}
+      <div className="flex items-center gap-[13px] h-[34px]">
+        {step > 0 && (
+          <button
+            onClick={back}
+            aria-label="Tillbaka"
+            className="w-[34px] h-[34px] rounded-[11px] bg-white border border-[var(--color-card-border)] flex items-center justify-center cursor-pointer"
+          >
+            <svg width="9" height="16" viewBox="0 0 9 16" fill="none" stroke="#6f6859" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 2 2 8l5 6"/></svg>
+          </button>
+        )}
+        <div className="flex gap-[7px]">
+          {[0, 1, 2, 3].map(i => (
             <div
               key={i}
-              className={`h-1 rounded-full transition-all duration-300 ${i === slide ? 'w-6 bg-[var(--color-green)]' : i < slide ? 'w-1.5 bg-[var(--color-green)]/40' : 'w-1.5 bg-[var(--color-paper-dark)]'}`}
+              className="h-[7px] rounded-full transition-all duration-[250ms] ease-out"
+              style={{ width: i === step ? 22 : 7, background: i <= step ? 'var(--color-green)' : '#D8CFBE' }}
             />
           ))}
         </div>
-
-        {/* Slide 0: Welcome */}
-        {slide === 0 && (
-          <div className="px-7 py-6 text-center">
-            <div className="text-4xl font-black mb-4 text-[var(--color-green)]">HP</div>
-            <h2 className="text-xl font-black mb-3 text-[var(--color-green)]">Välkommen till HP Träning</h2>
-            <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
-              Träna på det fullständiga Högskoleprovet — kvantitativt och verbalt — med hundratals frågor och smart repetition.
-            </p>
-            <div className="flex justify-center gap-2 mt-4 flex-wrap">
-              {[...QUANT_PILLS, ...VERBAL_PILLS].map(p => (
-                <span key={p.label} className={`text-xs font-black px-2.5 py-1 rounded-lg border ${p.color}`}>{p.label}</span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Slide 1: Alla delproven */}
-        {slide === 1 && (
-          <div className="px-7 py-6 text-center">
-            <div className="text-4xl font-black mb-4 text-[var(--color-ink)]">∑</div>
-            <h2 className="text-xl font-black mb-3 text-[var(--color-ink)]">Åtta delproven</h2>
-            <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed mb-4">
-              HP har ett kvantitativt och ett verbalt delprov. Båda räknas lika och ger vardera ett poäng på 1,0–2,0.
-            </p>
-            <div className="space-y-2 text-left">
-              <div className="bg-[var(--color-terracotta-muted)] border border-[var(--color-terracotta)] rounded-xl px-3 py-2">
-                <div className="text-[10px] font-bold text-[var(--color-terracotta)] uppercase tracking-widest mb-1.5">Kvantitativt</div>
-                <div className="flex gap-1.5 flex-wrap">
-                  {QUANT_PILLS.map(p => (
-                    <span key={p.label} className={`text-xs font-black px-2.5 py-1 rounded-lg border ${p.color}`}>{p.label}</span>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-[var(--color-green-muted)] border border-[var(--color-green)] rounded-xl px-3 py-2">
-                <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-1.5">Verbalt</div>
-                <div className="flex gap-1.5 flex-wrap">
-                  {VERBAL_PILLS.map(p => (
-                    <span key={p.label} className={`text-xs font-black px-2.5 py-1 rounded-lg border ${p.color}`}>{p.label}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Slide 2: Focus selection */}
-        {slide === 2 && (
-          <div className="px-7 py-6">
-            <div className="text-center mb-5">
-              <div className="text-4xl font-black mb-4 text-[var(--color-gold-deep)]">?</div>
-              <h2 className="text-xl font-black mb-2 text-[var(--color-gold-deep)]">Vad vill du fokusera på?</h2>
-              <p className="text-[var(--color-ink-muted)] text-sm">Appen anpassar startsidan och rekommendationer efter ditt val. Du kan ändra det när som helst.</p>
-            </div>
-            <div className="space-y-2">
-              {FOCUS_OPTIONS.map(opt => (
-                <button
-                  key={opt.value}
-                  onClick={() => {
-                    setSelectedFocus(opt.value)
-                  }}
-                  className={`w-full text-left px-4 py-3.5 rounded-xl border transition-all duration-150 ${
-                    selectedFocus === opt.value
-                      ? `${opt.bg} ${opt.border} ring-1 ring-inset ring-[var(--color-card-border)]`
-                      : 'bg-[var(--color-paper)] border-[var(--color-card-border)] hover:bg-[var(--color-paper-dark)]'
-                  }`}
-                >
-                  <div className={`font-black text-sm ${selectedFocus === opt.value ? opt.color : 'text-[var(--color-ink)]'}`}>{opt.label}</div>
-                  <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">{opt.sub}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Slide 3: Smart repetition */}
-        {slide === 3 && (
-          <div className="px-7 py-6 text-center">
-            <div className="text-4xl font-black mb-4 text-[var(--color-green)]">↻</div>
-            <h2 className="text-xl font-black mb-3 text-[var(--color-green)]">Smart repetition</h2>
-            <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
-              Appen lär sig vilka frågor du kan och vilka du behöver träna mer på. Repetitionsläget visar rätt frågor vid rätt tillfälle.
-            </p>
-          </div>
-        )}
-
-        {/* Slide 4: Progress */}
-        {slide === 4 && (
-          <div className="px-7 py-6 text-center">
-            <div className="text-4xl font-black mb-4 text-[var(--color-gold-deep)]">→</div>
-            <h2 className="text-xl font-black mb-3 text-[var(--color-gold-deep)]">Följ dina framsteg</h2>
-            <p className="text-[var(--color-ink-muted)] text-sm leading-relaxed">
-              Provberedskapspoäng (0–100), HP-estimat (1,0–2,0) för kvantitativt och verbalt, tidanalys och prestationsmärken hjälper dig förstå var du befinner dig — och vart du är på väg.
-            </p>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <div className="px-7 pb-7 flex gap-3">
-          <button
-            onClick={() => finish()}
-            className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] text-sm transition-colors py-3 px-2"
-          >
-            Hoppa över
-          </button>
-          <button
-            onClick={next}
-            disabled={!canAdvance}
-            className={`flex-1 rounded-xl py-3 font-bold text-sm transition-colors ${canAdvance ? 'btn-primary' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)] cursor-not-allowed'}`}
-          >
-            {isLast ? 'Kom igång →' : isFocusSlide && selectedFocus ? `Fortsätt med ${FOCUS_OPTIONS.find(o => o.value === selectedFocus)?.label} →` : 'Nästa →'}
-          </button>
-        </div>
       </div>
+
+      {/* Step content */}
+      <div className="flex-1 flex flex-col justify-center">
+
+        {/* Step 0: Welcome */}
+        {step === 0 && (
+          <div>
+            <div className="w-[62px] h-[62px] rounded-[18px] bg-[var(--color-green)] flex items-center justify-center mb-7">
+              <span className="font-serif font-medium text-[30px] leading-none text-[var(--color-cream)]">H</span>
+            </div>
+            <div className="font-serif font-normal text-[38px] leading-[1.08] text-[var(--color-ink)] tracking-[-0.015em]">
+              Plugga smartare<br />inför provet.
+            </div>
+            <div className="font-medium text-[15px] leading-[1.6] text-[var(--color-ink-muted)] mt-4 max-w-[300px]">
+              Öva på alla åtta delprov, följ din utveckling och se exakt hur många dagar du har kvar till Högskoleprovet.
+            </div>
+          </div>
+        )}
+
+        {/* Step 1: Name */}
+        {step === 1 && (
+          <div>
+            <div className="font-serif font-normal text-[31px] leading-[1.12] text-[var(--color-ink)] tracking-[-0.01em]">
+              Vad ska vi kalla dig?
+            </div>
+            <div className="font-medium text-[14px] leading-[1.55] text-[var(--color-ink-muted)] mt-[11px]">
+              Ditt namn visas på startsidan och i dina resultat.
+            </div>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Ditt namn"
+              className="mt-7 w-full h-[58px] rounded-2xl border-[1.5px] border-[#E0D8C8] bg-white px-[18px] font-semibold text-[18px] text-[var(--color-ink)] outline-none"
+            />
+          </div>
+        )}
+
+        {/* Step 2: Goal */}
+        {step === 2 && (
+          <div>
+            <div className="font-serif font-normal text-[31px] leading-[1.12] text-[var(--color-ink)] tracking-[-0.01em]">
+              Vilket resultat<br />siktar du på?
+            </div>
+            <div className="font-medium text-[14px] leading-[1.55] text-[var(--color-ink-muted)] mt-[11px]">
+              Snittet för många utbildningar ligger runt 1,30–1,50. Du kan ändra målet när som helst.
+            </div>
+            <div className="flex flex-wrap gap-[10px] mt-7">
+              {GOAL_CHIPS.map(g => {
+                const sel = g === goal
+                return (
+                  <button
+                    key={g}
+                    onClick={() => setGoal(g)}
+                    className={`px-[21px] py-[13px] rounded-[14px] border-[1.5px] font-bold text-[17px] leading-none cursor-pointer transition-all duration-150 ${
+                      sel
+                        ? 'bg-[var(--color-green)] border-[var(--color-green)] text-[var(--color-cream)]'
+                        : 'bg-white border-[#E5DDCE] text-[var(--color-ink-soft)]'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Exam date */}
+        {step === 3 && (
+          <div>
+            <div className="font-serif font-normal text-[31px] leading-[1.12] text-[var(--color-ink)] tracking-[-0.01em]">
+              När skriver du provet?
+            </div>
+            <div className="font-medium text-[14px] leading-[1.55] text-[var(--color-ink-muted)] mt-[11px]">
+              Vi räknar ner dagarna åt dig på startsidan.
+            </div>
+            <div className="flex flex-col gap-[10px] mt-[26px]">
+              {EXAM_OPTIONS.map(o => {
+                const sel = o.iso === examISO
+                return (
+                  <button
+                    key={o.iso}
+                    onClick={() => setExamISO(o.iso)}
+                    className={`flex items-center justify-between rounded-2xl px-[17px] py-[15px] text-left cursor-pointer transition-all duration-150 ${
+                      sel
+                        ? 'bg-[#EEF3EF] border-[1.5px] border-[var(--color-green)]'
+                        : 'bg-white border border-[var(--color-card-border)]'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold text-[16px] leading-none text-[var(--color-ink)]">{o.label}</div>
+                      <div className="font-medium text-[12px] leading-none text-[var(--color-ink-faint)] mt-1.5">
+                        {o.sub} · om {daysLeft(o.iso)} dagar
+                      </div>
+                    </div>
+                    <div
+                      className="w-[22px] h-[22px] rounded-full box-border shrink-0"
+                      style={{ border: sel ? '7px solid var(--color-green)' : '2px solid #D8CFBE' }}
+                    />
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* CTA */}
+      <button
+        onClick={next}
+        className="h-14 rounded-2xl bg-[var(--color-green)] flex items-center justify-center font-bold text-[16px] leading-none text-[var(--color-cream)] cursor-pointer"
+      >
+        {CTA_LABELS[step]}
+      </button>
     </div>
   )
 }

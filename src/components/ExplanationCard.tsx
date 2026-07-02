@@ -3,7 +3,8 @@ import type { ExplanationData, AnswerKey } from '../types'
 
 interface Props {
   isCorrect: boolean
-  correctAnswer: string
+  /** Kept for caller compatibility; the correct answer is shown highlighted in the option list per the prototype. */
+  correctAnswer?: string
   correctAnswerText?: string
   explanation: string
   explanationData?: ExplanationData
@@ -12,21 +13,19 @@ interface Props {
   learnMoreLabel?: string
 }
 
-export default function ExplanationCard({ isCorrect, correctAnswer, correctAnswerText, explanation, explanationData, chosenAnswer, onLearnMore, learnMoreLabel }: Props) {
+export default function ExplanationCard({ isCorrect, explanation, explanationData, chosenAnswer, onLearnMore, learnMoreLabel }: Props) {
   return (
     <div className={`rounded-2xl overflow-hidden mt-4 border bg-[var(--color-card)] ${isCorrect ? 'border-[var(--color-feedback-correct-border)]' : 'border-[var(--color-feedback-wrong-border)]'}`}>
 
       {/* Header */}
-      <div className={`px-5 py-3 flex items-center gap-3 ${isCorrect ? 'bg-[var(--color-feedback-correct-bg)]' : 'bg-[var(--color-feedback-wrong-bg)]'}`}>
-        {isCorrect ? (
-          <span className="text-lg font-black text-[var(--color-feedback-correct-title)]">✓ Rätt!</span>
-        ) : correctAnswerText ? (
-          <span className="text-lg font-black text-[var(--color-feedback-wrong-title)]">
-            ✗ Fel — rätt svar {correctAnswer}:&nbsp;<MathText text={correctAnswerText} />
-          </span>
-        ) : (
-          <span className="text-lg font-black text-[var(--color-feedback-wrong-title)]">✗ Fel — rätt svar: {correctAnswer}</span>
-        )}
+      <div className={`px-5 py-3 flex items-center gap-2 ${isCorrect ? 'bg-[var(--color-feedback-correct-bg)]' : 'bg-[var(--color-feedback-wrong-bg)]'}`}>
+        <span
+          className="shrink-0 w-[9px] h-[9px] rounded-[3px] rotate-45"
+          style={{ background: isCorrect ? 'var(--color-correct-badge)' : 'var(--color-wrong-badge)' }}
+        />
+        <span className={`text-sm font-bold ${isCorrect ? 'text-[var(--color-feedback-correct-title)]' : 'text-[var(--color-feedback-wrong-title)]'}`}>
+          {isCorrect ? 'Rätt!' : 'Inte riktigt'}
+        </span>
       </div>
 
       {/* Body */}

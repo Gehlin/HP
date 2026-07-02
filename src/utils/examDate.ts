@@ -1,10 +1,11 @@
 const KEY = 'hp_exam_date'
 
-// Known upcoming HP exam dates (update each year)
-export const KNOWN_HP_DATES: { label: string; date: string }[] = [
-  { label: 'HP Vår 2026 (april)', date: '2026-04-04' },
-  { label: 'HP Höst 2026 (oktober)', date: '2026-10-10' },
-  { label: 'HP Vår 2027 (april)', date: '2027-04-10' },
+// Upcoming HP exam dates (prototype EXAM_OPTIONS — single source of truth,
+// used by both Onboarding step 3 and Profil's "Ändra" flow; update each year)
+export const EXAM_OPTIONS: { iso: string; label: string; sub: string }[] = [
+  { iso: '2026-10-25', label: '25 oktober 2026', sub: 'Höstens prov' },
+  { iso: '2027-04-10', label: '10 april 2027',   sub: 'Vårens prov' },
+  { iso: '2027-10-24', label: '24 oktober 2027', sub: 'Höstens prov' },
 ]
 
 export function getExamDate(): Date | null {

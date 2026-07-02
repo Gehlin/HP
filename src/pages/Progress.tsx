@@ -62,7 +62,7 @@ export default function Progress() {
 
   if (history.length === 0) {
     return (
-      <div className="min-h-screen bg-app pb-8 pt-topnav flex items-center justify-center px-4">
+      <div className="min-h-screen bg-app pb-bottomnav pt-topnav flex items-center justify-center px-4">
         <div className="card rounded-2xl p-10 text-center max-w-sm w-full">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4 text-[var(--color-ink-faint)]">
             <path d="M3 3v18h18" />
@@ -266,8 +266,8 @@ export default function Progress() {
     d.setDate(d.getDate() - (6 - i))
     const key = d.toISOString().slice(0, 10)
     const count = questionsByDay[key] ?? 0
-    const dayLabel = d.toLocaleDateString('sv-SE', { weekday: 'short' }).slice(0, 2).toUpperCase()
-    return { dayLabel, count }
+    const dayLabel = d.toLocaleDateString('sv-SE', { weekday: 'short' }).slice(0, 3)
+    return { dayLabel, count, isToday: i === 6 }
   })
   const maxActivity = Math.max(1, ...sevenDayActivityRaw.map(d => d.count))
   const sevenDayActivity = sevenDayActivityRaw.map(d => ({
@@ -275,18 +275,98 @@ export default function Progress() {
     barHeightPx: d.count > 0 ? Math.max(8, Math.round((d.count / maxActivity) * 48)) : 0,
   }))
 
+  // Normerat trend for the score card — aggregate each calendar month's answers
+  // into a sectioned score (real data, no placeholders), up to the last 6 months.
+  // Falls back to per-session points when history spans fewer than two months.
+  const emptyByType = (): Record<QuestionType, { correct: number; total: number }> => ({
+    XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
+    NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
+    ORD: { correct: 0, total: 0 }, LAS: { correct: 0, total: 0 },
+    MEK: { correct: 0, total: 0 }, ELF: { correct: 0, total: 0 },
+  })
+  const monthBuckets: Record<string, ReturnType<typeof emptyByType>> = {}
+  history.forEach(s => {
+    const d = new Date(s.startTime)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    if (!monthBuckets[key]) monthBuckets[key] = emptyByType()
+    s.questionIds.forEach(qid => {
+      const q = questions.find(x => x.id === qid)
+      if (!q || !s.answers[qid]) return
+      monthBuckets[key][q.type].total++
+      if (s.answers[qid] === q.answer) monthBuckets[key][q.type].correct++
+    })
+  })
+  const monthlyPoints = Object.keys(monthBuckets)
+    .sort()
+    .slice(-6)
+    .map(key => {
+      const [y, m] = key.split('-').map(Number)
+      const date = new Date(y, m - 1, 1)
+      return {
+        short: date.toLocaleDateString('sv-SE', { month: 'short' }).replace('.', ''),
+        full: date.toLocaleDateString('sv-SE', { month: 'long' }),
+        value: estimateSectionedScore(monthBuckets[key]).combined,
+      }
+    })
+    .filter((p): p is { short: string; full: string; value: number } => p.value !== null)
+  const trendPoints = monthlyPoints.length >= 2
+    ? monthlyPoints
+    : history
+        .slice(0, 15)
+        .reverse()
+        .map(s => {
+          const bt = emptyByType()
+          s.questionIds.forEach(qid => {
+            const q = questions.find(x => x.id === qid)
+            if (!q || !s.answers[qid]) return
+            bt[q.type].total++
+            if (s.answers[qid] === q.answer) bt[q.type].correct++
+          })
+          const d = new Date(s.startTime)
+          return {
+            short: d.toLocaleDateString('sv-SE', { day: 'numeric', month: 'numeric' }),
+            full: d.toLocaleDateString('sv-SE', { day: 'numeric', month: 'long' }),
+            value: estimateSectionedScore(bt).combined,
+          }
+        })
+        .filter((p): p is { short: string; full: string; value: number } => p.value !== null)
+  const trendDelta = trendPoints.length >= 2 ? trendPoints[trendPoints.length - 1].value - trendPoints[0].value : 0
+  // Chart geometry per the prototype's viewBox 0 0 300 120: x spans 14→289, y maps min→98 / max→39
+  const tMin = Math.min(...trendPoints.map(p => p.value))
+  const tMax = Math.max(...trendPoints.map(p => p.value))
+  const tX = (i: number) => trendPoints.length < 2 ? 14 : 14 + (i * 275) / (trendPoints.length - 1)
+  const tY = (v: number) => tMax === tMin ? 70 : 98 - ((v - tMin) / (tMax - tMin)) * 59
+  const trendLine = trendPoints.map((p, i) => `${tX(i).toFixed(1)},${tY(p.value).toFixed(1)}`).join(' ')
+  const trendArea = trendPoints.length >= 2 ? `${trendLine} ${tX(trendPoints.length - 1).toFixed(1)},112 14,112` : ''
+  const labelStep = Math.max(1, Math.ceil(trendPoints.length / 6))
+  const trendLabels = trendPoints.filter((_, i) => i % labelStep === 0 || i === trendPoints.length - 1).map(p => p.short)
+
   return (
-    <div className="min-h-screen bg-app pb-8 pt-topnav">
+    <div className="min-h-screen bg-app pb-bottomnav pt-topnav">
       <div className="px-4 pb-4 max-w-2xl mx-auto">
-        <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)]">Statistik</h1>
-        <div className="flex rounded-xl p-1 bg-[var(--color-paper-dark)] w-fit mt-3">
+        <h1 style={{ fontFamily: "'Newsreader', serif", fontWeight: 400, fontSize: 26, lineHeight: 1.05, color: '#23201A' }}>Statistik</h1>
+        <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 13, color: '#8B8478', marginTop: 6 }}>Din utveckling över tid</div>
+
+        <div style={{ display: 'flex', background: '#E6DFD0', borderRadius: 12, padding: 3, marginTop: 16 }}>
           {(['week', 'month', 'all'] as const).map((range, i) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={timeRange === range
-                ? 'bg-white rounded-lg px-4 py-1.5 text-sm font-semibold text-[var(--color-ink)] shadow-sm'
-                : 'px-4 py-1.5 text-sm text-[var(--color-ink-faint)]'}
+              style={{
+                flex: 1,
+                textAlign: 'center',
+                padding: '8px 0',
+                borderRadius: 9,
+                fontFamily: "'Hanken Grotesk', system-ui",
+                fontWeight: timeRange === range ? 700 : 600,
+                fontSize: 13,
+                color: timeRange === range ? '#224A3A' : '#8B8478',
+                background: timeRange === range ? '#FFFFFF' : 'transparent',
+                boxShadow: timeRange === range ? '0 1px 2px rgba(0,0,0,.06)' : 'none',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
             >
               {(['Vecka', 'Månad', 'Allt'] as const)[i]}
             </button>
@@ -294,62 +374,99 @@ export default function Progress() {
         </div>
       </div>
 
-      {/* Summary stat cards */}
-      <div className="grid grid-cols-3 gap-2 px-4 max-w-2xl mx-auto mb-4">
-        <div className="card p-3 text-center">
-          <div className="text-xl font-semibold text-[var(--color-ink)]">{filteredHistory.length}</div>
-          <div className="text-xs text-[var(--color-ink-faint)]">Sessioner</div>
-        </div>
-        <div className="card p-3 text-center">
-          <div className="text-xl font-semibold text-[var(--color-ink)]">
-            {totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0}%
-          </div>
-          <div className="text-xs text-[var(--color-ink-faint)]">Rätt</div>
-        </div>
-        <div className="card p-3 text-center">
-          <div className="text-xl font-semibold text-[var(--color-ink)]">🔥{stats.streak}</div>
-          <div className="text-xs text-[var(--color-ink-faint)]">Streak</div>
-        </div>
-      </div>
-
-      {/* Weekly activity bar chart */}
-      <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
-        <div className="text-sm font-semibold text-[var(--color-ink)] mb-3">Aktivitet</div>
-        <div className="flex items-end justify-between gap-1 h-[60px]">
-          {sevenDayActivity.map(({ dayLabel, count, barHeightPx }) => (
-            <div key={dayLabel} className="flex flex-col items-center gap-1 flex-1">
-              {count > 0 ? (
-                <div
-                  className="w-full rounded-t-md bg-[var(--color-green)]"
-                  style={{ height: `${barHeightPx}px` }}
-                />
-              ) : (
-                <div className="w-full h-2 rounded-t-md bg-[var(--color-track)]" />
+      {/* ── Score card ─────────────────────────────────────── */}
+      <div className="card mx-4 p-4 mb-3 max-w-2xl mx-auto" style={{ borderRadius: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 600, fontSize: 10, letterSpacing: '0.12em', color: '#A89F90' }}>NORMERAT (ESTIMAT)</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 8 }}>
+              <span style={{ fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 34, lineHeight: 0.9, color: '#23201A' }}>{combinedScore !== null ? combinedScore.toFixed(2).replace('.', ',') : '—'}</span>
+              {trendPoints.length >= 2 && trendDelta !== 0 && (
+                <span style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 12, lineHeight: 1, color: trendDelta > 0 ? '#2E6A4C' : '#A84A26' }}>
+                  {trendDelta > 0 ? '▲' : '▼'} {Math.abs(trendDelta).toFixed(2).replace('.', ',')}
+                </span>
               )}
-              <span className="text-[10px] text-[var(--color-muted)]">{dayLabel}</span>
             </div>
-          ))}
+          </div>
+          <div style={{ textAlign: 'right', fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 11, lineHeight: 1.5, color: '#A89F90' }}>
+            {trendPoints.length >= 2 ? (
+              <>sedan<br/>{trendPoints[0].full}</>
+            ) : (
+              <>{filteredHistory.length} sessioner<br/>{totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0}% rätt</>
+            )}
+          </div>
+        </div>
+        {trendPoints.length >= 2 && (
+          <>
+            <svg viewBox="0 0 300 120" preserveAspectRatio="none" style={{ width: '100%', height: 104, marginTop: 12, display: 'block' }}>
+              <defs>
+                <linearGradient id="normTrendArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#224A3A" stopOpacity="0.16" />
+                  <stop offset="1" stopColor="#224A3A" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="39" x2="300" y2="39" stroke="#EFE8DA" strokeWidth="1" />
+              <line x1="0" y1="74" x2="300" y2="74" stroke="#EFE8DA" strokeWidth="1" />
+              <polygon points={trendArea} fill="url(#normTrendArea)" />
+              <polyline points={trendLine} fill="none" stroke="#224A3A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx={tX(trendPoints.length - 1)} cy={tY(trendPoints[trendPoints.length - 1].value)} r="4.5" fill="#224A3A" />
+              <circle cx={tX(trendPoints.length - 1)} cy={tY(trendPoints[trendPoints.length - 1].value)} r="8" fill="#224A3A" fillOpacity="0.16" />
+            </svg>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 600, fontSize: 10, lineHeight: 1, color: '#B3AA9B' }}>
+              {trendLabels.map((l, i) => <span key={i}>{l}</span>)}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* ── Weekly activity bar chart ───────────────────────── */}
+      <div className="card mx-4 p-4 mb-3 max-w-2xl mx-auto" style={{ borderRadius: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <span style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 13, color: '#23201A' }}>Den här veckan</span>
+          <span style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 600, fontSize: 12, color: '#8B8478' }}>{sevenDayActivity.reduce((s, d) => s + d.count, 0)} frågor</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8, height: 86 }}>
+          {sevenDayActivity.map(({ dayLabel, count, barHeightPx, isToday }) => {
+            return (
+              <div key={dayLabel} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}>
+                <div style={{
+                  width: '100%',
+                  height: Math.max(6, barHeightPx),
+                  borderRadius: 6,
+                  background: count > 0 ? (isToday ? '#224A3A' : '#CBD7CD') : '#E4DCCC',
+                }} />
+                <span style={{
+                  fontFamily: "'Hanken Grotesk', system-ui",
+                  fontWeight: isToday ? 700 : 600,
+                  fontSize: 10,
+                  lineHeight: 1,
+                  color: isToday ? '#224A3A' : '#A89F90',
+                }}>
+                  {dayLabel}
+                </span>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* Per-section accuracy bars */}
-      <div className="card mx-4 p-4 mb-4 max-w-2xl mx-auto">
-        <div className="text-sm font-semibold text-[var(--color-ink)] mb-3">Per delprovstyp</div>
+      {/* ── Per-section accuracy bars ───────────────────────── */}
+      <div className="card mx-4 p-4 mb-3 max-w-2xl mx-auto" style={{ borderRadius: 18 }}>
+        <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 13, color: '#23201A', marginBottom: 14 }}>Träffsäkerhet per delprov</div>
         {(Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
           .map(([type, v]) => ({ type, v, pct: v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0 }))
           .sort((a, b) => b.pct - a.pct)
-          .map(({ type, v, pct }) => {
-            const fillColor = VERBAL_TYPES.includes(type) ? 'var(--color-green)' : 'var(--color-terracotta)'
+          .map(({ type, v, pct }, idx, arr) => {
+            const isVerbal = VERBAL_TYPES.includes(type)
+            const fillColor = isVerbal ? '#224A3A' : '#BF5A33'
+            const displayType = type === 'LAS' ? 'LÄS' : type
             return (
-              <div key={type} className="flex items-center gap-3 mb-2">
-                <span className="text-xs font-bold text-[var(--color-ink)] w-[30px]">{type}</span>
-                <div className="progress-bar-track flex-1">
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${pct}%`, backgroundColor: fillColor }}
-                  />
+              <div key={type} style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: idx < arr.length - 1 ? 11 : 0 }}>
+                <span style={{ width: 34, fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 800, fontSize: 13, color: '#23201A' }}>{displayType}</span>
+                <div style={{ flex: 1, height: 8, borderRadius: 999, background: '#EFE8DA', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${pct}%`, borderRadius: 999, background: fillColor }} />
                 </div>
-                <span className="text-xs font-semibold text-[var(--color-ink)] w-[35px] text-right">
+                <span style={{ width: 32, textAlign: 'right', fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 12, color: '#6f6859' }}>
                   {v.total > 0 ? `${pct}%` : '—'}
                 </span>
               </div>

@@ -21,7 +21,7 @@ export default function ExamSelect() {
   const totalVerbal = Object.values(VERBAL_SECTION_SIZES).reduce((a, b) => a + b, 0)
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="Välj prov" />
       <div className="max-w-2xl mx-auto px-4 py-6">
 

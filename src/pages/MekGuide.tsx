@@ -10,20 +10,20 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
       {steps.map((step, i) => (
         <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-lime-600 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-[var(--color-green)] text-[var(--color-cream)]' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
                   <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{step.content}</div>
-                  {step.result && <div className="mt-1.5 text-xs font-bold text-lime-400">{step.result}</div>}
+                  {step.result && <div className="mt-1.5 text-xs font-bold text-[var(--color-green-light)]">{step.result}</div>}
                 </>
               ) : (
                 <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
-              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-lime-400 border border-lime-500/30 rounded-lg px-2 py-1 hover:bg-lime-500/10 transition-colors">Visa</button>
+              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-[var(--color-green)] border border-[var(--color-card-border)] rounded-lg px-2 py-1 hover:bg-[var(--color-green-muted)] transition-colors">Visa</button>
             )}
           </div>
         </div>
@@ -41,7 +41,7 @@ const CONJUNCTION_TYPES = [
     name: 'Kausala',
     signal: 'eftersom · för att · därför att · på grund av',
     logic: 'Orsak → Verkan',
-    logicColor: 'text-amber-400',
+    logicColor: 'text-[var(--color-gold-deep)]',
     desc: 'Den ena halvan orsakar den andra. Orsaken är sann — konsekvensen är naturlig och förväntad.',
     ex: 'Han misslyckades med provet eftersom han inte hade studerat.',
     trap: 'Blanda inte ihop "för att" (orsak) med "för att" (syfte). "Han åt för att bli mätt" = syfte, inte orsak.',
@@ -51,7 +51,7 @@ const CONJUNCTION_TYPES = [
     name: 'Koncessiva',
     signal: 'trots att · fastän · även om · oaktat att · hur ... än',
     logic: 'Förväntat utfall uteblir',
-    logicColor: 'text-red-400',
+    logicColor: 'text-[var(--color-terracotta)]',
     desc: 'Det förväntade resultatet av en situation inträffar INTE. Kontrasten är stark — "fast A borde leda till B, ledde det inte till det."',
     ex: 'Trots att hon studerade hårt klarade hon inte provet.',
     trap: 'Skillnad: "trots att" (starkt koncessivt) vs "men" (svagt adversativt). "Trots att" antyder att resultatet är överraskande.',
@@ -61,7 +61,7 @@ const CONJUNCTION_TYPES = [
     name: 'Adversativa',
     signal: 'men · dock · däremot · likväl · å andra sidan',
     logic: 'Enkel kontrast',
-    logicColor: 'text-orange-400',
+    logicColor: 'text-[var(--color-terracotta)]',
     desc: 'Två saker ställs mot varandra, men utan det starka "förväntningsbrott" som koncessiva ger. En nyansering eller motpol.',
     ex: 'Projektet var dyrt, men resultaten var imponerande.',
     trap: '"Dock" och "däremot" är mer formella/skriftspråkliga än "men". HP väljer ofta "dock" i akademiska meningar.',
@@ -71,7 +71,7 @@ const CONJUNCTION_TYPES = [
     name: 'Additiva',
     signal: 'dels...dels · inte bara...utan · dessutom · vidare · likaså',
     logic: 'Tillägg / Kombination',
-    logicColor: 'text-sky-400',
+    logicColor: 'text-[var(--color-ink-muted)]',
     desc: 'Lägger till en eller flera likvärdiga faktorer. Ingen kontrast — allt stämmer och förstärker varandra.',
     ex: 'Reformerna genomfördes dels av ekonomiska skäl, dels av ideologiska.',
     trap: '"Dels...dels" = båda gäller parallellt. "Antingen...eller" = exklusivt val. Blanda dem inte.',
@@ -81,7 +81,7 @@ const CONJUNCTION_TYPES = [
     name: 'Proportionella',
     signal: 'ju...desto · alltmer · ju mer...desto mer',
     logic: 'Proportionell relation',
-    logicColor: 'text-violet-400',
+    logicColor: 'text-[var(--color-ink-muted)]',
     desc: 'Ju mer A ökar, desto mer (eller mindre) förändras B. Relationen kan vara direkt (båda ökar) eller omvänd (en ökar, en minskar).',
     ex: 'Ju mer komplex organisationen är, desto svårare är det att fatta beslut.',
     trap: 'Grammatiken kräver "ju [komparativ]...desto [komparativ]". Fel: "ju mer...desto mycket". Rätt: "ju mer...desto fler".',
@@ -91,7 +91,7 @@ const CONJUNCTION_TYPES = [
     name: 'Konditionella',
     signal: 'om · förutsatt att · i den mån · given att · på villkor att',
     logic: 'Villkor → Konsekvens',
-    logicColor: 'text-blue-400',
+    logicColor: 'text-[var(--color-ink-muted)]',
     desc: 'B gäller bara om A är uppfyllt. Villkoret kan vara realistiskt (om) eller starkt begränsande (förutsatt att).',
     ex: 'Förutsatt att finansieringen godkänns kan projektet starta i maj.',
     trap: '"Förutsatt att" är starkare än "om" — det antyder att villkoret är avgörande och osäkert.',
@@ -111,7 +111,7 @@ const CONJUNCTION_TYPES = [
     name: 'Negativa',
     signal: 'varken...eller · inte...utan · ingalunda',
     logic: 'Dubbel negation / Ersättning',
-    logicColor: 'text-red-300',
+    logicColor: 'text-[var(--color-terracotta)]',
     desc: '"Varken...eller" negerar båda alternativen. "Inte...utan" ersätter det negerade med ett positivt alternativ.',
     ex: 'Utredningen lyckades varken fastställa orsaken eller föreslå en lösning.',
     trap: '"Inte...utan" är inte en enkel negation — den ersätter: "Inte arg, utan besviken." Läs noga.',
@@ -121,7 +121,7 @@ const CONJUNCTION_TYPES = [
     name: 'Alternativa',
     signal: 'antingen...eller · antingen...annars',
     logic: 'Exklusivt val',
-    logicColor: 'text-teal-400',
+    logicColor: 'text-[var(--color-ink-muted)]',
     desc: 'Av två alternativ gäller exakt ett. Används när alternativen utesluter varandra.',
     ex: 'Antingen godkänner styrelsen förslaget, eller avvisas det helt.',
     trap: '"Dels...dels" vs "antingen...eller": dels = båda gäller, antingen = bara ett gäller. HP testar just den skillnaden.',
@@ -131,7 +131,7 @@ const CONJUNCTION_TYPES = [
     name: 'Konjunktiv (hypotetisk)',
     signal: 'som om...vore · som om...hade · om...vore',
     logic: 'Kontrafaktisk / Hypotetisk',
-    logicColor: 'text-rose-400',
+    logicColor: 'text-[var(--color-terracotta)]',
     desc: 'Beskriver en situation som INTE är verklig — man föreställer sig ett annat scenario. Kräver konjunktivformen av verbet.',
     ex: 'Han talade om framtidsplanerna som om de redan vore verklighet.',
     trap: '"Som om" + konjunktiv (vore/hade/vore). Ofta sätts "var" istället för "vore" — det är vardagsspråk men inte korrekt skriftspråk.',
@@ -168,9 +168,9 @@ function Konjunktioner() {
                   <div className="text-[9px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Exempelmening</div>
                   <p className="text-sm text-[var(--color-ink)] italic">"{ct.ex}"</p>
                 </div>
-                <div className="bg-amber-500/8 border border-amber-500/20 rounded-lg px-3 py-2.5">
-                  <div className="text-[9px] font-bold text-amber-400 uppercase tracking-widest mb-1">Vanlig fälla</div>
-                  <p className="text-xs text-amber-200/80 leading-relaxed">{ct.trap}</p>
+                <div className="bg-[var(--color-gold-muted)] border border-[var(--color-card-border)] rounded-lg px-3 py-2.5">
+                  <div className="text-[9px] font-bold text-[var(--color-gold-deep)] uppercase tracking-widest mb-1">Vanlig fälla</div>
+                  <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">{ct.trap}</p>
                 </div>
               </div>
             )}
@@ -179,7 +179,7 @@ function Konjunktioner() {
       </div>
 
       <div className="card rounded-2xl p-4">
-        <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Snabbreferens</div>
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Snabbreferens</div>
         <div className="space-y-1.5">
           {[
             ['Orsak',       'eftersom, för att, därför att'],
@@ -239,7 +239,7 @@ function Strategi() {
           },
         ].map(item => (
           <div key={item.n} className="card rounded-xl p-4 flex gap-3">
-            <span className="text-lime-400 font-black text-sm shrink-0 w-4">{item.n}</span>
+            <span className="text-[var(--color-green)] font-black text-sm shrink-0 w-4">{item.n}</span>
             <div>
               <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
               <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
@@ -248,8 +248,8 @@ function Strategi() {
         ))}
       </div>
 
-      <div className="card rounded-2xl p-5 border border-lime-500/10">
-        <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Signalord → Relation (snabbkort)</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Signalord → Relation (snabbkort)</div>
         <div className="grid grid-cols-1 gap-1.5">
           {[
             { signal: 'eftersom / för att / därför att', rel: '→ kausal (orsak leder till konsekvens)' },
@@ -263,7 +263,7 @@ function Strategi() {
             { signal: 'som om...vore', rel: '→ konjunktiv (hypotetiskt, inte verkligt)' },
           ].map(({ signal, rel }) => (
             <div key={signal} className="text-xs flex gap-2">
-              <span className="font-mono text-lime-300 shrink-0 min-w-[180px]">{signal}</span>
+              <span className="font-mono text-[var(--color-green-light)] shrink-0 min-w-[180px]">{signal}</span>
               <span className="text-[var(--color-ink-faint)]">{rel}</span>
             </div>
           ))}
@@ -281,8 +281,8 @@ function Ovning() {
       </p>
 
       {/* Exercise 1 */}
-      <div className="card rounded-2xl p-5 border border-lime-500/10">
-        <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Övning 1 — Koncessiv</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Övning 1 — Koncessiv</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
           <p className="text-sm text-[var(--color-ink)] mb-3">
             "Trots att rapporten var _______ i sin analys, fick den ett _______ mottagande av forskarvärlden."
@@ -303,8 +303,8 @@ function Ovning() {
       </div>
 
       {/* Exercise 2 */}
-      <div className="card rounded-2xl p-5 border border-lime-500/10">
-        <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Övning 2 — Kausal + intern logik</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Övning 2 — Kausal + intern logik</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
           <p className="text-sm text-[var(--color-ink)] mb-3">
             "Eftersom boken var _______ i sin presentation av källorna, fick den _______ kritik från forskarvärlden."
@@ -324,8 +324,8 @@ function Ovning() {
       </div>
 
       {/* Exercise 3 */}
-      <div className="card rounded-2xl p-5 border border-lime-500/10">
-        <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Övning 3 — Proportionell (ju...desto)</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Övning 3 — Proportionell (ju...desto)</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
           <p className="text-sm text-[var(--color-ink)] mb-3">
             "Ju mer komplex en organisation är, desto _______ är det att _______ snabba beslut."
@@ -345,8 +345,8 @@ function Ovning() {
       </div>
 
       {/* Exercise 4 */}
-      <div className="card rounded-2xl p-5 border border-lime-500/10">
-        <div className="text-[10px] font-bold text-lime-400 uppercase tracking-widest mb-3">Övning 4 — Additiv vs Alternativ</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Övning 4 — Additiv vs Alternativ</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4">
           <p className="text-sm text-[var(--color-ink)] mb-3">
             "Reformerna genomfördes _______ på ekonomiska grunder _______ av ideologiska skäl."
@@ -378,14 +378,14 @@ export default function MekGuide() {
   const [tab, setTab] = useState<Tab>('konjunktioner')
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="MEK – Meningskomplettering" />
 
       {/* Hero */}
       <div className="border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
-          <div className="inline-flex items-center gap-2 bg-lime-500/10 border border-lime-500/20 text-lime-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-lime-400" />
+          <div className="inline-flex items-center gap-2 bg-[var(--color-green-muted)] border border-[var(--color-card-border)] text-[var(--color-green)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-green)]" />
             MEK · Meningskomplettering
           </div>
           <h1 className="text-4xl font-black mb-2 tracking-tight">MEK-guiden</h1>
@@ -403,11 +403,11 @@ export default function MekGuide() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-lime-400' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
               {tab === t.id && (
-                <span className="absolute bottom-0 inset-x-3 h-[2px] rounded-full bg-lime-400" />
+                <span className="absolute bottom-0 inset-x-3 h-[2px] rounded-full bg-[var(--color-green)]" />
               )}
             </button>
           ))}

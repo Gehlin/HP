@@ -9,11 +9,11 @@ const TOPICS = [
     id: 'algebra',
     name: 'Algebra & ekvationer',
     icon: '∑',
-    color: 'text-violet-400',
-    bg: 'bg-violet-500/8',
-    border: 'border-violet-500/20',
+    color: 'text-[var(--color-terracotta)]',
+    bg: 'bg-[var(--color-terracotta-muted)]',
+    border: 'border-[var(--color-card-border)]',
     freq: 'Hög',
-    freqColor: 'text-red-400',
+    freqColor: 'text-[var(--color-wrong-text)]',
     approach: 'Isolera variabeln. Testa svarsalternativen baklänges (plug-in) vid svåra ekvationer. Vid ekvationssystem: eliminationsmetoden är snabbare än substitution.',
     patterns: ['Linjära ekvationer: ax + b = c', 'Kvadratiska: x² + bx + c = 0 → pq-formeln', 'Ekvationssystem: 2 ekvationer, 2 okända', 'Olikheter: byt tecken vid multiplikation med negativt tal'],
     trap: 'Vid kvadratiska ekvationer — glöm inte att x kan ha två lösningar. Kontrollera om frågan frågar om "minsta" eller "största" värdet.',
@@ -22,11 +22,11 @@ const TOPICS = [
     id: 'procent',
     name: 'Procent & ekonomi',
     icon: '%',
-    color: 'text-blue-400',
-    bg: 'bg-blue-500/8',
-    border: 'border-blue-500/20',
+    color: 'text-[var(--color-green-light)]',
+    bg: 'bg-[var(--color-green-muted)]',
+    border: 'border-[var(--color-card-border)]',
     freq: 'Hög',
-    freqColor: 'text-red-400',
+    freqColor: 'text-[var(--color-wrong-text)]',
     approach: 'Multiplikationsfaktorn är din bästa vän: +20% = ×1,20. Kedjeberäkningar: multiplicera faktorerna. Undvik att beräkna procentbelopp separat om det inte behövs.',
     patterns: ['X% av Y = X/100 × Y', 'Förändring: nytt = gammalt × (1 ± p/100)', 'Omvänd %-beräkning: gammalt = nytt / (1 + p/100)', 'Kedja: 10% upp + 10% ner = 1,10 × 0,90 = 0,99 (−1%)'],
     trap: 'Procent är relativt, inte absolut. "10% upp och sedan 10% ner" ger inte 0% förändring totalt — det ger −1%.',
@@ -35,11 +35,11 @@ const TOPICS = [
     id: 'sannolikhet',
     name: 'Sannolikhet & kombinatorik',
     icon: '⚀',
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/8',
-    border: 'border-emerald-500/20',
+    color: 'text-[var(--color-gold-deep)]',
+    bg: 'bg-[var(--color-gold-muted)]',
+    border: 'border-[var(--color-card-border)]',
     freq: 'Medel',
-    freqColor: 'text-amber-400',
+    freqColor: 'text-[var(--color-gold-deep)]',
     approach: 'Rita ett träd eller ett Venn-diagram vid sammansatta händelser. Multiplicera oberoende sannolikheter. Vid kombinatorik: tänk "hur många val har jag vid varje steg?"',
     patterns: ['P(A och B oberoende) = P(A) × P(B)', 'P(A eller B) = P(A) + P(B) − P(A och B)', 'Permutationer: n! / (n−k)!', 'Kombinationer: n! / (k! × (n−k)!)'],
     trap: 'Skilja på "med återläggning" och "utan återläggning". Vid kortspel och urval utan återläggning minskar täljaren och nämnaren för varje drag.',
@@ -48,11 +48,11 @@ const TOPICS = [
     id: 'geometri',
     name: 'Geometri & area',
     icon: '△',
-    color: 'text-amber-400',
-    bg: 'bg-amber-500/8',
-    border: 'border-amber-500/20',
+    color: 'text-[var(--color-ink-muted)]',
+    bg: 'bg-[var(--color-paper-dark)]',
+    border: 'border-[var(--color-card-border)]',
     freq: 'Hög',
-    freqColor: 'text-red-400',
+    freqColor: 'text-[var(--color-wrong-text)]',
     approach: 'Rita alltid en figur — den ger dig insikter som texten döljer. Märk ut alla givna mått. Pythagoras används mer frekvent än du tror på HP.',
     patterns: ['Area triangel: bh/2', 'Area cirkel: πr²', 'Omkrets cirkel: 2πr', 'Pythagoras: a² + b² = c²', 'Area parallellogram: bh'],
     trap: 'Höjden i en triangel är alltid vinkelrät mot basen — inte en av sidorna, om inte rätvinklig triangel. Blanda inte ihop sida och höjd.',
@@ -61,11 +61,11 @@ const TOPICS = [
     id: 'statistik',
     name: 'Statistik & data',
     icon: 'x̄',
-    color: 'text-rose-400',
-    bg: 'bg-rose-500/8',
-    border: 'border-rose-500/20',
+    color: 'text-[var(--color-wrong-text)]',
+    bg: 'bg-[var(--color-wrong-bg)]',
+    border: 'border-[var(--color-wrong-border)]',
     freq: 'Medel',
-    freqColor: 'text-amber-400',
+    freqColor: 'text-[var(--color-gold-deep)]',
     approach: 'Medelvärde kräver summa, inte ordning. Median kräver ordning men inte exakta värden (vet bara att mitten är X). Typvärde = mest frekvent värde.',
     patterns: ['Medelvärde = summa / antal', 'Median = mittersta värdet (sorterat)', 'Typvärde = vanligaste värdet', 'Spridning: max − min'],
     trap: 'Medelvärde påverkas av extremvärden (outliers); median gör det inte. En fråga kan ge data som "ser ut" att ge ett medelvärde men i verkligheten frågar om medianen.',
@@ -74,11 +74,11 @@ const TOPICS = [
     id: 'funktioner',
     name: 'Funktioner & koordinater',
     icon: 'f(x)',
-    color: 'text-fuchsia-400',
-    bg: 'bg-fuchsia-500/8',
-    border: 'border-fuchsia-500/20',
+    color: 'text-[var(--color-ink-soft)]',
+    bg: 'bg-[var(--color-paper-dark)]',
+    border: 'border-[var(--color-card-border)]',
     freq: 'Medel',
-    freqColor: 'text-amber-400',
+    freqColor: 'text-[var(--color-gold-deep)]',
     approach: 'En rät linjes ekvation: y = kx + m. k = lutning (rise/run). m = y-intercept. Identifiera skärningspunkter algebraiskt (sätt ekvationerna lika).',
     patterns: ['Rät linje: y = kx + m', 'Lutning: k = (y₂−y₁)/(x₂−x₁)', 'Skärning med x-axeln: sätt y=0', 'Skärning med y-axeln: sätt x=0'],
     trap: 'Negativ lutning = linjen lutar nedåt (från vänster till höger). Blanda inte ihop k-värdet med vilket håll linjen pekar.',
@@ -88,7 +88,7 @@ const TOPICS = [
 const FORMULAS = [
   {
     category: 'Algebra',
-    color: 'text-violet-400',
+    color: 'text-[var(--color-terracotta)]',
     items: [
       { name: 'pq-formeln', formula: 'x = −p/2 ± √((p/2)² − q)   för x² + px + q = 0' },
       { name: 'Kvadreringsreglerna', formula: '(a+b)² = a²+2ab+b²\n(a−b)² = a²−2ab+b²\n(a+b)(a−b) = a²−b²' },
@@ -96,7 +96,7 @@ const FORMULAS = [
   },
   {
     category: 'Geometri',
-    color: 'text-amber-400',
+    color: 'text-[var(--color-ink-muted)]',
     items: [
       { name: 'Pythagoras', formula: 'a² + b² = c²   (c = hypotenusa)' },
       { name: 'Triangel area', formula: 'A = bh/2' },
@@ -109,7 +109,7 @@ const FORMULAS = [
   },
   {
     category: 'Procent',
-    color: 'text-blue-400',
+    color: 'text-[var(--color-green-light)]',
     items: [
       { name: 'Förändringsfaktor', formula: '+p% → ×(1+p/100)\n−p% → ×(1−p/100)' },
       { name: 'Basvärde', formula: 'Bas = Nytt / (1+p/100)' },
@@ -118,7 +118,7 @@ const FORMULAS = [
   },
   {
     category: 'Sannolikhet',
-    color: 'text-emerald-400',
+    color: 'text-[var(--color-gold-deep)]',
     items: [
       { name: 'Komplementregeln', formula: 'P(A) = 1 − P(Aᶜ)' },
       { name: 'Multiplikationsregeln', formula: 'P(A∩B) = P(A)×P(B)   (oberoende)' },
@@ -128,7 +128,7 @@ const FORMULAS = [
   },
   {
     category: 'Statistik',
-    color: 'text-rose-400',
+    color: 'text-[var(--color-wrong-text)]',
     items: [
       { name: 'Medelvärde', formula: 'x̄ = (x₁+x₂+...+xₙ) / n' },
       { name: 'Vägat medelvärde', formula: 'x̄ = Σ(wᵢ×xᵢ) / Σwᵢ' },
@@ -148,14 +148,14 @@ export default function XyzGuide() {
   ]
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="XYZ – Matematisk problemlösning" />
       <div className="max-w-lg mx-auto px-4 py-10 pb-24">
 
         {/* Header */}
         <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-[var(--color-terracotta-muted)] border border-[var(--color-card-border)] text-[var(--color-terracotta)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-terracotta)] animate-pulse" />
             XYZ · Matematisk problemlösning
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">XYZ-guide</h1>
@@ -163,10 +163,10 @@ export default function XyzGuide() {
         </div>
 
         {/* Core insight */}
-        <div className="card rounded-2xl p-4 mb-6 border border-violet-500/15">
-          <div className="text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-2">Examtaktik i ett nötskal</div>
+        <div className="card rounded-2xl p-4 mb-6 border border-[var(--color-card-border)]">
+          <div className="text-[10px] font-bold text-[var(--color-terracotta)] uppercase tracking-widest mb-2">Examtaktik i ett nötskal</div>
           <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
-            XYZ belönar <span className="text-violet-300 font-semibold">smart uppskattning</span> lika ofta som exakt beräkning. Många frågor kan lösas på 20 sekunder genom att eliminera uppenbart felaktiga alternativ och testa ett rimligt värde. Fastnar du efter 60s — gissa och gå vidare, ingen minuspoäng.
+            XYZ belönar <span className="text-[var(--color-terracotta)] font-semibold">smart uppskattning</span> lika ofta som exakt beräkning. Många frågor kan lösas på 20 sekunder genom att eliminera uppenbart felaktiga alternativ och testa ett rimligt värde. Fastnar du efter 60s — gissa och gå vidare, ingen minuspoäng.
           </p>
         </div>
 
@@ -176,7 +176,7 @@ export default function XyzGuide() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-violet-700 text-white' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-[var(--color-terracotta)] text-[var(--color-cream)]' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
             </button>
@@ -222,8 +222,8 @@ export default function XyzGuide() {
                           ))}
                         </ul>
                       </div>
-                      <div className="flex items-start gap-2 bg-amber-500/5 border border-amber-500/15 rounded-xl p-2.5">
-                        <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚠</span>
+                      <div className="flex items-start gap-2 bg-[var(--color-gold-muted)] border border-[var(--color-card-border)] rounded-xl p-2.5">
+                        <span className="text-[var(--color-gold-deep)] text-xs shrink-0 mt-0.5">⚠</span>
                         <span className="text-[11px] text-[var(--color-ink-muted)]">{topic.trap}</span>
                       </div>
                     </div>
@@ -238,7 +238,7 @@ export default function XyzGuide() {
                 className="w-full card rounded-2xl p-4 text-left hover:bg-[var(--color-paper-dark)] transition-colors flex items-center justify-between"
               >
                 <div>
-                  <div className="text-sm font-bold text-violet-300">Fördjupa dig i matematiken</div>
+                  <div className="text-sm font-bold text-[var(--color-terracotta)]">Fördjupa dig i matematiken</div>
                   <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">10 ämnen med fullständiga förklaringar och begrepp</div>
                 </div>
                 <span className="text-[var(--color-ink-faint)]">→</span>
@@ -255,37 +255,37 @@ export default function XyzGuide() {
             {[
               {
                 title: 'Plug-in — testa svarsalternativen',
-                color: 'text-violet-400',
-                border: 'border-violet-500/20',
-                bg: 'bg-violet-500/8',
+                color: 'text-[var(--color-terracotta)]',
+                border: 'border-[var(--color-card-border)]',
+                bg: 'bg-[var(--color-terracotta-muted)]',
                 body: 'Om frågan frågar "Vilket värde på x uppfyller...?" — testa A, B, C, D i uttrycket. Det är ofta snabbare än att lösa algebraiskt. Börja med C (mitten) vid ordnade alternativ.',
               },
               {
                 title: 'Eliminering av felaktiga alternativ',
-                color: 'text-blue-400',
-                border: 'border-blue-500/20',
-                bg: 'bg-blue-500/8',
+                color: 'text-[var(--color-green-light)]',
+                border: 'border-[var(--color-card-border)]',
+                bg: 'bg-[var(--color-green-muted)]',
                 body: 'Kan du se att svaret måste vara positivt? Eliminera negativa alternativ. Att halvera antalet alternativ fördubblar sannolikheten vid gissning. 50% chans är bättre än att lämna blankt.',
               },
               {
                 title: 'Uppskattning och storleksordning',
-                color: 'text-emerald-400',
-                border: 'border-emerald-500/20',
-                bg: 'bg-emerald-500/8',
+                color: 'text-[var(--color-gold-deep)]',
+                border: 'border-[var(--color-card-border)]',
+                bg: 'bg-[var(--color-gold-muted)]',
                 body: 'Är alternativen spridda (10, 100, 1000)? Uppskatta storleksordningen först. Om du vet svaret är "i hundratusental" behöver du bara läsa av rätt storleksklass, inte beräkna exakt.',
               },
               {
                 title: 'Rita alltid en figur vid geometri',
-                color: 'text-amber-400',
-                border: 'border-amber-500/20',
-                bg: 'bg-amber-500/8',
+                color: 'text-[var(--color-ink-muted)]',
+                border: 'border-[var(--color-card-border)]',
+                bg: 'bg-[var(--color-paper-dark)]',
                 body: 'En handritad figur med alla givna mått inritade avslöjar relationer du inte ser i texten. Märk ut höjder, diagonaler och parallella sidor. Pythagoras döljer sig i oväntat många XYZ-uppgifter.',
               },
               {
                 title: '60-sekundersregeln',
-                color: 'text-rose-400',
-                border: 'border-rose-500/20',
-                bg: 'bg-rose-500/8',
+                color: 'text-[var(--color-wrong-text)]',
+                border: 'border-[var(--color-wrong-border)]',
+                bg: 'bg-[var(--color-wrong-bg)]',
                 body: 'Om du inte löst uppgiften på 60 sekunder: välj det bästa gissningen bland alternativen, flagga frågan och gå vidare. Inga minuspoäng — en välgrundad gissning är alltid bättre än att lämna blankt. Återkom om tid finns.',
               },
             ].map(s => (
@@ -307,7 +307,7 @@ export default function XyzGuide() {
                   { ämne: 'Funktioner', tips: '40–60s. Sätt in x-värden.' },
                 ].map(({ ämne, tips }) => (
                   <div key={ämne} className="flex gap-3 text-xs">
-                    <span className="text-violet-400 font-bold shrink-0 w-20">{ämne}</span>
+                    <span className="text-[var(--color-terracotta)] font-bold shrink-0 w-20">{ämne}</span>
                     <span className="text-[var(--color-ink-muted)]">{tips}</span>
                   </div>
                 ))}
@@ -348,7 +348,7 @@ export default function XyzGuide() {
                   { val: '2/3 ≈ 0,667', note: 'Bråkkonvertering' },
                 ].map(({ val, note }) => (
                   <div key={val} className="bg-[var(--color-paper-dark)] rounded-xl p-2.5">
-                    <div className="text-violet-400 font-black text-xs mb-0.5 font-mono">{val}</div>
+                    <div className="text-[var(--color-terracotta)] font-black text-xs mb-0.5 font-mono">{val}</div>
                     <div className="text-[10px] text-[var(--color-ink-faint)]">{note}</div>
                   </div>
                 ))}
@@ -361,7 +361,7 @@ export default function XyzGuide() {
         <div className="mt-8 pt-6 border-t border-[var(--color-card-border)]">
           <button
             onClick={() => navigate('/practice?type=XYZ')}
-            className="w-full bg-violet-800 hover:bg-violet-700 transition-colors rounded-xl py-3 font-bold text-sm"
+            className="w-full bg-[var(--color-terracotta)] hover:bg-[var(--color-terracotta-deep)] transition-colors rounded-xl py-3 font-bold text-sm text-[var(--color-cream)]"
           >
             Öva XYZ nu →
           </button>

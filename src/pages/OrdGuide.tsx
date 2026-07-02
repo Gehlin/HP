@@ -20,10 +20,10 @@ function Callout({ title, children, color = 'rose' }: {
   color?: 'rose' | 'amber' | 'emerald' | 'blue'
 }) {
   const styles = {
-    rose:    'border-rose-500/20 bg-rose-500/5 text-rose-400',
-    amber:   'border-amber-500/20 bg-amber-500/5 text-amber-400',
-    emerald: 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400',
-    blue:    'border-blue-500/20 bg-blue-500/5 text-blue-400',
+    rose:    'border-[var(--color-card-border)] bg-[var(--color-green-muted)] text-[var(--color-green)]',
+    amber:   'border-[var(--color-card-border)] bg-[var(--color-gold-muted)] text-[var(--color-gold-deep)]',
+    emerald: 'border-[var(--color-card-border)] bg-[var(--color-green-muted)] text-[var(--color-green-light)]',
+    blue:    'border-[var(--color-card-border)] bg-[var(--color-paper-dark)] text-[var(--color-ink-muted)]',
   }
   return (
     <div className={`rounded-xl border p-4 mb-4 ${styles[color]}`}>
@@ -49,7 +49,7 @@ function PrefixTable({ entries }: { entries: PrefixEntry[] }) {
         <tbody>
           {entries.map((e, i) => (
             <tr key={i} className="border-b border-[var(--color-card-border)] last:border-0">
-              <td className="px-3 py-2 font-mono font-bold text-rose-400 whitespace-nowrap">{e.prefix}</td>
+              <td className="px-3 py-2 font-mono font-bold text-[var(--color-green)] whitespace-nowrap">{e.prefix}</td>
               <td className="px-3 py-2 text-[var(--color-ink-muted)]">{e.meaning}</td>
               <td className="px-3 py-2 text-[var(--color-ink-faint)]">{e.examples}</td>
             </tr>
@@ -81,13 +81,13 @@ function IntroSection() {
               key={opt.key}
               className={`flex gap-2 items-center text-sm px-3 py-1.5 rounded-lg ${
                 opt.correct
-                  ? 'bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 font-bold'
+                  ? 'bg-[var(--color-correct-bg)] border border-[var(--color-correct-border)] text-[var(--color-correct-text)] font-bold'
                   : 'text-[var(--color-ink-faint)]'
               }`}
             >
               <span className="font-black w-4 shrink-0">{opt.key}</span>
               <span>{opt.text}</span>
-              {opt.correct && <span className="text-[10px] text-emerald-500 ml-auto">← rätt svar</span>}
+              {opt.correct && <span className="text-[10px] text-[var(--color-success)] ml-auto">← rätt svar</span>}
             </div>
           ))}
         </div>
@@ -96,10 +96,10 @@ function IntroSection() {
       <SectionHeading>Ordkategorier på HP</SectionHeading>
       <div className="space-y-2">
         {[
-          { label: 'Latinska lånord', desc: 'ambulant, frekvent, koncis, konsekvent, abstrakt, implicit', color: 'text-violet-400' },
-          { label: 'Franska lånord', desc: 'renommé, naiv, precis, subtil, nuanserad', color: 'text-blue-400' },
-          { label: 'Akademiska termer', desc: 'pragmatisk, empirisk, stringent, paradoxal, tvetydig', color: 'text-emerald-400' },
-          { label: 'Karaktärsbeskrivningar', desc: 'förtegen, enigmatisk, drastisk, ambivalent, intuitiv', color: 'text-amber-400' },
+          { label: 'Latinska lånord', desc: 'ambulant, frekvent, koncis, konsekvent, abstrakt, implicit', color: 'text-[var(--color-green)]' },
+          { label: 'Franska lånord', desc: 'renommé, naiv, precis, subtil, nuanserad', color: 'text-[var(--color-green-light)]' },
+          { label: 'Akademiska termer', desc: 'pragmatisk, empirisk, stringent, paradoxal, tvetydig', color: 'text-[var(--color-ink-muted)]' },
+          { label: 'Karaktärsbeskrivningar', desc: 'förtegen, enigmatisk, drastisk, ambivalent, intuitiv', color: 'text-[var(--color-gold-deep)]' },
         ].map((cat, i) => (
           <div key={i} className="card rounded-xl p-3 flex gap-3">
             <div className={`text-base shrink-0 mt-0.5 ${cat.color}`}>◆</div>
@@ -183,7 +183,7 @@ function PrefixSection() {
             onClick={() => setSub(t.id)}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
               sub === t.id
-                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                ? 'bg-[var(--color-green-muted)] text-[var(--color-green)] border border-[var(--color-card-border)]'
                 : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'
             }`}
           >
@@ -199,16 +199,16 @@ function PrefixSection() {
       <div className="mt-4 card rounded-xl p-4">
         <div className="text-[10px] font-black uppercase tracking-widest text-[var(--color-ink-faint)] mb-2">Exempel: dela upp ordet</div>
         <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
-          <span className="text-rose-400 font-mono font-bold">im-</span>plicit =
-          {' '}<span className="text-rose-400">im-</span> (inte) + <span className="text-[var(--color-ink-muted)]">plicit</span> (lagt) → inte utlagt/sagt → underförstått
+          <span className="text-[var(--color-green)] font-mono font-bold">im-</span>plicit =
+          {' '}<span className="text-[var(--color-green)]">im-</span> (inte) + <span className="text-[var(--color-ink-muted)]">plicit</span> (lagt) → inte utlagt/sagt → underförstått
         </div>
         <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed mt-2">
-          <span className="text-rose-400 font-mono font-bold">pseudo-</span>nym =
-          {' '}<span className="text-rose-400">pseudo-</span> (falsk) + <span className="text-[var(--color-ink-muted)]">nym</span> (namn) → falskt namn
+          <span className="text-[var(--color-green)] font-mono font-bold">pseudo-</span>nym =
+          {' '}<span className="text-[var(--color-green)]">pseudo-</span> (falsk) + <span className="text-[var(--color-ink-muted)]">nym</span> (namn) → falskt namn
         </div>
         <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed mt-2">
-          <span className="text-rose-400 font-mono font-bold">sub-</span>til =
-          {' '}<span className="text-rose-400">sub-</span> (under) + <span className="text-[var(--color-ink-muted)]">til</span> (tunt/fint) → fint underifrån → knappt märkbar
+          <span className="text-[var(--color-green)] font-mono font-bold">sub-</span>til =
+          {' '}<span className="text-[var(--color-green)]">sub-</span> (under) + <span className="text-[var(--color-ink-muted)]">til</span> (tunt/fint) → fint underifrån → knappt märkbar
         </div>
       </div>
     </div>
@@ -248,7 +248,7 @@ function SuffixSection() {
           <tbody>
             {SUFFIXES.map((e, i) => (
               <tr key={i} className="border-b border-[var(--color-card-border)] last:border-0">
-                <td className="px-3 py-2 font-mono font-bold text-amber-400 whitespace-nowrap">{e.suffix}</td>
+                <td className="px-3 py-2 font-mono font-bold text-[var(--color-gold-deep)] whitespace-nowrap">{e.suffix}</td>
                 <td className="px-3 py-2 text-[var(--color-ink-faint)] text-[10px] whitespace-nowrap">{e.type}</td>
                 <td className="px-3 py-2 text-[var(--color-ink-faint)]">{e.examples}</td>
               </tr>
@@ -261,8 +261,8 @@ function SuffixSection() {
         <div className="text-[10px] font-black uppercase tracking-widest text-[var(--color-ink-faint)] mb-2">Praktisk tillämpning</div>
         <div className="space-y-2 text-sm text-[var(--color-ink-muted)]">
           <div>Du ser alternativet <span className="text-[var(--color-ink)] font-semibold">tystlåten</span>. Roten tyst + ändelsen -en (adj.) → som håller sig tyst.</div>
-          <div>Du ser <span className="text-[var(--color-ink)] font-semibold">meningslös</span>. <span className="text-amber-400">-lös</span> = utan → utan mening.</div>
-          <div>Du ser <span className="text-[var(--color-ink)] font-semibold">trolig</span>. <span className="text-amber-400">-lig</span> = av denna sort → av trotypes sort → sannolik.</div>
+          <div>Du ser <span className="text-[var(--color-ink)] font-semibold">meningslös</span>. <span className="text-[var(--color-gold-deep)]">-lös</span> = utan → utan mening.</div>
+          <div>Du ser <span className="text-[var(--color-ink)] font-semibold">trolig</span>. <span className="text-[var(--color-gold-deep)]">-lig</span> = av denna sort → av trotypes sort → sannolik.</div>
         </div>
       </div>
     </div>
@@ -306,7 +306,7 @@ function StrategiSection() {
       <div className="space-y-3">
         {steps.map((step, i) => (
           <div key={i} className="card rounded-xl p-4 flex gap-3">
-            <div className="text-base font-black text-rose-500 shrink-0 w-5">{i + 1}</div>
+            <div className="text-base font-black text-[var(--color-green)] shrink-0 w-5">{i + 1}</div>
             <div>
               <div className="text-sm font-bold text-[var(--color-ink)] mb-1">{step.title}</div>
               <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{step.body}</div>
@@ -315,8 +315,8 @@ function StrategiSection() {
         ))}
       </div>
 
-      <div className="mt-6 bg-rose-900/20 border border-rose-700/30 rounded-xl p-4">
-        <div className="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-2">Vanlig fälla</div>
+      <div className="mt-6 bg-[var(--color-gold-muted)] border border-[var(--color-card-border)] rounded-xl p-4">
+        <div className="text-[10px] font-black uppercase tracking-widest text-[var(--color-gold-deep)] mb-2">Vanlig fälla</div>
         <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
           HP väljer ofta alternativ som är <em>relaterade</em> till rätt svar utan att vara synonymer. T.ex. för INTUITIV är "kreativ" ett lockbete — kreativitet och intuition hänger ihop men är inte samma sak. Fråga alltid: kan jag byta ut det givna ordet mot detta alternativ och få exakt samma mening?
         </p>
@@ -329,11 +329,11 @@ export default function OrdGuide() {
   const [tab, setTab] = useState<Tab>('intro')
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="ORD – Ordförståelse" />
       <div className="max-w-2xl mx-auto px-4 pt-6">
 
-        <div className="mb-1 text-[10px] font-bold text-rose-400 uppercase tracking-widest">Ordförståelse</div>
+        <div className="mb-1 text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest">Ordförståelse</div>
         <h1 className="text-3xl font-black mb-1">ORD-guide</h1>
         <p className="text-[var(--color-ink-muted)] text-sm mb-6">Prefix, suffix och strategier för att knäcka okända ord</p>
 
@@ -344,7 +344,7 @@ export default function OrdGuide() {
               onClick={() => setTab(t.id)}
               className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
                 tab === t.id
-                  ? 'bg-rose-500/15 text-rose-300 border border-rose-500/20'
+                  ? 'bg-[var(--color-green-muted)] text-[var(--color-green)] border border-[var(--color-card-border)]'
                   : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'
               }`}
             >

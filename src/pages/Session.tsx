@@ -74,15 +74,23 @@ const fmtTime = (s: number) => {
   return `${m}:${sec.toString().padStart(2, '0')}`
 }
 
+// Prototype timer: counts the whole practice set (mm:ss, 1s tick), resets when a
+// new set starts (component remount). The per-question elapsed is still tracked
+// internally to keep the app's 2-minute pacing warning.
 const QuestionTimer = memo(function QuestionTimer({ currentIdx }: { currentIdx: number }) {
   const [elapsed, setElapsed] = useState(0)
+  const [questionElapsed, setQuestionElapsed] = useState(0)
   useEffect(() => {
-    setElapsed(0)
-    const t = setInterval(() => setElapsed(s => s + 1), 1000)
+    const t = setInterval(() => {
+      setElapsed(s => s + 1)
+      setQuestionElapsed(s => s + 1)
+    }, 1000)
     return () => clearInterval(t)
-  }, [currentIdx])
+  }, [])
+  useEffect(() => { setQuestionElapsed(0) }, [currentIdx])
   return (
-    <span className={`font-[var(--font-sans)] font-semibold text-[13px] tabular-nums shrink-0 bg-[var(--color-card)] border border-[var(--color-hairline)] rounded-full px-3 py-[5px] ${elapsed >= 120 ? 'text-[var(--color-error)] timer-warning' : 'text-[var(--color-ink)]'}`}>
+    <span className={`inline-flex items-center gap-1.5 font-[var(--font-sans)] font-bold text-[13px] tabular-nums shrink-0 bg-[var(--color-card)] border border-[var(--color-hairline)] rounded-full px-[11px] py-[7px] ${questionElapsed >= 120 ? 'text-[var(--color-error)] timer-warning' : 'text-[var(--color-ink)]'}`}>
+      <span className="w-[7px] h-[7px] rounded-full bg-[var(--color-terracotta)]" />
       {fmtTime(elapsed)}
     </span>
   )
@@ -120,6 +128,7 @@ export default function Session() {
   const questionStartRef = useRef<number>(Date.now())
   const explanationRef = useRef<HTMLDivElement>(null)
   const touchStartXRef = useRef<number | null>(null)
+  const mainRef = useRef<HTMLElement>(null)
 
   const finishModalRef = useFocusTrap(showFinishModal)
   const jumpModalRef   = useFocusTrap(showJump)
@@ -179,10 +188,17 @@ export default function Session() {
     setShowFinishModal(false)
     recordCurrentQuestionTime()
     finishSession()
-    navigate('/results')
+    navigate('/resultat')
   }, [navigate, recordCurrentQuestionTime])
 
   const requestFinish = useCallback(() => setShowFinishModal(true), [])
+
+  // Prototype: "Se resultat" on the last question goes straight to results.
+  // The confirmation modal only guards sets with unanswered questions left.
+  const finishOrConfirm = useCallback(() => {
+    if (Object.keys(answers).length >= sessionQuestions.length) handleFinish()
+    else requestFinish()
+  }, [answers, sessionQuestions.length, handleFinish, requestFinish])
 
   const jumpTo = useCallback((idx: number) => {
     recordCurrentQuestionTime()
@@ -207,11 +223,12 @@ export default function Session() {
         : (streak < 0 ? streak - 1 : -1)
       setStreak(newStreak)
 
-      if (Math.abs(newStreak) >= 2) {
+      // Never swap linked reading-passage questions — their groups must stay consecutive
+      if (Math.abs(newStreak) >= 2 && !sessionQuestions[nextIdx]?.passageId) {
         const targetDifficulty = newStreak >= 2 ? 'hard' : 'easy'
         const remaining = sessionQuestions.slice(nextIdx)
         const swapOffset = remaining.findIndex(
-          rq => rq.type === q.type && rq.difficulty === targetDifficulty
+          rq => rq.type === q.type && rq.difficulty === targetDifficulty && !rq.passageId
         )
         if (swapOffset > 0) {
           setOrderedIds(ids => {
@@ -322,6 +339,12 @@ export default function Session() {
     }
   }, [breakScreen?.nextSection])
 
+  // Each question starts at the top of the scroll area (prototype pages reset per question)
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 })
+    window.scrollTo(0, 0)
+  }, [current])
+
   useEffect(() => {
     if (!undoSkip) return
     const t = setTimeout(() => setUndoSkip(null), 4000)
@@ -426,6 +449,23 @@ export default function Session() {
 
   const sectionMeta = SECTION_META[q.type]
 
+  // Linked reading-passage lead, prototype format: "Text N · Fråga X av Y".
+  // N = ordinal of this passage among the session's distinct passages,
+  // X/Y = position within the consecutive run sharing the same passage.
+  const passageLead = (() => {
+    if (!q.passageId) return null
+    let start = current
+    while (start > 0 && sessionQuestions[start - 1]?.passageId === q.passageId) start--
+    let end = current
+    while (end < sessionQuestions.length - 1 && sessionQuestions[end + 1]?.passageId === q.passageId) end++
+    const distinct = new Set<string>()
+    for (let i = 0; i <= start; i++) {
+      const pid = sessionQuestions[i]?.passageId
+      if (pid) distinct.add(pid)
+    }
+    return `Text ${distinct.size} · Fråga ${current - start + 1} av ${end - start + 1}`
+  })()
+
 
   return (
     <div className="min-h-screen bg-[var(--color-paper)] flex flex-col">
@@ -459,17 +499,18 @@ export default function Session() {
           )}
         </div>
 
-        {/* Linear progress bar */}
+        {/* Linear progress bar — fills per the prototype: (qIndex + (checked ? 1 : 0)) / total */}
         <div className="h-[3px] bg-[var(--color-track)]">
           <div
             className="h-full bg-[var(--color-green)] transition-all duration-300"
-            style={{ width: `${(current / sessionQuestions.length) * 100}%` }}
+            style={{ width: `${((current + (isRevealed ? 1 : 0)) / sessionQuestions.length) * 100}%` }}
           />
         </div>
       </header>
 
       {/* ── Scrollable question area ───────────────────────────── */}
       <main
+        ref={mainRef}
         className="flex-1 overflow-y-auto pt-[72px] pb-[96px] px-4 max-w-2xl mx-auto w-full"
         onTouchStart={e => { touchStartXRef.current = e.touches[0].clientX }}
         onTouchEnd={e => {
@@ -499,21 +540,31 @@ export default function Session() {
             })()}
           </div>
 
-          {/* Context box */}
+          {/* Passage / context card — prototype "LÄSTEXT" card: radius 16, padding 15/16, Newsreader 15/1.7 */}
           {(q.context || q.passageId) && (() => {
             const passageText = q.passageId ? getPassage(q.passageId)?.text : undefined
             const displayText = passageText ?? q.context ?? ''
+            const isPassage = !!q.passageId || q.type === 'LAS' || q.type === 'ELF'
             return (
-              <div className="card p-4 mb-4 text-sm text-[var(--color-ink-muted)] leading-relaxed">
-                <div className="text-[9px] font-bold tracking-widest uppercase text-[var(--color-ink-faint)] mb-1.5">
-                  {q.type === 'LAS' ? 'Lästext' : q.type === 'ELF' ? 'Reading passage' : 'Kontext'}
+              <div className="card px-4 py-[15px] mb-[18px]">
+                <div className="text-[10px] font-semibold tracking-[.12em] uppercase text-[var(--color-ink-faint)] mb-2.5">
+                  {isPassage ? 'Lästext' : 'Kontext'}
                 </div>
-                <MathText text={displayText} />
+                <div className={isPassage
+                  ? 'font-[var(--font-serif)] text-[15px] leading-[1.7] text-[var(--color-ink-soft)] whitespace-pre-line'
+                  : 'text-sm text-[var(--color-ink-muted)] leading-relaxed'}>
+                  <MathText text={displayText} />
+                </div>
               </div>
             )
           })()}
 
-          {/* Question text */}
+          {/* Lead + question text */}
+          {passageLead && (
+            <div className="text-[13px] font-medium leading-[1.4] text-[var(--color-ink-muted)] mb-2">
+              {passageLead}
+            </div>
+          )}
           <div className="text-base leading-relaxed text-[var(--color-ink)] font-[var(--font-sans)] mb-6">
             <MathText text={q.text} />
           </div>
@@ -562,14 +613,26 @@ export default function Session() {
                 isRevealed && !isAnswer && !isChosen ? 'answer-option-other' : '',
               ].filter(Boolean).join(' ')
 
-              let badgeBg = 'bg-[var(--color-hairline)]'
-              let badgeColor = 'text-[var(--color-ink)]'
-              if (!isRevealed && isChosen) { badgeBg = 'bg-[var(--color-terracotta)]'; badgeColor = 'text-[var(--color-cream)]' }
-              if (isRevealed && isAnswer) { badgeBg = 'bg-[var(--color-correct-badge)]'; badgeColor = 'text-[var(--color-cream)]' }
-              if (isRevealed && isChosen && !isAnswer) { badgeBg = 'bg-[var(--color-wrong-badge)]'; badgeColor = 'text-[var(--color-cream)]' }
+              // Badge: 27×27, radius 8. Default transparent with #E0D8C8 border,
+              // solid fill (terracotta / correct green / wrong red) per prototype.
+              let badgeCls = 'bg-transparent border-[1.5px] border-[#E0D8C8] text-[var(--color-ink-faint)]'
+              let textCls = 'font-semibold text-[var(--color-ink-soft)]'
+              if (!isRevealed && isChosen) {
+                badgeCls = 'bg-[var(--color-terracotta)] border-[1.5px] border-[var(--color-terracotta)] text-white'
+                textCls = 'font-bold text-[var(--color-ink)]'
+              } else if (isRevealed && isAnswer) {
+                badgeCls = 'bg-[var(--color-correct-badge)] border-[1.5px] border-[var(--color-correct-badge)] text-white'
+                textCls = 'font-bold text-[var(--color-correct-text)]'
+              } else if (isRevealed && isChosen && !isAnswer) {
+                badgeCls = 'bg-[var(--color-wrong-badge)] border-[1.5px] border-[var(--color-wrong-badge)] text-white'
+                textCls = 'font-bold text-[var(--color-wrong-text)]'
+              } else if (isRevealed) {
+                badgeCls = 'bg-transparent border-[1.5px] border-[#E0D8C8] text-[#C3BBAC]'
+                textCls = 'font-semibold text-[var(--color-ink-faint)]'
+              }
 
               const badgeLabel = isRevealed && isAnswer ? '✓'
-                : (isRevealed && isChosen && !isAnswer) ? '✗'
+                : (isRevealed && isChosen && !isAnswer) ? '✕'
                 : key
 
               return (
@@ -577,12 +640,12 @@ export default function Session() {
                   key={key}
                   onClick={() => pick(key)}
                   disabled={isRevealed}
-                  className={`w-full text-left flex items-start gap-3 min-h-[52px] ${optionClasses}`}
+                  className={`w-full text-left flex items-start gap-[13px] min-h-[52px] ${optionClasses}`}
                 >
-                  <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${badgeBg} ${badgeColor}`}>
+                  <span className={`shrink-0 w-[27px] h-[27px] rounded-lg flex items-center justify-center text-xs font-bold transition-colors ${badgeCls}`}>
                     {badgeLabel}
                   </span>
-                  <div className="mt-0.5 flex-1 text-sm text-[var(--color-ink)]">
+                  <div className={`mt-0.5 flex-1 text-base leading-[1.3] ${textCls}`}>
                     <MathText text={text} />
                   </div>
                 </button>
@@ -648,7 +711,7 @@ export default function Session() {
 
       {/* ── Key guide overlay ─────────────────────────────────── */}
       {showKeyGuide && (
-        <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowKeyGuide(false)}>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowKeyGuide(false)}>
           <div ref={keyGuideRef} role="dialog" aria-modal="true" aria-label="Tangentbordsgenvägar" className="bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl w-full max-w-xs p-6 animate-scale-in" onClick={e => e.stopPropagation()}>
             <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-4">Tangentbordsgenvägar</div>
             <div className="space-y-3">
@@ -671,7 +734,7 @@ export default function Session() {
 
       {/* ── Finish confirmation modal ──────────────────────────── */}
       {showFinishModal && (
-        <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onClick={() => setShowFinishModal(false)}>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onClick={() => setShowFinishModal(false)}>
           <div ref={finishModalRef} role="dialog" aria-modal="true" aria-label="Avsluta passet" className="bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl w-full max-w-sm p-6 animate-slide-up sm:animate-scale-in" onClick={e => e.stopPropagation()}>
             <div className="text-base font-black text-[var(--color-ink)] mb-1">Avsluta passet?</div>
             <p className="text-sm text-[var(--color-ink-faint)] mb-5">Du kan inte återgå till frågorna efter att du avslutat.</p>
@@ -703,7 +766,7 @@ export default function Session() {
 
       {showJump && (
         <div
-          className="fixed inset-0 z-20 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
           onClick={() => setShowJump(false)}
         >
           <div
@@ -753,21 +816,25 @@ export default function Session() {
 
       {/* ── Fixed footer ──────────────────────────────────────── */}
       <div className="fixed bottom-0 inset-x-0 z-40 bg-[var(--color-paper)] border-t border-[var(--color-card-border)] pb-safe">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
 
-          {/* Left: bookmark toggle */}
+          {/* Left: bookmark toggle — 54×54, filled terracotta when saved (prototype bmBtnStyle) */}
           <button
             onClick={handleBookmark}
             aria-label={q && bookmarked[q.id] ? 'Ta bort bokmärke' : 'Bokmärk fråga'}
-            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] transition-colors"
+            className={`shrink-0 w-[54px] h-[54px] inline-flex items-center justify-center rounded-2xl transition-all duration-150 ${
+              q && bookmarked[q.id]
+                ? 'bg-[var(--color-terracotta-soft)] border-[1.5px] border-[#E0B79F] text-[var(--color-terracotta)]'
+                : 'bg-[var(--color-card)] border border-[var(--color-hairline)] text-[var(--color-ink-faint)]'
+            }`}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill={q && bookmarked[q.id] ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill={q && bookmarked[q.id] ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/>
             </svg>
           </button>
 
           {/* Right: action buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-1">
             {session.studyMode && isRevealed ? (
               <>
                 {[
@@ -779,11 +846,11 @@ export default function Session() {
                     key={label}
                     onClick={() => {
                       saveQuestionQuality(q.id, quality)
-                      current < sessionQuestions.length - 1 ? handleNextQuestion() : requestFinish()
+                      current < sessionQuestions.length - 1 ? handleNextQuestion() : finishOrConfirm()
                     }}
                     disabled={isTransitioning}
                     style={{ color, backgroundColor: bg, borderColor: color }}
-                    className="border rounded-xl px-4 py-2.5 font-bold text-sm transition-colors disabled:opacity-40"
+                    className="flex-1 h-[54px] border rounded-2xl font-bold text-sm transition-colors disabled:opacity-40"
                   >
                     {label}
                   </button>
@@ -795,15 +862,19 @@ export default function Session() {
                   setRevealed(r => ({ ...r, [q.id]: true }))
                   setTimeout(() => explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80)
                 }}
-                className="btn-primary px-8"
+                className="flex-1 h-[54px] rounded-2xl font-bold text-base bg-[var(--color-green)] text-[var(--color-cream)]"
               >
                 Kontrollera svar
               </button>
             ) : (
               <button
-                onClick={current < sessionQuestions.length - 1 ? handleNextQuestion : requestFinish}
+                onClick={current < sessionQuestions.length - 1 ? handleNextQuestion : finishOrConfirm}
                 disabled={(!chosen && !isRevealed) || isTransitioning}
-                className="btn-primary px-8 disabled:opacity-[0.45]"
+                className={`flex-1 h-[54px] rounded-2xl font-bold text-base transition-colors ${
+                  !chosen && !isRevealed
+                    ? 'bg-[#DAD3C5] text-[#9A9183]'
+                    : 'bg-[var(--color-green)] text-[var(--color-cream)]'
+                }`}
               >
                 {!chosen && !isRevealed
                   ? 'Välj ett svar'

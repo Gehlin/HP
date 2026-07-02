@@ -78,7 +78,7 @@ export default function OrdBuilder() {
 
   if (mode === 'menu') {
     return (
-      <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+      <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
         <PageHeader title="Ordbyggaren" onBack={() => navigate('/practice')} />
         <div className="max-w-lg mx-auto px-4 py-6 pb-8">
           <div className="mb-8">

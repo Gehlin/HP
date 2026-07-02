@@ -2,13 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loadStats } from '../utils/gamification'
 import { loadHistory } from '../utils/session'
-import {
-  getExamDate,
-  setExamDate,
-  clearExamDate,
-  daysUntilExam,
-  KNOWN_HP_DATES,
-} from '../utils/examDate'
+import { getExamDate, daysUntilExam } from '../utils/examDate'
+import Onboarding from '../components/Onboarding'
 import { getDueQuestions } from '../utils/srs'
 import { getBookmarks } from '../utils/bookmarks'
 import { questions } from '../data/questions'
@@ -25,12 +20,20 @@ function formatSwedishDate(date: Date): string {
   return date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-const SHORT_MONTHS_SV = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
+const MONTHS_SV = ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december']
 
 function memberSinceLabel(history: ReturnType<typeof loadHistory>): string {
   const earliest = history.length > 0 ? Math.min(...history.map(s => s.startTime)) : Date.now()
   const d = new Date(earliest)
-  return `Medlem sedan ${SHORT_MONTHS_SV[d.getMonth()]} ${d.getFullYear()}`
+  return `Medlem sedan ${MONTHS_SV[d.getMonth()]} ${d.getFullYear()}`
+}
+
+// Prototype initials(): first letters of the first two words, else the first two chars
+function initialsFor(name: string | null): string {
+  const parts = (name || '').trim().split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
+  const w = parts[0] || 'HP'
+  return (w.length >= 2 ? w.slice(0, 2) : w).toUpperCase()
 }
 
 function computeStats(): ProfileStats {
@@ -63,8 +66,8 @@ const FOCUS_LABELS: Record<FocusPreference, string> = {
 
 function ChevronIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-faint)] shrink-0">
-      <path d="M9 18l6-6-6-6" />
+    <svg width="8" height="14" viewBox="0 0 8 14" className="shrink-0">
+      <path d="M1 1l6 6-6 6" stroke="#C3BBAC" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -74,14 +77,6 @@ function BookIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
-    </svg>
-  )
-}
-
-function BookmarkIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
-      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
     </svg>
   )
 }
@@ -213,20 +208,21 @@ function IOSToggle({ on }: { on: boolean }) {
   return (
     <div
       className="relative rounded-full shrink-0"
-      style={{ width: 44, height: 26, background: on ? 'var(--color-green)' : 'var(--color-track)', transition: 'background 0.2s' }}
+      style={{ width: 46, height: 28, background: on ? 'var(--color-green)' : '#E0D8C8', transition: 'background 0.2s' }}
     >
       <div
-        className="absolute rounded-full bg-white shadow-sm"
-        style={{ width: 22, height: 22, top: 2, left: on ? 20 : 2, transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }}
+        className="absolute rounded-full bg-white"
+        style={{ width: 22, height: 22, top: 3, left: on ? 21 : 3, transition: 'left 0.2s', boxShadow: on ? '0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.15)' }}
       />
     </div>
   )
 }
 
-function FocusChip({ pref }: { pref: FocusPreference }) {
+// Prototype settings-row value text (500 14px #8B8478), e.g. "20 frågor" / "Svenska"
+function RowValue({ children }: { children: React.ReactNode }) {
   return (
-    <span className="text-xs font-medium bg-[var(--color-green)]/10 text-[var(--color-green)] rounded-full px-2 py-0.5 shrink-0">
-      {FOCUS_LABELS[pref]}
+    <span className="shrink-0" style={{ fontWeight: 500, fontSize: 14, lineHeight: 1, color: '#8B8478' }}>
+      {children}
     </span>
   )
 }
@@ -238,23 +234,20 @@ interface SettingsRowProps {
   onClick: () => void
   last?: boolean
   right?: React.ReactNode
+  danger?: boolean
 }
 
-function SettingsRow({ icon, label, badge, onClick, last, right }: SettingsRowProps) {
+function SettingsRow({ icon, label, badge, onClick, last, right, danger }: SettingsRowProps) {
   return (
     <button
       onClick={onClick}
-      className={`w-full px-4 py-3.5 flex items-center gap-3 text-left active:bg-[var(--color-paper-darker)] transition-colors ${!last ? 'border-b border-[var(--color-card-border)]' : ''}`}
+      className={`relative w-full px-4 py-3.5 flex items-center gap-[13px] text-left active:bg-[var(--color-paper-darker)] transition-colors ${!last ? 'after:absolute after:left-4 after:right-0 after:bottom-0 after:h-px after:bg-[#F0EADD]' : ''}`}
     >
       {icon}
-      <span className="flex-1 text-[15px] font-medium text-[var(--color-ink)]">{label}</span>
+      <span className="flex-1 text-[15px] font-semibold" style={{ color: danger ? 'var(--color-wrong-badge)' : 'var(--color-ink)' }}>{label}</span>
       {right !== undefined ? right : (
         <>
-          {badge !== undefined && badge > 0 && (
-            <span className="text-xs font-medium bg-[var(--color-green)] text-[var(--color-cream)] rounded-full px-1.5 py-0.5 leading-none">
-              {badge}
-            </span>
-          )}
+          {badge !== undefined && badge > 0 && <RowValue><span style={{ fontWeight: 700 }}>{badge}</span></RowValue>}
           <ChevronIcon />
         </>
       )}
@@ -267,8 +260,8 @@ export default function Profil() {
   const [stats, setStats] = useState<ProfileStats>({ totalQuestions: 0, streak: 0, sessions: 0 })
   const [examDate, setExamDateState] = useState<Date | null>(null)
   const [daysLeft, setDaysLeft] = useState<number | null>(null)
-  const [showDateModal, setShowDateModal] = useState(false)
-  const [pendingDate, setPendingDate] = useState<string | null>(null)
+  const [goal, setGoal] = useState<string>('1,40')
+  const [showGoalEdit, setShowGoalEdit] = useState(false)
   const [notifEnabled, setNotifEnabled] = useState(() => localStorage.getItem('hp_notif_enabled') === '1')
   const [focusPref, setFocusPrefState] = useState<FocusPreference | null>(() => getFocusPreference())
   const [showFocusModal, setShowFocusModal] = useState(false)
@@ -283,7 +276,17 @@ export default function Profil() {
     setStats(computeStats())
     setExamDateState(getExamDate())
     setDaysLeft(daysUntilExam())
+    try { setGoal(localStorage.getItem('hp_goal') ?? '1,40') } catch { /* ignore */ }
   }, [])
+
+  // Prototype goalEdit: "Ändra" re-enters the onboarding wizard at the goal step,
+  // returning here (overlay unmounts) when finished; re-read what it wrote.
+  function closeGoalEdit() {
+    setShowGoalEdit(false)
+    setExamDateState(getExamDate())
+    setDaysLeft(daysUntilExam())
+    try { setGoal(localStorage.getItem('hp_goal') ?? '1,40') } catch { /* ignore */ }
+  }
 
   async function handleNotifToggle() {
     if (notifEnabled) {
@@ -330,43 +333,25 @@ export default function Profil() {
     window.location.reload()
   }
 
-  function handleConfirmDate() {
-    if (pendingDate) {
-      setExamDate(pendingDate)
-      const d = new Date(pendingDate)
-      setExamDateState(d)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      d.setHours(0, 0, 0, 0)
-      setDaysLeft(Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)))
-    } else {
-      clearExamDate()
-      setExamDateState(null)
-      setDaysLeft(null)
-    }
-    setShowDateModal(false)
-    setPendingDate(null)
-  }
+  const userName = (() => { try { return localStorage.getItem('hp_user_name') } catch { return null } })()
+  const userInitials = initialsFor(userName)
 
   return (
-    <div className="min-h-screen bg-app pb-8 pt-topnav">
+    <div className="min-h-screen bg-app pb-bottomnav pt-topnav">
       <div className="max-w-2xl mx-auto px-4">
-        <h1 className="text-[26px] font-[var(--font-serif)] text-[var(--color-ink)] mb-5">
+        <h1 style={{ fontFamily: "'Newsreader', serif", fontWeight: 400, fontSize: 26, lineHeight: 1.05, color: '#23201A', marginBottom: 16 }}>
           Profil
         </h1>
 
-        {/* Profile card */}
-        <div className="card mb-4" style={{ borderRadius: 18, padding: '16px 18px' }}>
-          <div className="flex items-center gap-4">
-            <div
-              className="flex items-center justify-center rounded-full bg-[var(--color-green)] shrink-0"
-              style={{ width: 48, height: 48 }}
-            >
-              <span className="text-[var(--color-cream)] text-xl font-[var(--font-serif)] select-none">HP</span>
+        {/* ── Avatar + name card ────────────────────────────── */}
+        <div className="card mb-3" style={{ borderRadius: 18, padding: '16px' }}>
+          <div className="flex items-center gap-[14px]">
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#224A3A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 20, color: '#FBF7EE', flexShrink: 0 }}>
+              {userInitials}
             </div>
-            <div>
-              <p className="text-[16px] font-bold text-[var(--color-ink)]">HP Träning</p>
-              <p className="text-xs font-medium text-[var(--color-muted)] mt-0.5">{memberSinceLabel(loadHistory())}</p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 18, lineHeight: 1.1, color: '#23201A' }}>{userName || 'HP Träning'}</div>
+              <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 13, lineHeight: 1, color: '#8B8478', marginTop: 5 }}>{memberSinceLabel(loadHistory())}</div>
               <div className="flex gap-4 mt-2">
                 <StatItem value={stats.totalQuestions} label="Frågor" />
                 <StatItem value={stats.streak} label="Streak" />
@@ -376,46 +361,64 @@ export default function Profil() {
           </div>
         </div>
 
-        {/* Goal card */}
-        <div className="card-green mb-6" style={{ borderRadius: 18, padding: '16px 18px' }}>
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-green-tint)]">
-              PROVDATUM
-            </span>
-            <span className="text-[13px] font-medium text-[var(--color-cream-dim)] text-right">
-              {examDate
-                ? `${formatSwedishDate(examDate)}${daysLeft !== null ? ` (${daysLeft > 0 ? `om ${daysLeft} dagar` : daysLeft === 0 ? 'idag' : 'passerat'})` : ''}`
-                : 'Inget datum valt'}
-            </span>
-          </div>
-          <div className="flex justify-end mt-3">
+        {/* ── Goal / exam card ──────────────────────────────── */}
+        <div style={{ background: '#224A3A', borderRadius: 18, padding: '16px 18px', marginBottom: 12, color: '#EFE9DD' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 600, fontSize: 10, lineHeight: 1, letterSpacing: '0.12em', color: '#9FB7A8' }}>DITT MÅL</div>
+              <div style={{ fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 30, lineHeight: 1, color: '#FBF7EE', marginTop: 8 }}>{goal}</div>
+            </div>
+            <div style={{ width: 1, height: 46, background: 'rgba(255,255,255,.14)' }} />
+            <div>
+              <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 600, fontSize: 10, lineHeight: 1, letterSpacing: '0.12em', color: '#9FB7A8' }}>PROVDATUM</div>
+              <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 17, lineHeight: 1, color: '#FBF7EE', marginTop: 11 }}>
+                {examDate ? formatSwedishDate(examDate) : 'Inget datum'}
+              </div>
+              {daysLeft !== null && (
+                <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 12, lineHeight: 1, color: '#A9C0B2', marginTop: 5 }}>
+                  {daysLeft > 0 ? `om ${daysLeft} dagar` : daysLeft === 0 ? 'idag' : 'passerat'}
+                </div>
+              )}
+            </div>
             <button
-              onClick={() => { setPendingDate(null); setShowDateModal(true) }}
-              className="text-[13px] font-semibold text-[var(--color-cream)] rounded-full"
-              style={{ background: 'rgba(255,255,255,0.12)', padding: '6px 14px' }}
+              onClick={() => setShowGoalEdit(true)}
+              style={{ padding: '8px 13px', border: '1px solid rgba(255,255,255,.25)', borderRadius: 999, fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 600, fontSize: 12, color: '#EFE9DD', background: 'none', cursor: 'pointer' }}
             >
               Ändra
             </button>
           </div>
         </div>
 
-        {/* Studieverktyg */}
-        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2 px-1">Studieverktyg</p>
-        <div className="card mb-4 overflow-hidden" style={{ borderRadius: 18 }}>
+        {/* ── Sparade frågor row (prototype goSaved) ────────── */}
+        <button
+          onClick={() => navigate('/bookmarks')}
+          className="card w-full flex items-center gap-[13px] text-left active:bg-[var(--color-paper-darker)] transition-colors"
+          style={{ borderRadius: 18, padding: '14px 16px', marginBottom: 12 }}
+        >
+          <div style={{ width: 38, height: 38, borderRadius: 11, background: 'var(--color-terracotta-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#BF5A33" stroke="#BF5A33" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z" /></svg>
+          </div>
+          <div className="flex-1 text-[15px] font-semibold text-[var(--color-ink)]">Sparade frågor</div>
+          <span style={{ fontWeight: 700, fontSize: 14, lineHeight: 1, color: '#8B8478' }}>{bookmarkCount}</span>
+          <ChevronIcon />
+        </button>
+
+        {/* ── Studieverktyg ─────────────────────────────────── */}
+        <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', color: '#A89F90', margin: '20px 4px 9px' }}>STUDIEVERKTYG</div>
+        <div className="card mb-3 overflow-hidden" style={{ borderRadius: 18 }}>
           <SettingsRow icon={<BookIcon />} label="Teori & guider" onClick={() => navigate('/theory')} />
-          <SettingsRow icon={<BookmarkIcon />} label="Bokmärken" badge={bookmarkCount} onClick={() => navigate('/bookmarks')} />
           <SettingsRow icon={<ClockIcon />} label="Repetitionskö" badge={dueCount} onClick={() => navigate('/srs')} />
           <SettingsRow icon={<TimerIcon />} label="Provsimulatorn" onClick={() => navigate('/exam-select')} />
           <SettingsRow icon={<TypeIcon />} label="Ordbyggaren" onClick={() => navigate('/ord-builder')} />
           <SettingsRow icon={<ChartIcon />} label="HP-poängprediktor" onClick={() => navigate('/score')} last />
         </div>
 
-        {/* Inställningar */}
-        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2 px-1">Inställningar</p>
-        <div className="card mb-4 overflow-hidden" style={{ borderRadius: 18 }}>
+        {/* ── Inställningar ─────────────────────────────────── */}
+        <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', color: '#A89F90', margin: '20px 4px 9px' }}>ÖVNING</div>
+        <div className="card mb-3 overflow-hidden" style={{ borderRadius: 18 }}>
           <SettingsRow
             icon={<BellIcon />}
-            label="Aviseringar"
+            label="Daglig påminnelse"
             onClick={handleNotifToggle}
             right={<IOSToggle on={notifEnabled} />}
           />
@@ -423,13 +426,13 @@ export default function Profil() {
             icon={<SlidersIcon />}
             label="Fokusprioritet"
             onClick={() => setShowFocusModal(true)}
-            right={<>{focusPref && <FocusChip pref={focusPref} />}<ChevronIcon /></>}
+            right={<>{focusPref && <RowValue>{FOCUS_LABELS[focusPref]}</RowValue>}<ChevronIcon /></>}
             last
           />
         </div>
 
-        {/* Hantera data */}
-        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2 px-1">Hantera data</p>
+        {/* ── Konto / data ─────────────────────────────────── */}
+        <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', color: '#A89F90', margin: '20px 4px 9px' }}>KONTO</div>
         <div className="card mb-4 overflow-hidden" style={{ borderRadius: 18 }}>
           <SettingsRow
             icon={<DownloadIcon />}
@@ -445,7 +448,8 @@ export default function Profil() {
             icon={<TrashIcon />}
             label="Återställ all data"
             onClick={() => setShowResetModal(true)}
-            right={<ChevronIcon />}
+            right={null}
+            danger
             last
           />
         </div>
@@ -527,7 +531,7 @@ export default function Profil() {
               </button>
               <button
                 onClick={handleResetAll}
-                className="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold"
+                className="flex-1 py-2.5 rounded-xl bg-[var(--color-terracotta)] text-white text-sm font-semibold"
               >
                 Återställ
               </button>
@@ -536,59 +540,8 @@ export default function Profil() {
         </div>
       )}
 
-      {/* Date picker modal */}
-      {showDateModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pb-8"
-          onClick={() => setShowDateModal(false)}
-        >
-          <div
-            className="card w-full max-w-md p-5"
-            onClick={e => e.stopPropagation()}
-          >
-            <h2 className="text-base font-semibold text-[var(--color-ink)] mb-4">Välj provdatum</h2>
-            <div className="flex flex-col gap-2 mb-5">
-              {KNOWN_HP_DATES.map(({ label, date }) => (
-                <button
-                  key={date}
-                  onClick={() => setPendingDate(date)}
-                  className={`px-4 py-3 rounded-xl text-left text-sm font-medium border transition-colors ${
-                    pendingDate === date
-                      ? 'bg-[var(--color-green)] text-[var(--color-cream)] border-[var(--color-green)]'
-                      : 'border-[var(--color-card-border)] text-[var(--color-ink)] bg-[var(--color-paper)]'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-              <button
-                onClick={() => setPendingDate(null)}
-                className={`px-4 py-3 rounded-xl text-left text-sm font-medium border transition-colors ${
-                  pendingDate === null
-                    ? 'bg-[var(--color-green)] text-[var(--color-cream)] border-[var(--color-green)]'
-                    : 'border-[var(--color-card-border)] text-[var(--color-ink)] bg-[var(--color-paper)]'
-                }`}
-              >
-                Inget datum
-              </button>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowDateModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-[var(--color-card-border)] text-sm text-[var(--color-ink)]"
-              >
-                Avbryt
-              </button>
-              <button
-                onClick={handleConfirmDate}
-                className="btn-primary flex-1 py-2.5 text-sm"
-              >
-                Bekräfta
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* "Ändra" → re-enter onboarding at the goal step (prototype goalEdit) */}
+      {showGoalEdit && <Onboarding initialStep={2} onClose={closeGoalEdit} />}
     </div>
   )
 }

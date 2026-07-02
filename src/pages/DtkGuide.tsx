@@ -11,20 +11,20 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
       {steps.map((step, i) => (
         <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-amber-600 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-[var(--color-terracotta)] text-[var(--color-cream)]' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
                   <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{step.content}</div>
-                  {step.result && <div className="mt-1.5 text-xs font-bold text-amber-400">{step.result}</div>}
+                  {step.result && <div className="mt-1.5 text-xs font-bold text-[var(--color-terracotta)]">{step.result}</div>}
                 </>
               ) : (
                 <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
-              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-amber-400 border border-amber-500/30 rounded-lg px-2 py-1 hover:bg-amber-500/10 transition-colors">Visa</button>
+              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-[var(--color-terracotta)] border border-[var(--color-card-border)] rounded-lg px-2 py-1 hover:bg-[var(--color-terracotta-muted)] transition-colors">Visa</button>
             )}
           </div>
         </div>
@@ -40,9 +40,9 @@ const CHART_TYPES = [
   {
     name: 'Stapeldiagram',
     icon: '▊',
-    color: 'text-amber-400',
-    bg: 'bg-amber-500/8',
-    border: 'border-amber-500/20',
+    color: 'text-[var(--color-terracotta)]',
+    bg: 'bg-[var(--color-terracotta-muted)]',
+    border: 'border-[var(--color-card-border)]',
     questions: ['Avläsning av enskilda värden', 'Jämförelse mellan staplar', 'Procentuell skillnad', 'Rangordning'],
     strategy: 'Läs av y-axelns skala NOGA — den börjar inte alltid vid noll. En stapel som ser dubbelt så hög ut kanske bara är 10% större om y-axeln startar vid 80.',
     trap: 'Trunkerad y-axel: när y-axeln börjar vid t.ex. 80 istället för 0 ser skillnader dramatiska ut. Beräkna alltid den faktiska skillnaden i siffror.',
@@ -50,9 +50,9 @@ const CHART_TYPES = [
   {
     name: 'Linjediagram',
     icon: '↗',
-    color: 'text-blue-400',
-    bg: 'bg-blue-500/8',
-    border: 'border-blue-500/20',
+    color: 'text-[var(--color-green-light)]',
+    bg: 'bg-[var(--color-green-muted)]',
+    border: 'border-[var(--color-card-border)]',
     questions: ['Trend och riktning', 'Avläsning vid specifik tidpunkt', 'Hastigaste förändringen', 'Korsningspunkter'],
     strategy: 'Identifiera om y-axeln visar absoluta tal eller procent. "Andel som ökar" och "antal som ökar" kan ge helt olika kurvor för samma fenomen.',
     trap: 'Linje som planar ut ≠ minskar. Stigande kurva med avtagande lutning = fortfarande ökning, bara långsammare.',
@@ -60,9 +60,9 @@ const CHART_TYPES = [
   {
     name: 'Cirkeldiagram',
     icon: '◔',
-    color: 'text-violet-400',
-    bg: 'bg-violet-500/8',
-    border: 'border-violet-500/20',
+    color: 'text-[var(--color-gold-deep)]',
+    bg: 'bg-[var(--color-gold-muted)]',
+    border: 'border-[var(--color-card-border)]',
     questions: ['Andelar och procent', 'Jämförelse av sektorer', 'Beräkning av absolut antal givet totalt'],
     strategy: 'Cirkeldiagram visar alltid ANDELAR av en helhet. För att få absoluta tal behöver du totalsumman. Kontrollera om den anges i rubriken eller i en not.',
     trap: 'Visuell bedömning av sektorstorlek är opålitlig — alltid läs av de angivna procenttalen. Vinklar är svåra att jämföra exakt med ögat.',
@@ -70,9 +70,9 @@ const CHART_TYPES = [
   {
     name: 'Tabeller',
     icon: '⊞',
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/8',
-    border: 'border-emerald-500/20',
+    color: 'text-[var(--color-ink-muted)]',
+    bg: 'bg-[var(--color-paper-dark)]',
+    border: 'border-[var(--color-card-border)]',
     questions: ['Avläsning av specifik cell', 'Radvis eller kolumnvis jämförelse', 'Beräkning av summa eller medelvärde', 'Procentuell förändring'],
     strategy: 'Skanna alltid rad- och kolumnrubrikerna innan du läser data. Notera enheter (tkr, MSEK, %) och om siffrorna är avrundade.',
     trap: 'Förväxla "procentuell förändring" med "procentenheter". Om andelen ökar från 20% till 25% = 5 procentenheter, men 25% relativ ökning.',
@@ -80,9 +80,9 @@ const CHART_TYPES = [
   {
     name: 'Kartor och geografiska data',
     icon: '⊙',
-    color: 'text-rose-400',
-    bg: 'bg-rose-500/8',
-    border: 'border-rose-500/20',
+    color: 'text-[var(--color-wrong-text)]',
+    bg: 'bg-[var(--color-wrong-bg)]',
+    border: 'border-[var(--color-wrong-border)]',
     questions: ['Identifiera region med högst/lägst värde', 'Jämförelse mellan regioner', 'Beräkning med angivna skalfaktorer'],
     strategy: 'Kartfrågor handlar sällan om geografi — de handlar om att avläsa en sifferskala kopplad till olika regioner. Fokusera på legenden/skalan.',
     trap: 'Stora ytor ser viktigare ut men kan ha låga värden. Areabias påverkar uppfattningen — läs alltid faktavärdena i legenden.',
@@ -133,14 +133,14 @@ export default function DtkGuide() {
   ]
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="DTK – Diagram, tabeller & kartor" />
       <div className="max-w-lg mx-auto px-4 py-10 pb-24">
 
         {/* Header */}
         <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-[var(--color-terracotta-muted)] border border-[var(--color-card-border)] text-[var(--color-terracotta)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-terracotta)] animate-pulse" />
             DTK · Diagram, tabeller &amp; kartor
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">DTK-guide</h1>
@@ -148,10 +148,10 @@ export default function DtkGuide() {
         </div>
 
         {/* Core insight */}
-        <div className="card rounded-2xl p-4 mb-6 border border-amber-500/15">
-          <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-2">Kärninsikt</div>
+        <div className="card rounded-2xl p-4 mb-6 border border-[var(--color-card-border)]">
+          <div className="text-[10px] font-bold text-[var(--color-terracotta)] uppercase tracking-widest mb-2">Kärninsikt</div>
           <p className="text-sm text-[var(--color-ink-muted)] leading-relaxed">
-            DTK är <span className="text-amber-300 font-semibold">ett precisionsprov, inte ett matematikprov</span>. Svaret finns i diagrammet — uppgiften är att läsa av det korrekt. De flesta fel beror inte på felräkning utan på att man läser av fel enhet, fel axel, eller jämför procent med absoluta tal. Läs alltid rubrik, enheter och axlar INNAN du svarar.
+            DTK är <span className="text-[var(--color-terracotta)] font-semibold">ett precisionsprov, inte ett matematikprov</span>. Svaret finns i diagrammet — uppgiften är att läsa av det korrekt. De flesta fel beror inte på felräkning utan på att man läser av fel enhet, fel axel, eller jämför procent med absoluta tal. Läs alltid rubrik, enheter och axlar INNAN du svarar.
           </p>
         </div>
 
@@ -161,7 +161,7 @@ export default function DtkGuide() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-amber-600 text-white' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-[var(--color-terracotta)] text-[var(--color-cream)]' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
             </button>
@@ -212,7 +212,7 @@ export default function DtkGuide() {
                 ].map(({ name, formula }) => (
                   <div key={name} className="flex items-start justify-between gap-4">
                     <span className="text-xs text-[var(--color-ink-faint)]">{name}</span>
-                    <span className="text-xs font-mono text-amber-300 text-right">{formula}</span>
+                    <span className="text-xs font-mono text-[var(--color-terracotta)] text-right">{formula}</span>
                   </div>
                 ))}
               </div>
@@ -228,7 +228,7 @@ export default function DtkGuide() {
                   { time: '>90s', action: 'Eliminera klart felaktiga alternativ. Välj bland resterande.' },
                 ].map(({ time, action }) => (
                   <div key={time} className="flex gap-3 text-xs">
-                    <span className="text-amber-400 font-black shrink-0 w-14">{time}</span>
+                    <span className="text-[var(--color-terracotta)] font-black shrink-0 w-14">{time}</span>
                     <span className="text-[var(--color-ink-muted)]">{action}</span>
                   </div>
                 ))}
@@ -271,17 +271,17 @@ export default function DtkGuide() {
             <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Vanliga fallgropar</div>
             {TRAPS.map(trap => (
               <div key={trap.name} className={`card rounded-2xl p-4 border ${
-                trap.severity === 'hög' ? 'border-red-200' : trap.severity === 'medel' ? 'border-amber-200' : 'border-[var(--color-card-border)]'
+                trap.severity === 'hög' ? 'border-[var(--color-wrong-border)]' : trap.severity === 'medel' ? 'border-[var(--color-card-border)]' : 'border-[var(--color-card-border)]'
               }`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                    trap.severity === 'hög' ? 'bg-red-50 text-red-700' : trap.severity === 'medel' ? 'bg-amber-50 text-amber-700' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'
+                    trap.severity === 'hög' ? 'bg-[var(--color-wrong-bg)] text-[var(--color-wrong-text)]' : trap.severity === 'medel' ? 'bg-[var(--color-gold-muted)] text-[var(--color-gold-deep)]' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'
                   }`}>{trap.severity}</span>
                   <span className="text-sm font-bold text-[var(--color-ink)]">{trap.name}</span>
                 </div>
                 <p className="text-xs text-[var(--color-ink-muted)] mb-3 leading-relaxed">{trap.desc}</p>
-                <div className="flex items-start gap-2 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5">
-                  <span className="text-emerald-700 text-xs shrink-0 mt-0.5">✓</span>
+                <div className="flex items-start gap-2 bg-[var(--color-correct-bg)] border border-[var(--color-correct-border)] rounded-xl p-2.5">
+                  <span className="text-[var(--color-correct-text)] text-xs shrink-0 mt-0.5">✓</span>
                   <span className="text-[11px] text-[var(--color-ink-muted)]">{trap.fix}</span>
                 </div>
               </div>
@@ -311,7 +311,7 @@ export default function DtkGuide() {
         <div className="mt-8 pt-6 border-t border-[var(--color-card-border)]">
           <button
             onClick={() => navigate('/practice?type=DTK')}
-            className="w-full bg-amber-700 hover:bg-amber-600 transition-colors rounded-xl py-3 font-bold text-sm"
+            className="w-full bg-[var(--color-terracotta)] hover:bg-[var(--color-terracotta-deep)] transition-colors rounded-xl py-3 font-bold text-sm text-[var(--color-cream)]"
           >
             Öva DTK nu →
           </button>

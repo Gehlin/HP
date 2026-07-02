@@ -140,7 +140,7 @@ export default function ScorePredictor() {
   const hasData = history.length > 0 && (quant !== null || verbal !== null)
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="HP-poängprediktor" onBack={() => navigate('/')} />
       <div className="max-w-2xl mx-auto px-4 py-8">
 

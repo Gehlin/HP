@@ -94,7 +94,7 @@ export default function SrsQueue() {
     : null
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="Spaced Repetition" />
       <div className="max-w-lg mx-auto px-5 py-6">
 

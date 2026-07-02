@@ -1459,7 +1459,7 @@ export default function MathGuide() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="Matematik" />
 
       {/* ── Hero ──────────────────────────────────────────────────── */}

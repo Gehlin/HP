@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+</style>
+</helmet>
+
+<div style="display:flex; justify-content:center; padding:24px; background:#E9E3D8; min-height:100vh;">
+  <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+    <div style="position:absolute; inset:0; background:#F1ECE3; font-family:'Hanken Grotesk',system-ui; overflow:hidden;">
+
+      <!-- ═══════════ ONBOARDING ═══════════ -->
+      <sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column; padding:62px 24px 36px;">
+          <div style="display:flex; align-items:center; gap:13px; height:34px;">
+            <sc-if value="{{ onbCanBack }}" hint-placeholder-val="{{ false }}">
+              <div style="width:34px; height:34px; border-radius:11px; background:#FFFFFF; border:1px solid #EAE3D6; display:flex; align-items:center; justify-content:center; cursor:pointer;" onClick="{{ onbBack }}">
+                <svg width="9" height="16" viewBox="0 0 9 16" fill="none" stroke="#6f6859" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2 2 8l5 6"/></svg>
+              </div>
+            </sc-if>
+            <div style="display:flex; gap:7px;">
+              <sc-for list="{{ onbDots }}" as="d" hint-placeholder-count="4">
+                <div style="{{ d.style }}"></div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+            <sc-if value="{{ onbStep0 }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <div style="width:62px; height:62px; border-radius:18px; background:#224A3A; display:flex; align-items:center; justify-content:center; margin-bottom:28px;">
+                  <span style="font:500 30px/1 'Newsreader',serif; color:#FBF7EE;">H</span>
+                </div>
+                <div style="font:400 38px/1.08 'Newsreader',serif; color:#23201A; letter-spacing:-.015em;">Plugga smartare<br>inför provet.</div>
+                <div style="font:500 15px/1.6 'Hanken Grotesk'; color:#8B8478; margin-top:16px; max-width:300px;">Öva på alla åtta delprov, följ din utveckling och se exakt hur många dagar du har kvar till Högskoleprovet.</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ onbStep1 }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="font:400 31px/1.12 'Newsreader',serif; color:#23201A; letter-spacing:-.01em;">Vad ska vi kalla dig?</div>
+                <div style="font:500 14px/1.55 'Hanken Grotesk'; color:#8B8478; margin-top:11px;">Ditt namn visas på startsidan och i dina resultat.</div>
+                <input value="{{ nameVal }}" onInput="{{ onName }}" placeholder="Ditt namn" style="margin-top:28px; width:100%; height:58px; border-radius:16px; border:1.5px solid #E0D8C8; background:#FFFFFF; padding:0 18px; font:600 18px/1 'Hanken Grotesk'; color:#23201A; outline:none;">
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ onbStep2 }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="font:400 31px/1.12 'Newsreader',serif; color:#23201A; letter-spacing:-.01em;">Vilket resultat<br>siktar du på?</div>
+                <div style="font:500 14px/1.55 'Hanken Grotesk'; color:#8B8478; margin-top:11px;">Snittet för många utbildningar ligger runt 1,30–1,50. Du kan ändra målet när som helst.</div>
+                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:28px;">
+                  <sc-for list="{{ goalChips }}" as="g" hint-placeholder-count="5">
+                    <div style="{{ g.style }}" onClick="{{ g.onClick }}">{{ g.label }}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ onbStep3 }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="font:400 31px/1.12 'Newsreader',serif; color:#23201A; letter-spacing:-.01em;">När skriver du provet?</div>
+                <div style="font:500 14px/1.55 'Hanken Grotesk'; color:#8B8478; margin-top:11px;">Vi räknar ner dagarna åt dig på startsidan.</div>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:26px;">
+                  <sc-for list="{{ examCards }}" as="e" hint-placeholder-count="3">
+                    <div style="{{ e.boxStyle }}" onClick="{{ e.onClick }}">
+                      <div>
+                        <div style="{{ e.titleStyle }}">{{ e.label }}</div>
+                        <div style="font:500 12px/1 'Hanken Grotesk'; color:#A89F90; margin-top:6px;">{{ e.sub }}</div>
+                      </div>
+                      <div style="{{ e.radioStyle }}"></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="height:56px; border-radius:16px; background:#224A3A; display:flex; align-items:center; justify-content:center; font:700 16px/1 'Hanken Grotesk'; color:#FBF7EE; cursor:pointer;" onClick="{{ onbNext }}">{{ onbCta }}</div>
+        </div>
+      </sc-if>
+
+      <!-- ═══════════ HOME ═══════════ -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute; inset:0; overflow:auto; padding:58px 18px 100px;">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px;">
+            <div>
+              <div style="font:400 26px/1.05 'Newsreader',serif; color:#23201A; letter-spacing:-.01em;">{{ greet }}</div>
+              <div style="font:500 13px/1 'Hanken Grotesk'; color:#8B8478; margin-top:6px;">{{ todayLabel }}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; background:#F3E0D5; border:1px solid #ECCFBE; border-radius:999px; padding:7px 11px 7px 9px;">
+              <div style="width:9px; height:9px; border-radius:2px; background:#BF5A33; transform:rotate(45deg);"></div>
+              <span style="font:700 13px/1 'Hanken Grotesk'; color:#A84A26;">{{ streak }}</span>
+            </div>
+          </div>
+
+          <div style="background:#224A3A; border-radius:22px; padding:18px 20px 17px; color:#EFE9DD; cursor:pointer;" onClick="{{ openStats }}">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font:600 10.5px/1 'Hanken Grotesk'; letter-spacing:.14em; color:#9FB7A8;">DITT NORMERADE RESULTAT</span>
+              <span style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,.12); border-radius:999px; padding:4px 9px; font:700 11px/1 'Hanken Grotesk'; color:#D6E4D9;">▲ 0,12</span>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:8px; margin-top:10px;">
+              <span style="font:500 50px/.9 'Newsreader',serif; color:#FBF7EE; letter-spacing:-.02em;">1,15</span>
+              <span style="font:500 16px/1 'Hanken Grotesk'; color:#8FA89A;">/ 2,0</span>
+            </div>
+            <div style="height:7px; border-radius:999px; background:rgba(255,255,255,.14); margin-top:15px; overflow:hidden;">
+              <div style="height:100%; width:57%; border-radius:999px; background:linear-gradient(90deg,#C9A24A,#E4C66A);"></div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:11px; font:500 12px/1 'Hanken Grotesk'; color:#A9C0B2;">
+              <span>Mål <span style="color:#EFE9DD; font-weight:700;">{{ goalText }}</span></span>
+              <span>Provet om <span style="color:#EFE9DD; font-weight:700;">{{ daysText }}</span> · {{ examShort }}</span>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:13px; background:#FFFFFF; border:1px solid #EAE3D6; border-radius:18px; padding:13px 14px; margin-top:13px; cursor:pointer;" onClick="{{ continueLast }}">
+            <div style="width:46px; height:46px; border-radius:13px; background:#E7EDE7; display:flex; align-items:center; justify-content:center; font:800 15px/1 'Hanken Grotesk'; color:#224A3A; flex-shrink:0;">ORD</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font:500 10px/1 'Hanken Grotesk'; letter-spacing:.1em; color:#A89F90;">FORTSÄTT DÄR DU SLUTADE</div>
+              <div style="font:700 15px/1.2 'Hanken Grotesk'; color:#23201A; margin-top:4px;">Ordförståelse</div>
+              <div style="font:500 12px/1 'Hanken Grotesk'; color:#8B8478; margin-top:4px;">12 av 20 frågor klara</div>
+            </div>
+            <div style="width:40px; height:40px; border-radius:50%; background:#224A3A; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="3,2 12,7 3,12" fill="#FBF7EE"/></svg>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin:20px 2px 11px;">
+            <span style="font:700 12px/1 'Hanken Grotesk'; color:#224A3A; letter-spacing:.04em;">VERBAL</span>
+            <span style="font:700 12px/1 'Hanken Grotesk'; color:#BF5A33; letter-spacing:.04em;">KVANTITATIV</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <sc-for list="{{ gridCells }}" as="c" hint-placeholder-count="8">
+              <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:15px; padding:11px 12px; display:flex; align-items:center; gap:10px; cursor:pointer;" onClick="{{ c.onClick }}">
+                <div style="flex:1; min-width:0;">
+                  <div style="font:800 16px/1 'Hanken Grotesk'; color:#23201A;">{{ c.code }}</div>
+                  <div style="font:500 11px/1.2 'Hanken Grotesk'; color:#8B8478; margin-top:3px;">{{ c.name }}</div>
+                </div>
+                <div style="{{ c.ringStyle }}"><div style="{{ c.numStyle }}">{{ c.pctText }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="position:absolute; left:0; right:0; bottom:0; height:84px; background:rgba(241,236,227,.92); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-top:1px solid #E4DCCC; display:flex; justify-content:space-around; align-items:flex-start; padding:11px 14px 0;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goHome }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#224A3A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.5V20h11V9.5"/></svg>
+            <span style="font:700 10px/1 'Hanken Grotesk'; color:#224A3A;">Hem</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goOva }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><polygon points="10,8.5 16,12 10,15.5" fill="#A89F90" stroke="none"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Öva</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goStats }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V12"/><path d="M12 19V6"/><path d="M19 19v-9"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Statistik</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goProfile }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.7"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Profil</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ═══════════ PRACTICE ═══════════ -->
+      <sc-if value="{{ isPractice }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column; padding:56px 18px 0;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:12px; background:#FFFFFF; border:1px solid #EAE3D6; display:flex; align-items:center; justify-content:center; cursor:pointer;" onClick="{{ backHome }}">
+              <svg width="9" height="16" viewBox="0 0 9 16" fill="none" stroke="#6f6859" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2 2 8l5 6"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="height:7px; border-radius:999px; background:#E4DCCC; overflow:hidden;"><div style="{{ progStyle }}"></div></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; background:#FFFFFF; border:1px solid #EAE3D6; border-radius:999px; padding:7px 11px;">
+              <div style="width:7px; height:7px; border-radius:50%; background:#BF5A33;"></div>
+              <span style="font:700 13px/1 'Hanken Grotesk'; color:#23201A; font-variant-numeric:tabular-nums;">{{ timer }}</span>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px;">
+            <span style="font:700 11px/1 'Hanken Grotesk'; letter-spacing:.12em; color:#224A3A;">{{ secCode }} · {{ secName }}</span>
+            <span style="font:600 12px/1 'Hanken Grotesk'; color:#A89F90;">Fråga {{ qNum }} / {{ qTotal }}</span>
+          </div>
+
+          <div style="flex:1; overflow:auto; margin:18px -18px 0; padding:2px 18px 4px;">
+            <sc-if value="{{ hasPassage }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:16px; padding:15px 16px; margin-bottom:18px;">
+                <div style="font:600 10px/1 'Hanken Grotesk'; letter-spacing:.12em; color:#A89F90; margin-bottom:10px;">LÄSTEXT</div>
+                <div style="font:400 15px/1.7 'Newsreader',serif; color:#33302A;">{{ passageText }}</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ hasChart }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:16px; padding:14px 16px 12px; margin-bottom:18px;">
+                <div style="font:700 12px/1.3 'Hanken Grotesk'; color:#23201A; margin-bottom:16px;">{{ chartTitle }}</div>
+                <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; height:118px;">
+                  <sc-for list="{{ chartBars }}" as="b" hint-placeholder-count="4">
+                    <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end;">
+                      <span style="font:700 11px/1 'Hanken Grotesk'; color:#8B8478; font-variant-numeric:tabular-nums;">{{ b.value }}</span>
+                      <div style="{{ b.barStyle }}"></div>
+                      <span style="font:600 11px/1 'Hanken Grotesk'; color:#A89F90;">{{ b.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <div>
+              <div style="font:500 13px/1.4 'Hanken Grotesk'; color:#8B8478;">{{ qLead }}</div>
+              <div style="font:500 26px/1.2 'Newsreader',serif; color:#23201A; letter-spacing:-.01em; margin-top:9px;">{{ qMain }}</div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+              <sc-for list="{{ practiceOpts }}" as="opt" hint-placeholder-count="4">
+                <div style="{{ opt.boxStyle }}" onClick="{{ opt.onClick }}">
+                  <div style="{{ opt.badgeStyle }}">{{ opt.badgeText }}</div>
+                  <span style="{{ opt.textStyle }}">{{ opt.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ checked }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ feedbackStyle }}">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div style="{{ feedbackDotStyle }}"></div>
+                  <span style="{{ feedbackTitleStyle }}">{{ feedbackTitle }}</span>
+                </div>
+                <div style="font:500 13px/1.5 'Hanken Grotesk'; color:#6f6859; margin-top:7px;">{{ feedbackText }}</div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:12px; padding:14px 0 30px;">
+            <div style="{{ bmBtnStyle }}" onClick="{{ toggleBookmark }}">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="{{ bmFill }}" stroke="{{ bmStroke }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>
+            </div>
+            <div style="{{ footerBtnStyle }}" onClick="{{ onFooter }}">{{ footerLabel }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ═══════════ RESULT ═══════════ -->
+      <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; background:#224A3A; display:flex; flex-direction:column; padding:64px 20px 0;">
+          <div style="text-align:center;">
+            <div style="font:700 11px/1 'Hanken Grotesk'; letter-spacing:.16em; color:#9FB7A8;">PASS SLUTFÖRT · {{ resSec }}</div>
+            <div style="font:400 32px/1.1 'Newsreader',serif; color:#FBF7EE; margin-top:12px;">{{ resTitle }}</div>
+          </div>
+          <div style="display:flex; justify-content:center; margin-top:26px;">
+            <div style="{{ ringStyle }}">
+              <div style="width:140px; height:140px; border-radius:50%; background:#224A3A; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <div style="font:500 46px/.9 'Newsreader',serif; color:#FBF7EE;">{{ resCorrect }}<span style="font-size:22px; color:#8FA89A;">/{{ resTotal }}</span></div>
+                <div style="font:600 11px/1 'Hanken Grotesk'; letter-spacing:.1em; color:#9FB7A8; margin-top:7px;">{{ resPct }} % RÄTT</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:18px; margin-top:24px; overflow:hidden;">
+            <div style="flex:1; padding:15px 8px; text-align:center;">
+              <div style="font:700 18px/1 'Hanken Grotesk'; color:#FBF7EE; font-variant-numeric:tabular-nums;">{{ resTime }}</div>
+              <div style="font:500 11px/1 'Hanken Grotesk'; color:#9FB7A8; margin-top:6px;">Total tid</div>
+            </div>
+            <div style="width:1px; background:rgba(255,255,255,.1);"></div>
+            <div style="flex:1; padding:15px 8px; text-align:center;">
+              <div style="font:700 18px/1 'Hanken Grotesk'; color:#FBF7EE; font-variant-numeric:tabular-nums;">{{ resAvg }}</div>
+              <div style="font:500 11px/1 'Hanken Grotesk'; color:#9FB7A8; margin-top:6px;">Snitt / fråga</div>
+            </div>
+            <div style="width:1px; background:rgba(255,255,255,.1);"></div>
+            <div style="flex:1; padding:15px 8px; text-align:center;">
+              <div style="font:700 18px/1 'Hanken Grotesk'; color:#E4C66A; font-variant-numeric:tabular-nums;">{{ resNorm }}</div>
+              <div style="font:500 11px/1 'Hanken Grotesk'; color:#9FB7A8; margin-top:6px;">Normerat</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:11px; background:rgba(191,90,51,.16); border:1px solid rgba(217,128,89,.35); border-radius:16px; padding:13px 15px; margin-top:13px;">
+            <div style="width:34px; height:34px; border-radius:10px; background:#BF5A33; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <div style="width:13px; height:13px; border-radius:3px; background:#FBE7D9; transform:rotate(45deg);"></div>
+            </div>
+            <div style="flex:1;">
+              <div style="font:700 14px/1.2 'Hanken Grotesk'; color:#FBF7EE;">{{ streak }} dagars svit!</div>
+              <div style="font:500 12px/1 'Hanken Grotesk'; color:#D9B7A6; margin-top:3px;">{{ answered }} frågor besvarade totalt.</div>
+            </div>
+          </div>
+          <div style="flex:1;"></div>
+          <div style="display:flex; flex-direction:column; gap:10px; padding-bottom:30px;">
+            <div style="height:54px; border-radius:16px; background:#FBF7EE; display:flex; align-items:center; justify-content:center; font:700 16px/1 'Hanken Grotesk'; color:#224A3A; cursor:pointer;" onClick="{{ goReview }}">Granska dina svar</div>
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1; height:50px; border-radius:16px; border:1.5px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font:600 15px/1 'Hanken Grotesk'; color:#D6E4D9; cursor:pointer;" onClick="{{ againPractice }}">Öva igen</div>
+              <div style="flex:1; height:50px; border-radius:16px; border:1.5px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font:600 15px/1 'Hanken Grotesk'; color:#D6E4D9; cursor:pointer;" onClick="{{ resultHome }}">Till hem</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ═══════════ REVIEW ═══════════ -->
+      <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column; padding:56px 18px 0;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:12px; background:#FFFFFF; border:1px solid #EAE3D6; display:flex; align-items:center; justify-content:center; cursor:pointer;" onClick="{{ reviewBack }}">
+              <svg width="9" height="16" viewBox="0 0 9 16" fill="none" stroke="#6f6859" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2 2 8l5 6"/></svg>
+            </div>
+            <div style="font:400 22px/1.05 'Newsreader',serif; color:#23201A;">Granska dina svar</div>
+          </div>
+          <div style="flex:1; overflow:auto; margin:18px -18px 0; padding:2px 18px 30px; display:flex; flex-direction:column; gap:12px;">
+            <sc-for list="{{ reviewItems }}" as="r" hint-placeholder-count="3">
+              <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:16px; padding:15px 16px; display:flex; flex-direction:column;">
+                <div style="{{ r.tagStyle }}">{{ r.tagText }}</div>
+                <div style="font:500 12px/1 'Hanken Grotesk'; color:#A89F90; margin-top:11px;">{{ r.num }}</div>
+                <div style="font:500 18px/1.3 'Newsreader',serif; color:#23201A; margin-top:5px;">{{ r.main }}</div>
+                <div style="{{ r.yourStyle }}">{{ r.yourText }}</div>
+                <sc-if value="{{ r.showCorrect }}" hint-placeholder-val="{{ false }}">
+                  <div style="font:600 13px/1.4 'Hanken Grotesk'; color:#2E6A4C; margin-top:4px;">{{ r.correctText }}</div>
+                </sc-if>
+                <div style="height:1px; background:#F0EADD; margin:12px 0 10px;"></div>
+                <div style="font:500 13px/1.55 'Hanken Grotesk'; color:#6f6859;">{{ r.expl }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ═══════════ SAVED ═══════════ -->
+      <sc-if value="{{ isSaved }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column; padding:56px 18px 0;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:12px; background:#FFFFFF; border:1px solid #EAE3D6; display:flex; align-items:center; justify-content:center; cursor:pointer;" onClick="{{ savedBack }}">
+              <svg width="9" height="16" viewBox="0 0 9 16" fill="none" stroke="#6f6859" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2 2 8l5 6"/></svg>
+            </div>
+            <div style="font:400 22px/1.05 'Newsreader',serif; color:#23201A;">Sparade frågor</div>
+          </div>
+
+          <sc-if value="{{ hasSaved }}" hint-placeholder-val="{{ true }}">
+            <div style="height:52px; border-radius:16px; background:#224A3A; display:flex; align-items:center; justify-content:center; font:700 15px/1 'Hanken Grotesk'; color:#FBF7EE; cursor:pointer; margin-top:18px; flex-shrink:0;" onClick="{{ startSaved }}">Öva alla sparade frågor</div>
+            <div style="flex:1; overflow:auto; margin:14px -18px 0; padding:2px 18px 30px; display:flex; flex-direction:column; gap:10px;">
+              <sc-for list="{{ savedItems }}" as="s" hint-placeholder-count="3">
+                <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:15px; padding:14px 15px; display:flex; align-items:flex-start; gap:12px;">
+                  <div style="flex:1; min-width:0;">
+                    <div style="font:800 11px/1 'Hanken Grotesk'; letter-spacing:.08em; color:#224A3A;">{{ s.sec }}</div>
+                    <div style="font:500 16px/1.35 'Newsreader',serif; color:#23201A; margin-top:6px;">{{ s.main }}</div>
+                  </div>
+                  <div style="width:34px; height:34px; border-radius:10px; background:#F3E0D5; border:1px solid #E0B79F; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;" onClick="{{ s.onRemove }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#BF5A33" stroke="#BF5A33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ savedEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 30px 60px;">
+              <div style="width:60px; height:60px; border-radius:18px; background:#F3E0D5; border:1px solid #ECCFBE; display:flex; align-items:center; justify-content:center; margin-bottom:18px;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#BF5A33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>
+              </div>
+              <div style="font:400 22px/1.2 'Newsreader',serif; color:#23201A;">Inga sparade frågor än</div>
+              <div style="font:500 14px/1.6 'Hanken Grotesk'; color:#8B8478; margin-top:9px;">Tryck på bokmärket under en fråga när du övar för att spara den och repetera senare.</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ═══════════ STATS ═══════════ -->
+      <sc-if value="{{ isStats }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; overflow:auto; padding:58px 18px 100px;">
+          <div style="font:400 26px/1.05 'Newsreader',serif; color:#23201A;">Statistik</div>
+          <div style="font:500 13px/1 'Hanken Grotesk'; color:#8B8478; margin-top:6px;">Din utveckling över tid</div>
+
+          <div style="display:flex; background:#E6DFD0; border-radius:12px; padding:3px; margin-top:16px;">
+            <div style="flex:1; text-align:center; padding:8px 0; border-radius:9px; font:600 13px/1 'Hanken Grotesk'; color:#8B8478;">Vecka</div>
+            <div style="flex:1; text-align:center; padding:8px 0; border-radius:9px; background:#FFFFFF; box-shadow:0 1px 2px rgba(0,0,0,.06); font:700 13px/1 'Hanken Grotesk'; color:#224A3A;">Månad</div>
+            <div style="flex:1; text-align:center; padding:8px 0; border-radius:9px; font:600 13px/1 'Hanken Grotesk'; color:#8B8478;">Allt</div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:18px; padding:16px 16px 14px; margin-top:14px;">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+              <div>
+                <div style="font:600 10px/1 'Hanken Grotesk'; letter-spacing:.12em; color:#A89F90;">NORMERAT (ESTIMAT)</div>
+                <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+                  <span style="font:500 34px/.9 'Newsreader',serif; color:#23201A;">1,15</span>
+                  <span style="font:700 12px/1 'Hanken Grotesk'; color:#2E6A4C;">▲ 0,25</span>
+                </div>
+              </div>
+              <div style="text-align:right; font:500 11px/1.5 'Hanken Grotesk'; color:#A89F90;">sedan<br>februari</div>
+            </div>
+            <svg viewBox="0 0 300 120" preserveAspectRatio="none" style="width:100%; height:104px; margin-top:12px; display:block;">
+              <defs><linearGradient id="hpArea2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#224A3A" stop-opacity="0.16"/><stop offset="1" stop-color="#224A3A" stop-opacity="0"/></linearGradient></defs>
+              <line x1="0" y1="39" x2="300" y2="39" stroke="#EFE8DA" stroke-width="1"/>
+              <line x1="0" y1="74" x2="300" y2="74" stroke="#EFE8DA" stroke-width="1"/>
+              <polygon points="14,98 69,86 124,70 179,60 234,48 289,39 289,112 14,112" fill="url(#hpArea2)"/>
+              <polyline points="14,98 69,86 124,70 179,60 234,48 289,39" fill="none" stroke="#224A3A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="289" cy="39" r="4.5" fill="#224A3A"/><circle cx="289" cy="39" r="8" fill="#224A3A" fill-opacity="0.16"/>
+            </svg>
+            <div style="display:flex; justify-content:space-between; margin-top:6px; font:600 10px/1 'Hanken Grotesk'; color:#B3AA9B;"><span>feb</span><span>mar</span><span>apr</span><span>maj</span><span>jun</span></div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:18px; padding:15px 16px 13px; margin-top:12px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font:700 13px/1 'Hanken Grotesk'; color:#23201A;">Den här veckan</span>
+              <span style="font:600 12px/1 'Hanken Grotesk'; color:#8B8478;">126 frågor</span>
+            </div>
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:8px; height:86px; margin-top:14px;">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="width:100%; height:38px; border-radius:6px; background:#CBD7CD;"></div><span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">mån</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="width:100%; height:50px; border-radius:6px; background:#CBD7CD;"></div><span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">tis</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="width:100%; height:6px; border-radius:6px; background:#E4DCCC;"></div><span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">ons</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="width:100%; height:66px; border-radius:6px; background:#CBD7CD;"></div><span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">tor</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="width:100%; height:42px; border-radius:6px; background:#224A3A;"></div><span style="font:700 10px/1 'Hanken Grotesk'; color:#224A3A;">fre</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="width:100%; height:13px; border-radius:6px; background:#E4DCCC;"></div><span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">lör</span></div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="width:100%; height:13px; border-radius:6px; background:#E4DCCC;"></div><span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">sön</span></div>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:18px; padding:15px 16px 16px; margin-top:12px;">
+            <div style="font:700 13px/1 'Hanken Grotesk'; color:#23201A; margin-bottom:14px;">Träffsäkerhet per delprov</div>
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:11px;"><span style="width:34px; font:800 13px/1 'Hanken Grotesk'; color:#23201A;">ELF</span><div style="flex:1; height:8px; border-radius:999px; background:#EFE8DA; overflow:hidden;"><div style="height:100%; width:70%; border-radius:999px; background:#224A3A;"></div></div><span style="width:32px; text-align:right; font:700 12px/1 'Hanken Grotesk'; color:#6f6859;">70%</span></div>
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:11px;"><span style="width:34px; font:800 13px/1 'Hanken Grotesk'; color:#23201A;">ORD</span><div style="flex:1; height:8px; border-radius:999px; background:#EFE8DA; overflow:hidden;"><div style="height:100%; width:62%; border-radius:999px; background:#224A3A;"></div></div><span style="width:32px; text-align:right; font:700 12px/1 'Hanken Grotesk'; color:#6f6859;">62%</span></div>
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:11px;"><span style="width:34px; font:800 13px/1 'Hanken Grotesk'; color:#23201A;">LÄS</span><div style="flex:1; height:8px; border-radius:999px; background:#EFE8DA; overflow:hidden;"><div style="height:100%; width:54%; border-radius:999px; background:#224A3A;"></div></div><span style="width:32px; text-align:right; font:700 12px/1 'Hanken Grotesk'; color:#6f6859;">54%</span></div>
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:11px;"><span style="width:34px; font:800 13px/1 'Hanken Grotesk'; color:#23201A;">MEK</span><div style="flex:1; height:8px; border-radius:999px; background:#EFE8DA; overflow:hidden;"><div style="height:100%; width:48%; border-radius:999px; background:#224A3A;"></div></div><span style="width:32px; text-align:right; font:700 12px/1 'Hanken Grotesk'; color:#6f6859;">48%</span></div>
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:11px;"><span style="width:34px; font:800 13px/1 'Hanken Grotesk'; color:#23201A;">XYZ</span><div style="flex:1; height:8px; border-radius:999px; background:#EFE8DA; overflow:hidden;"><div style="height:100%; width:41%; border-radius:999px; background:#BF5A33;"></div></div><span style="width:32px; text-align:right; font:700 12px/1 'Hanken Grotesk'; color:#6f6859;">41%</span></div>
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:11px;"><span style="width:34px; font:800 13px/1 'Hanken Grotesk'; color:#23201A;">KVA</span><div style="flex:1; height:8px; border-radius:999px; background:#EFE8DA; overflow:hidden;"><div style="height:100%; width:33%; border-radius:999px; background:#BF5A33;"></div></div><span style="width:32px; text-align:right; font:700 12px/1 'Hanken Grotesk'; color:#6f6859;">33%</span></div>
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:11px;"><span style="width:34px; font:800 13px/1 'Hanken Grotesk'; color:#23201A;">NOG</span><div style="flex:1; height:8px; border-radius:999px; background:#EFE8DA; overflow:hidden;"><div style="height:100%; width:27%; border-radius:999px; background:#BF5A33;"></div></div><span style="width:32px; text-align:right; font:700 12px/1 'Hanken Grotesk'; color:#6f6859;">27%</span></div>
+            <div style="display:flex; align-items:center; gap:11px;"><span style="width:34px; font:800 13px/1 'Hanken Grotesk'; color:#23201A;">DTK</span><div style="flex:1; height:8px; border-radius:999px; background:#EFE8DA; overflow:hidden;"><div style="height:100%; width:19%; border-radius:999px; background:#BF5A33;"></div></div><span style="width:32px; text-align:right; font:700 12px/1 'Hanken Grotesk'; color:#6f6859;">19%</span></div>
+          </div>
+        </div>
+
+        <div style="position:absolute; left:0; right:0; bottom:0; height:84px; background:rgba(241,236,227,.92); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-top:1px solid #E4DCCC; display:flex; justify-content:space-around; align-items:flex-start; padding:11px 14px 0;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goHome }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.5V20h11V9.5"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Hem</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goOva }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><polygon points="10,8.5 16,12 10,15.5" fill="#A89F90" stroke="none"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Öva</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goStats }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#224A3A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V12"/><path d="M12 19V6"/><path d="M19 19v-9"/></svg>
+            <span style="font:700 10px/1 'Hanken Grotesk'; color:#224A3A;">Statistik</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goProfile }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.7"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Profil</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ═══════════ PROFILE ═══════════ -->
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; overflow:auto; padding:58px 18px 100px;">
+          <div style="font:400 26px/1.05 'Newsreader',serif; color:#23201A; margin-bottom:16px;">Profil</div>
+          <div style="display:flex; align-items:center; gap:14px; background:#FFFFFF; border:1px solid #EAE3D6; border-radius:18px; padding:16px;">
+            <div style="width:56px; height:56px; border-radius:50%; background:#224A3A; display:flex; align-items:center; justify-content:center; font:700 20px/1 'Hanken Grotesk'; color:#FBF7EE; flex-shrink:0;">{{ profInitials }}</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font:700 18px/1.1 'Hanken Grotesk'; color:#23201A;">{{ profName }}</div>
+              <div style="font:500 13px/1 'Hanken Grotesk'; color:#8B8478; margin-top:5px;">Medlem sedan februari 2026</div>
+            </div>
+          </div>
+          <div style="background:#224A3A; border-radius:18px; padding:16px 18px; margin-top:12px; color:#EFE9DD;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div><div style="font:600 10px/1 'Hanken Grotesk'; letter-spacing:.12em; color:#9FB7A8;">DITT MÅL</div><div style="font:500 30px/1 'Newsreader',serif; color:#FBF7EE; margin-top:8px;">{{ goalText }}</div></div>
+              <div style="width:1px; height:46px; background:rgba(255,255,255,.14);"></div>
+              <div><div style="font:600 10px/1 'Hanken Grotesk'; letter-spacing:.12em; color:#9FB7A8;">PROVDATUM</div><div style="font:700 17px/1 'Hanken Grotesk'; color:#FBF7EE; margin-top:11px;">{{ examLong }}</div><div style="font:500 12px/1 'Hanken Grotesk'; color:#A9C0B2; margin-top:5px;">om {{ daysText }}</div></div>
+              <div style="padding:8px 13px; border:1px solid rgba(255,255,255,.25); border-radius:999px; font:600 12px/1 'Hanken Grotesk'; color:#EFE9DD; cursor:pointer;" onClick="{{ goalEdit }}">Ändra</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:13px; background:#FFFFFF; border:1px solid #EAE3D6; border-radius:18px; padding:14px 16px; margin-top:12px; cursor:pointer;" onClick="{{ goSaved }}">
+            <div style="width:38px; height:38px; border-radius:11px; background:#F3E0D5; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#BF5A33" stroke="#BF5A33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>
+            </div>
+            <div style="flex:1; font:600 15px/1 'Hanken Grotesk'; color:#23201A;">Sparade frågor</div>
+            <span style="font:700 14px/1 'Hanken Grotesk'; color:#8B8478;">{{ savedCount }}</span>
+            <svg width="8" height="14" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke="#C3BBAC" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="font:700 11px/1 'Hanken Grotesk'; letter-spacing:.1em; color:#A89F90; margin:20px 4px 9px;">ÖVNING</div>
+          <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:18px; overflow:hidden;">
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 16px;"><div style="flex:1; font:600 15px/1 'Hanken Grotesk'; color:#23201A;">Daglig påminnelse</div><div style="width:46px; height:28px; border-radius:999px; background:#224A3A; position:relative;"><div style="position:absolute; top:3px; left:21px; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.2);"></div></div></div>
+            <div style="height:1px; background:#F0EADD; margin-left:16px;"></div>
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 16px;"><div style="flex:1; font:600 15px/1 'Hanken Grotesk'; color:#23201A;">Dagligt mål</div><span style="font:500 14px/1 'Hanken Grotesk'; color:#8B8478;">20 frågor</span><svg width="8" height="14" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke="#C3BBAC" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="height:1px; background:#F0EADD; margin-left:16px;"></div>
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 16px;"><div style="flex:1; font:600 15px/1 'Hanken Grotesk'; color:#23201A;">Svårighetsgrad</div><span style="font:500 14px/1 'Hanken Grotesk'; color:#8B8478;">Adaptiv</span><svg width="8" height="14" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke="#C3BBAC" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="height:1px; background:#F0EADD; margin-left:16px;"></div>
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 16px;"><div style="flex:1; font:600 15px/1 'Hanken Grotesk'; color:#23201A;">Ljudeffekter</div><div style="width:46px; height:28px; border-radius:999px; background:#E0D8C8; position:relative;"><div style="position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.15);"></div></div></div>
+          </div>
+          <div style="font:700 11px/1 'Hanken Grotesk'; letter-spacing:.1em; color:#A89F90; margin:20px 4px 9px;">KONTO</div>
+          <div style="background:#FFFFFF; border:1px solid #EAE3D6; border-radius:18px; overflow:hidden;">
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 16px;"><div style="flex:1; font:600 15px/1 'Hanken Grotesk'; color:#23201A;">Språk</div><span style="font:500 14px/1 'Hanken Grotesk'; color:#8B8478;">Svenska</span><svg width="8" height="14" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke="#C3BBAC" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="height:1px; background:#F0EADD; margin-left:16px;"></div>
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 16px;"><div style="flex:1; font:600 15px/1 'Hanken Grotesk'; color:#23201A;">Hjälp &amp; support</div><svg width="8" height="14" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke="#C3BBAC" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="height:1px; background:#F0EADD; margin-left:16px;"></div>
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 16px;"><div style="flex:1; font:600 15px/1 'Hanken Grotesk'; color:#BF4A2E;">Logga ut</div></div>
+          </div>
+        </div>
+
+        <div style="position:absolute; left:0; right:0; bottom:0; height:84px; background:rgba(241,236,227,.92); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-top:1px solid #E4DCCC; display:flex; justify-content:space-around; align-items:flex-start; padding:11px 14px 0;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goHome }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.5V20h11V9.5"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Hem</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goOva }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><polygon points="10,8.5 16,12 10,15.5" fill="#A89F90" stroke="none"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Öva</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goStats }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A89F90" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V12"/><path d="M12 19V6"/><path d="M19 19v-9"/></svg>
+            <span style="font:600 10px/1 'Hanken Grotesk'; color:#A89F90;">Statistik</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;" onClick="{{ goProfile }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#224A3A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.7"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></svg>
+            <span style="font:700 10px/1 'Hanken Grotesk'; color:#224A3A;">Profil</span>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'home', section: 'ORD', qIndex: 0, selected: null, checked: false, results: [], answers: [], elapsed: 0, streak: 12, answered: 247, lastDate: null, onboarded: true, onboardStep: 0, onboardReturn: 'home', name: 'Elin', goal: '1,40', examISO: '2026-10-25', bookmarks: [], customQs: null };
+
+  componentDidMount() {
+    try {
+      const raw = localStorage.getItem('hp_progress_v1');
+      if (raw) { const p = JSON.parse(raw); this.setState({ streak: p.streak != null ? p.streak : 12, answered: p.answered != null ? p.answered : 247, lastDate: p.lastDate || null }); }
+      const onbRaw = localStorage.getItem('hp_onboard_v1');
+      if (onbRaw) { const o = JSON.parse(onbRaw); this.setState({ onboarded: true, name: o.name || 'Elin', goal: o.goal || '1,40', examISO: o.examISO || '2026-10-25' }); }
+      else { this.setState({ onboarded: false }); }
+      const bmRaw = localStorage.getItem('hp_bookmarks_v1');
+      if (bmRaw) { const b = JSON.parse(bmRaw); if (Array.isArray(b)) this.setState({ bookmarks: b }); }
+    } catch (e) {}
+    this._t = setInterval(() => {
+      if (this.state.view === 'practice') this.setState(s => ({ elapsed: (s.elapsed || 0) + 1 }));
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  SECTIONS() {
+    return [
+      { code: 'ORD', name: 'Ordförståelse', cat: 'v', pct: 62 },
+      { code: 'XYZ', name: 'Problemlösning', cat: 'q', pct: 41 },
+      { code: 'LÄS', name: 'Läsförståelse', cat: 'v', pct: 54 },
+      { code: 'KVA', name: 'Jämförelser', cat: 'q', pct: 33 },
+      { code: 'MEK', name: 'Meningskompl.', cat: 'v', pct: 48 },
+      { code: 'NOG', name: 'Tillräcklig info', cat: 'q', pct: 27 },
+      { code: 'ELF', name: 'Engelsk läsning', cat: 'v', pct: 70 },
+      { code: 'DTK', name: 'Diagram & kartor', cat: 'q', pct: 19 },
+    ];
+  }
+
+  BANK() {
+    const salesChart = { title: 'Försäljning (mkr) per år', bars: [{ label: '2021', value: 42 }, { label: '2022', value: 58 }, { label: '2023', value: 35 }, { label: '2024', value: 67 }] };
+    const travelChart = { title: 'Ressätt till jobbet (% av anställda)', bars: [{ label: 'Bil', value: 46 }, { label: 'Cykel', value: 22 }, { label: 'Buss', value: 20 }, { label: 'Gång', value: 12 }] };
+    const pCities = 'Många av världens äldsta städer växte fram vid floder, sjöar och kuster. Vattnet gav inte bara dricksvatten och bördig jord, utan fungerade också som transportled för handel. Närheten till vatten blev därför avgörande för var människor valde att bosätta sig och för hur snabbt en stad kunde växa.';
+    const pSleep = 'Forskning visar att sömnen spelar en central roll för minnet. Under den djupa sömnen bearbetas dagens intryck och flyttas från korttidsminnet till långtidsminnet. Den som sover för lite får därför svårare att befästa det som lärts in under dagen.';
+    const pBees = 'Bin gör långt mer än att producera honung. När de flyger mellan blommor för att samla nektar förflyttar de samtidigt pollen, vilket gör att växterna kan föröka sig. Uppskattningsvis är en tredjedel av allt vi äter beroende av sådan pollinering. När bipopulationer minskar hotas därför inte bara honungen utan även stora delar av livsmedelsproduktionen.';
+    return {
+      ORD: [
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'vedertagen', options: ['föråldrad', 'allmänt accepterad', 'omtvistad', 'tillfällig'], correct: 1, expl: '”Vedertagen” = allmänt accepterad, etablerad.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'nonchalant', options: ['likgiltig', 'noggrann', 'blygsam', 'envis'], correct: 0, expl: '”Nonchalant” = likgiltig, vårdslös.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'frenesi', options: ['lugn', 'vild iver', 'tvekan', 'vrede'], correct: 1, expl: '”Frenesi” = vild iver, lidelse.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'lakonisk', options: ['pratglad', 'kortfattad', 'känslosam', 'otydlig'], correct: 1, expl: '”Lakonisk” = kortfattad, fåordig.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'idog', options: ['lat', 'flitig', 'rastlös', 'glad'], correct: 1, expl: '”Idog” = flitig, arbetsam.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'evident', options: ['tveksam', 'uppenbar', 'dold', 'komplex'], correct: 1, expl: '”Evident” = uppenbar, tydlig.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'sporadisk', options: ['ständig', 'oregelbunden', 'snabb', 'kraftig'], correct: 1, expl: '”Sporadisk” = enstaka, oregelbunden.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'obeveklig', options: ['mild', 'omedgörlig', 'tveksam', 'vänlig'], correct: 1, expl: '”Obeveklig” = omedgörlig, som inte ger vika.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'diffus', options: ['tydlig', 'suddig', 'ljus', 'hård'], correct: 1, expl: '”Diffus” = otydlig, suddig.' },
+        { lead: 'Vilket ord betyder ungefär detsamma som', main: 'reticens', options: ['förtegenhet', 'öppenhet', 'ilska', 'iver'], correct: 0, expl: '”Reticens” = förtegenhet, återhållsamhet.' },
+      ],
+      LÄS: [
+        { passage: pCities, lead: 'Text 1 · Fråga 1 av 2', main: 'Vad är textens huvudtes?', options: ['Vatten begränsar tillväxt', 'Närhet till vatten formade städers framväxt', 'Städer bör undvika kuster', 'Floder saknar betydelse'], correct: 1, expl: 'Texten lyfter vattnets roll för städers framväxt.' },
+        { passage: pCities, lead: 'Text 1 · Fråga 2 av 2', main: 'Vilken funktion hade vattnet enligt texten?', options: ['Endast dricksvatten', 'Transportled för handel', 'Försvar mot fiender', 'Religiösa riter'], correct: 1, expl: 'Texten nämner vatten som transportled för handeln.' },
+        { passage: pSleep, lead: 'Text 2 · Fråga 1 av 1', main: 'Vad sker enligt texten under djupsömnen?', options: ['Intryck glöms bort', 'Minnen befästs i långtidsminnet', 'Hjärnan stänger av helt', 'Inlärning avstannar'], correct: 1, expl: 'Under djupsömnen flyttas intryck till långtidsminnet.' },
+        { passage: pBees, lead: 'Text 3 · Fråga 1 av 2', main: 'Vad är textens huvudpoäng?', options: ['Bin är farliga för växter', 'Bins pollinering är viktig för matproduktionen', 'Honung är onyttigt', 'Bin äter en tredjedel av all mat'], correct: 1, expl: 'Texten betonar pollineringens roll för livsmedel.' },
+        { passage: pBees, lead: 'Text 3 · Fråga 2 av 2', main: 'Hur stor del av vår mat beror enligt texten på pollinering?', options: ['En tiondel', 'En fjärdedel', 'En tredjedel', 'Hälften'], correct: 2, expl: 'Texten anger ungefär en tredjedel.' },
+      ],
+      MEK: [
+        { lead: 'Välj det ord som passar bäst i meningen', main: 'Trots motgångar visade hon en _____ vilja att lyckas.', options: ['flyktig', 'orubblig', 'tveksam', 'likgiltig'], correct: 1, expl: '”Orubblig” = fast, stark vilja.' },
+        { lead: 'Välj det ord som passar bäst i meningen', main: 'Förslaget möttes av _____ från flera håll.', options: ['kritik', 'beröm', 'tystnad', 'glädje'], correct: 0, expl: 'Sammanhanget antyder motstånd → ”kritik”.' },
+        { lead: 'Välj det ord som passar bäst i meningen', main: 'Eftersom vägen var _____ tog resan längre tid än beräknat.', options: ['gropig', 'rak', 'bred', 'tom'], correct: 0, expl: 'En gropig väg gör resan långsammare.' },
+        { lead: 'Välj det ord som passar bäst i meningen', main: 'Hennes argument var så _____ att ingen kunde invända.', options: ['svaga', 'övertygande', 'vaga', 'korta'], correct: 1, expl: 'Inget att invända → ”övertygande”.' },
+        { lead: 'Välj det ord som passar bäst i meningen', main: 'Han lyssnade _____ och missade därför halva instruktionen.', options: ['uppmärksamt', 'förstrött', 'ivrigt', 'noga'], correct: 1, expl: 'Att missa hälften → han lyssnade ”förstrött”.' },
+        { lead: 'Välj det ord som passar bäst i meningen', main: 'Rapporten var _____ men saknade konkreta förslag.', options: ['gedigen', 'slarvig', 'kort', 'felaktig'], correct: 0, expl: 'Motsats till bristen → den var ändå ”gedigen”.' },
+        { lead: 'Välj det ord som passar bäst i meningen', main: 'Priset steg _____ under året, med några få procent i månaden.', options: ['drastiskt', 'gradvis', 'plötsligt', 'omärkligt'], correct: 1, expl: 'Några procent i taget → ”gradvis”.' },
+      ],
+      ELF: [
+        { passage: 'Coral reefs support about a quarter of all marine species, yet they cover less than one percent of the ocean floor. Because so much life depends on them, even small changes in ocean temperature can have effects that reach far beyond the reefs themselves.', lead: 'Read the text and answer the question.', main: 'According to the text, coral reefs', options: ['cover most of the ocean floor', 'support very little marine life', 'host many species despite their small size', 'are unaffected by temperature'], correct: 2, expl: 'They host a quarter of marine species despite covering under 1%.' },
+        { lead: 'Choose the word that best completes the sentence', main: 'The results were _____ with our earlier findings.', options: ['consistent', 'reluctant', 'hollow', 'abrupt'], correct: 0, expl: '”Consistent with” = in agreement with.' },
+        { lead: 'Choose the word that best completes the sentence', main: 'She gave a _____ account of the events.', options: ['vague', 'meticulous', 'clumsy', 'silent'], correct: 1, expl: 'A detailed account = ”meticulous”.' },
+        { lead: 'Choose the word that best completes the sentence', main: 'The committee will _____ the proposal next week.', options: ['review', 'reviewing', 'reviewed', 'reviews'], correct: 0, expl: 'After ”will” we use the base form: review.' },
+      ],
+      XYZ: [
+        { lead: 'Beräkna', main: '15 % av 240 = ?', options: ['24', '36', '40', '45'], correct: 1, expl: '0,15 × 240 = 36.' },
+        { lead: 'Lös ut x', main: 'Om 3x − 7 = 14, vad är x?', options: ['5', '6', '7', '9'], correct: 2, expl: '3x = 21 → x = 7.' },
+        { lead: 'Beräkna', main: 'En tröja kostar 600 kr och sänks med 25 %. Nytt pris?', options: ['400 kr', '425 kr', '450 kr', '475 kr'], correct: 2, expl: '600 × 0,75 = 450 kr.' },
+        { lead: 'Beräkna', main: 'Medelvärdet av 4, 9 och x är 7. Vad är x?', options: ['6', '7', '8', '9'], correct: 2, expl: 'Summan är 21 → x = 21 − 13 = 8.' },
+        { lead: 'Beräkna', main: 'Ett recept för 4 personer kräver 6 dl mjöl. Hur mycket för 6 personer?', options: ['8 dl', '9 dl', '10 dl', '12 dl'], correct: 1, expl: '6 dl / 4 = 1,5 dl per person × 6 = 9 dl.' },
+        { lead: 'Beräkna', main: 'En rektangel har omkretsen 30 cm och bredden 6 cm. Vad är längden?', options: ['9 cm', '12 cm', '15 cm', '18 cm'], correct: 0, expl: '2(l+6)=30 → l+6=15 → l=9 cm.' },
+        { lead: 'Beräkna', main: 'Vad är 3/5 av 200?', options: ['100', '120', '125', '140'], correct: 1, expl: '200 ÷ 5 = 40, × 3 = 120.' },
+      ],
+      KVA: [
+        { lead: 'Jämför kvantiteterna I och II', main: 'I: 3 · 4     II: 5 + 6', options: ['I är störst', 'II är störst', 'Lika stora', 'Info saknas'], correct: 0, expl: 'I = 12, II = 11 → I störst.' },
+        { lead: 'Jämför kvantiteterna I och II', main: 'I: 2³     II: 3²', options: ['I är störst', 'II är störst', 'Lika stora', 'Info saknas'], correct: 1, expl: 'I = 8, II = 9 → II störst.' },
+        { lead: 'Jämför kvantiteterna I och II', main: 'I: 50 % av 80     II: 30 % av 120', options: ['I är störst', 'II är störst', 'Lika stora', 'Info saknas'], correct: 0, expl: 'I = 40, II = 36 → I störst.' },
+        { lead: 'Jämför kvantiteterna I och II', main: 'I: 7²     II: 50', options: ['I är störst', 'II är störst', 'Lika stora', 'Info saknas'], correct: 1, expl: 'I = 49, II = 50 → II störst.' },
+        { lead: 'Jämför kvantiteterna I och II', main: 'x är ett positivt heltal.  I: 2x     II: x + 3', options: ['I är störst', 'II är störst', 'Lika stora', 'Kan ej avgöras'], correct: 3, expl: 'x=1 ger II större, x=4 ger I större → beror på x.' },
+        { lead: 'Jämför kvantiteterna I och II', main: 'I: arean av en kvadrat med sidan 5  II: arean av en rektangel 4×6', options: ['I är störst', 'II är störst', 'Lika stora', 'Info saknas'], correct: 0, expl: 'I = 25, II = 24 → I störst.' },
+      ],
+      NOG: [
+        { lead: 'Är informationen tillräcklig?', main: 'Hur gammal är Anna? (1) Hon är 4 år äldre än Erik. (2) Erik är 19 år.', options: ['Endast (1) räcker', 'Endast (2) räcker', '(1) och (2) tillsammans', 'Informationen räcker inte'], correct: 2, expl: 'Båda behövs: 19 + 4 = 23 år.' },
+        { lead: 'Är informationen tillräcklig?', main: 'Är x > 0? (1) x² = 9 (2) x³ = 27', options: ['Endast (1) räcker', 'Endast (2) räcker', '(1) och (2) tillsammans', 'Informationen räcker inte'], correct: 1, expl: '(1) ger x = ±3. (2) ger x = 3 → svaret ja. Endast (2) räcker.' },
+        { lead: 'Är informationen tillräcklig?', main: 'Hur många elever i klassen? (1) Fler än 20. (2) Färre än 24.', options: ['Endast (1) räcker', 'Endast (2) räcker', '(1) och (2) tillsammans', 'Informationen räcker inte'], correct: 3, expl: 'Även tillsammans: 21, 22 eller 23 är möjliga.' },
+        { lead: 'Är informationen tillräcklig?', main: 'Vad kostar en biljett? (1) Fem biljetter kostar 600 kr. (2) Priset är samma för alla.', options: ['Endast (1) räcker', 'Endast (2) räcker', '(1) och (2) tillsammans', 'Informationen räcker inte'], correct: 2, expl: 'Först med (2) vet vi att 600/5 = 120 kr gäller per biljett.' },
+      ],
+      DTK: [
+        { chart: salesChart, lead: 'Enligt diagrammet', main: 'Vilket år var försäljningen högst?', options: ['2021', '2022', '2023', '2024'], correct: 3, expl: '2024 har den högsta stapeln (67 mkr).' },
+        { chart: salesChart, lead: 'Enligt diagrammet', main: 'Hur mycket högre var försäljningen 2024 än 2023?', options: ['22 mkr', '28 mkr', '32 mkr', '35 mkr'], correct: 2, expl: '67 − 35 = 32 mkr.' },
+        { chart: salesChart, lead: 'Enligt diagrammet', main: 'Mellan vilka år ökade försäljningen mest?', options: ['2021–2022', '2022–2023', '2023–2024', '2021–2024'], correct: 2, expl: '2023→2024: +32 mkr, den största ökningen.' },
+        { chart: travelChart, lead: 'Enligt diagrammet', main: 'Vilket ressätt är vanligast?', options: ['Bil', 'Cykel', 'Buss', 'Gång'], correct: 0, expl: 'Bil har högst andel (46 %).' },
+        { chart: travelChart, lead: 'Enligt diagrammet', main: 'Hur stor andel cyklar eller går till jobbet?', options: ['22 %', '32 %', '34 %', '42 %'], correct: 2, expl: 'Cykel 22 % + Gång 12 % = 34 %.' },
+        { chart: travelChart, lead: 'Enligt diagrammet', main: 'Hur många fler (procentenheter) tar bilen än bussen?', options: ['16', '20', '24', '26'], correct: 3, expl: '46 − 20 = 26 procentenheter.' },
+      ],
+    };
+  }
+
+  fmt(s) { const m = Math.floor(s / 60), x = s % 60; return m + ':' + (x < 10 ? '0' : '') + x; }
+
+  EXAM_OPTIONS() {
+    return [
+      { iso: '2026-10-25', label: '25 oktober 2026', short: '25 okt', sub: 'Höstens prov' },
+      { iso: '2027-04-10', label: '10 april 2027', short: '10 apr', sub: 'Vårens prov' },
+      { iso: '2027-10-24', label: '24 oktober 2027', short: '24 okt', sub: 'Höstens prov' },
+    ];
+  }
+  examOpt() { return this.EXAM_OPTIONS().find(o => o.iso === this.state.examISO) || this.EXAM_OPTIONS()[0]; }
+  daysLeft(iso) { return Math.max(0, Math.ceil((new Date(iso + 'T00:00:00') - new Date()) / 86400000)); }
+  greetPrefix() { const h = new Date().getHours(); return h < 10 ? 'God morgon' : (h < 18 ? 'God dag' : 'God kväll'); }
+  todayLabel() { const s = new Date().toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' }); return s.charAt(0).toUpperCase() + s.slice(1); }
+  firstName() { return (this.state.name || 'Elin').trim().split(/\s+/)[0]; }
+  initials() {
+    const p = (this.state.name || 'Elin').trim().split(/\s+/).filter(Boolean);
+    if (p.length >= 2) return (p[0][0] + p[1][0]).toUpperCase();
+    const w = p[0] || 'E'; return (w.length >= 2 ? w.slice(0, 2) : w).toUpperCase();
+  }
+  onbNext() { const s = this.state; if (s.onboardStep < 3) this.setState({ onboardStep: s.onboardStep + 1 }); else this.finishOnboard(); }
+  onbBack() { this.setState(s => ({ onboardStep: Math.max(0, s.onboardStep - 1) })); }
+  finishOnboard() {
+    const { name, goal, examISO } = this.state;
+    try { localStorage.setItem('hp_onboard_v1', JSON.stringify({ name: name || 'Elin', goal, examISO })); } catch (e) {}
+    this.setState(s => ({ onboarded: true, view: s.onboardReturn || 'home', onboardReturn: 'home', onboardStep: 0 }));
+  }
+
+  activeQs() { return this.state.customQs || this.BANK()[this.state.section] || []; }
+
+  startPractice(code) { this.setState({ view: 'practice', section: code, qIndex: 0, selected: null, checked: false, results: [], answers: [], elapsed: 0, customQs: null }); }
+
+  startSaved() {
+    const list = this.savedQuestions();
+    if (!list.length) return;
+    this.setState({ view: 'practice', customQs: list, section: list[0]._sec || 'ORD', qIndex: 0, selected: null, checked: false, results: [], answers: [], elapsed: 0 });
+  }
+
+  savedQuestions() {
+    const bank = this.BANK();
+    return (this.state.bookmarks || []).map(k => {
+      const parts = k.split(':'); const qq = (bank[parts[0]] || [])[+parts[1]];
+      return qq ? Object.assign({}, qq, { _key: k, _sec: parts[0] }) : null;
+    }).filter(Boolean);
+  }
+
+  toggleBookmark(key) {
+    this.setState(s => {
+      const has = s.bookmarks.indexOf(key) !== -1;
+      const bookmarks = has ? s.bookmarks.filter(x => x !== key) : s.bookmarks.concat(key);
+      try { localStorage.setItem('hp_bookmarks_v1', JSON.stringify(bookmarks)); } catch (e) {}
+      return { bookmarks };
+    });
+  }
+
+  onFooter() {
+    const st = this.state;
+    if (st.selected == null) return;
+    if (!st.checked) { this.setState({ checked: true }); return; }
+    const qs = this.activeQs();
+    const cur = qs[st.qIndex];
+    const newResults = st.results.concat(st.selected === cur.correct);
+    const newAnswers = st.answers.concat(st.selected);
+    if (st.qIndex + 1 < qs.length) this.setState({ qIndex: st.qIndex + 1, selected: null, checked: false, results: newResults, answers: newAnswers });
+    else {
+      const newAnswered = st.answered + newResults.length;
+      const today = new Date().toDateString();
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+      let newStreak = st.streak;
+      if (st.lastDate !== today) newStreak = (st.lastDate === yesterday) ? st.streak + 1 : (st.lastDate ? 1 : st.streak);
+      const persisted = { streak: newStreak, answered: newAnswered, lastDate: today };
+      try { localStorage.setItem('hp_progress_v1', JSON.stringify(persisted)); } catch (e) {}
+      this.setState(Object.assign({ view: 'result', results: newResults, answers: newAnswers }, persisted));
+    }
+  }
+
+  renderVals() {
+    const st = this.state;
+    const sections = this.SECTIONS();
+    const secMeta = sections.find(s => s.code === st.section) || sections[0];
+    const qs = this.activeQs();
+    const q = qs[st.qIndex] || qs[0] || { lead: '', main: '', options: [], correct: 0, expl: '', passage: '', chart: null };
+    const total = qs.length;
+    const isCustom = !!st.customQs;
+    const curKey = (q && q._key) ? q._key : (st.section + ':' + st.qIndex);
+    const bmActive = st.bookmarks.indexOf(curKey) !== -1;
+
+    const gridCells = sections.map(s => {
+      const accent = s.cat === 'v' ? '#224A3A' : '#BF5A33';
+      return {
+        code: s.code, name: s.name, pctText: String(s.pct),
+        ringStyle: { width: '32px', height: '32px', borderRadius: '50%', background: 'conic-gradient(' + accent + ' 0 ' + s.pct + '%,#E7E0D3 0)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+        numStyle: { width: '23px', height: '23px', borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', font: "700 8.5px/1 'Hanken Grotesk'", color: accent },
+        onClick: () => this.startPractice(s.code),
+      };
+    });
+
+    const practiceOpts = q.options.map((t, i) => {
+      const letter = String.fromCharCode(65 + i);
+      const isSel = st.selected === i, isCorrect = i === q.correct, checked = st.checked;
+      let bg = '#FFFFFF', border = '1px solid #EAE3D6', badgeBg = 'transparent', badgeBorder = '1.5px solid #E0D8C8', badgeColor = '#A89F90', textColor = '#33302A', tw = 600, badgeText = letter;
+      if (!checked) { if (isSel) { bg = '#F4E7DD'; border = '1.5px solid #C97A52'; badgeBg = '#BF5A33'; badgeBorder = '1.5px solid #BF5A33'; badgeColor = '#fff'; textColor = '#23201A'; tw = 700; } }
+      else if (isCorrect) { bg = '#E4EDE6'; border = '1.5px solid #3E7A5E'; badgeBg = '#2E6A4C'; badgeBorder = '1.5px solid #2E6A4C'; badgeColor = '#fff'; textColor = '#1E3A2E'; tw = 700; badgeText = '✓'; }
+      else if (isSel) { bg = '#F6E3DC'; border = '1.5px solid #C0573A'; badgeBg = '#BF4A2E'; badgeBorder = '1.5px solid #BF4A2E'; badgeColor = '#fff'; textColor = '#7A3A28'; tw = 700; badgeText = '✕'; }
+      else { bg = '#FBF9F4'; border = '1px solid #EEE8DC'; badgeColor = '#C3BBAC'; textColor = '#A89F90'; }
+      return {
+        text: t, badgeText,
+        boxStyle: { display: 'flex', alignItems: 'center', gap: '13px', background: bg, border, borderRadius: '15px', padding: '15px', cursor: checked ? 'default' : 'pointer', transition: 'background .15s ease, border-color .15s ease' },
+        badgeStyle: { width: '27px', height: '27px', borderRadius: '8px', background: badgeBg, border: badgeBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', font: "700 12px/1 'Hanken Grotesk'", color: badgeColor, flexShrink: 0 },
+        textStyle: { font: tw + " 16px/1.3 'Hanken Grotesk'", color: textColor },
+        onClick: () => { if (!this.state.checked) this.setState({ selected: i }); },
+      };
+    });
+
+    const isRight = st.selected === q.correct;
+    const last = st.qIndex + 1 >= total;
+    let footerLabel, footerBg, footerColor = '#FBF7EE';
+    if (st.selected == null) { footerLabel = 'Välj ett svar'; footerBg = '#DAD3C5'; footerColor = '#9A9183'; }
+    else if (!st.checked) { footerLabel = 'Kontrollera svar'; footerBg = '#224A3A'; }
+    else { footerLabel = last ? 'Se resultat' : 'Nästa fråga'; footerBg = '#224A3A'; }
+
+    const correct = st.results.filter(Boolean).length;
+    const rtotal = st.results.length || total;
+    const pct = Math.round((correct / (rtotal || 1)) * 100);
+    const normDelta = '+' + (correct * 0.01).toFixed(2).replace('.', ',');
+    const progFrac = Math.round(((st.qIndex + (st.checked ? 1 : 0)) / (total || 1)) * 100);
+    const chart = q.chart || null;
+    let chartBars = [];
+    if (chart) {
+      const cmax = Math.max.apply(null, chart.bars.map(b => b.value));
+      chartBars = chart.bars.map(b => ({
+        label: b.label, value: String(b.value),
+        barStyle: { width: '100%', height: Math.round((b.value / cmax) * 92) + 'px', borderRadius: '6px 6px 0 0', background: '#BF5A33' },
+      }));
+    }
+
+    const showOnb = !st.onboarded || st.view === 'onboard';
+    const examO = this.examOpt();
+    const dLeft = this.daysLeft(st.examISO);
+    const goalChips = ['1,20', '1,40', '1,60', '1,80', '2,00'].map(g => {
+      const sel = g === st.goal;
+      return { label: g, onClick: () => this.setState({ goal: g }),
+        style: { padding: '13px 21px', borderRadius: '14px', background: sel ? '#224A3A' : '#FFFFFF', border: sel ? '1.5px solid #224A3A' : '1.5px solid #E5DDCE', color: sel ? '#FBF7EE' : '#33302A', font: "700 17px/1 'Hanken Grotesk'", cursor: 'pointer', transition: 'all .15s ease' } };
+    });
+    const examCards = this.EXAM_OPTIONS().map(o => {
+      const sel = o.iso === st.examISO; const d = this.daysLeft(o.iso);
+      return { label: o.label, sub: o.sub + ' · om ' + d + ' dagar', onClick: () => this.setState({ examISO: o.iso }),
+        boxStyle: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: sel ? '#EEF3EF' : '#FFFFFF', border: sel ? '1.5px solid #224A3A' : '1px solid #EAE3D6', borderRadius: '16px', padding: '15px 17px', cursor: 'pointer', transition: 'all .15s ease' },
+        titleStyle: { font: "700 16px/1 'Hanken Grotesk'", color: '#23201A' },
+        radioStyle: { width: '22px', height: '22px', borderRadius: '50%', border: sel ? '7px solid #224A3A' : '2px solid #D8CFBE', boxSizing: 'border-box', flexShrink: 0 } };
+    });
+    const onbDots = [0, 1, 2, 3].map(i => ({ style: { width: i === st.onboardStep ? '22px' : '7px', height: '7px', borderRadius: '999px', background: i <= st.onboardStep ? '#224A3A' : '#D8CFBE', transition: 'all .25s ease' } }));
+
+    const reviewItems = (st.answers || []).map((sel, i) => {
+      const qq = qs[i]; if (!qq) return null;
+      const right = sel === qq.correct;
+      return {
+        num: 'Fråga ' + (i + 1), main: qq.main,
+        tagText: right ? 'Rätt' : 'Fel',
+        tagStyle: { alignSelf: 'flex-start', padding: '4px 10px', borderRadius: '999px', background: right ? '#E4EDE6' : '#F6E3DC', color: right ? '#2E6A4C' : '#A84A26', font: "700 10px/1 'Hanken Grotesk'", letterSpacing: '.06em' },
+        yourText: 'Ditt svar: ' + (qq.options[sel] != null ? qq.options[sel] : '—'),
+        yourStyle: { font: "600 13px/1.4 'Hanken Grotesk'", color: right ? '#2E6A4C' : '#A84A26', marginTop: '10px' },
+        showCorrect: !right, correctText: 'Rätt svar: ' + qq.options[qq.correct], expl: qq.expl,
+      };
+    }).filter(Boolean);
+
+    const savedList = this.savedQuestions();
+    const savedItems = savedList.map(qq => ({
+      sec: qq._sec, main: qq.main,
+      onRemove: () => this.toggleBookmark(qq._key),
+    }));
+
+    return {
+      isOnboard: showOnb,
+      isHome: !showOnb && st.view === 'home', isPractice: !showOnb && st.view === 'practice', isResult: !showOnb && st.view === 'result', isStats: !showOnb && st.view === 'stats', isProfile: !showOnb && st.view === 'profile',
+      isReview: !showOnb && st.view === 'review', isSaved: !showOnb && st.view === 'saved',
+      reviewItems, savedItems, savedCount: String(savedList.length), hasSaved: savedList.length > 0, savedEmpty: savedList.length === 0,
+      goReview: () => this.setState({ view: 'review' }), reviewBack: () => this.setState({ view: 'result' }),
+      goSaved: () => this.setState({ view: 'saved' }), savedBack: () => this.setState({ view: 'profile' }),
+      startSaved: () => this.startSaved(),
+      bmActive, toggleBookmark: () => this.toggleBookmark(curKey),
+      bmBtnStyle: { width: '54px', height: '54px', borderRadius: '16px', background: bmActive ? '#F3E0D5' : '#FFFFFF', border: bmActive ? '1.5px solid #E0B79F' : '1px solid #EAE3D6', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all .15s ease' },
+      bmStroke: bmActive ? '#BF5A33' : '#A89F90', bmFill: bmActive ? '#BF5A33' : 'none',
+      onbStep0: st.onboardStep === 0, onbStep1: st.onboardStep === 1, onbStep2: st.onboardStep === 2, onbStep3: st.onboardStep === 3,
+      onbCanBack: st.onboardStep > 0, onbDots,
+      onbCta: ['Kom igång', 'Fortsätt', 'Fortsätt', 'Sätt igång'][st.onboardStep],
+      onbNext: () => this.onbNext(), onbBack: () => this.onbBack(),
+      nameVal: st.name, onName: (e) => this.setState({ name: e.target.value }),
+      goalChips, examCards,
+      greet: this.greetPrefix() + ', ' + this.firstName(), todayLabel: this.todayLabel(),
+      goalText: st.goal, daysText: dLeft + ' dagar', examShort: examO.short, examLong: examO.label,
+      profName: st.name, profInitials: this.initials(),
+      goalEdit: () => this.setState({ view: 'onboard', onboarded: true, onboardStep: 2, onboardReturn: 'profile' }),
+      goHome: () => this.setState({ view: 'home' }),
+      goStats: () => this.setState({ view: 'stats' }),
+      goProfile: () => this.setState({ view: 'profile' }),
+      goOva: () => this.startPractice('ORD'),
+      openStats: () => this.setState({ view: 'stats' }),
+      continueLast: () => this.startPractice('ORD'),
+      gridCells,
+      streak: String(this.state.streak), answered: String(this.state.answered),
+      secCode: isCustom ? 'SPARADE' : secMeta.code, secName: isCustom ? 'Dina sparade frågor' : secMeta.name,
+      qLead: q.lead, qMain: q.main, qNum: String(st.qIndex + 1), qTotal: String(total),
+      hasPassage: !!q.passage, passageText: q.passage || '',
+      hasChart: !!chart, chartTitle: chart ? chart.title : '', chartBars,
+      progStyle: { height: '100%', width: progFrac + '%', borderRadius: '999px', background: '#224A3A', transition: 'width .3s ease' },
+      timer: this.fmt(st.elapsed),
+      practiceOpts, checked: st.checked,
+      footerLabel,
+      footerBtnStyle: { flex: 1, height: '54px', borderRadius: '16px', background: footerBg, display: 'flex', alignItems: 'center', justifyContent: 'center', font: "700 16px/1 'Hanken Grotesk'", color: footerColor, cursor: st.selected != null ? 'pointer' : 'default' },
+      onFooter: () => this.onFooter(),
+      feedbackStyle: { background: isRight ? '#EAF1EC' : '#F8EAE3', border: isRight ? '1px solid #CFE0D4' : '1px solid #ECD3C6', borderRadius: '15px', padding: '14px 15px', marginTop: '14px' },
+      feedbackDotStyle: { width: '9px', height: '9px', borderRadius: '3px', background: isRight ? '#2E6A4C' : '#BF4A2E', transform: 'rotate(45deg)' },
+      feedbackTitleStyle: { font: "700 14px/1 'Hanken Grotesk'", color: isRight ? '#2E6A4C' : '#A84A26' },
+      feedbackTitle: isRight ? 'Rätt!' : 'Inte riktigt', feedbackText: q.expl,
+      backHome: () => this.setState({ view: 'home' }),
+      resTitle: (pct >= 80 ? 'Bra jobbat, ' : (pct >= 50 ? 'Bra kämpat, ' : 'Fortsätt kämpa, ')) + this.firstName(),
+      resSec: isCustom ? 'SPARADE' : secMeta.code,
+      resCorrect: String(correct), resTotal: String(rtotal), resPct: String(pct),
+      ringStyle: { width: '172px', height: '172px', borderRadius: '50%', background: 'conic-gradient(#E4C66A 0 ' + pct + '%, rgba(255,255,255,.13) 0)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+      resTime: this.fmt(st.elapsed), resAvg: (rtotal ? Math.round(st.elapsed / rtotal) : 0) + ' s', resNorm: normDelta,
+      againPractice: () => this.startPractice(st.section),
+      resultHome: () => this.setState({ view: 'home' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

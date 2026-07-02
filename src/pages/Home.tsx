@@ -4,46 +4,47 @@ import { questions } from '../data/questions'
 import { loadStats, type GameStats } from '../utils/gamification'
 import { loadHistory, loadSession, saveSession, buildSession } from '../utils/session'
 import { getExamDate, daysUntilExam } from '../utils/examDate'
-import { computeReadiness } from '../utils/readiness'
-import { computePacing, type PacingResult } from '../utils/pacing'
-import { weakTypeSummary, buildWeakAreaSession } from '../utils/analytics'
-import type { ExamSession } from '../types'
+import { estimateSectionedScore } from '../utils/hpScore'
+import { weakTypeSummary, buildWeakAreaSession, hpScoreHistory } from '../utils/analytics'
+import type { ExamSession, QuestionType } from '../types'
 
-const TYPE_ACCENTS: Record<string, { color: string; ring: string; bg: string }> = {
-  XYZ: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
-  KVA: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
-  NOG: { color: 'var(--color-terracotta)', ring: 'var(--color-terracotta)', bg: 'var(--color-terracotta-muted)' },
-  DTK: { color: 'var(--color-gold-deep)', ring: 'var(--color-gold-deep)', bg: 'var(--color-gold-muted)' },
-  ORD: { color: 'var(--color-green)', ring: 'var(--color-green)', bg: 'var(--color-green-muted)' },
-  LAS: { color: 'var(--color-green)', ring: 'var(--color-green)', bg: 'var(--color-green-muted)' },
-  MEK: { color: 'var(--color-green)', ring: 'var(--color-green)', bg: 'var(--color-green-muted)' },
-  ELF: { color: 'var(--color-green)', ring: 'var(--color-green)', bg: 'var(--color-green-muted)' },
+const SECTIONS = [
+  { code: 'ORD', name: 'Ordförståelse',    cat: 'verbal', type: 'ORD' as const },
+  { code: 'XYZ', name: 'Problemlösning',   cat: 'quant',  type: 'XYZ' as const },
+  { code: 'LÄS', name: 'Läsförståelse',    cat: 'verbal', type: 'LAS' as const },
+  { code: 'KVA', name: 'Jämförelser',      cat: 'quant',  type: 'KVA' as const },
+  { code: 'MEK', name: 'Meningskompl.',    cat: 'verbal', type: 'MEK' as const },
+  { code: 'NOG', name: 'Tillräcklig info', cat: 'quant',  type: 'NOG' as const },
+  { code: 'ELF', name: 'Engelsk läsning',  cat: 'verbal', type: 'ELF' as const },
+  { code: 'DTK', name: 'Diagram & kartor', cat: 'quant',  type: 'DTK' as const },
+] as const
+
+function getUserName(): string | null {
+  try {
+    const raw = localStorage.getItem('hp_user_name')
+    if (raw) return raw
+  } catch { /* ignore */ }
+  return null
+}
+
+function getGoalText(): string {
+  try {
+    const raw = localStorage.getItem('hp_goal')
+    if (raw) return raw
+  } catch { /* ignore */ }
+  return '1,40'
 }
 
 export default function Home() {
   const navigate = useNavigate()
-  const byType = {
-    XYZ: questions.filter(q => q.type === 'XYZ').length,
-    KVA: questions.filter(q => q.type === 'KVA').length,
-    NOG: questions.filter(q => q.type === 'NOG').length,
-    DTK: questions.filter(q => q.type === 'DTK').length,
-    ORD: questions.filter(q => q.type === 'ORD').length,
-    LAS: questions.filter(q => q.type === 'LAS').length,
-    MEK: questions.filter(q => q.type === 'MEK').length,
-    ELF: questions.filter(q => q.type === 'ELF').length,
-  }
 
   const [stats, setStats] = useState<GameStats | null>(null)
   const [resumeSession, setResumeSession] = useState<ExamSession | null>(null)
-  const [examDate, setExamDateState] = useState<Date | null>(null)
-  const [readiness, setReadiness] = useState<ReturnType<typeof computeReadiness> | null>(null)
-  const [totalCorrect, setTotalCorrect] = useState(0)
+  const [normScore, setNormScore] = useState<number | null>(null)
+  const [scoreDelta, setScoreDelta] = useState<number | null>(null)
   const [typeAccuracy, setTypeAccuracy] = useState<Record<string, { correct: number; total: number }>>({})
-  const [hasHistory, setHasHistory] = useState(false)
-  const [pacing, setPacing] = useState<PacingResult | null>(null)
-  const [pacingDismissed, setPacingDismissed] = useState(false)
-  const [weakTypes, setWeakTypes] = useState<{ type: string; pct: number }[]>([])
   const [weakAreaIds, setWeakAreaIds] = useState<string[]>([])
+  const [weakTypes, setWeakTypes] = useState<{ type: string; pct: number }[]>([])
 
   useEffect(() => {
     setStats(loadStats())
@@ -51,293 +52,235 @@ export default function Home() {
     const session = loadSession()
     if (session && !session.endTime) setResumeSession(session)
 
-    const ed = getExamDate()
-    setExamDateState(ed)
-    setReadiness(computeReadiness())
-
-    if (ed) {
-      setPacing(computePacing())
-      const dismissKey = `pacing_dismissed_${new Date().toISOString().slice(0, 10)}`
-      setPacingDismissed(localStorage.getItem(dismissKey) === '1')
-    }
-
     const history = loadHistory()
-    setHasHistory(history.length > 0)
     if (history.length > 0) {
       setWeakTypes(weakTypeSummary())
       setWeakAreaIds(buildWeakAreaSession(20))
     }
-    const fullTypeAcc: Record<string, { correct: number; total: number }> = {
-      XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
-      NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
-      ORD: { correct: 0, total: 0 }, LAS: { correct: 0, total: 0 },
-      MEK: { correct: 0, total: 0 }, ELF: { correct: 0, total: 0 },
-    }
-    let tc = 0
+
+    const acc: Record<string, { correct: number; total: number }> = {}
+    SECTIONS.forEach(s => { acc[s.type] = { correct: 0, total: 0 } })
     history.forEach(sess => {
       sess.questionIds.forEach(id => {
         const q = questions.find(x => x.id === id)
         if (!q || !sess.answers[id]) return
-        fullTypeAcc[q.type].total++
-        if (sess.answers[id] === q.answer) {
-          tc++
-          fullTypeAcc[q.type].correct++
-        }
+        if (acc[q.type] === undefined) return
+        acc[q.type].total++
+        if (sess.answers[id] === q.answer) acc[q.type].correct++
       })
     })
-    setTotalCorrect(tc)
-    setTypeAccuracy(fullTypeAcc)
+    setTypeAccuracy(acc)
+
+    // Normerat estimate (1,00–2,00) for the hero card + delta since oldest tracked session
+    const { combined } = estimateSectionedScore(acc as Record<QuestionType, { correct: number; total: number }>)
+    setNormScore(combined)
+    const hpHistory = hpScoreHistory()
+    setScoreDelta(hpHistory.length >= 2 ? hpHistory[hpHistory.length - 1] - hpHistory[0] : null)
   }, [])
 
+  // Read at render time (not mount) so the value is fresh right after onboarding completes
+  const examDate = getExamDate()
   const days = examDate ? daysUntilExam() : null
+  const scoreText = normScore != null ? normScore.toFixed(2).replace('.', ',') : '–'
+  const scorePct = normScore != null ? Math.min(100, (normScore / 2.0) * 100) : 0
+  const deltaText = scoreDelta != null
+    ? `${scoreDelta >= 0 ? '▲' : '▼'} ${Math.abs(scoreDelta).toFixed(2).replace('.', ',')}`
+    : null
 
-  const heroScorePct = Math.min(100, Math.max(0, (readiness?.score ?? 0) / 2.0))
-
-  function dismissPacingCard() {
-    const key = `pacing_dismissed_${new Date().toISOString().slice(0, 10)}`
-    localStorage.setItem(key, '1')
-    setPacingDismissed(true)
-  }
+  const userName = getUserName()
+  const firstName = userName ? userName.trim().split(/\s+/)[0] : null
+  const goalText = getGoalText()
 
   const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'God morgon' : hour < 17 ? 'God dag' : 'God kväll'
+  const timeGreet = hour < 10 ? 'God morgon' : hour < 18 ? 'God dag' : 'God kväll'
+  const greeting = firstName ? `${timeGreet}, ${firstName}` : timeGreet
+  const todayRaw = new Date().toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' })
+  const todayLabel = todayRaw.charAt(0).toUpperCase() + todayRaw.slice(1)
+
+  // sv-SE short months come out as "okt." — the prototype's examShort has no trailing period
+  const examShort = examDate
+    ? examDate.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' }).replace(/\.$/, '')
+    : null
 
   return (
-    <div className="min-h-screen bg-app pb-8 pt-topnav">
-      {/* ── Header ────────────────────────────────────────── */}
-      <div className="px-4 pt-6 pb-4 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-[var(--font-serif)] text-[var(--color-ink)]">{greeting}</h1>
-          {stats && <span className="streak-pill">🔥 {stats.streak}</span>}
+    <div
+      className="min-h-screen bg-app overflow-auto"
+      style={{ padding: 'max(58px, calc(env(safe-area-inset-top,0px) + 20px)) 18px calc(100px + env(safe-area-inset-bottom,0px))' }}
+    >
+      {/* ── Header ─────────────────────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+        <div>
+          <div style={{ fontFamily: "'Newsreader', serif", fontWeight: 400, fontSize: 26, lineHeight: 1.05, color: '#23201A', letterSpacing: '-0.01em' }}>
+            {greeting}
+          </div>
+          <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 13, lineHeight: 1, color: '#8B8478', marginTop: 6 }}>
+            {todayLabel}
+          </div>
         </div>
-        <p className="text-sm text-[var(--color-ink-faint)]">
-          {new Date().toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' })}
-        </p>
+        {stats && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#F3E0D5', border: '1px solid #ECCFBE', borderRadius: 999, padding: '7px 11px 7px 9px', flexShrink: 0 }}>
+            <div style={{ width: 9, height: 9, borderRadius: 2, background: '#BF5A33', transform: 'rotate(45deg)', flexShrink: 0 }} />
+            <span style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 13, lineHeight: 1, color: '#A84A26' }}>
+              {stats.streak}
+            </span>
+          </div>
+        )}
       </div>
 
-      <div className="max-w-2xl mx-auto px-4">
-
-        {/* ── CTA hero ──────────────────────────────────────── */}
-        <button
-          onClick={() => navigate('/practice')}
-          className="w-full btn-primary py-4 text-base font-bold mb-4 rounded-2xl"
-        >
-          Starta träning →
-        </button>
-
-        {/* ── Exam date prompt ──────────────────────────────── */}
-        {hasHistory && !examDate && (
-          <button
-            onClick={() => navigate('/profil')}
-            className="w-full card p-4 mb-4 text-left flex items-center justify-between gap-3 border border-amber-500/30 bg-amber-500/5"
-          >
-            <div>
-              <div className="text-sm font-semibold text-[var(--color-ink)]">Ange ditt provdatum</div>
-              <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Se nedräkning och anpassa träningsplanen</div>
-            </div>
-            <span className="text-amber-600 text-lg shrink-0">→</span>
-          </button>
-        )}
-
-        {/* ── Welcome / first-use empty state ──────────────── */}
-        {!hasHistory && (
-          <div className="card p-5 mb-4 border-l-4 border-l-[var(--color-green)]">
-            <div className="text-sm font-bold text-[var(--color-ink)] mb-1">Välkommen! Kom igång nu.</div>
-            <p className="text-xs text-[var(--color-ink-faint)] mb-3 leading-relaxed">
-              Du har inte tränat än. Starta ett pass för att se dina framsteg här.
-            </p>
-            <button onClick={() => navigate('/practice')} className="btn-primary text-sm py-2 px-4">
-              Starta ditt första pass →
-            </button>
-          </div>
-        )}
-
-        {/* ── Hero score card ───────────────────────────────── */}
-        <div className="card-green mb-4" style={{ borderRadius: 22, padding: 20 }}>
-          <p
-            className="text-[10px] font-bold uppercase tracking-[0.16em] mb-1"
-            style={{ color: 'var(--color-green-tint)' }}
-          >
-            Uppskattat HP-poäng
-          </p>
-          <div className="text-5xl font-[var(--font-serif)] text-[var(--color-cream)] leading-none mb-4">
-            {readiness?.score ?? 0}
-          </div>
-          <div className="h-1.5 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.15)' }}>
-            <div
-              className="h-full rounded-full transition-all duration-300"
-              style={{ width: `${heroScorePct}%`, background: 'var(--color-gold)' }}
-            />
-          </div>
-          <div className="flex gap-5">
-            <div>
-              <div className="text-base text-[var(--color-cream)] font-semibold">{totalCorrect}</div>
-              <div className="text-xs text-[var(--color-cream)]/60">Rätt totalt</div>
-            </div>
-            <div>
-              <div className="text-base text-[var(--color-cream)] font-semibold">{stats?.streak ?? '–'}</div>
-              <div className="text-xs text-[var(--color-cream)]/60">Streak</div>
-            </div>
-            <div>
-              <div className="text-base text-[var(--color-cream)] font-semibold">{days ?? '–'}</div>
-              <div className="text-xs text-[var(--color-cream)]/60">Dagar kvar till HP</div>
-            </div>
-          </div>
+      {/* ── Score card ──────────────────────────────────────── */}
+      <div
+        style={{ background: '#224A3A', borderRadius: 22, padding: '18px 20px 17px', color: '#EFE9DD', cursor: 'pointer' }}
+        onClick={() => navigate('/progress')}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 600, fontSize: 10.5, lineHeight: 1, letterSpacing: '0.14em', color: '#9FB7A8' }}>
+            DITT NORMERADE RESULTAT
+          </span>
+          {deltaText && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.12)', borderRadius: 999, padding: '4px 9px', fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 11, lineHeight: 1, color: '#D6E4D9' }}>
+              {deltaText}
+            </span>
+          )}
         </div>
-
-        {/* ── Pacing nudge card ─────────────────────────────── */}
-        {examDate && pacing && !pacingDismissed && (
-          <div
-            className="card p-4 mb-4 relative"
-            style={{ borderLeft: `4px solid ${pacing.onTrack ? 'var(--color-green)' : 'var(--color-terracotta)'}` }}
-          >
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 10 }}>
+          <span style={{ fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 50, lineHeight: 0.9, color: '#FBF7EE', letterSpacing: '-0.02em' }}>
+            {scoreText}
+          </span>
+          <span style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 16, lineHeight: 1, color: '#8FA89A' }}>
+            / 2,0
+          </span>
+        </div>
+        <div style={{ height: 7, borderRadius: 999, background: 'rgba(255,255,255,0.14)', marginTop: 15, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${scorePct}%`, borderRadius: 999, background: 'linear-gradient(90deg,#C9A24A,#E4C66A)', transition: 'width 0.4s ease' }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 11, fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 12, lineHeight: 1, color: '#A9C0B2' }}>
+          <span>
+            Mål <span style={{ color: '#EFE9DD', fontWeight: 700 }}>{goalText}</span>
+          </span>
+          {days != null && examShort ? (
+            <span>
+              Provet om <span style={{ color: '#EFE9DD', fontWeight: 700 }}>{days} dagar</span> · {examShort}
+            </span>
+          ) : (
             <button
-              onClick={dismissPacingCard}
-              aria-label="Stäng"
-              className="absolute top-3 right-3 text-xl leading-none text-[var(--color-ink-faint)] hover:text-[var(--color-ink)]"
+              onClick={e => { e.stopPropagation(); navigate('/profil') }}
+              style={{ color: '#EFE9DD', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             >
-              ×
+              Ange provdatum →
             </button>
-            <div
-              className="text-[10px] font-bold uppercase tracking-[0.16em] mb-1"
-              style={{ color: pacing.onTrack ? 'var(--color-green)' : 'var(--color-terracotta)' }}
-            >
-              {pacing.onTrack ? 'I fas' : 'Halkar efter'}
+          )}
+        </div>
+      </div>
+
+      {/* ── Continue session card ───────────────────────────── */}
+      {resumeSession && (() => {
+        const answered = Object.keys(resumeSession.answers).length
+        const tot = resumeSession.questionIds.length
+        const firstId = resumeSession.questionIds[0]
+        const firstQ = questions.find(x => x.id === firstId)
+        const sectionType = firstQ?.type || 'ORD'
+        const sectionMeta = SECTIONS.find(s => s.type === sectionType)
+        const displayCode = sectionMeta?.code ?? sectionType
+
+        return (
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: 13, background: '#FFFFFF', border: '1px solid #EAE3D6', borderRadius: 18, padding: '13px 14px', marginTop: 13, cursor: 'pointer' }}
+            onClick={() => { saveSession({ ...resumeSession, endTime: undefined }); navigate('/session') }}
+          >
+            <div style={{ width: 46, height: 46, borderRadius: 13, background: '#E7EDE7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 800, fontSize: 15, color: '#224A3A', flexShrink: 0 }}>
+              {displayCode}
             </div>
-            <p className="text-sm text-[var(--color-ink)] mb-3 pr-6 leading-snug">{pacing.message}</p>
-            <div className="flex gap-5 text-xs text-[var(--color-ink-faint)]">
-              <span>
-                <strong className="text-[var(--color-ink)] font-semibold">{pacing.dailyTarget}</strong> frågor/dag
-              </span>
-              <span>
-                <strong className="text-[var(--color-ink)] font-semibold">{pacing.weeklyTarget}</strong> frågor/vecka
-              </span>
-              <button
-                onClick={() => navigate('/profil')}
-                className="ml-auto text-[var(--color-ink-faint)] underline underline-offset-2"
-              >
-                Ändra provdatum
-              </button>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 10, lineHeight: 1, letterSpacing: '0.1em', color: '#A89F90' }}>FORTSÄTT DÄR DU SLUTADE</div>
+              <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 15, lineHeight: 1.2, color: '#23201A', marginTop: 4 }}>
+                {sectionMeta?.name ?? 'Träningspass'}
+              </div>
+              <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 12, lineHeight: 1, color: '#8B8478', marginTop: 4 }}>
+                {answered} av {tot} frågor klara
+              </div>
+            </div>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#224A3A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="3,2 12,7 3,12" fill="#FBF7EE"/></svg>
             </div>
           </div>
-        )}
+        )
+      })()}
 
-        {/* ── Weak-area focus card ─────────────────────────── */}
-        {weakTypes.length > 0 && weakAreaIds.length > 0 && (
-          <button
-            onClick={() => {
-              const session = buildSession(weakAreaIds, null, true, 'drill', true)
-              saveSession(session)
-              navigate('/session')
-            }}
-            className="w-full card p-4 mb-4 text-left"
-            style={{ borderLeft: '4px solid var(--color-terracotta)' }}
-          >
-            <div
-              className="text-[10px] font-bold uppercase tracking-[0.16em] mb-1"
-              style={{ color: 'var(--color-terracotta)' }}
-            >
-              Fokusträning
+      {/* ── Weak-area card (app feature, not in prototype — placed after the continue card) ── */}
+      {weakTypes.length > 0 && weakAreaIds.length > 0 && (
+        <button
+          onClick={() => {
+            const session = buildSession(weakAreaIds, null, true, 'drill', true)
+            saveSession(session)
+            navigate('/session')
+          }}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 13, background: '#FFFFFF', border: '1px solid #EAE3D6', borderRadius: 18, padding: '13px 14px', marginTop: 13, cursor: 'pointer', textAlign: 'left' }}
+        >
+          <div style={{ width: 46, height: 46, borderRadius: 13, background: '#FBE7D9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 800, fontSize: 13, color: '#BF5A33', flexShrink: 0 }}>
+            ↗
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 10, lineHeight: 1, letterSpacing: '0.1em', color: '#A89F90' }}>FOKUSTRÄNING</div>
+            <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 15, lineHeight: 1.2, color: '#23201A', marginTop: 4 }}>
+              Öva på svaga delprov
             </div>
-            <div className="flex items-center justify-between gap-3 mb-2">
-              <p className="text-sm font-semibold text-[var(--color-ink)]">
-                Öva på dina svagaste delmoment
-              </p>
-              <span className="text-[var(--color-ink-faint)] shrink-0">→</span>
+            <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 12, lineHeight: 1, color: '#8B8478', marginTop: 4 }}>
+              {weakTypes.slice(0, 3).map(w => w.type).join(' · ')} · {weakAreaIds.length} frågor
             </div>
-            <div className="flex gap-1.5 flex-wrap items-center">
-              {weakTypes.map(({ type, pct }) => (
-                <span
-                  key={type}
-                  className="text-[10px] font-bold border px-1.5 py-0.5 rounded-md"
-                  style={{
-                    color: 'var(--color-terracotta)',
-                    borderColor: 'var(--color-terracotta)',
-                    background: 'var(--color-terracotta-muted)',
-                  }}
-                >
-                  {type} {pct}%
-                </span>
-              ))}
-              <span className="text-[10px] text-[var(--color-ink-faint)]">
-                · {weakAreaIds.length} frågor · studieläge
-              </span>
-            </div>
-          </button>
-        )}
+          </div>
+          <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#BF5A33', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="3,2 12,7 3,12" fill="#FBF7EE"/></svg>
+          </div>
+        </button>
+      )}
 
-        {/* ── Fortsätt card ─────────────────────────────────── */}
-        {resumeSession && (() => {
-          const answered = Object.keys(resumeSession.answers).length
-          const tot = resumeSession.questionIds.length
-          const remaining = tot - answered
-          const sessionType = resumeSession.type === 'exam' ? 'HP-prov' : resumeSession.studyMode ? 'Studieläge' : 'Övning'
+      {/* ── Section category headers ─────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '20px 2px 11px' }}>
+        <span style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 12, lineHeight: 1, color: '#224A3A', letterSpacing: '0.04em' }}>
+          VERBAL
+        </span>
+        <span style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 12, lineHeight: 1, color: '#BF5A33', letterSpacing: '0.04em' }}>
+          KVANTITATIV
+        </span>
+      </div>
+
+      {/* ── 2-column section grid ───────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {SECTIONS.map(sec => {
+          const acc = typeAccuracy[sec.type]
+          const pct = acc && acc.total > 0 ? Math.round((acc.correct / acc.total) * 100) : 0
+          const ringColor = sec.cat === 'verbal' ? '#224A3A' : '#BF5A33'
+
           return (
-            <div className="card p-4 mb-4 flex items-center justify-between gap-4" style={{ borderRadius: 18 }}>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs uppercase tracking-[0.16em] text-[var(--color-ink-faint)] font-semibold mb-1">
-                  Fortsätt där du slutade
+            <button
+              key={sec.type}
+              onClick={() => navigate('/practice', { state: { defaultType: sec.type } })}
+              style={{ background: '#FFFFFF', border: '1px solid #EAE3D6', borderRadius: 15, padding: '11px 12px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', textAlign: 'left' }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 800, fontSize: 16, lineHeight: 1, color: '#23201A' }}>
+                  {sec.code}
                 </div>
-                <div className="text-base font-semibold text-[var(--color-ink)]">
-                  {sessionType} · {remaining} frågor kvar
+                <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 500, fontSize: 11, lineHeight: 1.2, color: '#8B8478', marginTop: 3 }}>
+                  {sec.name}
                 </div>
               </div>
-              <button
-                onClick={() => { saveSession({ ...resumeSession, endTime: undefined }); navigate('/session') }}
-                className="btn-primary shrink-0"
-              >
-                Fortsätt
-              </button>
-            </div>
-          )
-        })()}
-
-        {/* ── Section grid ─────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {(Object.keys(TYPE_ACCENTS) as string[]).map(type => {
-            const accent = TYPE_ACCENTS[type]
-            const acc = typeAccuracy[type]
-            const pct = acc && acc.total > 0 ? Math.round((acc.correct / acc.total) * 100) : 0
-            const count = byType[type as keyof typeof byType] ?? 0
-            return (
-              <button
-                key={type}
-                onClick={() => navigate('/practice', { state: { defaultType: type } })}
-                className="card p-4 text-left"
-                style={{ backgroundColor: accent.bg }}
-              >
-                <div className="flex items-start gap-3 mb-1">
-                  <div
-                    className="shrink-0"
-                    style={{
-                      width: 32, height: 32, borderRadius: '50%',
-                      background: `conic-gradient(${accent.ring} ${pct}%, var(--color-track) 0)`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 23, height: 23, borderRadius: '50%',
-                        background: 'var(--color-card)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        font: '700 9px/1 var(--font-sans)',
-                        color: 'var(--color-ink)',
-                      }}
-                    >
-                      {pct}
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0 pt-1">
-                    <div className="text-sm font-semibold text-[var(--color-ink)]">{type}</div>
-                    <div className="text-xs text-[var(--color-ink-faint)]">{pct}% rätt</div>
-                    <div className="text-xs text-[var(--color-ink-faint)]">{count} frågor</div>
-                  </div>
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                background: `conic-gradient(${ringColor} 0 ${pct}%, #E7E0D3 0)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <div style={{
+                  width: 23, height: 23, borderRadius: '50%', background: '#FFFFFF',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 8.5, lineHeight: 1, color: ringColor,
+                }}>
+                  {pct}
                 </div>
-              </button>
-            )
-          })}
-        </div>
-
+              </div>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

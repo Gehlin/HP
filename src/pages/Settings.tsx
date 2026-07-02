@@ -123,7 +123,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-24">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="Inställningar" />
       <div className="max-w-2xl mx-auto px-6 py-6">
 

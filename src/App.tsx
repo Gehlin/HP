@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import ErrorBoundary from './components/ErrorBoundary'
 import InstallBanner from './components/InstallBanner'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
@@ -12,7 +12,8 @@ import { loadHistory } from './utils/session'
 const Home       = lazy(() => import('./pages/Home'))
 const Practice   = lazy(() => import('./pages/Practice'))
 const Session    = lazy(() => import('./pages/Session'))
-const Results    = lazy(() => import('./pages/Results'))
+const Resultat   = lazy(() => import('./pages/Resultat'))
+const Granska    = lazy(() => import('./pages/Granska'))
 const Theory     = lazy(() => import('./pages/Theory'))
 const Progress   = lazy(() => import('./pages/Progress'))
 const ExamSelect = lazy(() => import('./pages/ExamSelect'))
@@ -48,6 +49,14 @@ function PageLoader() {
       <div className="w-8 h-8 rounded-full border-2 border-[var(--color-paper-dark)] border-t-[var(--color-green)] animate-spin" />
     </div>
   )
+}
+
+// Every prototype screen renders from its top — reset scroll on route change
+// (SPA navigation otherwise carries the previous screen's scroll offset over).
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
 }
 
 function AppInner() {
@@ -132,12 +141,15 @@ function AppInner() {
         </div>
       )}
 
+      <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/practice" element={<Practice />} />
           <Route path="/session" element={<Session />} />
-          <Route path="/results" element={<Results />} />
+          <Route path="/resultat" element={<Resultat />} />
+          <Route path="/granska" element={<Granska />} />
+          <Route path="/results" element={<Navigate to="/resultat" replace />} />
           <Route path="/theory" element={<Theory />} />
           <Route path="/progress" element={<Progress />} />
           <Route path="/exam-select" element={<ExamSelect />} />

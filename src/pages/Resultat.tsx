@@ -1,19 +1,15 @@
 import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { loadSession, saveSession, buildSession, loadHistory } from '../utils/session'
 import { questions } from '../data/questions'
-import type { QuestionType, AnswerKey } from '../types'
+import type { QuestionType } from '../types'
 import MathText from '../components/MathText'
-import ExplanationCard from '../components/ExplanationCard'
-import { useState, useEffect } from 'react'
 import { loadStats, saveStats, getLevel } from '../utils/gamification'
-import { getStats as getSrsStats } from '../utils/srs'
 import { SECTION_META, HP_AVERAGES, SECTION_ORDER, getQuantExamQuestions } from '../data/exams'
 import { hpScoreColor, hpScoreLabel, estimateSectionedScore } from '../utils/hpScore'
-import { isBookmarked, toggleBookmark } from '../utils/bookmarks'
 import { checkAchievements } from '../utils/achievements'
 import AchievementToast from '../components/AchievementToast'
 import { notificationsEnabled, notificationsSupported, requestNotificationPermission } from '../utils/notifications'
-import { getTopicForQuestion } from '../utils/topicLookup'
 
 interface XpInfo {
   earned: number
@@ -26,17 +22,25 @@ interface XpInfo {
   streakIncreased: boolean
 }
 
-export default function Results() {
+/** Prototype's firstName(): first whitespace-separated word of the stored name. */
+function getFirstName(): string | null {
+  try {
+    const raw = localStorage.getItem('hp_user_name')
+    if (raw) return raw.trim().split(/\s+/)[0]
+  } catch { /* ignore */ }
+  return null
+}
+
+/** Display code for the eyebrow — prototype shows the section code (LÄS, ORD, …). */
+const DISPLAY_CODE: Record<QuestionType, string> = {
+  XYZ: 'XYZ', KVA: 'KVA', NOG: 'NOG', DTK: 'DTK',
+  ORD: 'ORD', LAS: 'LÄS', MEK: 'MEK', ELF: 'ELF',
+}
+
+export default function Resultat() {
   const navigate = useNavigate()
   const session = loadSession()
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [reviewFilter, setReviewFilter] = useState<'all' | 'wrong' | 'flagged'>('all')
   const [newAchievements, setNewAchievements] = useState<string[]>([])
-  const [bookmarkState, setBookmarkState] = useState<Record<string, boolean>>(() => {
-    const s = loadSession()
-    if (!s) return {}
-    return Object.fromEntries(s.questionIds.map(id => [id, isBookmarked(id)]))
-  })
   const [cardVisible, setCardVisible] = useState(false)
   const [xpInfo, setXpInfo] = useState<XpInfo | null>(null)
   const [showScale, setShowScale] = useState(false)
@@ -105,7 +109,7 @@ export default function Results() {
   }, [])
 
   if (!session) return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav flex items-center justify-center px-4">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] flex items-center justify-center px-4">
       <div className="text-center">
         <div className="text-5xl font-black text-[var(--color-ink-faint)] mb-4">—</div>
         <div className="text-[var(--color-ink-muted)] font-semibold mb-1">Ingen session hittades</div>
@@ -117,7 +121,6 @@ export default function Results() {
     </div>
   )
 
-  const skipped = session.skipped ?? []
   const correct = sessionQuestions.filter(q => session.answers[q.id] === q.answer).length
   const total = sessionQuestions.length
   const pct = Math.round((correct / total) * 100)
@@ -140,7 +143,22 @@ export default function Results() {
   const sectionedScore = estimateSectionedScore(byType)
 
   const duration = session.endTime ? Math.round((session.endTime - session.startTime) / 1000) : 0
-  const fmtDuration = `${Math.floor(duration / 60)}m ${duration % 60}s`
+
+  // ── Prototype hero values ─────────────────────────────
+  const typesInSession = [...new Set(sessionQuestions.map(q => q.type))]
+  const resSec = typesInSession.length === 1
+    ? DISPLAY_CODE[typesInSession[0]]
+    : session.type === 'exam' ? 'PROV' : 'BLANDAT'
+  const firstName = getFirstName()
+  const titlePrefix = pct >= 80 ? 'Bra jobbat' : pct >= 50 ? 'Bra kämpat' : 'Fortsätt kämpa'
+  const resTitle = firstName ? `${titlePrefix}, ${firstName}` : titlePrefix
+  const resTime = `${Math.floor(duration / 60)}:${String(duration % 60).padStart(2, '0')}`
+  const resAvg = `${total > 0 ? Math.round(duration / total) : 0} s`
+  const normScore = sectionedScore.combined
+  const resNorm = normScore !== null ? normScore.toFixed(2).replace('.', ',') : '—'
+
+  // Total answered questions across all sessions (current one is already in history)
+  const answeredTotal = loadHistory().reduce((sum, s) => sum + Object.keys(s.answers).length, 0)
 
   const scoreColor = pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'
 
@@ -166,8 +184,6 @@ export default function Results() {
     ELF: { color: 'var(--color-green)',      ring: 'var(--color-green)',      bg: 'var(--color-green-muted)' },
   }
 
-  const ANSWER_KEYS: AnswerKey[] = ['A', 'B', 'C', 'D', 'E']
-
   const handleShare = async () => {
     const typeLines = (Object.entries(byType) as [QuestionType, { correct: number; total: number }][])
       .filter(([, v]) => v.total > 0)
@@ -181,6 +197,7 @@ export default function Results() {
       ? `Kvantitativ: ${qScore.toFixed(2)} · Verbal: ${vScore.toFixed(2)}`
       : null
 
+    const fmtDuration = `${Math.floor(duration / 60)}m ${duration % 60}s`
     const text = [
       `HP Träning — ${new Date().toLocaleDateString('sv-SE')}`,
       `${correct}/${total} rätt (${pct}%) · ${fmtDuration}`,
@@ -203,6 +220,19 @@ export default function Results() {
     setTimeout(() => setShareFeedback('idle'), 2000)
   }
 
+  const handlePracticeAgain = () => {
+    // Prototype: "Öva igen" restarts the same set
+    const s = buildSession(
+      session.questionIds,
+      session.timeLimitSeconds ?? null,
+      session.instantFeedback,
+      session.type,
+      session.studyMode,
+    )
+    saveSession(s)
+    navigate('/session')
+  }
+
   const xpProgress = xpInfo
     ? xpInfo.level.level === 10
       ? 100
@@ -213,162 +243,239 @@ export default function Results() {
     : 0
 
   return (
-    <div className="min-h-screen bg-[var(--color-paper)] pt-topnav">
+    <div className="min-h-screen bg-[var(--color-green)]">
       {newAchievements.length > 0 && (
         <AchievementToast newIds={newAchievements} onDone={() => setNewAchievements([])} />
       )}
 
-      {/* ── Hero ─────────────────────────────────── */}
-      <div className="bg-[var(--color-green)] px-4 pt-10 pb-10 flex flex-col items-center relative">
-        <button
-          onClick={handleShare}
-          className="absolute top-4 right-4 flex items-center gap-1.5 text-xs font-semibold text-[var(--color-cream)]/60 hover:text-[var(--color-cream)]/90 transition-colors"
-        >
-          {shareFeedback === 'copied' ? (
-            <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Kopierat!
-            </>
-          ) : (
-            <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-              Dela
-            </>
-          )}
-        </button>
+      {/* ── Resultat (prototype-exact card stack) ─────────── */}
+      <div className="min-h-[100dvh] flex flex-col px-5 pt-16">
+        <div className="w-full max-w-md mx-auto flex flex-col flex-1">
 
-        {isNewBest && (
-          <div className="inline-flex items-center gap-1.5 bg-white/10 text-[var(--color-cream)]/80 text-[11px] font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-3">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
-            Nytt personbästa!
-          </div>
-        )}
-
-        <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-cream)]/60 font-[var(--font-sans)] mb-4">Resultat</p>
-
-        <div
-          style={{
-            width: 120, height: 120, borderRadius: '50%',
-            background: `conic-gradient(var(--color-gold) ${pct}%, rgba(255,255,255,0.15) 0)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <div
-            style={{
-              width: 88, height: 88, borderRadius: '50%',
-              background: 'var(--color-green)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              font: '700 22px var(--font-serif)',
-              color: 'var(--color-cream)',
-            }}
-          >
-            {pct}%
-          </div>
-        </div>
-
-        <div className="text-4xl font-[var(--font-serif)] text-[var(--color-cream)] mt-4">{pct}%</div>
-        <div className="text-base text-[var(--color-cream)]/70">{correct} av {total} rätt</div>
-      </div>
-
-      {/* ── Three-stat strip ─────────────────────── */}
-      <div className="bg-[var(--color-green-light)] px-4 py-4">
-        <div className="grid grid-cols-3 divide-x divide-[rgba(255,255,255,0.12)] max-w-2xl mx-auto">
-          <div className="flex flex-col items-center py-1">
-            <span className="text-xs text-[var(--color-cream)]/60">Rätt svar</span>
-            <span className="text-lg font-semibold text-[var(--color-cream)]">{correct}</span>
-          </div>
-          <div className="flex flex-col items-center py-1">
-            <span className="text-xs text-[var(--color-cream)]/60">Tid</span>
-            <span className="text-lg font-semibold text-[var(--color-cream)]">
-              {String(Math.floor(duration / 60)).padStart(2, '0')}:{String(duration % 60).padStart(2, '0')}
-            </span>
-          </div>
-          <div className="flex flex-col items-center py-1">
-            <span className="text-xs text-[var(--color-cream)]/60">Streak</span>
-            <span className="text-lg font-semibold text-[var(--color-cream)] flex items-center gap-1">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-orange-400">
-                <path d="M12 23c-4.97 0-9-3.58-9-8 0-2.39 1.05-4.55 2.86-6.12C7.1 7.77 8 6.15 8 4.25c0-.41.34-.75.75-.75.19 0 .37.07.5.2C10.68 5.16 11.5 6.77 11.5 8.5c0 .69-.14 1.35-.39 1.94C11.85 10.17 12.5 9.33 12.5 8c0-.32.2-.61.5-.72.29-.11.62-.03.84.2C15.23 9.18 16.5 11.09 16.5 13c0 .78-.16 1.52-.43 2.2.75-.62 1.2-1.48 1.3-2.4.04-.36.27-.67.61-.79.33-.12.7-.03.93.23C20.22 13.96 21 15.9 21 17.5c0 3.03-4.03 5.5-9 5.5z"/>
-              </svg>
-              {xpInfo?.stats.streak ?? '—'}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-[var(--color-paper)] px-4 pt-6 pb-8">
-        <div className="max-w-2xl mx-auto">
-
-        {/* ── Streak achievement card ──────────────── */}
-        {xpInfo?.streakIncreased && (
-          <div
-            className="mb-4"
-            style={{
-              background: 'var(--color-green-muted)',
-              border: '1px solid rgba(34, 74, 58, 0.12)',
-              borderRadius: 18,
-              padding: '16px 18px',
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-[var(--color-terracotta)] shrink-0">
-                <path d="M12 23c-4.97 0-9-3.58-9-8 0-2.39 1.05-4.55 2.86-6.12C7.1 7.77 8 6.15 8 4.25c0-.41.34-.75.75-.75.19 0 .37.07.5.2C10.68 5.16 11.5 6.77 11.5 8.5c0 .69-.14 1.35-.39 1.94C11.85 10.17 12.5 9.33 12.5 8c0-.32.2-.61.5-.72.29-.11.62-.03.84.2C15.23 9.18 16.5 11.09 16.5 13c0 .78-.16 1.52-.43 2.2.75-.62 1.2-1.48 1.3-2.4.04-.36.27-.67.61-.79.33-.12.7-.03.93.23C20.22 13.96 21 15.9 21 17.5c0 3.03-4.03 5.5-9 5.5z"/>
-              </svg>
-              <div>
-                <div className="font-semibold text-[var(--color-ink)]">Streak! {xpInfo.stats.streak} dagar i rad</div>
-                <div className="text-sm text-[var(--color-ink-faint)]">Fortsätt så — du bygger upp en fin vana!</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Action buttons ───────────────────────── */}
-        <div className="flex gap-3 mb-6">
-          <button onClick={() => navigate('/practice')} className="btn-primary flex-1">Öva igen</button>
-          <button onClick={() => navigate('/')} className="btn-ghost flex-1">Hem</button>
-        </div>
-
-        {/* XP earned card */}
-        {xpInfo && (
-          <div className={`mb-6 transition-all duration-500 ${cardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
-            {xpInfo.leveledUp && (
-              <div className="bg-amber-500/20 border border-amber-500 rounded-xl px-4 py-3 mb-3 text-center">
-                <span className="text-amber-400 font-bold">⭐ Ny nivå uppnådd! Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
+          <div className="text-center">
+            {isNewBest && (
+              <div className="inline-flex items-center gap-1.5 bg-white/10 text-[var(--color-cream)]/80 text-[11px] font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-3">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
+                Nytt personbästa!
               </div>
             )}
-            <div className="card border border-blue-200 rounded-2xl p-5">
-              <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-4xl font-black text-blue-700">+{xpInfo.earned} XP</span>
-                <span className="text-[var(--color-ink-muted)] text-sm">intjänat</span>
-              </div>
-              <div className="space-y-0.5 mb-4 text-sm text-[var(--color-ink-muted)]">
-                {xpInfo.easy > 0 && (
-                  <div>{xpInfo.easy} lätt × 10 = <span className="text-[var(--color-ink)]">{xpInfo.easy * 10} XP</span></div>
-                )}
-                {xpInfo.medium > 0 && (
-                  <div>{xpInfo.medium} medel × 15 = <span className="text-[var(--color-ink)]">{xpInfo.medium * 15} XP</span></div>
-                )}
-                {xpInfo.hard > 0 && (
-                  <div>{xpInfo.hard} svår × 25 = <span className="text-[var(--color-ink)]">{xpInfo.hard * 25} XP</span></div>
-                )}
-                <div>Sessionbonus = <span className="text-[var(--color-ink)]">20 XP</span></div>
-              </div>
-              <div className="flex items-center justify-between text-xs text-[var(--color-ink-muted)] mb-1.5">
-                <span>Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
-                {xpInfo.level.level < 10 && (
-                  <span>
-                    {xpInfo.stats.xp - xpInfo.level.currentLevelXp} / {xpInfo.level.nextLevelXp - xpInfo.level.currentLevelXp} XP
-                  </span>
-                )}
-              </div>
-              <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-blue-500 rounded-full transition-all duration-1000"
-                  style={{ width: `${xpProgress}%` }}
-                />
+            <div className="text-[11px] leading-none font-bold tracking-[0.16em] text-[var(--color-green-tint)]">
+              PASS SLUTFÖRT · {resSec}
+            </div>
+            <div className="font-[var(--font-serif)] font-normal text-[32px] leading-[1.1] text-[var(--color-cream)] mt-3">
+              {resTitle}
+            </div>
+          </div>
+
+          {/* Score ring */}
+          <div className="flex justify-center mt-[26px]">
+            <div
+              style={{
+                width: 172, height: 172, borderRadius: '50%',
+                background: `conic-gradient(var(--color-gold) 0 ${pct}%, rgba(255,255,255,.13) 0)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <div className="w-[140px] h-[140px] rounded-full bg-[var(--color-green)] flex flex-col items-center justify-center">
+                <div className="font-[var(--font-serif)] font-medium text-[46px] leading-[0.9] text-[var(--color-cream)]">
+                  {correct}<span className="text-[22px] text-[#8FA89A]">/{total}</span>
+                </div>
+                <div className="text-[11px] leading-none font-semibold tracking-[0.1em] text-[var(--color-green-tint)] mt-[7px]">
+                  {pct} % RÄTT
+                </div>
               </div>
             </div>
           </div>
+
+          {/* 3-up stat strip */}
+          <div className="flex bg-white/[.07] border border-white/10 rounded-[18px] mt-6 overflow-hidden">
+            <div className="flex-1 px-2 py-[15px] text-center">
+              <div className="text-lg leading-none font-bold text-[var(--color-cream)] tabular-nums">{resTime}</div>
+              <div className="text-[11px] leading-none font-medium text-[var(--color-green-tint)] mt-1.5">Total tid</div>
+            </div>
+            <div className="w-px bg-white/10" />
+            <div className="flex-1 px-2 py-[15px] text-center">
+              <div className="text-lg leading-none font-bold text-[var(--color-cream)] tabular-nums">{resAvg}</div>
+              <div className="text-[11px] leading-none font-medium text-[var(--color-green-tint)] mt-1.5">Snitt / fråga</div>
+            </div>
+            <div className="w-px bg-white/10" />
+            <div className="flex-1 px-2 py-[15px] text-center">
+              <div className="text-lg leading-none font-bold text-[var(--color-gold)] tabular-nums">{resNorm}</div>
+              <div className="text-[11px] leading-none font-medium text-[var(--color-green-tint)] mt-1.5">Normerat</div>
+            </div>
+          </div>
+
+          {/* Streak card */}
+          <div className="flex items-center gap-[11px] bg-[rgba(191,90,51,.16)] border border-[rgba(217,128,89,.35)] rounded-2xl px-[15px] py-[13px] mt-[13px]">
+            <div className="w-[34px] h-[34px] rounded-[10px] bg-[var(--color-terracotta)] flex items-center justify-center shrink-0">
+              <div className="w-[13px] h-[13px] rounded-[3px] bg-[#FBE7D9] rotate-45" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm leading-[1.2] font-bold text-[var(--color-cream)]">
+                {xpInfo?.stats.streak ?? 0} dagars svit!
+              </div>
+              <div className="text-xs leading-none font-medium text-[#D9B7A6] mt-[3px]">
+                {answeredTotal} frågor besvarade totalt.
+              </div>
+            </div>
+          </div>
+
+          {/* Relocated gamification: level-up banner + XP card, just below the streak card */}
+          {xpInfo && (
+            <div className={`transition-all duration-500 ${cardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+              {xpInfo.leveledUp && (
+                <div className="bg-[rgba(228,198,106,.14)] border border-[rgba(228,198,106,.4)] rounded-2xl px-4 py-3 mt-[13px] text-center">
+                  <span className="text-[var(--color-gold)] font-bold text-sm">⭐ Ny nivå uppnådd! Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
+                </div>
+              )}
+              <div className="bg-white/[.07] border border-white/10 rounded-2xl px-[15px] py-[13px] mt-[13px]">
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-2xl font-black text-[var(--color-cream)]">+{xpInfo.earned} XP</span>
+                  <span className="text-xs text-[var(--color-green-tint)]">intjänat</span>
+                </div>
+                <div className="space-y-0.5 mb-3 text-xs text-[var(--color-green-tint)]">
+                  {xpInfo.easy > 0 && (
+                    <div>{xpInfo.easy} lätt × 10 = <span className="text-[var(--color-cream)]">{xpInfo.easy * 10} XP</span></div>
+                  )}
+                  {xpInfo.medium > 0 && (
+                    <div>{xpInfo.medium} medel × 15 = <span className="text-[var(--color-cream)]">{xpInfo.medium * 15} XP</span></div>
+                  )}
+                  {xpInfo.hard > 0 && (
+                    <div>{xpInfo.hard} svår × 25 = <span className="text-[var(--color-cream)]">{xpInfo.hard * 25} XP</span></div>
+                  )}
+                  <div>Sessionbonus = <span className="text-[var(--color-cream)]">20 XP</span></div>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-[var(--color-green-tint)] mb-1.5">
+                  <span>Nivå {xpInfo.level.level} — {xpInfo.level.label}</span>
+                  {xpInfo.level.level < 10 && (
+                    <span className="tabular-nums">
+                      {xpInfo.stats.xp - xpInfo.level.currentLevelXp} / {xpInfo.level.nextLevelXp - xpInfo.level.currentLevelXp} XP
+                    </span>
+                  )}
+                </div>
+                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[var(--color-gold)] rounded-full transition-all duration-1000"
+                    style={{ width: `${xpProgress}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex-1 min-h-6" />
+
+          {/* Actions */}
+          <div className="flex flex-col gap-2.5 pb-[30px]">
+            <button
+              onClick={() => navigate('/granska')}
+              className="h-[54px] rounded-2xl bg-[var(--color-cream)] flex items-center justify-center font-bold text-base leading-none text-[var(--color-green)]"
+            >
+              Granska dina svar
+            </button>
+            <div className="flex gap-2.5">
+              <button
+                onClick={handlePracticeAgain}
+                className="flex-1 h-[50px] rounded-2xl border-[1.5px] border-white/[.22] flex items-center justify-center font-semibold text-[15px] leading-none text-[#D6E4D9]"
+              >
+                Öva igen
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="flex-1 h-[50px] rounded-2xl border-[1.5px] border-white/[.22] flex items-center justify-center font-semibold text-[15px] leading-none text-[#D6E4D9]"
+              >
+                Till hem
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Relocated analysis cards (below the fold, paper) ── */}
+      <div className="bg-[var(--color-paper)] px-4 pt-6 pb-10">
+        <div className="max-w-2xl mx-auto">
+
+        <div className="text-[10px] font-black tracking-widest uppercase text-[var(--color-ink-faint)] mb-4">Detaljerad analys</div>
+
+        {/* Full HP Day — pass 1 break card */}
+        {session.fullDayPass === 1 && (
+          <div className="card rounded-2xl p-5 mb-6 border border-indigo-200">
+            <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">Pass 1 klart — halvtid!</div>
+            <h2 className="text-xl font-black mb-1">Dags för paus</h2>
+            <p className="text-sm text-[var(--color-ink-muted)] mb-4 leading-relaxed">
+              Ta 10–15 minuters paus. Drick vatten, sträck på dig. Starta sedan det kvantitativa passet när du är redo.
+            </p>
+            <div className="flex gap-3 mb-4 text-xs text-[var(--color-ink-faint)]">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Verbalt klart</span>
+              <span>·</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500/40 border border-blue-500/50 inline-block" /> Kvantitativt återstår</span>
+            </div>
+            <button
+              onClick={() => {
+                const quantQs = getQuantExamQuestions()
+                const s = buildSession(quantQs.map(q => q.id), 55 * 60, false, 'exam')
+                saveSession({ ...s, examId: 'full-hp-pass2', fullDayPass: 2, fullDayGroupId: session.fullDayGroupId })
+                navigate('/session', { replace: true })
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-500 transition-colors rounded-xl py-3 font-bold text-sm text-white"
+            >
+              Starta kvantitativt pass →
+            </button>
+          </div>
         )}
+
+        {/* Full HP Day — pass 2 combined score */}
+        {session.fullDayPass === 2 && (() => {
+          const history = loadHistory()
+          const pass1 = history.find(s => s.fullDayGroupId === session.fullDayGroupId && s.fullDayPass === 1)
+          if (!pass1) return null
+          const pass1Qs = pass1.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as typeof questions
+          const combinedByType: Record<QuestionType, { correct: number; total: number }> = {
+            XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
+            NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
+            ORD: { correct: 0, total: 0 }, LAS: { correct: 0, total: 0 },
+            MEK: { correct: 0, total: 0 }, ELF: { correct: 0, total: 0 },
+          }
+          pass1Qs.forEach(q => {
+            combinedByType[q.type].total++
+            if (pass1.answers[q.id] === q.answer) combinedByType[q.type].correct++
+          })
+          sessionQuestions.forEach(q => {
+            combinedByType[q.type].total++
+            if (session.answers[q.id] === q.answer) combinedByType[q.type].correct++
+          })
+          const combinedScore = estimateSectionedScore(combinedByType)
+          const combinedTotal = pass1Qs.length + sessionQuestions.length
+          const combinedCorrect = pass1Qs.filter(q => pass1.answers[q.id] === q.answer).length +
+            sessionQuestions.filter(q => session.answers[q.id] === q.answer).length
+          const combinedPct = Math.round((combinedCorrect / combinedTotal) * 100)
+          const { quant, verbal, combined } = combinedScore
+          const displayScore = combined ?? 1.00
+          return (
+            <div className="card rounded-2xl p-5 mb-6 border border-indigo-200">
+              <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-3">Komplett HP-dag — sammanlagt resultat</div>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-rose-600 mb-1">Verbalt</div>
+                  <div className={`text-2xl font-black ${verbal !== null ? hpScoreColor(verbal) : 'text-[var(--color-ink-faint)]'}`}>
+                    {verbal !== null ? verbal.toFixed(2) : '—'}
+                  </div>
+                </div>
+                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-blue-600 mb-1">Kvant.</div>
+                  <div className={`text-2xl font-black ${quant !== null ? hpScoreColor(quant) : 'text-[var(--color-ink-faint)]'}`}>
+                    {quant !== null ? quant.toFixed(2) : '—'}
+                  </div>
+                </div>
+                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center border border-indigo-200">
+                  <div className="text-[9px] font-black tracking-widest uppercase text-indigo-600 mb-1">Totalt</div>
+                  <div className={`text-2xl font-black ${hpScoreColor(displayScore)}`}>{displayScore.toFixed(2)}</div>
+                </div>
+              </div>
+              <div className="text-xs text-[var(--color-ink-faint)] text-center">{combinedCorrect}/{combinedTotal} rätt ({combinedPct}%) totalt · {hpScoreLabel(displayScore)}</div>
+            </div>
+          )
+        })()}
 
         {/* HP Score Predictor */}
         {(() => {
@@ -445,86 +552,6 @@ export default function Results() {
           )
         })()}
 
-        {/* Full HP Day — pass 1 break card */}
-        {session.fullDayPass === 1 && (
-          <div className="card rounded-2xl p-5 mb-6 border border-indigo-200">
-            <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">Pass 1 klart — halvtid!</div>
-            <h2 className="text-xl font-black mb-1">Dags för paus</h2>
-            <p className="text-sm text-[var(--color-ink-muted)] mb-4 leading-relaxed">
-              Ta 10–15 minuters paus. Drick vatten, sträck på dig. Starta sedan det kvantitativa passet när du är redo.
-            </p>
-            <div className="flex gap-3 mb-4 text-xs text-[var(--color-ink-faint)]">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Verbalt klart</span>
-              <span>·</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500/40 border border-blue-500/50 inline-block" /> Kvantitativt återstår</span>
-            </div>
-            <button
-              onClick={() => {
-                const quantQs = getQuantExamQuestions()
-                const s = buildSession(quantQs.map(q => q.id), 55 * 60, false, 'exam')
-                saveSession({ ...s, examId: 'full-hp-pass2', fullDayPass: 2, fullDayGroupId: session.fullDayGroupId })
-                navigate('/session', { replace: true })
-              }}
-              className="w-full bg-blue-600 hover:bg-blue-500 transition-colors rounded-xl py-3 font-bold text-sm"
-            >
-              Starta kvantitativt pass →
-            </button>
-          </div>
-        )}
-
-        {/* Full HP Day — pass 2 combined score */}
-        {session.fullDayPass === 2 && (() => {
-          const history = loadHistory()
-          const pass1 = history.find(s => s.fullDayGroupId === session.fullDayGroupId && s.fullDayPass === 1)
-          if (!pass1) return null
-          const pass1Qs = pass1.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as typeof questions
-          const combinedByType: Record<QuestionType, { correct: number; total: number }> = {
-            XYZ: { correct: 0, total: 0 }, KVA: { correct: 0, total: 0 },
-            NOG: { correct: 0, total: 0 }, DTK: { correct: 0, total: 0 },
-            ORD: { correct: 0, total: 0 }, LAS: { correct: 0, total: 0 },
-            MEK: { correct: 0, total: 0 }, ELF: { correct: 0, total: 0 },
-          }
-          pass1Qs.forEach(q => {
-            combinedByType[q.type].total++
-            if (pass1.answers[q.id] === q.answer) combinedByType[q.type].correct++
-          })
-          sessionQuestions.forEach(q => {
-            combinedByType[q.type].total++
-            if (session.answers[q.id] === q.answer) combinedByType[q.type].correct++
-          })
-          const combinedScore = estimateSectionedScore(combinedByType)
-          const combinedTotal = pass1Qs.length + sessionQuestions.length
-          const combinedCorrect = pass1Qs.filter(q => pass1.answers[q.id] === q.answer).length +
-            sessionQuestions.filter(q => session.answers[q.id] === q.answer).length
-          const combinedPct = Math.round((combinedCorrect / combinedTotal) * 100)
-          const { quant, verbal, combined } = combinedScore
-          const displayScore = combined ?? 1.00
-          return (
-            <div className="card rounded-2xl p-5 mb-6 border border-indigo-200">
-              <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-3">Komplett HP-dag — sammanlagt resultat</div>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center">
-                  <div className="text-[9px] font-black tracking-widest uppercase text-rose-600 mb-1">Verbalt</div>
-                  <div className={`text-2xl font-black ${verbal !== null ? hpScoreColor(verbal) : 'text-[var(--color-ink-faint)]'}`}>
-                    {verbal !== null ? verbal.toFixed(2) : '—'}
-                  </div>
-                </div>
-                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center">
-                  <div className="text-[9px] font-black tracking-widest uppercase text-blue-600 mb-1">Kvant.</div>
-                  <div className={`text-2xl font-black ${quant !== null ? hpScoreColor(quant) : 'text-[var(--color-ink-faint)]'}`}>
-                    {quant !== null ? quant.toFixed(2) : '—'}
-                  </div>
-                </div>
-                <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center border border-indigo-200">
-                  <div className="text-[9px] font-black tracking-widest uppercase text-indigo-600 mb-1">Totalt</div>
-                  <div className={`text-2xl font-black ${hpScoreColor(displayScore)}`}>{displayScore.toFixed(2)}</div>
-                </div>
-              </div>
-              <div className="text-xs text-[var(--color-ink-faint)] text-center">{combinedCorrect}/{combinedTotal} rätt ({combinedPct}%) totalt · {hpScoreLabel(displayScore)}</div>
-            </div>
-          )
-        })()}
-
         {/* Per delprovstyp */}
         <div className="mb-8">
           <div className="text-sm font-semibold text-[var(--color-ink-muted)] uppercase tracking-widest mb-3">Per delprovstyp</div>
@@ -581,7 +608,7 @@ export default function Results() {
               <div className="space-y-2 mb-4">
                 {(Object.entries(typeAvgs) as [QuestionType, number][]).map(([t, avg]) => {
                   const bench = BENCHMARKS[t]
-                  const pct = Math.min(100, Math.round((avg / (bench * 1.5)) * 100))
+                  const pctW = Math.min(100, Math.round((avg / (bench * 1.5)) * 100))
                   const overBudget = avg > bench
                   const tc = TYPE_COLORS[t]
                   return (
@@ -590,7 +617,7 @@ export default function Results() {
                       <div className="flex-1 h-1.5 bg-[var(--color-paper-dark)] rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${overBudget ? 'bg-red-500' : tc.bar}`}
-                          style={{ width: `${pct}%` }}
+                          style={{ width: `${pctW}%` }}
                         />
                       </div>
                       <span className={`text-xs font-mono tabular-nums w-12 text-right ${overBudget ? 'text-red-600' : 'text-[var(--color-ink-muted)]'}`}>
@@ -623,8 +650,8 @@ export default function Results() {
         {(['easy', 'medium', 'hard'] as const).some(d => sessionQuestions.some(q => q.difficulty === d)) && (() => {
           const diffData = (['easy', 'medium', 'hard'] as const).map(d => {
             const dqs = sessionQuestions.filter(q => q.difficulty === d)
-            const correct = dqs.filter(q => session.answers[q.id] === q.answer).length
-            return { d, total: dqs.length, correct }
+            const correctD = dqs.filter(q => session.answers[q.id] === q.answer).length
+            return { d, total: dqs.length, correct: correctD }
           }).filter(x => x.total > 0)
           const DIFF_LABELS = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' }
           const DIFF_COLORS = { easy: 'text-emerald-400 bg-emerald-500', medium: 'text-amber-400 bg-amber-500', hard: 'text-red-400 bg-red-500' }
@@ -632,16 +659,16 @@ export default function Results() {
             <div className="card rounded-2xl p-5 mb-6">
               <div className="text-[10px] font-black tracking-widest uppercase text-[var(--color-ink-faint)] mb-4">Resultat per svårighetsgrad</div>
               <div className="grid grid-cols-3 gap-3">
-                {diffData.map(({ d, total, correct }) => {
-                  const pct = Math.round((correct / total) * 100)
+                {diffData.map(({ d, total: dTotal, correct: dCorrect }) => {
+                  const p = Math.round((dCorrect / dTotal) * 100)
                   const [textCls, barCls] = DIFF_COLORS[d].split(' ')
                   return (
                     <div key={d} className="bg-[var(--color-paper-dark)] rounded-xl p-3 text-center">
                       <div className={`text-[10px] font-black uppercase tracking-wide mb-1 ${textCls}`}>{DIFF_LABELS[d]}</div>
-                      <div className="text-xl font-black text-[var(--color-ink)]">{pct}%</div>
-                      <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">{correct}/{total}</div>
+                      <div className="text-xl font-black text-[var(--color-ink)]">{p}%</div>
+                      <div className="text-[10px] text-[var(--color-ink-faint)] mt-0.5">{dCorrect}/{dTotal}</div>
                       <div className="mt-2 h-1 bg-[var(--color-paper)] rounded-full overflow-hidden">
-                        <div className={`h-full ${barCls} rounded-full`} style={{ width: `${pct}%` }} />
+                        <div className={`h-full ${barCls} rounded-full`} style={{ width: `${p}%` }} />
                       </div>
                     </div>
                   )
@@ -791,158 +818,6 @@ export default function Results() {
           )
         })()}
 
-        {/* Review */}
-        <div className="text-sm font-semibold text-[var(--color-ink-muted)] uppercase tracking-widest mb-3">Genomgång</div>
-        <div className="flex gap-2 mb-4 flex-wrap">
-          <button
-            onClick={() => setReviewFilter('all')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'all' ? 'border-[var(--color-selected-border)] text-[var(--color-ink)] bg-[var(--color-selected-bg)]' : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
-          >
-            Alla ({sessionQuestions.length})
-          </button>
-          <button
-            onClick={() => setReviewFilter('wrong')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'wrong' ? 'border-[var(--color-wrong-border)] text-[var(--color-wrong-badge)] bg-[var(--color-wrong-bg)]' : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
-          >
-            Fel ({sessionQuestions.filter(q => !skipped.includes(q.id) && session.answers[q.id] !== q.answer).length})
-          </button>
-          <button
-            onClick={() => setReviewFilter('flagged')}
-            className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${reviewFilter === 'flagged' ? 'border-[var(--color-gold-deep)] text-[var(--color-gold-deep)] bg-[var(--color-gold-muted)]' : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
-          >
-            ★ Markerade ({(session.flagged ?? []).length})
-          </button>
-        </div>
-        <div className="mb-8">
-          {sessionQuestions.filter(q => {
-            if (reviewFilter === 'wrong') return !skipped.includes(q.id) && session.answers[q.id] !== q.answer
-            if (reviewFilter === 'flagged') return (session.flagged ?? []).includes(q.id)
-            return true
-          }).map((q, index) => {
-            const isSkipped = skipped.includes(q.id)
-            const userAnswer = session.answers[q.id]
-            const ok = !isSkipped && userAnswer === q.answer
-            const isFlagged = (session.flagged ?? []).includes(q.id)
-            const expanded = expandedId === q.id
-            const answerOptions = Object.entries(q.options).filter(([k]) =>
-              ANSWER_KEYS.includes(k as AnswerKey)
-            ) as [AnswerKey, string][]
-
-            const questionTimeMs = session.questionTimes?.[q.id]
-            const fmtQuestionTime = questionTimeMs
-              ? questionTimeMs >= 60000
-                ? `${Math.floor(questionTimeMs / 60000)}m ${Math.round((questionTimeMs % 60000) / 1000)}s`
-                : `${Math.round(questionTimeMs / 1000)}s`
-              : null
-
-            const srs = getSrsStats(q.id)
-            const srsPill = (() => {
-              if (!srs) return null
-              if (srs.timesWrong > srs.timesCorrect)
-                return { label: 'Repeteras', cls: 'bg-red-500/10 text-red-500 border-red-500/40' }
-              if (srs.timesCorrect >= 3 && ok)
-                return { label: 'Kan detta', cls: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/40' }
-              return { label: 'Övar', cls: 'bg-amber-500/10 text-amber-600 border-amber-500/40' }
-            })()
-
-            const accent = WARM_TYPE_COLORS[q.type]
-
-            return (
-              <div key={q.id} className="card p-3 mb-2">
-                <button
-                  onClick={() => setExpandedId(expanded ? null : q.id)}
-                  className="w-full flex items-center gap-3 text-left"
-                >
-                  <div className="shrink-0 flex flex-col items-center gap-1 w-10">
-                    <span className="text-[10px] text-[var(--color-ink-faint)]">#{index + 1}</span>
-                    <span
-                      className="text-xs font-bold px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: accent.bg, color: accent.color }}
-                    >
-                      {q.type}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0 text-sm text-[var(--color-ink)] line-clamp-2">
-                    <MathText text={q.text} />
-                  </div>
-                  {ok ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500 shrink-0">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  ) : isSkipped ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-faint)] shrink-0">
-                      <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-500 shrink-0">
-                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  )}
-                </button>
-
-                <div className="flex items-center gap-2 mt-1.5 flex-wrap pl-[52px]">
-                  <span className="text-[10px] text-[var(--color-ink-faint)]">{q.source}</span>
-                  {isFlagged && <span className="text-amber-500 text-xs">★</span>}
-                  {srsPill && (
-                    <span className={`border rounded px-1.5 py-0.5 text-[10px] font-medium ${srsPill.cls}`}>
-                      {srsPill.label}
-                    </span>
-                  )}
-                  {fmtQuestionTime && (
-                    <span className="border border-[var(--color-card-border)] rounded px-1.5 py-0.5 text-[10px] text-[var(--color-ink-faint)]">
-                      ⏱ {fmtQuestionTime}
-                    </span>
-                  )}
-                  <button
-                    onClick={e => {
-                      e.stopPropagation()
-                      const next = toggleBookmark(q.id)
-                      setBookmarkState(s => ({ ...s, [q.id]: next }))
-                    }}
-                    className={`border rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${bookmarkState[q.id] ? 'border-[var(--color-gold-deep)] text-[var(--color-gold-deep)] bg-[var(--color-gold-muted)]' : 'border-[var(--color-card-border)] text-[var(--color-ink-faint)] hover:border-[var(--color-ink-muted)]'}`}
-                  >
-                    🔖 {bookmarkState[q.id] ? 'Sparat' : 'Spara'}
-                  </button>
-                </div>
-
-                {expanded && (
-                  <div className="bg-[var(--color-paper-dark)] rounded-xl p-3 mt-2">
-                    <div className="grid gap-2">
-                      {answerOptions.map(([key, text]) => {
-                        let cls = 'border-[var(--color-card-border)] text-[var(--color-ink-faint)]'
-                        let labelCls = 'bg-[var(--color-paper-dark)] text-[var(--color-ink-muted)]'
-                        if (key === q.answer) { cls = 'border-[var(--color-correct-border)] text-[var(--color-ink)] bg-[var(--color-correct-bg)]'; labelCls = 'bg-[var(--color-correct-badge)] text-[var(--color-cream)]' }
-                        if (key === userAnswer && key !== q.answer) { cls = 'border-[var(--color-wrong-border)] text-[var(--color-ink)] bg-[var(--color-wrong-bg)]'; labelCls = 'bg-[var(--color-wrong-badge)] text-[var(--color-cream)]' }
-                        return (
-                          <div key={key} className={`border rounded-xl px-3 py-2.5 text-sm flex gap-3 items-start ${cls}`}>
-                            <span className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-black ${labelCls}`}>{key}</span>
-                            <MathText text={text} />
-                          </div>
-                        )
-                      })}
-                    </div>
-                    <ExplanationCard
-                      isCorrect={!isSkipped && userAnswer === q.answer}
-                      correctAnswer={q.answer}
-                      explanation={q.explanation}
-                      explanationData={q.explanationData}
-                      chosenAnswer={userAnswer as AnswerKey | undefined}
-                      onLearnMore={(isSkipped || userAnswer !== q.answer) ? (() => {
-                        const topic = getTopicForQuestion(q.tags)
-                        navigate(topic ? `/matematik?topic=${topic.id}&inner=lesson` : '/matematik')
-                      }) : undefined}
-                      learnMoreLabel={(isSkipped || userAnswer !== q.answer) ? (() => {
-                        const topic = getTopicForQuestion(q.tags)
-                        return topic ? `Lär dig ${topic.name}` : 'Öppna Matematikguiden'
-                      })() : undefined}
-                    />
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-
         {/* Share card */}
         <div className="mb-6">
           <div className="text-xs font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">Dela resultat</div>
@@ -981,28 +856,25 @@ export default function Results() {
               </div>
               <div className="text-[10px] text-[var(--color-ink-faint)]">{new Date().toLocaleDateString('sv-SE')}</div>
             </div>
-            <p className="text-xs text-[var(--color-ink-faint)] text-center">Ta en skärmbild av kortet ovan för att dela ditt resultat</p>
+            <button
+              onClick={handleShare}
+              className="btn-ghost w-full flex items-center justify-center gap-2 text-sm"
+            >
+              {shareFeedback === 'copied' ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Kopierat!
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                  Dela resultat
+                </>
+              )}
+            </button>
+            <p className="text-xs text-[var(--color-ink-faint)] text-center mt-3">Ta en skärmbild av kortet ovan för att dela ditt resultat</p>
           </div>
         </div>
-
-        {(() => {
-          const wrongIds = sessionQuestions
-            .filter(q => !skipped.includes(q.id) && session.answers[q.id] !== q.answer)
-            .map(q => q.id)
-          if (wrongIds.length === 0) return null
-          return (
-            <button
-              onClick={() => {
-                const drill = buildSession(wrongIds, null, true, 'drill', true)
-                saveSession(drill)
-                navigate('/session')
-              }}
-              className="w-full mb-3 border border-amber-600/60 bg-amber-900/15 hover:bg-amber-900/30 text-amber-300 rounded-xl py-3 font-bold transition-colors"
-            >
-              Öva på {wrongIds.length} fel från detta pass →
-            </button>
-          )
-        })()}
 
         </div>
       </div>

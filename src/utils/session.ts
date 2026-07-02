@@ -6,6 +6,32 @@ import { questions } from '../data/questions'
 const CURRENT_KEY = 'hp_current_session'
 const HISTORY_KEY = 'hp_session_history'
 
+/**
+ * Questions sharing the same passage are linked and must stay on screen
+ * together (prototype: consecutive items referencing the same `passage`).
+ * Stable reorder: each passage group is pulled together at the position
+ * of its first occurrence; everything else keeps its order.
+ */
+function groupLinkedPassages(questionIds: string[]): string[] {
+  const passageOf = new Map(questions.map(q => [q.id, q.passageId]))
+  const placed = new Set<string>()
+  const out: string[] = []
+  for (const id of questionIds) {
+    if (placed.has(id)) continue
+    out.push(id)
+    placed.add(id)
+    const pid = passageOf.get(id)
+    if (!pid) continue
+    for (const other of questionIds) {
+      if (!placed.has(other) && passageOf.get(other) === pid) {
+        out.push(other)
+        placed.add(other)
+      }
+    }
+  }
+  return out
+}
+
 export function buildSession(
   questionIds: string[],
   timeLimitSeconds: number | null,
@@ -15,7 +41,7 @@ export function buildSession(
 ): ExamSession {
   return {
     id: crypto.randomUUID(),
-    questionIds,
+    questionIds: groupLinkedPassages(questionIds),
     answers: {},
     startTime: Date.now(),
     mode: timeLimitSeconds ? 'timed' : 'untimed',

@@ -10,20 +10,20 @@ function StepReveal({ steps }: { steps: { label: string; content: string; result
       {steps.map((step, i) => (
         <div key={i} className={`rounded-xl border transition-all ${i < revealed ? 'border-[var(--color-card-border)] bg-[var(--color-paper-dark)]' : 'border-[var(--color-card-border)] bg-[var(--color-card)]'} p-3.5`}>
           <div className="flex items-start gap-3">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-purple-700 text-white' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${i < revealed ? 'bg-[var(--color-green)] text-[var(--color-cream)]' : 'bg-[var(--color-paper-dark)] text-[var(--color-ink-faint)]'}`}>{i + 1}</span>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-[var(--color-ink-muted)] mb-0.5">{step.label}</div>
               {i < revealed ? (
                 <>
                   <div className="text-sm text-[var(--color-ink-muted)] leading-relaxed">{step.content}</div>
-                  {step.result && <div className="mt-1.5 text-xs font-bold text-purple-400">{step.result}</div>}
+                  {step.result && <div className="mt-1.5 text-xs font-bold text-[var(--color-green-light)]">{step.result}</div>}
                 </>
               ) : (
                 <div className="text-xs text-[var(--color-ink-faint)]">Klicka för att avslöja</div>
               )}
             </div>
             {i >= revealed && (
-              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-purple-400 border border-purple-500/30 rounded-lg px-2 py-1 hover:bg-purple-500/10 transition-colors">Visa</button>
+              <button onClick={() => setRevealed(i + 1)} className="shrink-0 text-[10px] text-[var(--color-green)] border border-[var(--color-card-border)] rounded-lg px-2 py-1 hover:bg-[var(--color-green-muted)] transition-colors">Visa</button>
             )}
           </div>
         </div>
@@ -83,16 +83,16 @@ function FalseFriends() {
         placeholder="Sök ord..."
         value={filter}
         onChange={e => setFilter(e.target.value)}
-        className="w-full bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-ink)] placeholder-[var(--color-ink-faint)] focus:outline-none focus:border-purple-500/40"
+        className="w-full bg-[var(--color-paper-dark)] border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-ink)] placeholder-[var(--color-ink-faint)] focus:outline-none focus:border-[var(--color-card-border)]"
       />
 
       <div className="space-y-2">
         {filtered.map(ff => (
           <div key={ff.eng} className="card rounded-xl p-4">
             <div className="flex items-start justify-between gap-4 mb-2">
-              <span className="font-black text-purple-300 text-base">{ff.eng}</span>
+              <span className="font-black text-[var(--color-green)] text-base">{ff.eng}</span>
               <div className="text-right text-xs">
-                <div className="text-emerald-400 font-semibold">✓ {ff.sv_right}</div>
+                <div className="text-[var(--color-success)] font-semibold">✓ {ff.sv_right}</div>
                 <div className="text-red-400/70 line-through mt-0.5">✗ {ff.sv_wrong}</div>
               </div>
             </div>
@@ -105,17 +105,17 @@ function FalseFriends() {
       </div>
 
       <div className="card rounded-2xl p-4">
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Diskursmarkörer — textens logik</div>
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Diskursmarkörer — textens logik</div>
         <div className="space-y-1.5">
           {DISCOURSE_MARKERS.map(dm => (
             <div key={dm.eng} className="grid grid-cols-3 gap-2 text-xs items-baseline">
-              <span className="font-mono text-purple-300 text-[11px] leading-tight">{dm.eng.split(' / ')[0]}</span>
+              <span className="font-mono text-[var(--color-green-light)] text-[11px] leading-tight">{dm.eng.split(' / ')[0]}</span>
               <span className={`font-bold text-[10px] ${
-                dm.logic === 'Kontrast' || dm.logic === 'Kontrast (stark)' ? 'text-orange-400' :
-                dm.logic === 'Slutsats' ? 'text-blue-400' :
-                dm.logic === 'Tillägg' ? 'text-sky-400' :
-                dm.logic === 'Koncessiv' ? 'text-red-400' :
-                dm.logic === 'Sammanfattning' ? 'text-pink-400' :
+                dm.logic === 'Kontrast' || dm.logic === 'Kontrast (stark)' ? 'text-[var(--color-terracotta)]' :
+                dm.logic === 'Slutsats' ? 'text-[var(--color-terracotta)]' :
+                dm.logic === 'Tillägg' ? 'text-[var(--color-ink-muted)]' :
+                dm.logic === 'Koncessiv' ? 'text-[var(--color-terracotta)]' :
+                dm.logic === 'Sammanfattning' ? 'text-[var(--color-green)]' :
                 'text-[var(--color-ink-muted)]'
               }`}>{dm.logic}</span>
               <span className="text-[var(--color-ink-faint)]">{dm.sv}</span>
@@ -169,7 +169,7 @@ function Strategi() {
           },
         ].map(item => (
           <div key={item.n} className="card rounded-xl p-4 flex gap-3">
-            <span className="text-purple-400 font-black text-sm shrink-0 w-4">{item.n}</span>
+            <span className="text-[var(--color-green)] font-black text-sm shrink-0 w-4">{item.n}</span>
             <div>
               <div className="text-sm font-semibold text-[var(--color-ink)] mb-0.5">{item.title}</div>
               <div className="text-xs text-[var(--color-ink-faint)] leading-relaxed">{item.body}</div>
@@ -178,8 +178,8 @@ function Strategi() {
         ))}
       </div>
 
-      <div className="bg-purple-500/8 border border-purple-500/20 rounded-xl p-4">
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-2">Akademisk engelska — vanliga mönster</div>
+      <div className="bg-[var(--color-green-muted)] border border-[var(--color-card-border)] rounded-xl p-4">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-2">Akademisk engelska — vanliga mönster</div>
         <div className="space-y-1.5 text-xs">
           {[
             ['"The study suggests that..."', 'Försiktig slutsats — inte ett faktapåstående'],
@@ -189,15 +189,15 @@ function Strategi() {
             ['"This is not to say that..."', 'Begränsning av ett påstående — viktig nyans följer'],
           ].map(([mönster, förklaring]) => (
             <div key={mönster} className="flex flex-col gap-0.5">
-              <span className="font-mono text-purple-300 text-[11px]">{mönster}</span>
+              <span className="font-mono text-[var(--color-green-light)] text-[11px]">{mönster}</span>
               <span className="text-[var(--color-ink-faint)] text-[11px]">{förklaring}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="card rounded-2xl p-5 border border-purple-500/10">
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Textstruktur i akademisk engelska</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Textstruktur i akademisk engelska</div>
         <div className="space-y-2">
           {[
             { del: 'Introduction', funktion: 'Tes eller problemformulering presenteras — ofta är textens huvudsyfte här' },
@@ -206,7 +206,7 @@ function Strategi() {
             { del: 'Conclusion', funktion: 'Sammanfattning och slutsats. Läs detta för "vad är textens slutsats"-frågor' },
           ].map(({ del, funktion }) => (
             <div key={del} className="flex gap-3 text-xs">
-              <span className="font-bold text-purple-300 w-24 shrink-0">{del}</span>
+              <span className="font-bold text-[var(--color-green-light)] w-24 shrink-0">{del}</span>
               <span className="text-[var(--color-ink-faint)] leading-relaxed">{funktion}</span>
             </div>
           ))}
@@ -224,8 +224,8 @@ function Ovning() {
       </p>
 
       {/* Exercise 1 */}
-      <div className="card rounded-2xl p-5 border border-purple-500/10">
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Övning 1 — Diskursmarkör</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Övning 1 — Diskursmarkör</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
           <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (excerpt)</div>
           <p>The industrial revolution brought unprecedented economic growth. <strong>However</strong>, the rapid urbanization that followed created significant social inequalities and public health challenges that would persist for decades.</p>
@@ -239,8 +239,8 @@ function Ovning() {
       </div>
 
       {/* Exercise 2 */}
-      <div className="card rounded-2xl p-5 border border-purple-500/10">
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Övning 2 — False friend i kontext</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Övning 2 — False friend i kontext</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
           <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (excerpt)</div>
           <p>The researchers were <strong>confident</strong> in their methodology and <strong>eventually</strong> published their findings after three years of peer review.</p>
@@ -254,8 +254,8 @@ function Ovning() {
       </div>
 
       {/* Exercise 3 */}
-      <div className="card rounded-2xl p-5 border border-purple-500/10">
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Övning 3 — Försiktig slutsats ("suggests")</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Övning 3 — Försiktig slutsats ("suggests")</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
           <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (excerpt)</div>
           <p>The data <strong>suggests</strong> a correlation between screen time and reduced sleep quality among adolescents. This does <strong>not</strong> imply a direct causal relationship, as other lifestyle factors may contribute.</p>
@@ -269,8 +269,8 @@ function Ovning() {
       </div>
 
       {/* Exercise 4 */}
-      <div className="card rounded-2xl p-5 border border-purple-500/10">
-        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Övning 4 — Identifiera textens ton</div>
+      <div className="card rounded-2xl p-5 border border-[var(--color-card-border)]">
+        <div className="text-[10px] font-bold text-[var(--color-green)] uppercase tracking-widest mb-3">Övning 4 — Identifiera textens ton</div>
         <div className="bg-[var(--color-paper-dark)] rounded-xl p-4 mb-4 text-xs text-[var(--color-ink-muted)] leading-relaxed">
           <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-2">Text (excerpt)</div>
           <p>While proponents argue that artificial intelligence will create new employment opportunities, critics <strong>rightly</strong> point out that the transition period will inevitably displace millions of workers with insufficient support systems in place.</p>
@@ -296,14 +296,14 @@ export default function ElfGuide() {
   const [tab, setTab] = useState<Tab>('falsefriends')
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-8">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
       <PageHeader title="ELF – Engelsk läsförståelse" />
 
       {/* Hero */}
       <div className="border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
-          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+          <div className="inline-flex items-center gap-2 bg-[var(--color-green-muted)] border border-[var(--color-card-border)] text-[var(--color-green)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-green)]" />
             ELF · Engelsk läsförståelse
           </div>
           <h1 className="text-4xl font-black mb-2 tracking-tight">ELF-guiden</h1>
@@ -321,11 +321,11 @@ export default function ElfGuide() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-purple-400' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${tab === t.id ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)]'}`}
             >
               {t.label}
               {tab === t.id && (
-                <span className="absolute bottom-0 inset-x-3 h-[2px] rounded-full bg-purple-400" />
+                <span className="absolute bottom-0 inset-x-3 h-[2px] rounded-full bg-[var(--color-green)]" />
               )}
             </button>
           ))}

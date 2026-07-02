@@ -1,6 +1,6 @@
 import type { ChartData } from '../types'
 
-const PALETTE = ['var(--color-green)', 'var(--color-gold)', 'var(--color-terracotta)', 'var(--color-green-light)']
+const PALETTE = ['var(--color-terracotta)', 'var(--color-green)', 'var(--color-gold)', 'var(--color-green-light)']
 const W = 360, H = 220, mL = 50, mR = 10, mT = 28, mB = 32
 const pW = W - mL - mR, pH = H - mT - mB
 
@@ -28,7 +28,7 @@ function Legend({ series }: { series: ChartData['series'] }) {
     <>
       {series.map((s, i) => (
         <g key={i} transform={`translate(${mL + i * 85}, 6)`}>
-          <rect x={0} y={1} width={10} height={10} style={{ fill: s.color ?? PALETTE[i % 4] }} rx={2} />
+          <rect x={0} y={1} width={10} height={10} style={{ fill: PALETTE[i % 4] }} rx={2} />
           <text x={14} y={10} fontSize={10} style={{ fill: 'var(--color-ink-faint)' }}>{s.label}</text>
         </g>
       ))}
@@ -69,7 +69,7 @@ function BarChart({ data }: { data: ChartData }) {
       <Legend series={data.series} />
       <YAxis min={min} max={max} step={step} ticks={ticks} />
       {data.series.map((s, si) => {
-        const color = s.color ?? PALETTE[si % 4]
+        const color = PALETTE[si % 4]
         return s.values.map((v, gi) => {
           const bH = Math.max(0, ((v - min) / range) * pH)
           const x = mL + gi * groupW + groupOffset + si * barW
@@ -97,7 +97,7 @@ function LineChart({ data }: { data: ChartData }) {
       <Legend series={data.series} />
       <YAxis min={min} max={max} step={step} ticks={ticks} />
       {data.series.map((s, si) => {
-        const color = s.color ?? PALETTE[si % 4]
+        const color = PALETTE[si % 4]
         const pts = s.values.map((v, i) => `${toX(i)},${toY(v)}`).join(' ')
         return (
           <g key={si}>
@@ -116,11 +116,39 @@ function LineChart({ data }: { data: ChartData }) {
   )
 }
 
-export default function ChartView({ data }: { data: ChartData }) {
+/**
+ * Prototype-exact diagram layout for single-series bar charts:
+ * value label above each bar, terracotta fill, axis label below,
+ * bar height = value / max * 92px inside a 118px flex-end row.
+ */
+function SimpleBarChart({ data }: { data: ChartData }) {
+  const values = data.series[0].values
+  const max = Math.max(...values, 1)
   return (
-    <div className="card rounded-2xl p-4 mb-5 overflow-x-auto">
-      {data.title && <p className="text-xs text-[var(--color-ink-faint)] mb-3">{data.title}</p>}
-      {data.type === 'bar' ? <BarChart data={data} /> : <LineChart data={data} />}
+    <div className="flex items-end justify-between gap-3 h-[118px]">
+      {data.xLabels.map((label, i) => {
+        const value = values[i] ?? 0
+        return (
+          <div key={i} className="flex-1 h-full flex flex-col items-center justify-end gap-1.5">
+            <span className="text-[11px] font-bold text-[var(--color-ink-muted)] tabular-nums">{value}</span>
+            <div
+              className="w-full rounded-t-[6px] bg-[var(--color-terracotta)]"
+              style={{ height: `${Math.round((value / max) * 92)}px` }}
+            />
+            <span className="text-[11px] font-semibold text-[var(--color-ink-faint)]">{label}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+export default function ChartView({ data }: { data: ChartData }) {
+  const isSimpleBar = data.type === 'bar' && data.series.length === 1
+  return (
+    <div className="card overflow-x-auto mb-[18px] pt-3.5 px-4 pb-3">
+      {data.title && <p className="text-xs font-bold leading-[1.3] text-[var(--color-ink)] mb-4">{data.title}</p>}
+      {isSimpleBar ? <SimpleBarChart data={data} /> : data.type === 'bar' ? <BarChart data={data} /> : <LineChart data={data} />}
     </div>
   )
 }

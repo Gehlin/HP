@@ -1,84 +1,114 @@
-import { useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { getDueQuestions } from '../utils/srs'
-import { questions } from '../data/questions'
 
 const HomeIcon = ({ active }: { active: boolean }) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth={active ? 2 : 1.75} stroke="currentColor">
-    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5Z" strokeLinejoin="round"/>
-    <path d="M9 21V12h6v9" strokeLinejoin="round"/>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth={active ? 2.3 : 2.1}
+    strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 11 12 4l8 7"/>
+    <path d="M6.5 9.5V20h11V9.5"/>
   </svg>
 )
 
 const PracticeIcon = ({ active }: { active: boolean }) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth={active ? 2 : 1.75} stroke="currentColor">
-    <path d="M12 20h9" strokeLinecap="round"/>
-    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" strokeLinejoin="round"/>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth={active ? 2.3 : 2.1}
+    strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="8.5"/>
+    <polygon points="10,8.5 16,12 10,15.5" fill="currentColor" stroke="none"/>
   </svg>
 )
 
 const StatsIcon = ({ active }: { active: boolean }) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth={active ? 2 : 1.75} stroke="currentColor">
-    <path d="M18 20V10M12 20V4M6 20v-6" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth={active ? 2.3 : 2.1}
+    strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 19V12"/>
+    <path d="M12 19V6"/>
+    <path d="M19 19v-9"/>
   </svg>
 )
 
 const ProfileIcon = ({ active }: { active: boolean }) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth={active ? 2 : 1.75} stroke="currentColor">
-    <circle cx="12" cy="8" r="4" strokeLinejoin="round"/>
-    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth={active ? 2.3 : 2.1}
+    strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8.5" r="3.7"/>
+    <path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/>
   </svg>
 )
 
 const TABS = [
   { path: '/',         label: 'Hem',      Icon: HomeIcon     },
-  { path: '/practice', label: 'Träna',    Icon: PracticeIcon },
+  { path: '/practice', label: 'Öva',      Icon: PracticeIcon },
   { path: '/progress', label: 'Statistik', Icon: StatsIcon   },
   { path: '/profil',   label: 'Profil',   Icon: ProfileIcon  },
 ] as const
 
+const HIDDEN_PATHS = ['/session', '/resultat', '/granska', '/exam/']
+
 export default function TopNav() {
   const location = useLocation()
   const navigate = useNavigate()
-  const dueCount = useMemo(() => getDueQuestions(questions.map(q => q.id)).length, [])
 
-  if (location.pathname.startsWith('/session')) return null
+  if (HIDDEN_PATHS.some(p => location.pathname.startsWith(p))) return null
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-[var(--color-paper)] border-b border-[var(--color-card-border)]" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-      <div className="max-w-2xl mx-auto flex items-stretch">
-        <div className="px-4 flex items-center font-[var(--font-serif)] font-black text-lg text-[var(--color-green)]">
-          HP
-        </div>
-        <div className="flex flex-1 justify-end">
-          {TABS.map(tab => {
-            const isActive = tab.path === '/'
-              ? location.pathname === '/'
-              : location.pathname.startsWith(tab.path)
+    <nav
+      style={{
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 50,
+        height: 84,
+        background: 'rgba(241,236,227,0.92)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderTop: '1px solid #E4DCCC',
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'flex-start',
+        paddingTop: 11,
+        paddingLeft: 14,
+        paddingRight: 14,
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
+    >
+      {TABS.map(tab => {
+        const isActive = tab.path === '/'
+          ? location.pathname === '/'
+          : location.pathname.startsWith(tab.path)
 
-            return (
-              <button
-                key={tab.path}
-                onClick={() => navigate(tab.path)}
-                className="flex flex-col items-center justify-center gap-0.5 px-3 py-2 relative group min-w-[3.5rem]"
-              >
-                <span className={`relative transition-colors duration-150 ${isActive ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-faint)] group-hover:text-[var(--color-ink-muted)]'} ${tab.path === '/practice' && dueCount > 0 ? 'due-pulse' : ''}`}>
-                  <tab.Icon active={isActive} />
-                  {tab.path === '/practice' && dueCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full bg-[var(--color-gold-deep)] text-[var(--color-cream)] text-[9px] font-black flex items-center justify-center px-0.5 ring-2 ring-[var(--color-paper)]">{dueCount > 9 ? '9+' : dueCount}</span>
-                  )}
-                </span>
-                <span className={`text-[10px] font-medium leading-none transition-colors duration-150 ${isActive ? 'text-[var(--color-green)]' : 'text-[var(--color-ink-faint)] group-hover:text-[var(--color-ink-muted)]'}`}>
-                  {tab.label}
-                </span>
-                {isActive && (
-                  <span className="absolute bottom-0 inset-x-3 h-[2px] bg-[var(--color-green)] rounded-full" />
-                )}
-              </button>
-            )
-          })}
-        </div>
-      </div>
+        return (
+          <button
+            key={tab.path}
+            onClick={() => navigate(tab.path)}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 5,
+              cursor: 'pointer',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              color: isActive ? '#224A3A' : '#A89F90',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <tab.Icon active={isActive} />
+            <span style={{
+              fontFamily: "'Hanken Grotesk', system-ui",
+              fontWeight: isActive ? 700 : 600,
+              fontSize: 10,
+              lineHeight: 1,
+              color: isActive ? '#224A3A' : '#A89F90',
+            }}>
+              {tab.label}
+            </span>
+          </button>
+        )
+      })}
     </nav>
   )
 }

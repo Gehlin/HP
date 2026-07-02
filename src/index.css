@@ -174,31 +174,30 @@
 .answer-option {
   background: var(--color-card);
   border: 1px solid var(--color-card-border);
-  border-radius: 12px;
-  padding: 14px 16px;
+  border-radius: 15px;
+  padding: 15px;
   cursor: pointer;
-  transition: border-color 150ms;
+  transition: background 150ms ease, border-color 150ms ease;
 }
 
 .answer-option-selected {
-  border: 2px solid var(--color-selected-border);
+  border: 1.5px solid var(--color-selected-border);
   background: var(--color-selected-bg);
 }
 
 .answer-option-correct {
-  border: 2px solid var(--color-correct-border);
+  border: 1.5px solid var(--color-correct-border);
   background: var(--color-correct-bg);
 }
 
 .answer-option-wrong {
-  border: 2px solid var(--color-wrong-border);
+  border: 1.5px solid var(--color-wrong-border);
   background: var(--color-wrong-bg);
 }
 
 .answer-option-other {
   background: var(--color-surface-warm);
   border-color: #EEE8DC;
-  opacity: 0.8;
 }
 
 /* ─── Spacing utility ────────────────────────────────────────── */
@@ -208,7 +207,11 @@
 }
 
 .pt-topnav {
-  padding-top: calc(3.5rem + env(safe-area-inset-top, 0px));
+  padding-top: max(20px, env(safe-area-inset-top, 0px));
+}
+
+.pb-bottomnav {
+  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ─── Question card slide transitions ───────────────────────── */
