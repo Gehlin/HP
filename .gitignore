@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Copyrighted UHR Högskoleprovet exam PDFs downloaded for local style/
+# difficulty reference only — never committed, never redistributed.
+# See .maestro/playbooks/2026-07-02-Question-Bank-Accuracy-and-Expansion/
+.maestro/playbooks/2026-07-02-Question-Bank-Accuracy-and-Expansion/Reference/raw-exams/
