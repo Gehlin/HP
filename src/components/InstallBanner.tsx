@@ -38,7 +38,8 @@ export default function InstallBanner() {
   if (!visible) return null
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 z-[150] max-w-md mx-auto">
+    // bottom-20 used to clear the old fixed bottom tab bar — no longer needed
+    <div className="fixed bottom-[max(16px,env(safe-area-inset-bottom))] left-4 right-4 z-[150] max-w-md mx-auto">
       <div className="card border border-[var(--color-card-border)] rounded-2xl p-4 flex items-center gap-4 shadow-2xl animate-slide-up">
         <div className="w-10 h-10 bg-[var(--color-green)] rounded-xl flex items-center justify-center shrink-0">
           <span className="text-[var(--color-cream)] text-xs font-black">HP</span>

@@ -72,7 +72,7 @@ export default function ExamStart() {
     const verbalTotal = Object.values(VERBAL_SECTION_SIZES).reduce((a, b) => a + b, 0)
     const quantTotal  = Object.values(SECTION_SIZES).reduce((a, b) => a + b, 0)
     return (
-      <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
+      <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav-collapsed pb-bottomnav">
         <PageHeader title="HP-prov" onBack={() => navigate('/exam-select')} />
         <div className="max-w-lg mx-auto px-5 py-6">
           <div className="mb-8">
@@ -176,7 +176,7 @@ export default function ExamStart() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
+    <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav-collapsed pb-bottomnav">
       <PageHeader title="HP-prov" onBack={() => navigate('/exam-select')} />
       <div className="max-w-lg mx-auto px-5 py-6">
 

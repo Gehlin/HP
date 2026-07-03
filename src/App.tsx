@@ -1,9 +1,9 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, useLayoutEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import ErrorBoundary from './components/ErrorBoundary'
 import InstallBanner from './components/InstallBanner'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
-import TopNav from './components/TopNav'
+import AppHeader from './components/AppHeader'
 import { maybeShowDueNotification, maybeShowPacingNotification } from './utils/notifications'
 import { getDueQuestions } from './utils/srs'
 import { questions } from './data/questions'
@@ -53,9 +53,18 @@ function PageLoader() {
 
 // Every prototype screen renders from its top — reset scroll on route change
 // (SPA navigation otherwise carries the previous screen's scroll offset over).
+// Native history.scrollRestoration must be 'manual': with the default 'auto',
+// the browser re-applies its saved offset *after* our reset on POP navigations
+// (browser back / PageHeader's navigate(-1)), landing mid-page. Set at module
+// load so it's in effect before any navigation can happen.
+if ('scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual'
+}
+
 function ScrollToTop() {
   const { pathname } = useLocation()
-  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  // useLayoutEffect: reset before paint, so no one-frame flash of stale scroll
+  useLayoutEffect(() => { window.scrollTo(0, 0) }, [pathname])
   return null
 }
 
@@ -142,6 +151,7 @@ function AppInner() {
       )}
 
       <ScrollToTop />
+      <AppHeader />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -175,7 +185,6 @@ function AppInner() {
         </Routes>
       </Suspense>
 
-      <TopNav />
       <InstallBanner />
     </>
   )

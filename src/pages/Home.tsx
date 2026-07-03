@@ -104,8 +104,8 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen bg-app overflow-auto"
-      style={{ padding: 'max(58px, calc(env(safe-area-inset-top,0px) + 20px)) 18px calc(100px + env(safe-area-inset-bottom,0px))' }}
+      className="min-h-screen bg-app overflow-auto pt-topnav pb-bottomnav"
+      style={{ paddingLeft: 18, paddingRight: 18 }}
     >
       {/* ── Header ─────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>

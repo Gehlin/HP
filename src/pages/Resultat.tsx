@@ -249,7 +249,7 @@ export default function Resultat() {
       )}
 
       {/* ── Resultat (prototype-exact card stack) ─────────── */}
-      <div className="min-h-[100dvh] flex flex-col px-5 pt-16">
+      <div className="min-h-[100dvh] flex flex-col px-5 pt-topnav-collapsed">
         <div className="w-full max-w-md mx-auto flex flex-col flex-1">
 
           <div className="text-center">

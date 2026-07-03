@@ -44,7 +44,7 @@ export default function Granska() {
     .map(q => q.id)
 
   return (
-    <div className="min-h-screen bg-[var(--color-paper)] pt-14 px-[18px]">
+    <div className="min-h-screen bg-[var(--color-paper)] pt-topnav-collapsed pb-bottomnav px-[18px]">
       <div className="max-w-2xl mx-auto">
 
         {/* Header: back arrow → Resultat + title */}

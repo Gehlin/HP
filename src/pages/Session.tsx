@@ -471,7 +471,8 @@ export default function Session() {
     <div className="min-h-screen bg-[var(--color-paper)] flex flex-col">
 
       {/* ── Header ────────────────────────────────────────────── */}
-      <header className="fixed top-0 inset-x-0 z-40 bg-[var(--color-paper)] border-b border-[var(--color-card-border)]">
+      {/* Sits directly below the collapsed 54px AppHeader band */}
+      <header className="fixed top-[calc(54px+env(safe-area-inset-top,0px))] inset-x-0 z-40 bg-[var(--color-paper)] border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           {/* Left: close button */}
           <button
@@ -511,7 +512,7 @@ export default function Session() {
       {/* ── Scrollable question area ───────────────────────────── */}
       <main
         ref={mainRef}
-        className="flex-1 overflow-y-auto pt-[72px] pb-[96px] px-4 max-w-2xl mx-auto w-full"
+        className="flex-1 overflow-y-auto pt-[calc(126px+env(safe-area-inset-top,0px))] pb-[96px] px-4 max-w-2xl mx-auto w-full"
         onTouchStart={e => { touchStartXRef.current = e.touches[0].clientX }}
         onTouchEnd={e => {
           if (touchStartXRef.current === null) return

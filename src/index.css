@@ -206,12 +206,21 @@
   padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
 
+/* Clearance for the fixed AppHeader masthead (97px full bar + 22px gap).
+   Keep in sync with APP_HEADER_HEIGHT in src/components/AppHeader.tsx. */
 .pt-topnav {
-  padding-top: max(20px, env(safe-area-inset-top, 0px));
+  padding-top: calc(119px + env(safe-area-inset-top, 0px));
 }
 
+/* Clearance on the logo-only paths (/session, /resultat, /granska, /exam/*)
+   where the masthead collapses to its 54px identity row (+ 22px gap). */
+.pt-topnav-collapsed {
+  padding-top: calc(76px + env(safe-area-inset-top, 0px));
+}
+
+/* No bottom bar anymore — just breathing room + home-indicator clearance. */
 .pb-bottomnav {
-  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 0px));
 }
 
 /* ─── Question card slide transitions ───────────────────────── */
