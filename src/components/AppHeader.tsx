@@ -11,6 +11,11 @@
  *
  * Page clearance lives in src/index.css: `.pt-topnav` (full bar) and
  * `.pt-topnav-collapsed` (logo-only paths).
+ *
+ * Since Phase 05 (desktop branded surround) the fixed band caps at
+ * --content-max-width and centers via auto margins, so it stays aligned
+ * with DesktopFrame's paper sheet at wide viewports. At mobile widths the
+ * cap is inert and the band spans the viewport exactly as before.
  */
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { loadStats } from '../utils/gamification'
@@ -78,12 +83,20 @@ export default function AppHeader() {
       style={{
         position: 'fixed',
         top: 0,
-        left: 0,
-        right: 0,
+        // Keep the band aligned with DesktopFrame's centered sheet at desktop
+        // widths (same centering the Phase 04 harness used for its header).
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        maxWidth: 'var(--content-max-width)',
         zIndex: 50,
         height: `calc(${logoOnly ? APP_HEADER_LOGO_ONLY_HEIGHT : APP_HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
         paddingTop: 'env(safe-area-inset-top, 0px)',
         background: '#224A3A',
+        // Paper sliver at the bottom edge: invisible against the paper page at
+        // rest, but keeps the band from fusing with the identically-green hero
+        // card (or any dark content) that scrolls beneath it.
+        borderBottom: '2px solid #F1ECE3',
         boxShadow: '0 10px 28px -14px rgba(26,58,45,0.55)',
         display: 'flex',
         flexDirection: 'column',

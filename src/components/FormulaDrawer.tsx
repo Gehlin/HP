@@ -29,7 +29,7 @@ export default function FormulaDrawer({ questionType, onClose }: Props) {
       />
 
       {/* Drawer */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[80vh] flex flex-col bg-[var(--color-card)] border-t border-[var(--color-card-border)] rounded-t-2xl shadow-2xl overflow-hidden animate-slide-up">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[var(--content-max-width)] z-50 max-h-[80vh] flex flex-col bg-[var(--color-card)] border-t border-[var(--color-card-border)] rounded-t-2xl shadow-2xl overflow-hidden animate-slide-up">
 
         {/* Handle + header */}
         <div className={`shrink-0 border-b ${card.borderColor} px-5 pt-4 pb-3`}>

@@ -472,7 +472,7 @@ export default function Session() {
 
       {/* ── Header ────────────────────────────────────────────── */}
       {/* Sits directly below the collapsed 54px AppHeader band */}
-      <header className="fixed top-[calc(54px+env(safe-area-inset-top,0px))] inset-x-0 z-40 bg-[var(--color-paper)] border-b border-[var(--color-card-border)]">
+      <header className="fixed top-[calc(54px+env(safe-area-inset-top,0px))] left-1/2 -translate-x-1/2 w-full max-w-[var(--content-max-width)] z-40 bg-[var(--color-paper)] border-b border-[var(--color-card-border)]">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           {/* Left: close button */}
           <button
@@ -816,7 +816,7 @@ export default function Session() {
       )}
 
       {/* ── Fixed footer ──────────────────────────────────────── */}
-      <div className="fixed bottom-0 inset-x-0 z-40 bg-[var(--color-paper)] border-t border-[var(--color-card-border)] pb-safe">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[var(--content-max-width)] z-40 bg-[var(--color-paper)] border-t border-[var(--color-card-border)] pb-safe">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
 
           {/* Left: bookmark toggle — 54×54, filled terracotta when saved (prototype bmBtnStyle) */}

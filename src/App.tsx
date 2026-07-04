@@ -4,6 +4,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import InstallBanner from './components/InstallBanner'
 import Onboarding, { isOnboardingDone } from './components/Onboarding'
 import AppHeader from './components/AppHeader'
+import DesktopFrame from './components/DesktopFrame'
 import { maybeShowDueNotification, maybeShowPacingNotification } from './utils/notifications'
 import { getDueQuestions } from './utils/srs'
 import { questions } from './data/questions'
@@ -151,39 +152,41 @@ function AppInner() {
       )}
 
       <ScrollToTop />
-      <AppHeader />
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/practice" element={<Practice />} />
-          <Route path="/session" element={<Session />} />
-          <Route path="/resultat" element={<Resultat />} />
-          <Route path="/granska" element={<Granska />} />
-          <Route path="/results" element={<Navigate to="/resultat" replace />} />
-          <Route path="/theory" element={<Theory />} />
-          <Route path="/progress" element={<Progress />} />
-          <Route path="/exam-select" element={<ExamSelect />} />
-          <Route path="/exam/:examId" element={<ExamStart />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/matematik" element={<MathGuide />} />
-          <Route path="/bookmarks" element={<Bookmarks />} />
-          <Route path="/srs" element={<SrsQueue />} />
-          <Route path="/liggande-stolen" element={<LiggandeStolenGuide />} />
-          <Route path="/ord-guide" element={<OrdGuide />} />
-          <Route path="/mek-guide" element={<MekGuide />} />
-          <Route path="/las-guide" element={<LasGuide />} />
-          <Route path="/elf-guide" element={<ElfGuide />} />
-          <Route path="/score" element={<ScorePredictor />} />
-          <Route path="/verbalt" element={<VerbalHub />} />
-          <Route path="/kvantitativt" element={<QuantHub />} />
-          <Route path="/kva-guide" element={<KvaGuide />} />
-          <Route path="/dtk-guide" element={<DtkGuide />} />
-          <Route path="/nog-guide" element={<NogGuide />} />
-          <Route path="/xyz-guide" element={<XyzGuide />} />
-          <Route path="/ord-builder" element={<OrdBuilder />} />
-          <Route path="/profil" element={<Profil />} />
-        </Routes>
-      </Suspense>
+      <DesktopFrame>
+        <AppHeader />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/practice" element={<Practice />} />
+            <Route path="/session" element={<Session />} />
+            <Route path="/resultat" element={<Resultat />} />
+            <Route path="/granska" element={<Granska />} />
+            <Route path="/results" element={<Navigate to="/resultat" replace />} />
+            <Route path="/theory" element={<Theory />} />
+            <Route path="/progress" element={<Progress />} />
+            <Route path="/exam-select" element={<ExamSelect />} />
+            <Route path="/exam/:examId" element={<ExamStart />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/matematik" element={<MathGuide />} />
+            <Route path="/bookmarks" element={<Bookmarks />} />
+            <Route path="/srs" element={<SrsQueue />} />
+            <Route path="/liggande-stolen" element={<LiggandeStolenGuide />} />
+            <Route path="/ord-guide" element={<OrdGuide />} />
+            <Route path="/mek-guide" element={<MekGuide />} />
+            <Route path="/las-guide" element={<LasGuide />} />
+            <Route path="/elf-guide" element={<ElfGuide />} />
+            <Route path="/score" element={<ScorePredictor />} />
+            <Route path="/verbalt" element={<VerbalHub />} />
+            <Route path="/kvantitativt" element={<QuantHub />} />
+            <Route path="/kva-guide" element={<KvaGuide />} />
+            <Route path="/dtk-guide" element={<DtkGuide />} />
+            <Route path="/nog-guide" element={<NogGuide />} />
+            <Route path="/xyz-guide" element={<XyzGuide />} />
+            <Route path="/ord-builder" element={<OrdBuilder />} />
+            <Route path="/profil" element={<Profil />} />
+          </Routes>
+        </Suspense>
+      </DesktopFrame>
 
       <InstallBanner />
     </>

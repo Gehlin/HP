@@ -25,6 +25,12 @@
   --font-serif: 'Newsreader', Georgia, serif;
   --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
 
+  /* Single source of truth for the app's content-column width (Direction 2,
+     desktop branded surround). Consumed by DesktopFrame's sheet, AppHeader,
+     Session's fixed header/footer bars and FormulaDrawer — anything fixed
+     full-width must cap at this so it stays aligned with the sheet. */
+  --content-max-width: 528px;
+
   /* ─── Spec extended palette (additive; see Phase 01 token audit) ─── */
   --color-hairline: #EAE3D6;
   --color-ink-soft: #33302A;
@@ -221,6 +227,72 @@
 /* No bottom bar anymore — just breathing room + home-indicator clearance. */
 .pb-bottomnav {
   padding-bottom: max(28px, env(safe-area-inset-bottom, 0px));
+}
+
+/* ─── Desktop branded surround (Direction 2, Phase 05) ───────
+   Ported from the Phase 04 harness (src/design-preview/preview.css, the
+   `.d2-*` rules). The app's mobile-first pages render unchanged inside
+   `.desktop-frame-sheet` (a centered paper column capped at
+   --content-max-width); everything outside it is a dark forest-green
+   surround with a faint dot motif and, from 900px up, two large
+   watermark "H" glyphs. At mobile widths the sheet spans the whole
+   viewport, so the surround is completely covered → zero visual change. */
+
+.desktop-frame {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: clip;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% -8%, rgba(228, 198, 106, 0.16) 0%, transparent 65%),
+    linear-gradient(165deg, #1A3A2D 0%, #224A3A 55%, #26523F 100%);
+}
+
+/* faint diamond motif over the green, echoing the streak-chip diamond */
+.desktop-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(251, 247, 238, 0.05) 1.1px, transparent 1.1px);
+  background-size: 26px 26px;
+}
+
+.desktop-frame-watermark {
+  position: absolute;
+  top: 4vh;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: min(46vh, 480px);
+  line-height: 1;
+  color: rgba(251, 247, 238, 0.045);
+  user-select: none;
+  pointer-events: none;
+  display: none;
+}
+
+/* 288px = half the 528px sheet + a 24px gutter */
+.desktop-frame-watermark.left  { right: calc(50% + 288px); }
+.desktop-frame-watermark.right { left:  calc(50% + 288px); }
+
+@media (min-width: 900px) {
+  .desktop-frame-watermark { display: block; }
+}
+
+.desktop-frame-sheet {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  background: var(--color-paper);
+}
+
+@media (min-width: 600px) {
+  .desktop-frame-sheet {
+    box-shadow:
+      1px 0 0 rgba(228, 198, 106, 0.30),
+      -1px 0 0 rgba(228, 198, 106, 0.30),
+      0 0 80px rgba(8, 22, 16, 0.55);
+  }
 }
 
 /* ─── Question card slide transitions ───────────────────────── */
