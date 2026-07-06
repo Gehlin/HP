@@ -4,7 +4,7 @@
  * Phase 01 design-preview harness).
  *
  * Solid forest-green band: inverted cream logo tile (links to /) + serif
- * wordmark + gold streak chip on row 1, four editorial text tabs on row 2
+ * wordmark + gold streak chip on row 1, five editorial text tabs on row 2
  * (active = gold + underline). On /session, /resultat, /granska and /exam/*
  * the tabs row drops away and only the 54px identity row remains, so the
  * app stays branded inside a session without offering nav mid-pass.
@@ -30,6 +30,7 @@ export const APP_HEADER_LOGO_ONLY_HEIGHT = 54
 const TABS = [
   { path: '/',         label: 'Hem'       },
   { path: '/practice', label: 'Öva'       },
+  { path: '/theory',   label: 'Teori'     },
   { path: '/progress', label: 'Statistik' },
   { path: '/profil',   label: 'Profil'    },
 ] as const

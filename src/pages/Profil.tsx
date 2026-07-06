@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { loadStats } from '../utils/gamification'
 import { loadHistory } from '../utils/session'
 import { getExamDate, daysUntilExam } from '../utils/examDate'
@@ -69,55 +68,6 @@ function ChevronIcon() {
   return (
     <svg width="8" height="14" viewBox="0 0 8 14" className="shrink-0">
       <path d="M1 1l6 6-6 6" stroke="#C3BBAC" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function BookIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
-    </svg>
-  )
-}
-
-function ClockIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  )
-}
-
-function TimerIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
-      <circle cx="12" cy="13" r="8" />
-      <path d="M12 9v4l3 3" />
-      <path d="M9.5 3h5" />
-      <path d="M12 3v2" />
-    </svg>
-  )
-}
-
-function TypeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
-      <polyline points="4 7 4 4 20 4 20 7" />
-      <line x1="9" y1="20" x2="15" y2="20" />
-      <line x1="12" y1="4" x2="12" y2="20" />
-    </svg>
-  )
-}
-
-function ChartIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
-      <line x1="18" y1="20" x2="18" y2="10" />
-      <line x1="12" y1="20" x2="12" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="14" />
     </svg>
   )
 }
@@ -262,14 +212,13 @@ function RowValue({ children }: { children: React.ReactNode }) {
 interface SettingsRowProps {
   icon: React.ReactNode
   label: string
-  badge?: number
   onClick: () => void
   last?: boolean
   right?: React.ReactNode
   danger?: boolean
 }
 
-function SettingsRow({ icon, label, badge, onClick, last, right, danger }: SettingsRowProps) {
+function SettingsRow({ icon, label, onClick, last, right, danger }: SettingsRowProps) {
   return (
     <button
       onClick={onClick}
@@ -277,18 +226,12 @@ function SettingsRow({ icon, label, badge, onClick, last, right, danger }: Setti
     >
       {icon}
       <span className="flex-1 text-[15px] font-semibold" style={{ color: danger ? 'var(--color-wrong-badge)' : 'var(--color-ink)' }}>{label}</span>
-      {right !== undefined ? right : (
-        <>
-          {badge !== undefined && badge > 0 && <RowValue><span style={{ fontWeight: 700 }}>{badge}</span></RowValue>}
-          <ChevronIcon />
-        </>
-      )}
+      {right !== undefined ? right : <ChevronIcon />}
     </button>
   )
 }
 
 export default function Profil() {
-  const navigate = useNavigate()
   const [stats, setStats] = useState<ProfileStats>({ totalQuestions: 0, streak: 0, sessions: 0 })
   const [examDate, setExamDateState] = useState<Date | null>(null)
   const [daysLeft, setDaysLeft] = useState<number | null>(null)
@@ -443,32 +386,8 @@ export default function Profil() {
           </div>
         </div>
 
-        {/* ── Sparade frågor row (prototype goSaved) ────────── */}
-        <button
-          onClick={() => navigate('/bookmarks')}
-          className="card w-full flex items-center gap-[13px] text-left active:bg-[var(--color-paper-darker)] transition-colors"
-          style={{ borderRadius: 18, padding: '14px 16px', marginBottom: 12 }}
-        >
-          <div style={{ width: 38, height: 38, borderRadius: 11, background: 'var(--color-terracotta-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#BF5A33" stroke="#BF5A33" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z" /></svg>
-          </div>
-          <div className="flex-1 text-[15px] font-semibold text-[var(--color-ink)]">Sparade frågor</div>
-          <span style={{ fontWeight: 700, fontSize: 14, lineHeight: 1, color: '#8B8478' }}>{bookmarkCount}</span>
-          <ChevronIcon />
-        </button>
-
-        {/* ── Studieverktyg ─────────────────────────────────── */}
-        <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', color: '#A89F90', margin: '20px 4px 9px' }}>STUDIEVERKTYG</div>
-        <div className="card mb-3 overflow-hidden" style={{ borderRadius: 18 }}>
-          <SettingsRow icon={<BookIcon />} label="Teori & guider" onClick={() => navigate('/theory')} />
-          <SettingsRow icon={<ClockIcon />} label="Repetitionskö" badge={dueCount} onClick={() => navigate('/srs')} />
-          <SettingsRow icon={<TimerIcon />} label="Provsimulatorn" onClick={() => navigate('/exam-select')} />
-          <SettingsRow icon={<TypeIcon />} label="Ordbyggaren" onClick={() => navigate('/ord-builder')} />
-          <SettingsRow icon={<ChartIcon />} label="HP-poängprediktor" onClick={() => navigate('/score')} last />
-        </div>
-
         {/* ── Inställningar ─────────────────────────────────── */}
-        <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', color: '#A89F90', margin: '20px 4px 9px' }}>ÖVNING</div>
+        <div style={{ fontFamily: "'Hanken Grotesk', system-ui", fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', color: '#A89F90', margin: '20px 4px 9px' }}>INSTÄLLNINGAR</div>
         <div className="card mb-3 overflow-hidden" style={{ borderRadius: 18 }}>
           <SettingsRow
             icon={<BellIcon />}
@@ -481,6 +400,11 @@ export default function Profil() {
             label="Fokusprioritet"
             onClick={() => setShowFocusModal(true)}
             right={<>{focusPref && <RowValue>{FOCUS_LABELS[focusPref]}</RowValue>}<ChevronIcon /></>}
+          />
+          <SettingsRow
+            icon={<ReplayIcon />}
+            label="Visa introduktion igen"
+            onClick={handleReplayOnboarding}
             last
           />
         </div>
@@ -502,11 +426,6 @@ export default function Profil() {
             icon={<EraseIcon />}
             label="Rensa specifik data"
             onClick={() => { setConfirmingReset(null); setShowGranularModal(true) }}
-          />
-          <SettingsRow
-            icon={<ReplayIcon />}
-            label="Visa introduktion igen"
-            onClick={handleReplayOnboarding}
           />
           <SettingsRow
             icon={<TrashIcon />}

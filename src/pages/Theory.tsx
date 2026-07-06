@@ -240,6 +240,22 @@ function LiggandeStolenBanner({ navigate }: { navigate: ReturnType<typeof useNav
   )
 }
 
+function OrdBuilderBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <button
+      onClick={() => navigate('/ord-builder')}
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-3"
+    >
+      <span className="w-2 h-2 rounded-full bg-[var(--color-green)] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">Ordbyggaren</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Lär dig ORD-delens synonymer med flashcards</div>
+      </div>
+      <ChevronRight />
+    </button>
+  )
+}
+
 function Overview({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
   return (
     <div className="space-y-6">
@@ -287,6 +303,7 @@ function Overview({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
 
       <MathGuideBanner navigate={navigate} />
       <LiggandeStolenBanner navigate={navigate} />
+      <OrdBuilderBanner navigate={navigate} />
     </div>
   )
 }
@@ -656,6 +673,7 @@ function ORDSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         </div>
       </div>
       <OrdGuideBanner navigate={navigate} />
+      <OrdBuilderBanner navigate={navigate} />
     </div>
   )
 }

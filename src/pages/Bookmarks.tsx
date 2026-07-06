@@ -79,7 +79,7 @@ export default function Bookmarks() {
     return (
       <div className="min-h-screen bg-app pt-topnav pb-bottomnav flex flex-col">
         <div className="max-w-2xl mx-auto w-full px-4 pt-2 flex-1 flex flex-col">
-          <Header onBack={() => navigate('/profil')} />
+          <Header onBack={() => navigate('/practice')} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 30px 60px' }}>
             <div style={{ width: 60, height: 60, borderRadius: 18, background: '#F3E0D5', border: '1px solid #ECCFBE', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#BF5A33" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={BOOKMARK_PATH} /></svg>
@@ -97,7 +97,7 @@ export default function Bookmarks() {
   return (
     <div className="min-h-screen bg-app pt-topnav pb-bottomnav">
       <div className="max-w-2xl mx-auto px-4 pt-2 pb-8">
-        <Header onBack={() => navigate('/profil')} />
+        <Header onBack={() => navigate('/practice')} />
 
         {/* Type filter (existing functionality, kept) */}
         <div className="flex gap-2 flex-wrap" style={{ marginTop: 14 }}>

@@ -160,14 +160,6 @@ export default function Practice() {
     navigate('/session')
   }
 
-  const startBookmarkDrill = () => {
-    const pool = questions.filter(q => bookmarkedIds.includes(q.id))
-    const shuffled = [...pool].sort(() => Math.random() - 0.5)
-    const session = buildSession(shuffled.map(q => q.id), null, true, 'drill')
-    saveSession(session)
-    navigate('/session')
-  }
-
   const start = () => {
     const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
     const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
@@ -231,27 +223,62 @@ export default function Practice() {
             </div>
           ))}
 
-          {/* Link into the SRS dashboard — repetition's single home is /srs */}
-          <div
-            onClick={() => navigate('/srs')}
-            className="bg-[var(--color-card)] rounded-2xl p-4 mb-3 cursor-pointer flex items-center gap-3 border border-[var(--color-card-border)]"
-          >
-            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-gold)' }} />
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
-              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.59"/>
-            </svg>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-[var(--color-ink)]">Repetitionskö</div>
-              <div className="text-sm text-[var(--color-ink-faint)]">
-                {dueIds.length > 0 ? `${dueIds.length} frågor att repetera` : 'Inget att repetera idag'}
+          {/* One-tap links into the practice tools that live on their own
+              pages — SRS dashboard, exam simulator and saved questions
+              (promoted here from Profil's old STUDIEVERKTYG list). */}
+          {[
+            {
+              path: '/srs',
+              title: 'Repetitionskö',
+              desc: dueIds.length > 0 ? `${dueIds.length} frågor att repetera` : 'Inget att repetera idag',
+              dotColor: 'var(--color-gold)',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+                  <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.59"/>
+                </svg>
+              ),
+            },
+            {
+              path: '/exam-select',
+              title: 'Provsimulatorn',
+              desc: 'Gamla högskoleprov och provpass med tid',
+              dotColor: 'var(--color-terracotta)',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+                  <circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 3"/><path d="M9.5 3h5"/>
+                </svg>
+              ),
+            },
+            {
+              path: '/bookmarks',
+              title: 'Sparade frågor',
+              desc: bookmarkedIds.length > 0 ? `${bookmarkedIds.length} bokmärkta frågor` : 'Inga sparade frågor än',
+              dotColor: 'var(--color-green)',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+                  <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/>
+                </svg>
+              ),
+            },
+          ].map(link => (
+            <div
+              key={link.path}
+              onClick={() => navigate(link.path)}
+              className="bg-[var(--color-card)] rounded-2xl p-4 mb-3 cursor-pointer flex items-center gap-3 border border-[var(--color-card-border)]"
+            >
+              <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: link.dotColor }} />
+              {link.icon}
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-[var(--color-ink)]">{link.title}</div>
+                <div className="text-sm text-[var(--color-ink-faint)]">{link.desc}</div>
               </div>
+              <span className="text-[var(--color-ink-faint)] shrink-0">→</span>
             </div>
-            <span className="text-[var(--color-ink-faint)] shrink-0">→</span>
-          </div>
+          ))}
         </div>
 
         {/* Quick-drill shortcuts */}
-        {(wrongQuestionIds.length > 0 || bookmarkedIds.length > 0 || adaptiveIds.length > 0) && (
+        {(wrongQuestionIds.length > 0 || adaptiveIds.length > 0) && (
           <div className="mb-6 space-y-2">
             {adaptiveIds.length > 0 && (
               <button
@@ -285,30 +312,6 @@ export default function Practice() {
                 <div className="font-bold text-[var(--color-gold-deep)] text-sm">Öva på dina fel</div>
                 <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">{wrongQuestionIds.length} frågor du svarat fel på · studieläge</div>
               </button>
-            )}
-            {bookmarkedIds.length > 0 && (
-              <div className="rounded-2xl border border-[var(--color-green)] bg-[var(--color-green-muted)] overflow-hidden">
-                <div className="flex items-center justify-between p-4">
-                  <div>
-                    <div className="font-bold text-[var(--color-green)] text-sm">Bokmärkta frågor</div>
-                    <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">{bookmarkedIds.length} sparade frågor</div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => navigate('/bookmarks')}
-                      className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] border border-[var(--color-card-border)] rounded-lg px-2.5 py-1.5 transition-colors"
-                    >
-                      Bläddra
-                    </button>
-                    <button
-                      onClick={startBookmarkDrill}
-                      className="text-xs text-[var(--color-green)] bg-[var(--color-paper-dark)] hover:bg-[var(--color-paper-darker)] rounded-lg px-2.5 py-1.5 font-bold transition-colors"
-                    >
-                      Drill →
-                    </button>
-                  </div>
-                </div>
-              </div>
             )}
           </div>
         )}

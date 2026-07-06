@@ -79,7 +79,7 @@ export default function OrdBuilder() {
   if (mode === 'menu') {
     return (
       <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
-        <PageHeader title="Ordbyggaren" onBack={() => navigate('/practice')} />
+        <PageHeader title="Ordbyggaren" onBack={() => navigate('/theory')} />
         <div className="max-w-lg mx-auto px-4 py-6 pb-8">
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 bg-[var(--color-green-muted)] border border-[var(--color-green)] text-[var(--color-green)] text-[11px] font-bold tracking-[0.1em] uppercase px-3 py-1.5 rounded-full mb-4">
