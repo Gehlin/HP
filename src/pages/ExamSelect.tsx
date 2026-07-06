@@ -19,6 +19,7 @@ export default function ExamSelect() {
   const [section, setSection] = useState<'quant' | 'verbal'>('quant')
 
   const totalVerbal = Object.values(VERBAL_SECTION_SIZES).reduce((a, b) => a + b, 0)
+  const totalQuant = Object.values(SECTION_SIZES).reduce((a, b) => a + b, 0)
 
   return (
     <div className="min-h-screen bg-app text-[var(--color-ink)] pt-topnav pb-bottomnav">
@@ -78,6 +79,25 @@ export default function ExamSelect() {
 
         {section === 'quant' && (
           <>
+            {/* Whole-section quick pass (migrated from the retired QuantHub) */}
+            <div className="card rounded-2xl p-4 mb-3">
+              <div className="font-black text-base text-[var(--color-ink)] mb-0.5">Kvantitativt provpass</div>
+              <div className="text-[var(--color-ink-faint)] text-xs mb-3">{totalQuant} frågor · slumpmässigt urval · 55 minuter</div>
+              <div className="flex gap-1.5 flex-wrap">
+                {(Object.entries(SECTION_SIZES) as [string, number][]).map(([type, count]) => (
+                  <span key={type} className={`text-[10px] font-bold px-2 py-0.5 rounded border ${TYPE_PILL[type]}`}>
+                    {type} {count}
+                  </span>
+                ))}
+              </div>
+              <button
+                onClick={() => navigate('/exam/quant-random')}
+                className="btn-primary w-full mt-4"
+              >
+                Starta →
+              </button>
+            </div>
+
             {(() => {
               const realExams = exams.filter(e => !e.id.startsWith('ovning-'))
               const practiceExams = exams.filter(e => e.id.startsWith('ovning-'))
@@ -156,7 +176,7 @@ export default function ExamSelect() {
         {section === 'verbal' && (
           <div>
             <div className="card rounded-2xl p-4 mb-3">
-              <div className="font-black text-base text-[var(--color-ink)] mb-0.5">Verbalt delprov</div>
+              <div className="font-black text-base text-[var(--color-ink)] mb-0.5">Verbalt provpass</div>
               <div className="text-[var(--color-ink-faint)] text-xs mb-3">{totalVerbal} frågor · slumpmässigt urval · 55 minuter</div>
               <div className="flex gap-1.5 flex-wrap">
                 {(Object.entries(VERBAL_SECTION_SIZES) as [string, number][]).map(([type, count]) => (

@@ -19,7 +19,6 @@ const Theory     = lazy(() => import('./pages/Theory'))
 const Progress   = lazy(() => import('./pages/Progress'))
 const ExamSelect = lazy(() => import('./pages/ExamSelect'))
 const ExamStart  = lazy(() => import('./pages/ExamStart'))
-const Settings   = lazy(() => import('./pages/Settings'))
 const MathGuide           = lazy(() => import('./pages/MathGuide'))
 const Bookmarks           = lazy(() => import('./pages/Bookmarks'))
 const SrsQueue            = lazy(() => import('./pages/SrsQueue'))
@@ -29,8 +28,6 @@ const MekGuide            = lazy(() => import('./pages/MekGuide'))
 const LasGuide            = lazy(() => import('./pages/LasGuide'))
 const ElfGuide            = lazy(() => import('./pages/ElfGuide'))
 const ScorePredictor      = lazy(() => import('./pages/ScorePredictor'))
-const VerbalHub           = lazy(() => import('./pages/VerbalHub'))
-const QuantHub            = lazy(() => import('./pages/QuantHub'))
 const KvaGuide            = lazy(() => import('./pages/KvaGuide'))
 const DtkGuide            = lazy(() => import('./pages/DtkGuide'))
 const NogGuide            = lazy(() => import('./pages/NogGuide'))
@@ -166,7 +163,6 @@ function AppInner() {
             <Route path="/progress" element={<Progress />} />
             <Route path="/exam-select" element={<ExamSelect />} />
             <Route path="/exam/:examId" element={<ExamStart />} />
-            <Route path="/settings" element={<Settings />} />
             <Route path="/matematik" element={<MathGuide />} />
             <Route path="/bookmarks" element={<Bookmarks />} />
             <Route path="/srs" element={<SrsQueue />} />
@@ -176,8 +172,6 @@ function AppInner() {
             <Route path="/las-guide" element={<LasGuide />} />
             <Route path="/elf-guide" element={<ElfGuide />} />
             <Route path="/score" element={<ScorePredictor />} />
-            <Route path="/verbalt" element={<VerbalHub />} />
-            <Route path="/kvantitativt" element={<QuantHub />} />
             <Route path="/kva-guide" element={<KvaGuide />} />
             <Route path="/dtk-guide" element={<DtkGuide />} />
             <Route path="/nog-guide" element={<NogGuide />} />

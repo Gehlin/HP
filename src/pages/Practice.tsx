@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import type { QuestionType, ExamSession } from '../types'
+import type { QuestionType } from '../types'
 import { questions } from '../data/questions'
 import { buildSession, saveSession, loadHistory } from '../utils/session'
 import { getDueQuestions } from '../utils/srs'
@@ -8,7 +8,7 @@ import { getBookmarks } from '../utils/bookmarks'
 import { getDailyChallengeIds, markDailyChallengeCompleted } from '../utils/dailyChallenge'
 import { weakTypeSummary, buildWeakAreaSession } from '../utils/analytics'
 
-type Mode = 'drill' | 'exam' | 'repetition'
+type Mode = 'drill' | 'exam'
 type Difficulty = 'easy' | 'medium' | 'hard'
 
 const TYPE_INFO: Record<QuestionType, { label: string; desc: string; time: string }> = {
@@ -114,15 +114,6 @@ export default function Practice() {
   const available = filteredPool.length
   const dueIds = useMemo(() => getDueQuestions(questions.map(q => q.id)), [])
 
-  const dueByType = useMemo(() => {
-    const counts: Record<QuestionType, number> = { XYZ: 0, KVA: 0, NOG: 0, DTK: 0, ORD: 0, LAS: 0, MEK: 0, ELF: 0 }
-    dueIds.forEach(id => {
-      const q = questions.find(x => x.id === id)
-      if (q) counts[q.type]++
-    })
-    return counts
-  }, [dueIds])
-
   const bookmarkedIds = useMemo(() => getBookmarks().filter(id => questions.some(q => q.id === id)), [])
   const isDaily = searchParams.get('daily') === '1'
   const isSrs = searchParams.get('srs') === '1'
@@ -178,23 +169,16 @@ export default function Practice() {
   }
 
   const start = () => {
-    let session: ExamSession
-    if (mode === 'repetition') {
-      const pool = questions.filter(q => dueIds.includes(q.id))
-      if (pool.length === 0) return
-      session = buildSession(pool.map(q => q.id), null, true, 'drill', true)
-    } else {
-      const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
-      const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
-      const chosenIds = chosen.map(q => q.id)
-      session = buildSession(chosenIds, timed ? computeTimeLimit(chosenIds) : null, instantFeedback, 'drill', studyMode || undefined)
-    }
+    const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
+    const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
+    const chosenIds = chosen.map(q => q.id)
+    const session = buildSession(chosenIds, timed ? computeTimeLimit(chosenIds) : null, instantFeedback, 'drill', studyMode || undefined)
     saveSession(session)
     navigate('/session')
   }
 
   const allTagsSelected = selectedTags.length === ALL_TAGS.length
-  const canStart = mode === 'repetition' ? dueIds.length > 0 : (selectedTypes.length > 0 && available > 0)
+  const canStart = selectedTypes.length > 0 && available > 0
 
   return (
     <div className="min-h-screen bg-app pt-topnav pb-bottomnav">
@@ -228,17 +212,6 @@ export default function Practice() {
                 </svg>
               ),
             },
-            {
-              id: 'repetition' as Mode,
-              title: 'Spaced Repetition',
-              desc: dueIds.length > 0 ? `${dueIds.length} frågor att repetera` : 'Inget idag',
-              dotColor: 'var(--color-gold)',
-              icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
-                  <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.59"/>
-                </svg>
-              ),
-            },
           ].map(card => (
             <div
               key={card.id}
@@ -257,6 +230,24 @@ export default function Practice() {
               </div>
             </div>
           ))}
+
+          {/* Link into the SRS dashboard — repetition's single home is /srs */}
+          <div
+            onClick={() => navigate('/srs')}
+            className="bg-[var(--color-card)] rounded-2xl p-4 mb-3 cursor-pointer flex items-center gap-3 border border-[var(--color-card-border)]"
+          >
+            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-gold)' }} />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.59"/>
+            </svg>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-[var(--color-ink)]">Repetitionskö</div>
+              <div className="text-sm text-[var(--color-ink-faint)]">
+                {dueIds.length > 0 ? `${dueIds.length} frågor att repetera` : 'Inget att repetera idag'}
+              </div>
+            </div>
+            <span className="text-[var(--color-ink-faint)] shrink-0">→</span>
+          </div>
         </div>
 
         {/* Quick-drill shortcuts */}
@@ -323,41 +314,13 @@ export default function Practice() {
         )}
 
         {/* Top CTA — quick launch before section drills */}
-        {(mode !== 'repetition' || dueIds.length > 0) && (
-          <button
-            onClick={start}
-            disabled={!canStart}
-            className="btn-primary w-full mb-6 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {canStart ? 'Starta träning →' : 'Inga frågor tillgängliga'}
-          </button>
-        )}
-
-        {/* Repetition mode panel — before Sektionsträning so empty-state is visible without scrolling */}
-        {mode === 'repetition' && (
-          <div className="mb-6 bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-2xl p-5">
-            {dueIds.length === 0 ? (
-              <p className="text-center text-[var(--color-ink-faint)] text-sm">Inga frågor att repetera idag — kom tillbaka imorgon!</p>
-            ) : (
-              <>
-                <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-3">
-                  {dueIds.length} frågor att repetera
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {(Object.entries(dueByType) as [QuestionType, number][])
-                    .filter(([, n]) => n > 0)
-                    .map(([type, n]) => (
-                      <div key={type} className="bg-[var(--color-paper-dark)] rounded-xl p-2.5 text-center">
-                        <div className="text-xs font-black mb-1" style={{ color: TYPE_ACCENTS[type].color }}>{type}</div>
-                        <div className="text-lg font-black text-[var(--color-ink)]">{n}</div>
-                      </div>
-                    ))}
-                </div>
-                <p className="text-[11px] text-[var(--color-ink-faint)] mt-3">Studieläge aktiveras automatiskt.</p>
-              </>
-            )}
-          </div>
-        )}
+        <button
+          onClick={start}
+          disabled={!canStart}
+          className="btn-primary w-full mb-6 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {canStart ? 'Starta träning →' : 'Inga frågor tillgängliga'}
+        </button>
 
         {/* Section drills */}
         <div className="mb-6">
@@ -389,15 +352,13 @@ export default function Practice() {
           </div>
         </div>
 
-        {mode !== 'repetition' && (
-          <>
-            <button
-              onClick={() => setAdvancedOpen(prev => !prev)}
-              className="w-full flex items-center justify-between text-[10px] font-bold tracking-widest text-[var(--color-ink-faint)] uppercase mb-4"
-            >
-              <span>Avancerat</span>
-              <span className="text-[var(--color-ink-muted)]">{advancedOpen ? '▲' : '▼'}</span>
-            </button>
+        <button
+          onClick={() => setAdvancedOpen(prev => !prev)}
+          className="w-full flex items-center justify-between text-[10px] font-bold tracking-widest text-[var(--color-ink-faint)] uppercase mb-4"
+        >
+          <span>Avancerat</span>
+          <span className="text-[var(--color-ink-muted)]">{advancedOpen ? '▲' : '▼'}</span>
+        </button>
 
             {advancedOpen && (<>
             {/* Question types */}
@@ -594,12 +555,10 @@ export default function Practice() {
             </div>
             </>)}
 
-            {available === 0 && (
-              <p className="text-[var(--color-gold-deep)] text-sm mb-4 text-center">
-                Inga frågor matchar filtren — justera svårighetsgrad, ämnen eller delprov.
-              </p>
-            )}
-          </>
+        {available === 0 && (
+          <p className="text-[var(--color-gold-deep)] text-sm mb-4 text-center">
+            Inga frågor matchar filtren — justera svårighetsgrad, ämnen eller delprov.
+          </p>
         )}
 
         {/* Start CTA */}

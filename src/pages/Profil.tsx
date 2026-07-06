@@ -6,6 +6,7 @@ import { getExamDate, daysUntilExam } from '../utils/examDate'
 import Onboarding from '../components/Onboarding'
 import { getDueQuestions } from '../utils/srs'
 import { getBookmarks } from '../utils/bookmarks'
+import { getEarnedIds } from '../utils/achievements'
 import { questions } from '../data/questions'
 import { requestNotificationPermission, disableNotifications } from '../utils/notifications'
 import { getFocusPreference, setFocusPreference, FocusPreference } from '../utils/focusPreference'
@@ -188,6 +189,37 @@ function TrashIcon() {
   )
 }
 
+function ReplayIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <polyline points="1 4 1 10 7 10" />
+      <path d="M3.51 15a9 9 0 1 0 .49-3.59" />
+    </svg>
+  )
+}
+
+function EraseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  )
+}
+
+// Granular per-category resets (migrated from the retired Settings.tsx)
+type GranularResetId = 'srs' | 'history' | 'bookmarks' | 'achievements'
+
+const GRANULAR_RESETS: { id: GranularResetId; label: string; description: string; keys: string[]; doneMsg: string }[] = [
+  { id: 'srs',          label: 'Nollställ SRS-framsteg',        description: 'Tar bort repetitionshistorik. Alla frågor börjar om från noll.', keys: ['hp_srs'],                                                       doneMsg: 'SRS-data rensad' },
+  { id: 'history',      label: 'Rensa träningshistorik & XP',   description: 'Tar bort alla pass, XP och streak. Brickor behålls.',            keys: ['hp_session_history', 'hp_current_session', 'hp_gamification'], doneMsg: 'Träningshistorik och XP nollställda' },
+  { id: 'bookmarks',    label: 'Rensa bokmärken',               description: 'Tar bort alla sparade frågor.',                                  keys: ['hp_bookmarks'],                                                 doneMsg: 'Bokmärken rensade' },
+  { id: 'achievements', label: 'Rensa brickor',                 description: 'Nollställer alla upplåsta achievements.',                        keys: ['hp_achievements'],                                              doneMsg: 'Brickor rensade' },
+]
+
 function SlidersIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-ink-muted)] shrink-0">
@@ -266,18 +298,22 @@ export default function Profil() {
   const [focusPref, setFocusPrefState] = useState<FocusPreference | null>(() => getFocusPreference())
   const [showFocusModal, setShowFocusModal] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
+  const [showGranularModal, setShowGranularModal] = useState(false)
+  const [confirmingReset, setConfirmingReset] = useState<GranularResetId | null>(null)
+  const [dataVersion, setDataVersion] = useState(0)
   const [toast, setToast] = useState<string | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
 
-  const dueCount = useMemo(() => getDueQuestions(allQuestionIds).length, [])
-  const bookmarkCount = useMemo(() => getBookmarks().length, [])
+  const dueCount = useMemo(() => getDueQuestions(allQuestionIds).length, [dataVersion])
+  const bookmarkCount = useMemo(() => getBookmarks().length, [dataVersion])
+  const earnedCount = useMemo(() => getEarnedIds().length, [dataVersion])
 
   useEffect(() => {
     setStats(computeStats())
     setExamDateState(getExamDate())
     setDaysLeft(daysUntilExam())
     try { setGoal(localStorage.getItem('hp_goal') ?? '1,40') } catch { /* ignore */ }
-  }, [])
+  }, [dataVersion])
 
   // Prototype goalEdit: "Ändra" re-enters the onboarding wizard at the goal step,
   // returning here (overlay unmounts) when finished; re-read what it wrote.
@@ -331,6 +367,24 @@ export default function Profil() {
     localStorage.clear()
     setShowResetModal(false)
     window.location.reload()
+  }
+
+  // Two-tap confirm per category, matching the retired Settings.tsx behavior
+  function handleGranularReset(item: typeof GRANULAR_RESETS[number]) {
+    if (confirmingReset === item.id) {
+      item.keys.forEach(k => localStorage.removeItem(k))
+      setConfirmingReset(null)
+      setDataVersion(v => v + 1)
+      flash(item.doneMsg)
+    } else {
+      setConfirmingReset(item.id)
+      setTimeout(() => setConfirmingReset(c => (c === item.id ? null : c)), 4000)
+    }
+  }
+
+  function handleReplayOnboarding() {
+    localStorage.removeItem('hp_onboarding_done')
+    window.location.href = '/'
   }
 
   const userName = (() => { try { return localStorage.getItem('hp_user_name') } catch { return null } })()
@@ -445,6 +499,16 @@ export default function Profil() {
             onClick={() => importRef.current?.click()}
           />
           <SettingsRow
+            icon={<EraseIcon />}
+            label="Rensa specifik data"
+            onClick={() => { setConfirmingReset(null); setShowGranularModal(true) }}
+          />
+          <SettingsRow
+            icon={<ReplayIcon />}
+            label="Visa introduktion igen"
+            onClick={handleReplayOnboarding}
+          />
+          <SettingsRow
             icon={<TrashIcon />}
             label="Återställ all data"
             onClick={() => setShowResetModal(true)}
@@ -502,6 +566,57 @@ export default function Profil() {
       {toast && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[400] bg-[var(--color-green)] text-[var(--color-cream)] text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg">
           {toast}
+        </div>
+      )}
+
+      {/* Granular reset modal (migrated from the retired Settings.tsx) */}
+      {showGranularModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pb-8"
+          onClick={() => setShowGranularModal(false)}
+        >
+          <div
+            className="card w-full max-w-md p-5"
+            onClick={e => e.stopPropagation()}
+          >
+            <h2 className="text-base font-semibold text-[var(--color-ink)] mb-1">Rensa specifik data</h2>
+            <p className="text-sm text-[var(--color-ink-muted)] mb-4">Tryck två gånger för att bekräfta. Övrig data behålls.</p>
+            <div className="flex flex-col gap-2">
+              {GRANULAR_RESETS.map(item => {
+                const badge =
+                  item.id === 'history' ? `${stats.sessions} pass` :
+                  item.id === 'bookmarks' ? `${bookmarkCount}` :
+                  item.id === 'achievements' ? `${earnedCount}` :
+                  `${dueCount} att repetera`
+                const isConfirming = confirmingReset === item.id
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleGranularReset(item)}
+                    className={`w-full text-left rounded-xl px-4 py-3 border transition-colors ${
+                      isConfirming
+                        ? 'border-[var(--color-gold-deep)] bg-[var(--color-gold-muted)]'
+                        : 'border-[var(--color-card-border)] bg-[var(--color-paper)]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-semibold text-[var(--color-ink)]">{item.label}</span>
+                      <span className={`text-xs shrink-0 px-2 py-0.5 rounded-lg font-medium ${isConfirming ? 'text-[var(--color-gold-deep)] bg-[var(--color-gold-muted)]' : 'text-[var(--color-ink-faint)] bg-[var(--color-paper-dark)]'}`}>
+                        {isConfirming ? 'Tryck igen' : badge}
+                      </span>
+                    </div>
+                    <div className="text-xs text-[var(--color-ink-faint)] mt-1">{item.description}</div>
+                  </button>
+                )
+              })}
+            </div>
+            <button
+              onClick={() => setShowGranularModal(false)}
+              className="mt-4 w-full py-2.5 rounded-xl border border-[var(--color-card-border)] text-sm text-[var(--color-ink)]"
+            >
+              Stäng
+            </button>
+          </div>
         </div>
       )}
 

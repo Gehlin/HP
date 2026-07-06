@@ -285,7 +285,7 @@ export default function Home() {
           return (
             <button
               key={sec.type}
-              onClick={() => navigate('/practice', { state: { defaultType: sec.type } })}
+              onClick={() => navigate(`/practice?type=${sec.type}`)}
               style={{ background: '#FFFFFF', border: '1px solid #EAE3D6', borderRadius: 16, padding: '13px 15px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left' }}
             >
               <span style={{ width: 44, flexShrink: 0, fontFamily: SANS, fontWeight: 800, fontSize: 16, lineHeight: 1, color: '#23201A' }}>

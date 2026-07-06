@@ -96,6 +96,70 @@ function MathGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate
   )
 }
 
+function XyzGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <button
+      onClick={() => navigate('/xyz-guide')}
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
+    >
+      <span className="w-2 h-2 rounded-full bg-[var(--color-terracotta)] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">XYZ-guide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Ämnesområden, strategier och formler för problemlösning</div>
+      </div>
+      <ChevronRight />
+    </button>
+  )
+}
+
+function KvaGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <button
+      onClick={() => navigate('/kva-guide')}
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
+    >
+      <span className="w-2 h-2 rounded-full bg-[var(--color-terracotta)] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">KVA-guide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Jämförelsemetoder, extremvärden och vanliga fällor</div>
+      </div>
+      <ChevronRight />
+    </button>
+  )
+}
+
+function NogGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <button
+      onClick={() => navigate('/nog-guide')}
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
+    >
+      <span className="w-2 h-2 rounded-full bg-[var(--color-green)] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">NOG-guide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Svarsalternativen, trestegsmetoden och typuppgifter</div>
+      </div>
+      <ChevronRight />
+    </button>
+  )
+}
+
+function DtkGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  return (
+    <button
+      onClick={() => navigate('/dtk-guide')}
+      className="card rounded-2xl p-4 mb-3 w-full text-left flex items-center gap-3 hover:bg-[var(--color-paper-dark)] transition-colors mt-4"
+    >
+      <span className="w-2 h-2 rounded-full bg-[var(--color-gold-deep)] shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-ink)]">DTK-guide</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Diagramtyper, avläsningsfällor och procentberäkningar</div>
+      </div>
+      <ChevronRight />
+    </button>
+  )
+}
+
 function OrdGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
   return (
     <button
@@ -276,6 +340,7 @@ function XYZSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         </div>
       </div>
 
+      <XyzGuideBanner navigate={navigate} />
       <MathGuideBanner navigate={navigate} />
       <LiggandeStolenBanner navigate={navigate} />
     </div>
@@ -362,6 +427,7 @@ function KVASection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         ]} />
       </div>
 
+      <KvaGuideBanner navigate={navigate} />
       <MathGuideBanner navigate={navigate} />
     </div>
   )
@@ -452,6 +518,7 @@ function NOGSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         ]} />
       </div>
 
+      <NogGuideBanner navigate={navigate} />
       <MathGuideBanner navigate={navigate} />
     </div>
   )
@@ -537,6 +604,7 @@ function DTKSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         ]} />
       </div>
 
+      <DtkGuideBanner navigate={navigate} />
       <MathGuideBanner navigate={navigate} />
     </div>
   )
@@ -606,6 +674,7 @@ function LASSection({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
         <div className="space-y-2">
           {[
             { title: 'Läs frågorna först', body: 'Vet du vad du letar efter innan du läser texten. Det sparar tid och fokuserar din läsning på det som testas.' },
+            { title: 'Bygg en styckeskarta', body: 'Läs första meningen i varje stycke innan du går till frågorna — det ger en karta över texten så du snabbt hittar rätt stycke igen.' },
             { title: 'Hitta textbevis', body: 'Rätt svar är alltid förankrat i texten. Om du inte hittar ett direkt citat eller stöd — välj bort alternativet.' },
             { title: 'Akta "för stark" formulering', body: '"Alltid", "aldrig", "alla", "ingen" — extrema ord är ofta fel. Texten säger sällan absoluta saker.' },
             { title: 'Gör inte egna slutledningar', body: 'LÄS testar vad texten säger, inte vad du tror/vet om ämnet. Din allmänbildning kan lura dig.' },
