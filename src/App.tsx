@@ -7,6 +7,7 @@ import AppHeader from './components/AppHeader'
 import DesktopFrame from './components/DesktopFrame'
 import { maybeShowDueNotification, maybeShowPacingNotification } from './utils/notifications'
 import { getDueQuestions } from './utils/srs'
+import { loadQuestions } from './data/questionsLoader'
 import { loadHistory } from './utils/session'
 
 const Home       = lazy(() => import('./pages/Home'))
@@ -82,10 +83,10 @@ function AppInner() {
   }, [])
 
   useEffect(() => {
-    // Dynamic import: the question bank is ~1.7MB of source and only its ids
-    // are needed here, so keep it out of the eager entry chunk (it's already
-    // pulled in by whichever lazy page the user actually visits).
-    import('./data/questions').then(({ questions }) => {
+    // Shared cached loader: only its ids are needed here, so keep the
+    // question bank out of the eager entry chunk (it's already pulled in,
+    // via the same cached promise, by whichever lazy page the user visits).
+    loadQuestions().then(questions => {
       const dueCount = getDueQuestions(questions.map(q => q.id)).length
       const history = loadHistory()
       const lastSession = history.length > 0 ? history[0].startTime : null

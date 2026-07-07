@@ -14,35 +14,35 @@ afterEach(() => {
 })
 
 describe('getDailyChallengeIds', () => {
-  it('returns exactly CHALLENGE_SIZE (10) question ids', () => {
-    expect(getDailyChallengeIds()).toHaveLength(CHALLENGE_SIZE)
+  it('returns exactly CHALLENGE_SIZE (10) question ids', async () => {
+    expect(await getDailyChallengeIds()).toHaveLength(CHALLENGE_SIZE)
   })
 
-  it('never returns a duplicate id within a single challenge', () => {
-    const ids = getDailyChallengeIds()
+  it('never returns a duplicate id within a single challenge', async () => {
+    const ids = await getDailyChallengeIds()
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  it('only returns ids that actually exist in the real question bank', () => {
-    const ids = getDailyChallengeIds()
+  it('only returns ids that actually exist in the real question bank', async () => {
+    const ids = await getDailyChallengeIds()
     ids.forEach(id => expect(realIds.has(id)).toBe(true))
   })
 
-  it('is deterministic for the same calendar day — calling it twice returns the identical set', () => {
+  it('is deterministic for the same calendar day — calling it twice returns the identical set', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-07-07T09:00:00'))
-    const first = getDailyChallengeIds()
+    const first = await getDailyChallengeIds()
     vi.setSystemTime(new Date('2026-07-07T21:00:00')) // later the same day
-    const second = getDailyChallengeIds()
+    const second = await getDailyChallengeIds()
     expect(second).toEqual(first)
   })
 
-  it('produces a different selection on a different calendar day', () => {
+  it('produces a different selection on a different calendar day', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-07-07T09:00:00'))
-    const day1 = getDailyChallengeIds()
+    const day1 = await getDailyChallengeIds()
     vi.setSystemTime(new Date('2026-07-08T09:00:00'))
-    const day2 = getDailyChallengeIds()
+    const day2 = await getDailyChallengeIds()
     expect(day2).not.toEqual(day1)
   })
 })

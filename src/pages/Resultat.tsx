@@ -103,8 +103,12 @@ export default function Resultat() {
     })
 
     const t = setTimeout(() => setCardVisible(true), 150)
-    const newlyEarned = checkAchievements()
-    if (newlyEarned.length > 0) setTimeout(() => setNewAchievements(newlyEarned), 800)
+    // checkAchievements is async (it loads the question bank via the shared
+    // cached loader) — this effect isn't itself async, so handle the result
+    // with .then() rather than await.
+    checkAchievements().then(newlyEarned => {
+      if (newlyEarned.length > 0) setTimeout(() => setNewAchievements(newlyEarned), 800)
+    })
     return () => clearTimeout(t)
   }, [])
 

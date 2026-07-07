@@ -120,11 +120,15 @@ export default function Practice() {
 
   useEffect(() => {
     if (!isDaily) return
-    const ids = getDailyChallengeIds()
-    const session = buildSession(ids, null, true, 'drill')
-    saveSession(session)
-    markDailyChallengeCompleted()
-    navigate('/session', { replace: true })
+    // getDailyChallengeIds is async (loads the question bank via the shared
+    // cached loader) — resolves near-instantly since Practice.tsx's own
+    // `questions` import already forces the same module to load.
+    getDailyChallengeIds().then(ids => {
+      const session = buildSession(ids, null, true, 'drill')
+      saveSession(session)
+      markDailyChallengeCompleted()
+      navigate('/session', { replace: true })
+    })
   }, [])
 
   useEffect(() => {
