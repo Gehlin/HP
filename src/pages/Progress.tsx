@@ -1035,10 +1035,10 @@ export default function Progress() {
                     )}
                   </div>
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       const pool = bookmarkIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as typeof questions
                       const shuffled = [...pool].sort(() => Math.random() - 0.5)
-                      const session = buildSession(shuffled.map(q => q.id), null, true, 'drill')
+                      const session = await buildSession(shuffled.map(q => q.id), null, true, 'drill')
                       saveSession(session)
                       navigate('/session')
                     }}

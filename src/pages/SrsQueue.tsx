@@ -124,9 +124,9 @@ export default function SrsQueue() {
                 )}
               </div>
               <button
-                onClick={() => {
+                onClick={async () => {
                   const pool = questions.filter(q => dueIds.includes(q.id))
-                  const session = buildSession(pool.map(q => q.id), null, true, 'drill', true)
+                  const session = await buildSession(pool.map(q => q.id), null, true, 'drill', true)
                   saveSession(session)
                   navigate('/session')
                 }}
@@ -163,10 +163,10 @@ export default function SrsQueue() {
                   {' '}({stats.byType[typeFilter]?.due ?? 0} frågor)
                 </div>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     const pool = questions.filter(q => dueIds.includes(q.id) && q.type === typeFilter)
                     if (pool.length === 0) return
-                    const session = buildSession(pool.map(q => q.id), null, true, 'drill', true)
+                    const session = await buildSession(pool.map(q => q.id), null, true, 'drill', true)
                     saveSession(session)
                     navigate('/session')
                   }}

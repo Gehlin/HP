@@ -126,8 +126,8 @@ export default function Home() {
     saveSession({ ...resumeSession, endTime: undefined })
     navigate('/session')
   }
-  const startWeakDrill = () => {
-    const session = buildSession(weakAreaIds, null, true, 'drill', true)
+  const startWeakDrill = async () => {
+    const session = await buildSession(weakAreaIds, null, true, 'drill', true)
     saveSession(session)
     navigate('/session')
   }

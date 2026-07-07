@@ -123,8 +123,8 @@ export default function Practice() {
     // getDailyChallengeIds is async (loads the question bank via the shared
     // cached loader) — resolves near-instantly since Practice.tsx's own
     // `questions` import already forces the same module to load.
-    getDailyChallengeIds().then(ids => {
-      const session = buildSession(ids, null, true, 'drill')
+    getDailyChallengeIds().then(async ids => {
+      const session = await buildSession(ids, null, true, 'drill')
       saveSession(session)
       markDailyChallengeCompleted()
       navigate('/session', { replace: true })
@@ -135,9 +135,10 @@ export default function Practice() {
     if (!isSrs) return
     const pool = questions.filter(q => dueIds.includes(q.id))
     if (pool.length === 0) return
-    const session = buildSession(pool.map(q => q.id), null, true, 'drill', true)
-    saveSession(session)
-    navigate('/session', { replace: true })
+    buildSession(pool.map(q => q.id), null, true, 'drill', true).then(session => {
+      saveSession(session)
+      navigate('/session', { replace: true })
+    })
   }, [dueIds.length])
 
   const wrongQuestionIds = useMemo(() => {
@@ -156,19 +157,19 @@ export default function Practice() {
 
   const weakTypes = useMemo(() => weakTypeSummary(), [])
 
-  const startWrongDrill = () => {
+  const startWrongDrill = async () => {
     const pool = questions.filter(q => wrongQuestionIds.includes(q.id))
     const shuffled = [...pool].sort(() => Math.random() - 0.5)
-    const session = buildSession(shuffled.map(q => q.id), null, true, 'drill', true)
+    const session = await buildSession(shuffled.map(q => q.id), null, true, 'drill', true)
     saveSession(session)
     navigate('/session')
   }
 
-  const start = () => {
+  const start = async () => {
     const shuffled = [...filteredPool].sort(() => Math.random() - 0.5)
     const chosen = shuffled.slice(0, Math.min(count, filteredPool.length))
     const chosenIds = chosen.map(q => q.id)
-    const session = buildSession(chosenIds, timed ? computeTimeLimit(chosenIds) : null, instantFeedback, 'drill', studyMode || undefined)
+    const session = await buildSession(chosenIds, timed ? computeTimeLimit(chosenIds) : null, instantFeedback, 'drill', studyMode || undefined)
     saveSession(session)
     navigate('/session')
   }
@@ -286,8 +287,8 @@ export default function Practice() {
           <div className="mb-6 space-y-2">
             {adaptiveIds.length > 0 && (
               <button
-                onClick={() => {
-                  const session = buildSession(adaptiveIds, null, true, 'drill', true)
+                onClick={async () => {
+                  const session = await buildSession(adaptiveIds, null, true, 'drill', true)
                   saveSession(session)
                   navigate('/session')
                 }}
@@ -342,9 +343,9 @@ export default function Practice() {
               return (
                 <button
                   key={t}
-                  onClick={() => {
+                  onClick={async () => {
                     const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, sectionCount)
-                    const session = buildSession(shuffled.map(q => q.id), timeSecs, false, 'drill')
+                    const session = await buildSession(shuffled.map(q => q.id), timeSecs, false, 'drill')
                     saveSession(session)
                     navigate('/session')
                   }}

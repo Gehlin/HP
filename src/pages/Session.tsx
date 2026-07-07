@@ -187,8 +187,11 @@ export default function Session() {
   const handleFinish = useCallback(() => {
     setShowFinishModal(false)
     recordCurrentQuestionTime()
-    finishSession()
-    navigate('/resultat')
+    // finishSession() is async (it needs the question bank to record SRS
+    // stats), but the localStorage writes Resultat.tsx reads (endTime,
+    // history) are committed synchronously before its internal await, so
+    // this resolves effectively instantly — no loading state needed here.
+    finishSession().then(() => navigate('/resultat'))
   }, [navigate, recordCurrentQuestionTime])
 
   const requestFinish = useCallback(() => setShowFinishModal(true), [])

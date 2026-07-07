@@ -135,8 +135,8 @@ export default function Granska() {
           {/* Drill wrong answers (kept app enhancement) */}
           {wrongIds.length > 0 && (
             <button
-              onClick={() => {
-                const drill = buildSession(wrongIds, null, true, 'drill', true)
+              onClick={async () => {
+                const drill = await buildSession(wrongIds, null, true, 'drill', true)
                 saveSession(drill)
                 navigate('/session')
               }}

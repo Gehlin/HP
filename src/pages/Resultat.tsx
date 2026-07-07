@@ -224,9 +224,9 @@ export default function Resultat() {
     setTimeout(() => setShareFeedback('idle'), 2000)
   }
 
-  const handlePracticeAgain = () => {
+  const handlePracticeAgain = async () => {
     // Prototype: "Öva igen" restarts the same set
-    const s = buildSession(
+    const s = await buildSession(
       session.questionIds,
       session.timeLimitSeconds ?? null,
       session.instantFeedback,
@@ -415,9 +415,9 @@ export default function Resultat() {
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500/40 border border-blue-500/50 inline-block" /> Kvantitativt återstår</span>
             </div>
             <button
-              onClick={() => {
+              onClick={async () => {
                 const quantQs = getQuantExamQuestions()
-                const s = buildSession(quantQs.map(q => q.id), 55 * 60, false, 'exam')
+                const s = await buildSession(quantQs.map(q => q.id), 55 * 60, false, 'exam')
                 saveSession({ ...s, examId: 'full-hp-pass2', fullDayPass: 2, fullDayGroupId: session.fullDayGroupId })
                 navigate('/session', { replace: true })
               }}

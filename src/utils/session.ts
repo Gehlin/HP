@@ -1,7 +1,7 @@
 import type { ExamSession, AnswerKey } from '../types'
 import { updateStreak, loadStats } from './gamification'
 import { recordAnswer } from './srs'
-import { questions } from '../data/questions'
+import { loadQuestions } from '../data/questionsLoader'
 
 const CURRENT_KEY = 'hp_current_session'
 const HISTORY_KEY = 'hp_session_history'
@@ -12,7 +12,8 @@ const HISTORY_KEY = 'hp_session_history'
  * Stable reorder: each passage group is pulled together at the position
  * of its first occurrence; everything else keeps its order.
  */
-function groupLinkedPassages(questionIds: string[]): string[] {
+async function groupLinkedPassages(questionIds: string[]): Promise<string[]> {
+  const questions = await loadQuestions()
   const passageOf = new Map(questions.map(q => [q.id, q.passageId]))
   const placed = new Set<string>()
   const out: string[] = []
@@ -32,16 +33,16 @@ function groupLinkedPassages(questionIds: string[]): string[] {
   return out
 }
 
-export function buildSession(
+export async function buildSession(
   questionIds: string[],
   timeLimitSeconds: number | null,
   instantFeedback: boolean,
   type: 'exam' | 'drill',
   studyMode?: boolean,
-): ExamSession {
+): Promise<ExamSession> {
   return {
     id: crypto.randomUUID(),
-    questionIds: groupLinkedPassages(questionIds),
+    questionIds: await groupLinkedPassages(questionIds),
     answers: {},
     startTime: Date.now(),
     mode: timeLimitSeconds ? 'timed' : 'untimed',
@@ -68,7 +69,7 @@ export function updateAnswer(id: string, answer: AnswerKey) {
   saveSession(session)
 }
 
-export function finishSession() {
+export async function finishSession() {
   const session = loadSession()
   if (!session) return
   session.endTime = Date.now()
@@ -78,6 +79,11 @@ export function finishSession() {
   history.unshift(session)
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50)))
   updateStreak()
+  // The critical synchronous state (endTime, history, streak) is already
+  // committed to localStorage above — the await below only gates the SRS
+  // bookkeeping loop, so callers that need immediate history reads (e.g.
+  // Resultat.tsx) don't need to wait on the question bank to resolve.
+  const questions = await loadQuestions()
   const qMap = Object.fromEntries(questions.map(q => [q.id, q.answer]))
   for (const [qid, userAnswer] of Object.entries(session.answers)) {
     if (qMap[qid]) {

@@ -54,15 +54,15 @@ export default function ExamStart() {
     sectionOrder.map(type => [type, isFullDay ? 0 : qs.filter(q => q.type === type).length])
   )
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setStarting(true)
     if (isFullDay) {
       const verbalQs = getVerbalExamQuestions()
       const groupId = crypto.randomUUID()
-      const session = buildSession(verbalQs.map(q => q.id), 55 * 60, false, 'exam')
+      const session = await buildSession(verbalQs.map(q => q.id), 55 * 60, false, 'exam')
       saveSession({ ...session, examId: 'full-hp-pass1', fullDayPass: 1, fullDayGroupId: groupId })
     } else {
-      const session = buildSession(qs.map(q => q.id), 55 * 60, false, 'exam')
+      const session = await buildSession(qs.map(q => q.id), 55 * 60, false, 'exam')
       saveSession({ ...session, examId: id })
     }
     navigate('/session', { replace: true })

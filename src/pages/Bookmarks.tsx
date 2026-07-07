@@ -67,10 +67,10 @@ export default function Bookmarks() {
     if (expandedId === id) setExpandedId(null)
   }
 
-  const startDrill = () => {
+  const startDrill = async () => {
     if (filtered.length === 0) return
     const shuffled = [...filtered].sort(() => Math.random() - 0.5)
-    const session = buildSession(shuffled.map(q => q.id), null, true, 'drill')
+    const session = await buildSession(shuffled.map(q => q.id), null, true, 'drill')
     saveSession(session)
     navigate('/session')
   }
