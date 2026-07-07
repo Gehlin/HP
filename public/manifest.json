@@ -1,18 +1,42 @@
 {
   "name": "HP Träning",
   "short_name": "HP",
-  "description": "Träna inför Högskoleprovets kvantitativa del — XYZ, KVA, NOG, DTK",
+  "description": "Träna inför Högskoleprovet — ORD, LÄS, MEK, ELF, XYZ, KVA, NOG, DTK",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#080C14",
-  "background_color": "#080C14",
+  "theme_color": "#F1ECE3",
+  "background_color": "#F1ECE3",
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [

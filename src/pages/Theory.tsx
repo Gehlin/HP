@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import PageHeader from '../components/PageHeader'
 
 function ChevronRight() {
   return (
@@ -89,7 +88,7 @@ function MathGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate
       <span className="w-2 h-2 rounded-full bg-[var(--color-terracotta)] shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--color-ink)]">Matematikguide</div>
-        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Formler, teori & begrepp — 10 ämnesområden</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Den samlade matteteorin bakom alla fyra kvantitativa delprov</div>
       </div>
       <ChevronRight />
     </button>
@@ -105,7 +104,7 @@ function XyzGuideBanner({ navigate }: { navigate: ReturnType<typeof useNavigate>
       <span className="w-2 h-2 rounded-full bg-[var(--color-terracotta)] shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--color-ink)]">XYZ-guide</div>
-        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Ämnesområden, strategier och formler för problemlösning</div>
+        <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">Så löser du XYZ-frågor på provet — taktik, exempel och fallgropar</div>
       </div>
       <ChevronRight />
     </button>
@@ -839,7 +838,9 @@ export default function Theory() {
   return (
     <div className="min-h-screen bg-app pt-topnav">
 
-      <PageHeader title="Teori" />
+      <div className="max-w-2xl mx-auto px-4">
+        <h1 style={{ fontFamily: "'Newsreader', serif", fontWeight: 400, fontSize: 26, lineHeight: 1.05, color: '#23201A', marginBottom: 16, marginTop: 4 }}>Teori</h1>
+      </div>
 
       {/* ── Top tabs ────────────────────────────────────────────── */}
       <div className="sticky top-0 z-20 bg-[var(--color-paper)]/95 backdrop-blur-sm border-b border-[var(--color-card-border)]">
