@@ -1,4 +1,4 @@
-import { questions } from '../data/questions'
+import { loadQuestions } from '../data/questionsLoader'
 import { loadHistory } from './session'
 import { getStats, MASTERY_INTERVAL_DAYS } from './srs'
 
@@ -11,7 +11,11 @@ export interface ReadinessBreakdown {
   labelColor: string
 }
 
-export function computeReadiness(): ReadinessBreakdown {
+// Eagerly reachable from App.tsx's mount-time useEffect via notifications.ts ->
+// pacing.ts -> here, so this must go through the shared cached loadQuestions()
+// (not a static import) to keep the ~1.7MB question bank out of the eager entry chunk.
+export async function computeReadiness(): Promise<ReadinessBreakdown> {
+  const questions = await loadQuestions()
   const history = loadHistory()
   const total = questions.length
 

@@ -60,7 +60,7 @@ beforeEach(() => {
 describe('computeReadiness', () => {
   it('returns all zeros and the lowest label with no data yet (first-ever session)', async () => {
     const { computeReadiness } = await import('./readiness')
-    const r = computeReadiness()
+    const r = await computeReadiness()
     expect(r.coverage).toBe(0)
     expect(r.mastery).toBe(0)
     expect(r.accuracy).toBe(0)
@@ -81,7 +81,7 @@ describe('computeReadiness', () => {
     // (shared threshold with achievements.ts's mastered_* achievements — see srs.ts)
     setMastered(MOCK_QUESTIONS.slice(0, 6).map(q => q.id))
 
-    const r = computeReadiness()
+    const r = await computeReadiness()
     expect(r.coverage).toBe(80)
     expect(r.mastery).toBe(60)
     expect(r.accuracy).toBe(88)
@@ -100,7 +100,7 @@ describe('computeReadiness', () => {
     setHistory([makeSession(attemptedIds, answers)])
     // Mastery: none mastered -> 0%
 
-    const r = computeReadiness()
+    const r = await computeReadiness()
     expect(r.coverage).toBe(20)
     expect(r.mastery).toBe(0)
     expect(r.accuracy).toBe(0) // 0/2 correct
@@ -120,21 +120,21 @@ describe('computeReadiness', () => {
     const oldSession = makeSession(['q1'], { q1: 'B' }) // wrong, correct answer is 'A'
     setHistory([...recentSessions, oldSession])
 
-    const r = computeReadiness()
+    const r = await computeReadiness()
     expect(r.accuracy).toBe(100)
   })
 
   it(`does not count a question at interval=${MASTERY_INTERVAL_DAYS - 1} toward mastery (one below the shared threshold)`, async () => {
     const { computeReadiness } = await import('./readiness')
     setMastered(MOCK_QUESTIONS.slice(0, 5).map(q => q.id), MASTERY_INTERVAL_DAYS - 1)
-    const r = computeReadiness()
+    const r = await computeReadiness()
     expect(r.mastery).toBe(0)
   })
 
   it(`counts a question at exactly interval=${MASTERY_INTERVAL_DAYS} toward mastery`, async () => {
     const { computeReadiness } = await import('./readiness')
     setMastered(MOCK_QUESTIONS.slice(0, 5).map(q => q.id), MASTERY_INTERVAL_DAYS)
-    const r = computeReadiness()
+    const r = await computeReadiness()
     expect(r.mastery).toBe(50) // 5 of 10 -> 50%
   })
 
@@ -148,7 +148,7 @@ describe('computeReadiness', () => {
     setHistory([makeSession(attemptedIds, answers)])
     setMastered(['q0'])
 
-    const r = computeReadiness()
+    const r = await computeReadiness()
     expect(r.coverage).toBe(100)
     expect(r.accuracy).toBe(100)
     expect(r.mastery).toBe(10)

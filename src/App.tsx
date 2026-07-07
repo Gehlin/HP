@@ -91,7 +91,10 @@ function AppInner() {
       const history = loadHistory()
       const lastSession = history.length > 0 ? history[0].startTime : null
       maybeShowDueNotification(dueCount, lastSession)
-      maybeShowPacingNotification(lastSession)
+      // Fire-and-forget: maybeShowPacingNotification is now async (it awaits
+      // computePacing() -> computeReadiness() -> loadQuestions()), but this is a
+      // mount-time side effect with no UI dependent on its result, so no await needed.
+      void maybeShowPacingNotification(lastSession)
     })
   }, [])
 

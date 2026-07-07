@@ -174,7 +174,7 @@ describe('maybeShowDueNotification', () => {
 describe('maybeShowPacingNotification', () => {
   async function mockPacing(result: PacingResult) {
     const { computePacing } = await import('./pacing')
-    vi.mocked(computePacing).mockReturnValue(result)
+    vi.mocked(computePacing).mockResolvedValue(result)
   }
 
   const onTrack: PacingResult = { dailyTarget: 20, weeklyTarget: 140, onTrack: true, message: 'on track' }
@@ -183,7 +183,7 @@ describe('maybeShowPacingNotification', () => {
   it('does nothing when notifications are disabled, regardless of pacing', async () => {
     await mockPacing(behind)
     const { maybeShowPacingNotification } = await import('./notifications')
-    maybeShowPacingNotification(null)
+    await maybeShowPacingNotification(null)
     expect(FakeNotification.instances).toHaveLength(0)
   })
 
@@ -191,7 +191,7 @@ describe('maybeShowPacingNotification', () => {
     enableNotifications()
     await mockPacing(onTrack)
     const { maybeShowPacingNotification } = await import('./notifications')
-    maybeShowPacingNotification(null)
+    await maybeShowPacingNotification(null)
     expect(FakeNotification.instances).toHaveLength(0)
   })
 
@@ -201,7 +201,7 @@ describe('maybeShowPacingNotification', () => {
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
     const { maybeShowPacingNotification } = await import('./notifications')
-    maybeShowPacingNotification(todayStart.getTime() + HOUR) // practiced this morning
+    await maybeShowPacingNotification(todayStart.getTime() + HOUR) // practiced this morning
     expect(FakeNotification.instances).toHaveLength(0)
   })
 
@@ -211,7 +211,7 @@ describe('maybeShowPacingNotification', () => {
     const { maybeShowPacingNotification } = await import('./notifications')
     // lastSessionTimestamp from yesterday -> not today, and > 3h ago
     const yesterday = Date.now() - 26 * HOUR
-    maybeShowPacingNotification(yesterday)
+    await maybeShowPacingNotification(yesterday)
     expect(FakeNotification.instances).toHaveLength(1)
     expect(FakeNotification.instances[0].options?.body).toBe(behind.message)
     expect(localStorage.getItem(PACING_LAST_SHOWN_KEY)).not.toBeNull()
@@ -223,7 +223,7 @@ describe('maybeShowPacingNotification', () => {
     // due-notification was shown recently, but pacing never was -> pacing should still fire
     localStorage.setItem(LAST_SHOWN_KEY, String(Date.now()))
     const { maybeShowPacingNotification } = await import('./notifications')
-    maybeShowPacingNotification(Date.now() - 26 * HOUR)
+    await maybeShowPacingNotification(Date.now() - 26 * HOUR)
     expect(FakeNotification.instances).toHaveLength(1)
   })
 
@@ -232,7 +232,7 @@ describe('maybeShowPacingNotification', () => {
     await mockPacing(behind)
     localStorage.setItem(PACING_LAST_SHOWN_KEY, String(Date.now() - (20 * HOUR - 1000)))
     const { maybeShowPacingNotification } = await import('./notifications')
-    maybeShowPacingNotification(Date.now() - 26 * HOUR)
+    await maybeShowPacingNotification(Date.now() - 26 * HOUR)
     expect(FakeNotification.instances).toHaveLength(0)
   })
 
@@ -240,7 +240,7 @@ describe('maybeShowPacingNotification', () => {
     enableNotifications()
     await mockPacing(behind)
     const { maybeShowPacingNotification } = await import('./notifications')
-    maybeShowPacingNotification(Date.now() - (3 * HOUR - 1000))
+    await maybeShowPacingNotification(Date.now() - (3 * HOUR - 1000))
     expect(FakeNotification.instances).toHaveLength(0)
   })
 })

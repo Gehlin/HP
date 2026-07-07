@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { loadHistory } from '../utils/session'
 import { questions } from '../data/questions'
 import { loadStats, getLevel, LEVELS } from '../utils/gamification'
 import { getStats as getSrsStats } from '../utils/srs'
 import { estimateHpScore, hpScoreColor, estimateSectionedScore } from '../utils/hpScore'
-import { computeReadiness } from '../utils/readiness'
+import { computeReadiness, type ReadinessBreakdown } from '../utils/readiness'
 import { getExamDate, daysUntilExam } from '../utils/examDate'
 import { getBookmarks, toggleBookmark } from '../utils/bookmarks'
 import { buildSession, saveSession } from '../utils/session'
@@ -50,7 +50,16 @@ export default function Progress() {
   const history = loadHistory()
   const stats = loadStats()
   const levelInfo = getLevel(stats.xp)
-  const readiness = computeReadiness()
+  // computeReadiness() is async (loads the question bank via the shared cached
+  // loadQuestions()), and this is called directly from the render body (unlike
+  // App.tsx's mount-effect caller), so it needs real loading state — the rest of
+  // this page's data (history/stats/level) doesn't depend on it and renders immediately.
+  const [readiness, setReadiness] = useState<ReadinessBreakdown | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    computeReadiness().then(r => { if (!cancelled) setReadiness(r) })
+    return () => { cancelled = true }
+  }, [])
   const examDate = getExamDate()
   const daysLeft = daysUntilExam()
   const [bookmarkIds, setBookmarkIds] = useState<string[]>(() => getBookmarks())
@@ -574,67 +583,80 @@ export default function Progress() {
 
         {/* Readiness card */}
         <div className="card rounded-2xl p-6 mb-4">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Provberedskap</div>
-              <div className="flex items-end gap-2">
-                <div className="text-4xl font-black text-[var(--color-ink)]">{readiness.score}</div>
-                <div className="text-[var(--color-ink-faint)] text-sm mb-1">/100</div>
-              </div>
-              <div className={`text-sm font-bold mt-1 ${readiness.labelColor}`}>{readiness.label}</div>
+          {readiness === null ? (
+            // computeReadiness() is still resolving (awaits the shared cached
+            // loadQuestions() the first time it's called this session) — show a
+            // spinner matching App.tsx's PageLoader visual language, scoped to just
+            // this card so the rest of the page (history/level/stats below, none of
+            // which depend on the question bank) can render immediately.
+            <div className="flex items-center justify-center py-10">
+              <div className="w-8 h-8 rounded-full border-2 border-[var(--color-paper-dark)] border-t-[var(--color-green)] animate-spin" />
             </div>
-            <div className="text-right">
-              {examDate && daysLeft !== null ? (
+          ) : (
+            <>
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <div className="text-xs text-[var(--color-ink-faint)] mb-1">Dagar kvar</div>
-                  <div className={`text-3xl font-black ${daysLeft <= 7 ? 'text-red-400' : daysLeft <= 14 ? 'text-amber-400' : 'text-[var(--color-ink)]'}`}>
-                    {daysLeft < 0 ? '—' : daysLeft}
+                  <div className="text-[10px] font-bold text-[var(--color-ink-faint)] uppercase tracking-widest mb-1">Provberedskap</div>
+                  <div className="flex items-end gap-2">
+                    <div className="text-4xl font-black text-[var(--color-ink)]">{readiness.score}</div>
+                    <div className="text-[var(--color-ink-faint)] text-sm mb-1">/100</div>
                   </div>
-                  <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">
-                    {examDate.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' })}
-                  </div>
+                  <div className={`text-sm font-bold mt-1 ${readiness.labelColor}`}>{readiness.label}</div>
                 </div>
-              ) : (
-                <button
-                  onClick={() => navigate('/')}
-                  className="text-xs text-[var(--color-green)] hover:text-[var(--color-green-light)] border border-[var(--color-green)]/25 rounded-lg px-3 py-1.5 transition-colors"
-                >
-                  Sätt provdatum →
-                </button>
-              )}
-            </div>
-          </div>
+                <div className="text-right">
+                  {examDate && daysLeft !== null ? (
+                    <div>
+                      <div className="text-xs text-[var(--color-ink-faint)] mb-1">Dagar kvar</div>
+                      <div className={`text-3xl font-black ${daysLeft <= 7 ? 'text-red-400' : daysLeft <= 14 ? 'text-amber-400' : 'text-[var(--color-ink)]'}`}>
+                        {daysLeft < 0 ? '—' : daysLeft}
+                      </div>
+                      <div className="text-xs text-[var(--color-ink-faint)] mt-0.5">
+                        {examDate.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' })}
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => navigate('/')}
+                      className="text-xs text-[var(--color-green)] hover:text-[var(--color-green-light)] border border-[var(--color-green)]/25 rounded-lg px-3 py-1.5 transition-colors"
+                    >
+                      Sätt provdatum →
+                    </button>
+                  )}
+                </div>
+              </div>
 
-          <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden mb-4">
-            <div
-              className={`h-full rounded-full transition-all duration-700 ${readiness.score >= 80 ? 'bg-emerald-500' : readiness.score >= 65 ? 'bg-blue-500' : readiness.score >= 45 ? 'bg-amber-500' : 'bg-red-500'}`}
-              style={{ width: `${readiness.score}%` }}
-            />
-          </div>
+              <div className="h-2 bg-[var(--color-paper-dark)] rounded-full overflow-hidden mb-4">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${readiness.score >= 80 ? 'bg-emerald-500' : readiness.score >= 65 ? 'bg-blue-500' : readiness.score >= 45 ? 'bg-amber-500' : 'bg-red-500'}`}
+                  style={{ width: `${readiness.score}%` }}
+                />
+              </div>
 
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className={`text-2xl font-black ${readiness.accuracy >= 70 ? 'text-emerald-400' : readiness.accuracy >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
-                {readiness.accuracy}%
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className={`text-2xl font-black ${readiness.accuracy >= 70 ? 'text-emerald-400' : readiness.accuracy >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                    {readiness.accuracy}%
+                  </div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-1">Träffsäkerhet</div>
+                  <div className="text-[10px] text-[var(--color-ink-faint)]">Senaste 10 pass</div>
+                </div>
+                <div>
+                  <div className={`text-2xl font-black ${readiness.mastery >= 50 ? 'text-emerald-400' : readiness.mastery >= 25 ? 'text-amber-400' : 'text-[var(--color-ink-faint)]'}`}>
+                    {readiness.mastery}%
+                  </div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-1">Bemästrat</div>
+                  <div className="text-[10px] text-[var(--color-ink-faint)]">SRS-intervall ≥7 dagar</div>
+                </div>
+                <div>
+                  <div className={`text-2xl font-black ${readiness.coverage >= 60 ? 'text-emerald-400' : readiness.coverage >= 30 ? 'text-amber-400' : 'text-[var(--color-ink-faint)]'}`}>
+                    {readiness.coverage}%
+                  </div>
+                  <div className="text-xs text-[var(--color-ink-faint)] mt-1">Täckning</div>
+                  <div className="text-[10px] text-[var(--color-ink-faint)]">Frågor sedda</div>
+                </div>
               </div>
-              <div className="text-xs text-[var(--color-ink-faint)] mt-1">Träffsäkerhet</div>
-              <div className="text-[10px] text-[var(--color-ink-faint)]">Senaste 10 pass</div>
-            </div>
-            <div>
-              <div className={`text-2xl font-black ${readiness.mastery >= 50 ? 'text-emerald-400' : readiness.mastery >= 25 ? 'text-amber-400' : 'text-[var(--color-ink-faint)]'}`}>
-                {readiness.mastery}%
-              </div>
-              <div className="text-xs text-[var(--color-ink-faint)] mt-1">Bemästrat</div>
-              <div className="text-[10px] text-[var(--color-ink-faint)]">SRS-intervall ≥7 dagar</div>
-            </div>
-            <div>
-              <div className={`text-2xl font-black ${readiness.coverage >= 60 ? 'text-emerald-400' : readiness.coverage >= 30 ? 'text-amber-400' : 'text-[var(--color-ink-faint)]'}`}>
-                {readiness.coverage}%
-              </div>
-              <div className="text-xs text-[var(--color-ink-faint)] mt-1">Täckning</div>
-              <div className="text-[10px] text-[var(--color-ink-faint)]">Frågor sedda</div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
         {/* Level Card */}

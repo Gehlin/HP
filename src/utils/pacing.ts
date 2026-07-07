@@ -11,7 +11,10 @@ export interface PacingResult {
 
 const TARGET_READINESS = 70
 
-export function computePacing(): PacingResult {
+// computeReadiness() is async (see readiness.ts), so this is too — its only caller,
+// notifications.ts's maybeShowPacingNotification, is already awaited from an
+// App.tsx-mount useEffect with no loading-state UI needed.
+export async function computePacing(): Promise<PacingResult> {
   const days = daysUntilExam()
 
   if (days === null) {
@@ -32,7 +35,7 @@ export function computePacing(): PacingResult {
     }
   }
 
-  const readiness = computeReadiness()
+  const readiness = await computeReadiness()
   const history = loadHistory()
 
   const weekMs = 7 * 24 * 60 * 60 * 1000

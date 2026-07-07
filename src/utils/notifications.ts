@@ -55,10 +55,10 @@ export function maybeShowDueNotification(dueCount: number, lastSessionTimestamp:
 /** Show a pacing reminder if the user is meaningfully behind pace and hasn't practiced today.
  *  Respects the same enabled/permission/last-shown/active-study guards as maybeShowDueNotification.
  */
-export function maybeShowPacingNotification(lastSessionTimestamp: number | null): void {
+export async function maybeShowPacingNotification(lastSessionTimestamp: number | null): Promise<void> {
   if (!notificationsEnabled()) return
 
-  const pacing = computePacing()
+  const pacing = await computePacing()
   if (pacing.onTrack) return
 
   // Don't send if user has already practiced today
