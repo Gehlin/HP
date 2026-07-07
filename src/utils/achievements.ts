@@ -1,11 +1,16 @@
-import { questions } from '../data/questions'
+import { loadQuestions } from '../data/questionsLoader'
 import { loadHistory } from './session'
 import { loadStats } from './gamification'
-import { getStats as getSrsStats } from './srs'
+import { getStats as getSrsStats, MASTERY_INTERVAL_DAYS } from './srs'
 import { getBookmarks } from './bookmarks'
 import { estimateHpScore } from './hpScore'
+import { timeAnalyticsByType } from './analytics'
+import type { QuestionType } from '../types'
 
 const STORAGE_KEY = 'hp_achievements'
+
+const VERBAL_TYPES: QuestionType[] = ['ORD', 'LAS', 'MEK', 'ELF']
+const QUANT_TYPES: QuestionType[] = ['XYZ', 'KVA', 'NOG', 'DTK']
 
 export interface Achievement {
   id: string
@@ -28,7 +33,7 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
   { id: 'hp_175',          title: 'Välbetyg',         icon: '📈', rarity: 'silver',   description: 'Uppnå estimerat HP-betyg 1.75 i ett pass' },
   { id: 'hp_190',          title: 'Toppresultat',     icon: '🏆', rarity: 'gold',     description: 'Uppnå estimerat HP-betyg 1.90 i ett pass' },
   { id: 'hp_200',          title: 'HP-mästaren',      icon: '👑', rarity: 'platinum', description: 'Uppnå estimerat HP-betyg 2.00 i ett pass' },
-  { id: 'mastered_10',     title: 'Memoreraren',      icon: '🧠', rarity: 'bronze',   description: '10 bemästrade frågor (SRS ≥21 dagar)' },
+  { id: 'mastered_10',     title: 'Memoreraren',      icon: '🧠', rarity: 'bronze',   description: '10 bemästrade frågor (SRS ≥20 dagar)' },
   { id: 'mastered_50',     title: 'Kunskapsbanken',   icon: '🧠', rarity: 'silver',   description: '50 bemästrade frågor' },
   { id: 'mastered_100',    title: 'Encyklopedin',     icon: '🧠', rarity: 'gold',     description: '100 bemästrade frågor' },
   { id: 'bookmarks_10',    title: 'Bokmärkaren',      icon: '🔖', rarity: 'bronze',   description: 'Spara 10 bokmärkta frågor' },
@@ -47,8 +52,14 @@ function earn(id: string): void {
   }
 }
 
-// Returns newly unlocked achievement IDs after checking current state
-export function checkAchievements(): string[] {
+// Returns newly unlocked achievement IDs after checking current state.
+// Async because it needs the full question bank for SRS-mastery and
+// per-session lookups — loaded via the shared cached loader rather than a
+// static import, so this file no longer pulls questions.ts into every
+// consumer's chunk. Only caller (Resultat.tsx) already awaits this inside
+// a useEffect, so the async signature has no ripple effect.
+export async function checkAchievements(): Promise<string[]> {
+  const questions = await loadQuestions()
   const history = loadHistory()
   const stats = loadStats()
   const earned = new Set(getEarnedIds())
@@ -78,14 +89,23 @@ export function checkAchievements(): string[] {
   // bookmarks
   if (getBookmarks().length >= 10) unlock('bookmarks_10')
 
-  // SRS mastery
+  // SRS mastery (shared threshold with readiness.ts — see MASTERY_INTERVAL_DAYS)
   const mastered = questions.filter(q => {
     const r = getSrsStats(q.id)
-    return r !== null && r.interval >= 21
+    return r !== null && r.interval >= MASTERY_INTERVAL_DAYS
   }).length
   if (mastered >= 10)  unlock('mastered_10')
   if (mastered >= 50)  unlock('mastered_50')
   if (mastered >= 100) unlock('mastered_100')
+
+  // speed_demon: across all recorded history, average answer time beats the
+  // HP-standard pace (analytics.ts's timeAnalyticsByType) in every one of the
+  // 8 question types — i.e. genuinely faster than HP standard "in all types",
+  // matching the achievement's description, not just one lucky session.
+  const timeStats = timeAnalyticsByType()
+  if (Object.values(timeStats).every(t => t.ratio !== null && t.ratio < 1)) {
+    unlock('speed_demon')
+  }
 
   // Per-session checks on most recent session
   const latest = history[0]
@@ -102,7 +122,9 @@ export function checkAchievements(): string[] {
     if (hp >= 1.90) unlock('hp_190')
     if (hp >= 2.00) unlock('hp_200')
 
-    // Allrounder: ≥70% in all 4 types (only if session has all 4 types)
+    // Allrounder: ≥70% in all 4 types of a single section (verbal OR quant) — not
+    // just any 4 distinct types. The Swedish description ("alla 4 delproven") means
+    // the 4 parts of one section, so a mixed 2-verbal/2-quant sweep must not count.
     const byType: Record<string, { correct: number; total: number }> = {}
     qs.forEach(q => {
       if (!q) return
@@ -110,8 +132,14 @@ export function checkAchievements(): string[] {
       byType[q.type].total++
       if (latest.answers[q.id] === q.answer) byType[q.type].correct++
     })
-    const types = Object.keys(byType)
-    if (types.length === 4 && types.every(t => byType[t].total > 0 && (byType[t].correct / byType[t].total) >= 0.7)) {
+    const types = Object.keys(byType) as QuestionType[]
+    const isSingleSectionSweep =
+      VERBAL_TYPES.every(t => types.includes(t)) || QUANT_TYPES.every(t => types.includes(t))
+    if (
+      types.length === 4 &&
+      isSingleSectionSweep &&
+      types.every(t => byType[t].total > 0 && (byType[t].correct / byType[t].total) >= 0.7)
+    ) {
       unlock('allrounder')
     }
   }

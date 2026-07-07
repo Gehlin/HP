@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { AnswerKey, ExamSession, Question } from '../types'
+import { MASTERY_INTERVAL_DAYS } from './srs'
 
 // computeReadiness divides by the *real* question bank size (1446 questions as of
 // writing), which makes hand-verified percentages impractical to construct from
@@ -44,10 +45,10 @@ function setHistory(sessions: ExamSession[]) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(sessions))
 }
 
-function setMastered(ids: string[]) {
+function setMastered(ids: string[], interval = MASTERY_INTERVAL_DAYS) {
   const store: Record<string, unknown> = {}
   ids.forEach(id => {
-    store[id] = { interval: 7, easeFactor: 2.5, nextReview: Date.now() + 7 * 86_400_000, timesCorrect: 3, timesWrong: 0 }
+    store[id] = { interval, easeFactor: 2.5, nextReview: Date.now() + interval * 86_400_000, timesCorrect: 3, timesWrong: 0 }
   })
   localStorage.setItem(SRS_KEY, JSON.stringify(store))
 }
@@ -76,7 +77,8 @@ describe('computeReadiness', () => {
     // Accuracy (rolling, last 10 sessions): 8 answered, 7 correct -> 88% -> rounds to 88
     attemptedIds.forEach((id, i) => { answers[id] = i < 7 ? 'A' : 'B' })
     setHistory([makeSession(attemptedIds, answers)])
-    // Mastery: 6 of 10 questions have SRS interval >= 7 -> 60%
+    // Mastery: 6 of 10 questions have SRS interval >= MASTERY_INTERVAL_DAYS -> 60%
+    // (shared threshold with achievements.ts's mastered_* achievements — see srs.ts)
     setMastered(MOCK_QUESTIONS.slice(0, 6).map(q => q.id))
 
     const r = computeReadiness()
@@ -120,6 +122,20 @@ describe('computeReadiness', () => {
 
     const r = computeReadiness()
     expect(r.accuracy).toBe(100)
+  })
+
+  it(`does not count a question at interval=${MASTERY_INTERVAL_DAYS - 1} toward mastery (one below the shared threshold)`, async () => {
+    const { computeReadiness } = await import('./readiness')
+    setMastered(MOCK_QUESTIONS.slice(0, 5).map(q => q.id), MASTERY_INTERVAL_DAYS - 1)
+    const r = computeReadiness()
+    expect(r.mastery).toBe(0)
+  })
+
+  it(`counts a question at exactly interval=${MASTERY_INTERVAL_DAYS} toward mastery`, async () => {
+    const { computeReadiness } = await import('./readiness')
+    setMastered(MOCK_QUESTIONS.slice(0, 5).map(q => q.id), MASTERY_INTERVAL_DAYS)
+    const r = computeReadiness()
+    expect(r.mastery).toBe(50) // 5 of 10 -> 50%
   })
 
   it('rounds the composite score using standard rounding, not truncation', async () => {

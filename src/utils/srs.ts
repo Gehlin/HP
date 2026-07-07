@@ -1,6 +1,21 @@
 const STORAGE_KEY = 'hp_srs'
 const DAY_MS = 24 * 60 * 60 * 1000
 
+// Shared "mastery" cutoff used by both achievements.ts and readiness.ts.
+//
+// The SM-2-style progression below only ever produces intervals of
+// 1 (new) -> 3 -> 8 -> 20 -> 50 -> 125 ... (round(interval * easeFactor), easeFactor
+// starting at 2.5) for a question answered correctly on every review. A cutoff of
+// 20 is the last of those steps reachable after three consecutive correct reviews
+// spaced roughly three weeks apart in total — genuinely "known long-term" without
+// requiring a fourth review (interval=50, ~7 weeks) that would make even the
+// bronze-tier mastery achievement unreasonably slow to earn. Values like 7 or 21
+// don't correspond to any interval the algorithm actually produces: 7 is crossed
+// automatically on the *second* correct review (interval=8) and so undercounts
+// "mastered", while 21 sits just past the third review's interval=20 and so quietly
+// demands the fourth review's jump to 50 — neither is a real, defensible line.
+export const MASTERY_INTERVAL_DAYS = 20
+
 export interface SrsRecord {
   interval: number
   easeFactor: number

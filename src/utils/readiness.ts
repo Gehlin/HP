@@ -1,10 +1,10 @@
 import { questions } from '../data/questions'
 import { loadHistory } from './session'
-import { getStats } from './srs'
+import { getStats, MASTERY_INTERVAL_DAYS } from './srs'
 
 export interface ReadinessBreakdown {
   score: number      // 0–100 composite
-  mastery: number    // % of questions with interval ≥ 7 days
+  mastery: number    // % of questions with interval ≥ MASTERY_INTERVAL_DAYS days
   accuracy: number   // rolling accuracy last 10 sessions
   coverage: number   // % of questions attempted at least once
   label: string
@@ -20,10 +20,10 @@ export function computeReadiness(): ReadinessBreakdown {
   history.forEach(s => Object.keys(s.answers).forEach(id => attempted.add(id)))
   const coverage = total > 0 ? Math.round((attempted.size / total) * 100) : 0
 
-  // Mastery: SRS interval >= 7
+  // Mastery: SRS interval >= MASTERY_INTERVAL_DAYS (shared with achievements.ts)
   const mastered = questions.filter(q => {
     const r = getStats(q.id)
-    return r !== null && r.interval >= 7
+    return r !== null && r.interval >= MASTERY_INTERVAL_DAYS
   }).length
   const mastery = total > 0 ? Math.round((mastered / total) * 100) : 0
 
